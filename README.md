@@ -22,6 +22,10 @@ The motivation for sharing this RESTful API Boilerplate on GitHub is to streamli
 
 This boilerplate is grounded in the Unix philosophy, emphasizing simplicity, modularity, and reusability. Each component is designed to do one thing and do it well, with the ability to combine components seamlessly to perform complex tasks. This approach ensures that the boilerplate remains lightweight, efficient, and easy to maintain.
 
+<p align="center">
+  <img src="https://i.imgur.com/jIX8esm.png" alt="Gopher Drink" width="250">
+</p>
+
 ## License
 
 This project is dual-licensed under the BSD 3-Clause License and the MIT License - see the [LICENSE](LICENSE) file for details.
