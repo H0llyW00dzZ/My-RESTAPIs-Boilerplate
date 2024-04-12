@@ -34,6 +34,9 @@ type FiberServer struct {
 // NewFiberServer returns a new FiberServer with the given Fiber app, application name, and monitor path.
 // It also initializes the database and registers routes.
 func NewFiberServer(app *fiber.App, appName, monitorPath string) *FiberServer {
+	// Note: The database.New() function and the database.service function that takes the database as a parameter are safe from multiple calls (e.g., 10,000 calls from different parts of the codebase)
+	// because they follow the singleton pattern. Without the singleton pattern, it would be unsafe
+	// as it would create multiple database connections, leading to potential resource exhaustion.
 	db := database.New()
 	middleware.RegisterRoutes(app, appName, monitorPath, db)
 	return &FiberServer{
