@@ -166,7 +166,7 @@ func (s *service) Health() map[string]string {
 		stats["mysql_max_lifetime_closed"] = strconv.FormatInt(dbStats.MaxLifetimeClosed, 10)
 
 		// Evaluate MySQL stats to provide a health message
-		if dbStats.OpenConnections > 50 { // Assuming 40 is the max for this example
+		if dbStats.OpenConnections > 40 { // Assuming 50 is the max for this example
 			stats["mysql_message"] = MsgDBHeavyLoad
 		}
 
