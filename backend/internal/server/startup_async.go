@@ -13,6 +13,7 @@ import (
 
 	"h0llyw00dz-template/backend/internal/database"
 	log "h0llyw00dz-template/backend/internal/logger"
+	"h0llyw00dz-template/backend/internal/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -34,6 +35,7 @@ type FiberServer struct {
 // It also initializes the database and registers routes.
 func NewFiberServer(app *fiber.App, appName, monitorPath string) *FiberServer {
 	db := database.New()
+	middleware.RegisterRoutes(app, appName, monitorPath, db)
 	return &FiberServer{
 		app: app,
 		db:  db,
