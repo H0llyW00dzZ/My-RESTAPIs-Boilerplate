@@ -10,6 +10,8 @@ import (
 )
 
 // parseDateAdded parses the date_added field from a byte slice.
+//
+// Note: This helper is useful for MySQL, for example, when you need to convert a time from MySQL into JSON or plain text.
 func parseDateAdded(dateAddedBytes []uint8) (time.Time, error) {
 	const layout = "2006-01-02 15:04:05" // Define the layout constant
 	dateAdded, err := time.Parse(layout, string(dateAddedBytes))
