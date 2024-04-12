@@ -1,0 +1,20 @@
+# Basic dependabot.yml file for a Go project using Go modules
+
+version: 2
+updates:
+  # Maintain dependencies for Go modules
+  - package-ecosystem: "gomod" # for Go modules
+    directory: "/" # Location of the go.mod file
+    schedule:
+      interval: "daily" # How often to check for updates
+
+    # Optional: Open pull requests only for the main branch
+    target-branch: "master"
+
+    # Optional: Limit the number of open pull requests Dependabot can have at any one time
+    # open-pull-requests-limit: 5
+
+    # Optional: Configure commit message options
+    # commit-message:
+    #   prefix: "chore"
+    #   include: "scope"
