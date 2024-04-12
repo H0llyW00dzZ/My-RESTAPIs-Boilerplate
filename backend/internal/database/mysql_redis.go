@@ -96,7 +96,7 @@ func New() Service {
 	db.SetMaxIdleConns(50)
 	db.SetMaxOpenConns(50)
 
-	// Initialize the Redis storage for rate limiting
+	// Initialize the Redis storage for rate limiting or any that needed in middleware
 	redisStorage := redisStorage.New(redisStorage.Config{
 		Host:     redisAddress,
 		Port:     portDB,
@@ -111,7 +111,7 @@ func New() Service {
 
 	dbInstance = &service{
 		db:          db,
-		ratelimiter: redisStorage, // Use the Redis storage for rate limiting
+		ratelimiter: redisStorage, // Use the Redis storage for rate limiting or any that needed in middleware
 	}
 
 	return dbInstance
