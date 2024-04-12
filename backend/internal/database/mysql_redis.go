@@ -17,6 +17,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	redisStorage "github.com/gofiber/storage/redis/v3" // Alias the import to avoid conflict
+	"github.com/redis/go-redis/v9"
 
 	_ "github.com/go-sql-driver/mysql" // MySQL driver is used for connecting to MySQL databases.
 	_ "github.com/joho/godotenv/autoload"
@@ -46,7 +47,8 @@ type Service interface {
 // service is a concrete implementation of the Service interface.
 type service struct {
 	db          *sql.DB
-	ratelimiter fiber.Storage
+	rdb         fiber.Storage
+	redisClient *redis.Client
 }
 
 // dbConfig holds the environment variables for the database connection.
@@ -96,6 +98,16 @@ func New() Service {
 	db.SetMaxIdleConns(50)
 	db.SetMaxOpenConns(50)
 
+	// Create a new Redis client for health checks
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%s", redisAddress, redisPort),
+		Password: redisPassword,
+		DB:       redisDB,
+		TLSConfig: &tls.Config{
+			MinVersion: tls.VersionTLS12,
+		},
+	})
+
 	// Initialize the Redis storage for rate limiting or any that needed in middleware
 	redisStorage := redisStorage.New(redisStorage.Config{
 		Host:     redisAddress,
@@ -111,7 +123,8 @@ func New() Service {
 
 	dbInstance = &service{
 		db:          db,
-		ratelimiter: redisStorage, // Use the Redis storage for rate limiting or any that needed in middleware
+		rdb:         redisStorage, // Use the Redis storage for rate limiting or any that needed in middleware
+		redisClient: redisClient,
 	}
 
 	return dbInstance
@@ -123,7 +136,7 @@ func (s *service) Close() error {
 	return s.db.Close()
 }
 
-// Health checks the health of the database connection by pinging the database.
+// Health checks the health of the database and Redis connections.
 // It returns a map with keys indicating various health statistics.
 func (s *service) Health() map[string]string {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
@@ -131,44 +144,71 @@ func (s *service) Health() map[string]string {
 
 	stats := make(map[string]string)
 
-	// Ping the database
+	// Ping the MySQL database
 	err := s.db.PingContext(ctx)
 	if err != nil {
-		stats["status"] = "down"
-		stats["error"] = fmt.Sprintf(ErrDBDown, err)
-		stats["message"] = fmt.Sprintf("%v", err)
-		return stats
+		stats["mysql_status"] = "down"
+		stats["mysql_error"] = fmt.Sprintf(ErrDBDown, err)
+		stats["mysql_message"] = fmt.Sprintf("%v", err)
+	} else {
+		// MySQL is up, add more statistics
+		stats["mysql_status"] = "up"
+		stats["mysql_message"] = MsgDBItsHealthy
+
+		// Get MySQL database stats (like open connections, in use, idle, etc.)
+		dbStats := s.db.Stats()
+		stats["mysql_open_connections"] = strconv.Itoa(dbStats.OpenConnections)
+		stats["mysql_in_use"] = strconv.Itoa(dbStats.InUse)
+		stats["mysql_idle"] = strconv.Itoa(dbStats.Idle)
+		stats["mysql_wait_count"] = strconv.FormatInt(dbStats.WaitCount, 10)
+		stats["mysql_wait_duration"] = dbStats.WaitDuration.String()
+		stats["mysql_max_idle_closed"] = strconv.FormatInt(dbStats.MaxIdleClosed, 10)
+		stats["mysql_max_lifetime_closed"] = strconv.FormatInt(dbStats.MaxLifetimeClosed, 10)
+
+		// Evaluate MySQL stats to provide a health message
+		if dbStats.OpenConnections > 50 { // Assuming 40 is the max for this example
+			stats["mysql_message"] = MsgDBHeavyLoad
+		}
+
+		if dbStats.WaitCount > 1000 {
+			stats["mysql_message"] = MsgDBHighWaitEvents
+		}
+
+		if dbStats.MaxIdleClosed > int64(dbStats.OpenConnections)/2 {
+			stats["mysql_message"] = MsgDBManyIdleConnections
+		}
+
+		if dbStats.MaxLifetimeClosed > int64(dbStats.OpenConnections)/2 {
+			stats["mysql_message"] = MsgDBManyMaxLifetimeClosures
+		}
 	}
 
-	// Database is up, add more statistics
-	stats["status"] = "up"
-	stats["message"] = MsgDBItsHealthy
+	// Ping the Redis server
+	pong, err := s.redisClient.Ping(context.Background()).Result()
+	if err != nil {
+		stats["redis_status"] = "down"
+		stats["redis_error"] = fmt.Sprintf("Redis is down: %v", err)
+		stats["redis_message"] = fmt.Sprintf("%v", err)
+	} else {
+		// Redis is up
+		stats["redis_status"] = "up"
+		stats["redis_message"] = "Redis is healthy"
+		stats["redis_ping_response"] = pong
 
-	// Get database stats (like open connections, in use, idle, etc.)
-	dbStats := s.db.Stats()
-	stats["open_connections"] = strconv.Itoa(dbStats.OpenConnections)
-	stats["in_use"] = strconv.Itoa(dbStats.InUse)
-	stats["idle"] = strconv.Itoa(dbStats.Idle)
-	stats["wait_count"] = strconv.FormatInt(dbStats.WaitCount, 10)
-	stats["wait_duration"] = dbStats.WaitDuration.String()
-	stats["max_idle_closed"] = strconv.FormatInt(dbStats.MaxIdleClosed, 10)
-	stats["max_lifetime_closed"] = strconv.FormatInt(dbStats.MaxLifetimeClosed, 10)
-
-	// Evaluate stats to provide a health message
-	if dbStats.OpenConnections > 40 { // Assuming 40 is the max for this example
-		stats["message"] = MsgDBHeavyLoad
-	}
-
-	if dbStats.WaitCount > 1000 {
-		stats["message"] = MsgDBHighWaitEvents
-	}
-
-	if dbStats.MaxIdleClosed > int64(dbStats.OpenConnections)/2 {
-		stats["message"] = MsgDBManyIdleConnections
-	}
-
-	if dbStats.MaxLifetimeClosed > int64(dbStats.OpenConnections)/2 {
-		stats["message"] = MsgDBManyMaxLifetimeClosures
+		// Get Redis server information
+		info, err := s.redisClient.Info(context.Background()).Result()
+		if err != nil {
+			stats["redis_info_error"] = fmt.Sprintf("Failed to retrieve Redis info: %v", err)
+		} else {
+			// Parse the Redis info response
+			redisInfo := parseRedisInfo(info)
+			stats["redis_version"] = redisInfo["redis_version"]
+			stats["redis_mode"] = redisInfo["redis_mode"]
+			stats["redis_connected_clients"] = redisInfo["connected_clients"]
+			stats["redis_used_memory"] = redisInfo["used_memory"]
+			stats["redis_used_memory_peak"] = redisInfo["used_memory_peak"]
+			stats["redis_uptime_in_seconds"] = redisInfo["uptime_in_seconds"]
+		}
 	}
 
 	return stats
@@ -190,5 +230,5 @@ func (s *service) QueryRow(ctx context.Context, query string, args ...interface{
 
 // FiberStorage returns the [fiber.Storage] interface for fiber storage middleware.
 func (s *service) FiberStorage() fiber.Storage {
-	return s.ratelimiter
+	return s.rdb
 }

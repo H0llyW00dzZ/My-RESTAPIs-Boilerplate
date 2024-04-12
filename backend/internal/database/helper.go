@@ -6,6 +6,7 @@ package database
 
 import (
 	log "h0llyw00dz-template/backend/internal/logger"
+	"strings"
 	"time"
 )
 
@@ -20,4 +21,19 @@ func parseDateAdded(dateAddedBytes []uint8) (time.Time, error) {
 		return time.Time{}, err
 	}
 	return dateAdded, nil
+}
+
+// parseRedisInfo parses the Redis info response and returns a map of key-value pairs.
+func parseRedisInfo(info string) map[string]string {
+	result := make(map[string]string)
+	lines := strings.Split(info, "\r\n")
+	for _, line := range lines {
+		if strings.Contains(line, ":") {
+			parts := strings.Split(line, ":")
+			key := strings.TrimSpace(parts[0])
+			value := strings.TrimSpace(parts[1])
+			result[key] = value
+		}
+	}
+	return result
 }
