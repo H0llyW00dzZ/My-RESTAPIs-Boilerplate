@@ -31,6 +31,15 @@ This boilerplate is grounded in the Unix philosophy, emphasizing simplicity, mod
   <img src="https://i.imgur.com/jIX8esm.png" alt="Gopher Drink" width="250">
 </p>
 
+## Resource Memory Usage
+
+- MySQL + 100K `POST` Request
+
+<img src="https://i.imgur.com/C9hZYDz.png" alt="Memory Usage with MYSQL">
+
+> [!NOTE]
+> The `Resource Memory Usage` section demonstrates how `Go` has stable and low memory overhead compared to other languages, especially `Java` hahaha.
+
 ## License
 
 This project is dual-licensed under the BSD 3-Clause License and the MIT License - see the [LICENSE](LICENSE) file for details.
