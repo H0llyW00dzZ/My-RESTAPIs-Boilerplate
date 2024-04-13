@@ -9,6 +9,11 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 - Middleware examples for logging and authentication
 - Scalable project structure
 - Dual-licensed under BSD 3-Clause and MIT (specific files)
+- High Performance (Thanks to the [`Sonic JSON serializing & deserializing library`](https://github.com/bytedance/sonic))
+
+## TODO Features
+
+- [ ] Custom Monitoring Integration with Kubernetes ecosystems, such as Grafana, etc. at the top level
 
 
 > [!NOTE]  
