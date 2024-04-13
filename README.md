@@ -33,7 +33,7 @@ This boilerplate is grounded in the Unix philosophy, emphasizing simplicity, mod
 
 ## Resource Memory Usage
 
-- MySQL + 100K `POST` Request
+- `MySQL` without `Redis` + 100K `POST` Request
 
 <img src="https://i.imgur.com/C9hZYDz.png" alt="Memory Usage with MYSQL">
 
