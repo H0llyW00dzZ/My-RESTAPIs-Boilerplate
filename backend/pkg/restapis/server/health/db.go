@@ -30,7 +30,7 @@ func DBHandler(db database.Service) fiber.Handler {
 		} else {
 			if mysqlStatus == "up" {
 				log.LogInfof("MySQL Status: %s, Stats: Open Connections: %s, In Use: %s, Idle: %s, Wait Count: %s, Wait Duration: %s",
-					database.MsgDBItsHealthy, health["mysql_open_connections"], health["mysql_in_use"], health["mysql_idle"],
+					health["mysql_message"], health["mysql_open_connections"], health["mysql_in_use"], health["mysql_idle"],
 					health["mysql_wait_count"], health["mysql_wait_duration"])
 			} else {
 				mysqlErrorMessage, _ := health["mysql_error"]
