@@ -6,12 +6,14 @@ package middleware
 
 import (
 	"h0llyw00dz-template/backend/internal/database"
+	"strings"
 	"time"
 
 	log "h0llyw00dz-template/backend/internal/logger"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 )
 
@@ -45,5 +47,25 @@ func NewRateLimiter(db database.Service, max int, expiration time.Duration, limi
 				"error": fiber.ErrTooManyRequests.Message,
 			})
 		},
+	})
+}
+
+// NewCORSMiddleware creates a new CORS middleware with a better configuration.
+// It allows specific origins, methods, headers, and credentials, and sets the maximum age for preflight requests.
+func NewCORSMiddleware() fiber.Handler {
+	return cors.New(cors.Config{
+		AllowOrigins: "https://example.com, https://api.example.com",
+		AllowMethods: strings.Join([]string{
+			fiber.MethodGet,
+			fiber.MethodPost,
+			fiber.MethodHead,
+			fiber.MethodPut,
+			fiber.MethodDelete,
+			fiber.MethodOptions,
+		}, ","),
+		AllowHeaders:     "Content-Type, Authorization",
+		AllowCredentials: true,
+		ExposeHeaders:    "Content-Length",
+		MaxAge:           86400, // 24 hours
 	})
 }
