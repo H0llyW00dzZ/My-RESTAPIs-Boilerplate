@@ -14,6 +14,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 )
 
@@ -67,5 +68,13 @@ func NewCORSMiddleware() fiber.Handler {
 		AllowCredentials: true,
 		ExposeHeaders:    "Content-Length",
 		MaxAge:           86400, // 24 hours
+	})
+}
+
+// NewETagMiddleware creates a new ETag middleware with the default configuration.
+// It generates strong ETags for response caching and validation.
+func NewETagMiddleware() fiber.Handler {
+	return etag.New(etag.Config{
+		Weak: false,
 	})
 }
