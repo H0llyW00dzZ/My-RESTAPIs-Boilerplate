@@ -42,7 +42,7 @@ This boilerplate is grounded in the Unix philosophy, emphasizing simplicity, mod
 
 ## Architecture
 
-Below is the architecture of this boilerplate and how it looks. I created this for REST APIs about volcano 🌋 monitoring used by the government, so it can easily monitor volcanoes in the real world.
+Below is the architecture of this boilerplate and how it looks. I created this for REST APIs about volcano 🌋 monitoring used by the government (has been done before), so it can easily monitor volcanoes in the real world.
 
 - Backend (Pure `Go`)
 
