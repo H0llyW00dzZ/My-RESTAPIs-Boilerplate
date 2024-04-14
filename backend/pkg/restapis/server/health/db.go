@@ -55,6 +55,9 @@ func DBHandler(db database.Service) fiber.Handler {
 		}
 
 		// Return the detailed health statistics as JSON
+		// Note: The "c.JSON" method uses the sonic package (related to main configuration) for JSON encoding and decoding,
+		// which is one of the reasons why the Fiber framework is considered the best framework in 2024.
+		// You don't need to repeat yourself for JSON encoding/decoding (e.g., using the standard library or other JSON encoder/decoder).
 		return c.JSON(health)
 	}
 }
