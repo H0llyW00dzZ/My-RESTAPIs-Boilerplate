@@ -40,6 +40,51 @@ This boilerplate is grounded in the Unix philosophy, emphasizing simplicity, mod
 > [!NOTE]
 > The `Resource Memory Usage` section demonstrates how `Go` has stable and low memory overhead compared to other languages, especially `Java` hahaha.
 
+## Architecture
+
+Below is the architecture of this boilerplate and how it looks. I created this for REST APIs about volcano 🌋 monitoring used by the government, so it can easily monitor volcanoes in the real world.
+
+- Backend (Pure `Go`)
+
+```
+backend/
+|-- cmd/
+|   `-- server/ (main application entry point)
+|       `-- main.go
+|-- pkg/
+|   |-- restapis/ (API route handlers)
+|   |-- any/ (any related code)
+|-- internal/ (private application and library code)
+|   |-- any/ (any related code)
+|-- .env (optional environment variables since it can placed anywhere)
+`-- go.mod (dependencies)
+```
+
+- Frontend (Any Framework `TS` e.g, React,NextJS or pure `JS` for `HTMX`)
+
+#### Example:
+
+```
+frontend/
+|-- pages/
+|   |-- api/ (optional, for Next.js API routes if needed)
+|   |-- _app.js (global page layouts and state)
+|   |-- index.js (home page)
+|   `-- [...other pages]
+|-- public/ (static files like images, fonts)
+|-- src/
+|   |-- components/ (shared React components)
+|   |   `-- [various components]
+|   |-- styles/ (global styles, theme)
+|   |-- hooks/ (custom React hooks)
+|   |-- utils/ (utility functions)
+|   |-- lib/ (libraries and configurations)
+|   `-- context/ (React context files for state management)
+|-- .env.local (environment variables)
+|-- next.config.js (Next.js configuration)
+`-- package.json (dependencies and scripts)
+```
+
 ## License
 
 This project is dual-licensed under the BSD 3-Clause License and the MIT License - see the [LICENSE](LICENSE) file for details.
