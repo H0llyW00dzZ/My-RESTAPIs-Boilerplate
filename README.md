@@ -19,6 +19,14 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 > [!NOTE]  
 > Additional features will be added later as my primary focus is on using this with the Fiber framework.
 
+## Supported Additional Features
+
+> [!NOTE]  
+> The following list includes additional features that I've been using before for extremely scalable and high-performance applications:
+
+- [`Protocol Buffers`](https://protobuf.dev/)
+- [`Templ`](https://templ.guide/)
+
 ## Motivation
 
 The motivation for sharing this RESTful API Boilerplate on GitHub is to streamline my development process, ensuring I don't have to start from scratch each time. It's a robust, secure foundation that adheres to best practices, designed for quick and efficient project initiation.
