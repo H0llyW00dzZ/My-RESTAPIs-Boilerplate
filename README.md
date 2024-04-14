@@ -46,7 +46,7 @@ This boilerplate is grounded in the Unix philosophy, emphasizing simplicity, mod
 <img src="https://i.imgur.com/C9hZYDz.png" alt="Memory Usage with MYSQL">
 
 > [!NOTE]
-> The `Resource Memory Usage` section demonstrates how `Go` has stable and low memory overhead compared to other languages, especially `Java` hahaha.
+> The `Resource Memory Usage` section demonstrates how `Go` has stable and low memory overhead compared to other languages, especially `Java` (See [this article](https://learn.microsoft.com/en-us/azure/spring-apps/enterprise/concepts-for-java-memory-management) for more information on Java memory management Lmao.) hahaha.
 
 ## Architecture
 
