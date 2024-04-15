@@ -38,7 +38,7 @@ func getEnvVariables() (appName, port, monitorPath string, readTimeout, writeTim
 	monitorPath = getEnv("MONITOR_PATH", "/monitor")
 
 	// Get the READ_TIMEOUT, WRITE_TIMEOUT, and SHUTDOWN_TIMEOUT from environment variables or use default values.
-	// Note: These default timeout values (5 seconds) are set to help prevent potential deadlocks.
+	// Note: These default timeout values (5 seconds) are set to help prevent potential deadlocks/hangs.
 	readTimeoutStr := getEnv("READ_TIMEOUT", "5s")
 	writeTimeoutStr := getEnv("WRITE_TIMEOUT", "5s")
 	shutdownTimeoutStr := getEnv("SHUTDOWN_TIMEOUT", "5s")
