@@ -57,7 +57,11 @@ func NewCORSMiddleware() fiber.Handler {
 	// Note: In the Fiber framework v3, this CORS middleware configuration provides better security and low overhead.
 	// For example, it allows blocking internal IPs by setting `AllowPrivateNetwork` to false (read more: https://docs.gofiber.io/api/middleware/cors).
 	return cors.New(cors.Config{
-		AllowOrigins: "https://example.com, https://api.example.com",
+		// Better Formatting
+		AllowOrigins: strings.Join([]string{
+			"https://example.com",
+			"https://api.example.com",
+		}, ","),
 		AllowMethods: strings.Join([]string{
 			fiber.MethodGet,
 			fiber.MethodPost,
@@ -66,9 +70,14 @@ func NewCORSMiddleware() fiber.Handler {
 			fiber.MethodDelete,
 			fiber.MethodOptions,
 		}, ","),
-		AllowHeaders:     "Content-Type, Authorization",
+		AllowHeaders: strings.Join([]string{
+			"Content-Type",
+			"Authorization",
+		}, ","),
+		ExposeHeaders: strings.Join([]string{
+			"Content-Length",
+		}, ","),
 		AllowCredentials: true,
-		ExposeHeaders:    "Content-Length",
 		MaxAge:           86400, // 24 hours
 	})
 }
