@@ -8,5 +8,5 @@ import "embed"
 
 // Files is an embedded file system containing the static files from the "images" directory.
 //
-//go:embed "images"
+//go:embed "assets/images"
 var Files embed.FS

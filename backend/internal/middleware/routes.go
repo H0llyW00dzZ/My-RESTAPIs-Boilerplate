@@ -19,6 +19,8 @@ import (
 func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Service) {
 	// Apply the combined middlewares
 	registerRouteConfigMiddleware(app)
+	// Register the Static Frontend Routes
+	registerStaticFrontendRoutes(app, appName, db)
 }
 
 // registerRouteConfigMiddleware applies middleware configurations to the Fiber application.
@@ -27,7 +29,7 @@ func registerRouteConfigMiddleware(app *fiber.App) {
 
 	// Favicon front end setup
 	// Note: this just an example
-	favicon := NewFaviconMiddleware("./frontend/public/images/favicon.ico", "/styles/images/favicon.ico")
+	favicon := NewFaviconMiddleware("./frontend/public/assets/images/favicon.ico", "/styles/images/favicon.ico")
 
 	// Recovery middleware setup
 	recoverMiddleware := recover.New(recover.Config{
