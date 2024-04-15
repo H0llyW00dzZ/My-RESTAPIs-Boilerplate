@@ -54,6 +54,8 @@ func NewRateLimiter(db database.Service, max int, expiration time.Duration, limi
 // NewCORSMiddleware creates a new CORS middleware with a better configuration.
 // It allows specific origins, methods, headers, and credentials, and sets the maximum age for preflight requests.
 func NewCORSMiddleware() fiber.Handler {
+	// Note: In the Fiber framework v3, this CORS middleware configuration provides better security and low overhead.
+	// For example, it allows blocking internal IPs by setting `AllowPrivateNetwork` to false (read more: https://docs.gofiber.io/api/middleware/cors).
 	return cors.New(cors.Config{
 		AllowOrigins: "https://example.com, https://api.example.com",
 		AllowMethods: strings.Join([]string{
