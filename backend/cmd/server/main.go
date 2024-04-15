@@ -21,28 +21,40 @@ import (
 // It relies on environment variables to customize the application's behavior,
 // and it starts the server with graceful shutdown capabilities.
 func main() {
-	appName, port, monitorPath := getEnvVariables()
-	app := setupFiber(appName)
+	appName, port, monitorPath, readTimeout, writeTimeout, shutdownTimeout := getEnvVariables()
+	app := setupFiber(appName, readTimeout, writeTimeout)
 
 	// Start the server with graceful shutdown and monitor
-	startServer(app, appName, port, monitorPath)
+	startServer(app, appName, port, monitorPath, shutdownTimeout)
 }
 
 // getEnvVariables retrieves essential configuration settings from environment variables.
-// It provides default values for the application name, port, and monitoring path
+// It provides default values for the application name, port, monitoring path, and timeouts
 // to ensure the application has sensible defaults if environment variables are not set.
-func getEnvVariables() (appName, port, monitorPath string) {
+func getEnvVariables() (appName, port, monitorPath string, readTimeout, writeTimeout, shutdownTimeout time.Duration) {
 	// Get the APP_NAME, PORT, and MONITOR_PATH from environment variables or use default values.
 	appName = getEnv("APP_NAME", "Gopher")
 	port = getEnv("PORT", "8080")
 	monitorPath = getEnv("MONITOR_PATH", "/monitor")
+
+	// Get the READ_TIMEOUT, WRITE_TIMEOUT, and SHUTDOWN_TIMEOUT from environment variables or use default values.
+	// Note: These default timeout values (5 seconds) are set to help prevent potential deadlocks.
+	readTimeoutStr := getEnv("READ_TIMEOUT", "5s")
+	writeTimeoutStr := getEnv("WRITE_TIMEOUT", "5s")
+	shutdownTimeoutStr := getEnv("SHUTDOWN_TIMEOUT", "5s")
+
+	// Parse the timeout values into time.Duration
+	readTimeout, _ = time.ParseDuration(readTimeoutStr)
+	writeTimeout, _ = time.ParseDuration(writeTimeoutStr)
+	shutdownTimeout, _ = time.ParseDuration(shutdownTimeoutStr)
+
 	return
 }
 
 // setupFiber initializes a new Fiber application with custom configuration.
 // It sets up the JSON encoder/decoder, case sensitivity, and strict routing,
 // and applies the application name to the server headers.
-func setupFiber(appName string) *fiber.App {
+func setupFiber(appName string, readTimeout, writeTimeout time.Duration) *fiber.App {
 	return fiber.New(fiber.Config{
 		ServerHeader: appName,
 		AppName:      appName,
@@ -53,8 +65,8 @@ func setupFiber(appName string) *fiber.App {
 		CaseSensitive:    true,
 		StrictRouting:    true,
 		DisableKeepalive: false,
-		ReadTimeout:      5 * time.Second,
-		WriteTimeout:     5 * time.Second,
+		ReadTimeout:      readTimeout,
+		WriteTimeout:     writeTimeout,
 		// Note: It's important to set Prefork to false because if it's enabled and running in Kubernetes,
 		// it may get killed by an Out-of-Memory (OOM) error due to a conflict with the Horizontal Pod Autoscaler (HPA).
 		Prefork: false,
@@ -62,15 +74,14 @@ func setupFiber(appName string) *fiber.App {
 }
 
 // startServer configures and starts the Fiber web server.
-// It initializes logging, determines the server address, sets up a shutdown timeout,
-// and calls the server start function with graceful shutdown handling.
-func startServer(app *fiber.App, appName, port, monitorPath string) {
+// It initializes logging, determines the server address, and calls the server start function
+// with graceful shutdown handling.
+func startServer(app *fiber.App, appName, port, monitorPath string, shutdownTimeout time.Duration) {
 	// Initialize the logger with the AppName from the environment variable
 	log.InitializeLogger(app.Config().AppName)
 
-	// Define server address, shutdown timeout, and monitor path
+	// Define server address
 	addr := fmt.Sprintf(":%s", port) // Use the port from the environment variable
-	shutdownTimeout := 5 * time.Second
 
 	// Create a new instance of FiberServer
 	server := handler.NewFiberServer(app, appName, monitorPath)
