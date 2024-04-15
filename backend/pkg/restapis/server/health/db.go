@@ -88,6 +88,9 @@ func DBHandler(db database.Service) fiber.Handler {
 // createHealthResponse creates a Response struct from the provided health statistics.
 func createHealthResponse(health map[string]string) Response {
 	// Note: By structuring the code this way, it is easily maintainable for customization,etc.
+	// Also note that, this method no need to use pointer to match into struct,
+	// as pointers are typically recommended for database interfaces
+	// (e.g., implementing database interfaces for viewing table data and values in JSON format, such as in real-time database systems).
 	return Response{
 		MySQLHealth: MySQLHealth{
 			Status:          health["mysql_status"],
