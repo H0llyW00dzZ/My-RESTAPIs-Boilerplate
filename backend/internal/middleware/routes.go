@@ -25,6 +25,10 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 // It sets up the necessary middleware such as recovery, logging, and custom error handling for manipulate panics (Currently unimplemented for this boilerplate).
 func registerRouteConfigMiddleware(app *fiber.App) {
 
+	// Favicon front end setup
+	// Note: this just an example
+	favicon := NewFaviconMiddleware("./frontend/public/images/favicon.ico", "/styles/images/favicon.ico")
+
 	// Recovery middleware setup
 	recoverMiddleware := recover.New(recover.Config{
 		EnableStackTrace: true,
@@ -37,5 +41,5 @@ func registerRouteConfigMiddleware(app *fiber.App) {
 	})
 
 	// Apply the recover middleware
-	app.Use(recoverMiddleware)
+	app.Use(favicon, recoverMiddleware)
 }
