@@ -15,6 +15,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/etag"
+	"github.com/gofiber/fiber/v2/middleware/favicon"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 )
 
@@ -87,5 +88,14 @@ func NewCORSMiddleware() fiber.Handler {
 func NewETagMiddleware() fiber.Handler {
 	return etag.New(etag.Config{
 		Weak: false,
+	})
+}
+
+// NewFaviconMiddleware creates a new favicon middleware to serve a favicon file.
+// It takes the file path of the favicon and the URL path where the favicon will be served.
+func NewFaviconMiddleware(filePath, urlPath string) fiber.Handler {
+	return favicon.New(favicon.Config{
+		File: filePath,
+		URL:  urlPath,
 	})
 }
