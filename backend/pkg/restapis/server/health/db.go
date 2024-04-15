@@ -11,9 +11,40 @@ import (
 	log "h0llyw00dz-template/backend/internal/logger"
 )
 
+// Response represents the structured response for the health statistics.
+type Response struct {
+	MySQLHealth MySQLHealth `json:"mysql_health"`
+	RedisHealth RedisHealth `json:"redis_health"`
+}
+
+// MySQLHealth represents the health statistics for MySQL.
+type MySQLHealth struct {
+	Status          string `json:"status"`
+	Message         string `json:"message"`
+	Error           string `json:"error,omitempty"`
+	OpenConnections string `json:"open_connections,omitempty"`
+	InUse           string `json:"in_use,omitempty"`
+	Idle            string `json:"idle,omitempty"`
+	WaitCount       string `json:"wait_count,omitempty"`
+	WaitDuration    string `json:"wait_duration,omitempty"`
+}
+
+// RedisHealth represents the health statistics for Redis.
+type RedisHealth struct {
+	Status           string `json:"status"`
+	Message          string `json:"message"`
+	Error            string `json:"error,omitempty"`
+	Version          string `json:"version,omitempty"`
+	Mode             string `json:"mode,omitempty"`
+	ConnectedClients string `json:"connected_clients,omitempty"`
+	UsedMemory       string `json:"used_memory,omitempty"`
+	PeakUsedMemory   string `json:"peak_used_memory,omitempty"`
+	Uptime           string `json:"uptime,omitempty"`
+}
+
 // DBHandler is a Fiber handler that checks the health of the database and Redis.
 // It logs the user activity and the health status of MySQL and Redis.
-// The detailed health statistics are returned as JSON.
+// The detailed health statistics are returned as a structured JSON response.
 func DBHandler(db database.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Log the user activity
@@ -22,42 +53,56 @@ func DBHandler(db database.Service) fiber.Handler {
 		// Get the health status from the database service
 		health := db.Health()
 
+		// Create the response struct
+		response := Response{
+			MySQLHealth: MySQLHealth{
+				Status:          health["mysql_status"],
+				Message:         health["mysql_message"],
+				Error:           health["mysql_error"],
+				OpenConnections: health["mysql_open_connections"],
+				InUse:           health["mysql_in_use"],
+				Idle:            health["mysql_idle"],
+				WaitCount:       health["mysql_wait_count"],
+				WaitDuration:    health["mysql_wait_duration"],
+			},
+			RedisHealth: RedisHealth{
+				Status:           health["redis_status"],
+				Message:          health["redis_message"],
+				Error:            health["redis_error"],
+				Version:          health["redis_version"],
+				Mode:             health["redis_mode"],
+				ConnectedClients: health["redis_connected_clients"],
+				UsedMemory:       health["redis_used_memory"],
+				PeakUsedMemory:   health["redis_used_memory_peak"],
+				Uptime:           health["redis_uptime_in_seconds"],
+			},
+		}
+
 		// Log the MySQL health status
-		mysqlStatus, ok := health["mysql_status"]
-		if !ok {
-			// If the MySQL status key is missing, log an error
-			log.LogError("MySQL health check did not return a status")
+		if response.MySQLHealth.Status == "up" {
+			log.LogInfof("MySQL Status: %s, Stats: Open Connections: %s, In Use: %s, Idle: %s, Wait Count: %s, Wait Duration: %s",
+				response.MySQLHealth.Message, response.MySQLHealth.OpenConnections, response.MySQLHealth.InUse,
+				response.MySQLHealth.Idle, response.MySQLHealth.WaitCount, response.MySQLHealth.WaitDuration)
 		} else {
-			if mysqlStatus == "up" {
-				log.LogInfof("MySQL Status: %s, Stats: Open Connections: %s, In Use: %s, Idle: %s, Wait Count: %s, Wait Duration: %s",
-					health["mysql_message"], health["mysql_open_connections"], health["mysql_in_use"], health["mysql_idle"],
-					health["mysql_wait_count"], health["mysql_wait_duration"])
-			} else {
-				mysqlErrorMessage, _ := health["mysql_error"]
-				log.LogErrorf("MySQL Error: %v", mysqlErrorMessage)
-			}
+			// If the MySQL status key is missing, log an error
+			log.LogErrorf("MySQL Error: %v", response.MySQLHealth.Error)
 		}
 
 		// Log the Redis health status
-		redisStatus, ok := health["redis_status"]
-		if !ok {
-			// If the Redis status key is missing, log an error
-			log.LogError("Redis health check did not return a status")
+		if response.RedisHealth.Status == "up" {
+			log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Connected Clients: %s, Used Memory: %s, Peak Used Memory: %s, Uptime: %s seconds",
+				response.RedisHealth.Message, response.RedisHealth.Version, response.RedisHealth.Mode,
+				response.RedisHealth.ConnectedClients, response.RedisHealth.UsedMemory, response.RedisHealth.PeakUsedMemory,
+				response.RedisHealth.Uptime)
 		} else {
-			if redisStatus == "up" {
-				log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Connected Clients: %s, Used Memory: %s, Peak Used Memory: %s, Uptime: %s seconds",
-					health["redis_message"], health["redis_version"], health["redis_mode"], health["redis_connected_clients"],
-					health["redis_used_memory"], health["redis_used_memory_peak"], health["redis_uptime_in_seconds"])
-			} else {
-				redisErrorMessage, _ := health["redis_error"]
-				log.LogErrorf("Redis Error: %v", redisErrorMessage)
-			}
+			// If the Redis status key is missing, log an error
+			log.LogErrorf("Redis Error: %v", response.RedisHealth.Error)
 		}
 
-		// Return the detailed health statistics as JSON
+		// Return the structured health statistics as JSON
 		// Note: The "c.JSON" method uses the sonic package (related to main configuration) for JSON encoding and decoding,
 		// which is one of the reasons why the Fiber framework is considered the best framework in 2024.
-		// You don't need to repeat yourself for JSON encoding/decoding (e.g., using the standard library or other JSON encoder/decoder).
-		return c.JSON(health)
+		// "You don't need to repeat yourself for JSON encoding/decoding (e.g., using the standard library or other JSON encoder/decoder)."
+		return c.JSON(response)
 	}
 }
