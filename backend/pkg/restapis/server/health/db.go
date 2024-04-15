@@ -53,30 +53,8 @@ func DBHandler(db database.Service) fiber.Handler {
 		// Get the health status from the database service
 		health := db.Health()
 
-		// Create the response struct
-		response := Response{
-			MySQLHealth: MySQLHealth{
-				Status:          health["mysql_status"],
-				Message:         health["mysql_message"],
-				Error:           health["mysql_error"],
-				OpenConnections: health["mysql_open_connections"],
-				InUse:           health["mysql_in_use"],
-				Idle:            health["mysql_idle"],
-				WaitCount:       health["mysql_wait_count"],
-				WaitDuration:    health["mysql_wait_duration"],
-			},
-			RedisHealth: RedisHealth{
-				Status:           health["redis_status"],
-				Message:          health["redis_message"],
-				Error:            health["redis_error"],
-				Version:          health["redis_version"],
-				Mode:             health["redis_mode"],
-				ConnectedClients: health["redis_connected_clients"],
-				UsedMemory:       health["redis_used_memory"],
-				PeakUsedMemory:   health["redis_used_memory_peak"],
-				Uptime:           health["redis_uptime_in_seconds"],
-			},
-		}
+		// Create the response struct using the createHealthResponse function
+		response := createHealthResponse(health)
 
 		// Log the MySQL health status
 		if response.MySQLHealth.Status == "up" {
@@ -104,5 +82,33 @@ func DBHandler(db database.Service) fiber.Handler {
 		// which is one of the reasons why the Fiber framework is considered the best framework in 2024.
 		// "You don't need to repeat yourself for JSON encoding/decoding (e.g., using the standard library or other JSON encoder/decoder)."
 		return c.JSON(response)
+	}
+}
+
+// createHealthResponse creates a Response struct from the provided health statistics.
+func createHealthResponse(health map[string]string) Response {
+	// Note: By structuring the code this way, it is easily maintainable for customization,etc.
+	return Response{
+		MySQLHealth: MySQLHealth{
+			Status:          health["mysql_status"],
+			Message:         health["mysql_message"],
+			Error:           health["mysql_error"],
+			OpenConnections: health["mysql_open_connections"],
+			InUse:           health["mysql_in_use"],
+			Idle:            health["mysql_idle"],
+			WaitCount:       health["mysql_wait_count"],
+			WaitDuration:    health["mysql_wait_duration"],
+		},
+		RedisHealth: RedisHealth{
+			Status:           health["redis_status"],
+			Message:          health["redis_message"],
+			Error:            health["redis_error"],
+			Version:          health["redis_version"],
+			Mode:             health["redis_mode"],
+			ConnectedClients: health["redis_connected_clients"],
+			UsedMemory:       health["redis_used_memory"],
+			PeakUsedMemory:   health["redis_used_memory_peak"],
+			Uptime:           health["redis_uptime_in_seconds"],
+		},
 	}
 }
