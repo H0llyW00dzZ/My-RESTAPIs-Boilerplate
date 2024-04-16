@@ -19,6 +19,8 @@ import (
 func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Service) {
 	// Apply the combined middlewares
 	registerRouteConfigMiddleware(app)
+	// Register the REST APIs Routes
+	registerRESTAPIsRoutes(app, db)
 	// Register the Static Frontend Routes
 	registerStaticFrontendRoutes(app, appName, db)
 }
