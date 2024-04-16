@@ -66,10 +66,12 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 //	rateLimiterRESTAPIs: The rate limiter middleware to be applied to the API routes.
 func serverAPIs(v1 fiber.Router, db database.Service, rateLimiterRESTAPIs fiber.Handler) {
 	// Define the API groups and routes
+	// Note: By refactoring like this, it allows for an unlimited number of handlers and easy maintainability,
+	// as I've had over 500 handlers across around 250 files.
 	apiGroups := []APIGroup{
 		{ // Note: Example https://localhost:8080/v1/server/health/db
 			Prefix:      "/server/health",
-			RateLimiter: rateLimiterRESTAPIs,
+			RateLimiter: rateLimiterRESTAPIs, // This is an optional example.
 			Routes: []APIRoute{
 				{
 					Path:    "/db",
