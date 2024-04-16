@@ -2,6 +2,10 @@
 
 This project provides a boilerplate for building RESTful APIs using Go. It is designed to a quick start with best practices, easy configuration, and a clear project structure.
 
+> [!WARNING]  
+> This boilerplate is specifically tailored for extensive codebases and scalable RESTful API applications, along with frontend websites that may span multiple sites.
+> Its design ensures scalability and straightforward maintenance, making it highly suitable for complex projects. However, it may not be the ideal choice for smaller-scale RESTful API applications or single-website frontends where such robust architecture is not required.
+
 ## Features
 
 - Use Fiber Framework
