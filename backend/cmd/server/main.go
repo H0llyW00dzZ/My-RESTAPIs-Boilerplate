@@ -21,21 +21,24 @@ import (
 // It relies on environment variables to customize the application's behavior,
 // and it starts the server with graceful shutdown capabilities.
 func main() {
-	appName, port, monitorPath, readTimeout, writeTimeout, shutdownTimeout := getEnvVariables()
+	appName, port, monitorPath, timeFormat, readTimeout, writeTimeout, shutdownTimeout := getEnvVariables()
 	app := setupFiber(appName, readTimeout, writeTimeout)
 
 	// Start the server with graceful shutdown and monitor
-	startServer(app, appName, port, monitorPath, shutdownTimeout)
+	startServer(app, appName, port, monitorPath, timeFormat, shutdownTimeout)
 }
 
 // getEnvVariables retrieves essential configuration settings from environment variables.
 // It provides default values for the application name, port, monitoring path, and timeouts
 // to ensure the application has sensible defaults if environment variables are not set.
-func getEnvVariables() (appName, port, monitorPath string, readTimeout, writeTimeout, shutdownTimeout time.Duration) {
+func getEnvVariables() (appName, port, monitorPath, timeFormat string, readTimeout, writeTimeout, shutdownTimeout time.Duration) {
 	// Get the APP_NAME, PORT, and MONITOR_PATH from environment variables or use default values.
 	appName = getEnv("APP_NAME", "Gopher")
 	port = getEnv("PORT", "8080")
 	monitorPath = getEnv("MONITOR_PATH", "/monitor")
+	// Get the TIME_FORMAT from environment variables or use default value
+	// Note: List Time Format Available: unix,default
+	timeFormat = getEnv("TIME_FORMAT", "unix")
 
 	// Get the READ_TIMEOUT, WRITE_TIMEOUT, and SHUTDOWN_TIMEOUT from environment variables or use default values.
 	// Note: These default timeout values (5 seconds) are set to help prevent potential deadlocks/hangs.
@@ -76,9 +79,9 @@ func setupFiber(appName string, readTimeout, writeTimeout time.Duration) *fiber.
 // startServer configures and starts the Fiber web server.
 // It initializes logging, determines the server address, and calls the server start function
 // with graceful shutdown handling.
-func startServer(app *fiber.App, appName, port, monitorPath string, shutdownTimeout time.Duration) {
+func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, shutdownTimeout time.Duration) {
 	// Initialize the logger with the AppName from the environment variable
-	log.InitializeLogger(app.Config().AppName)
+	log.InitializeLogger(app.Config().AppName, timeFormat)
 
 	// Define server address
 	addr := fmt.Sprintf(":%s", port) // Use the port from the environment variable
