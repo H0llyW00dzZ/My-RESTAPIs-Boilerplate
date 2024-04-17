@@ -9,12 +9,15 @@ import (
 	"strconv"
 )
 
-// bytesToMB converts bytes to megabytes (MB)
-func bytesToMB(bytesStr string) float64 {
+// bytesToMB converts bytes to megabytes (MB) and gigabytes (GB)
+func bytesToMBGB(bytesStr string) (float64, float64) {
 	// Note: Error handling is omitted here as it would unnecessarily complicate the code
 	// for a simple conversion/reformatting operation.
 	bytes, _ := strconv.ParseFloat(bytesStr, 64)
-	return bytes / (1024 * 1024)
+	// Note: Terabyte support is not implemented since gigabytes should be sufficient for most use cases in planet earth hahaha.
+	mb := bytes / (1024 * 1024)
+	gb := bytes / (1024 * 1024 * 1024)
+	return mb, gb
 }
 
 // formatUptime converts the uptime from seconds to a more readable format (days, hours, minutes, seconds)
