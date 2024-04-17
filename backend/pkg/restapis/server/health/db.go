@@ -77,7 +77,7 @@ func DBHandler(db database.Service) fiber.Handler {
 
 		// Log the Redis health status
 		if response.RedisHealth.Status == "up" {
-			log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Connected Clients: %s, Used Memory: %s (%s), Peak Used Memory: %s (%s), Uptime: %s",
+			log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Connected Clients: %s, Used Memory: %s MB (%s GB), Peak Used Memory: %s (%s), Uptime: %s",
 				response.RedisHealth.Message, response.RedisHealth.Version, response.RedisHealth.Mode,
 				response.RedisHealth.ConnectedClients, response.RedisHealth.UsedMemory.MB, response.RedisHealth.UsedMemory.GB,
 				response.RedisHealth.PeakUsedMemory.MB, response.RedisHealth.PeakUsedMemory.GB, response.RedisHealth.UptimeStats)
@@ -125,13 +125,15 @@ func createHealthResponse(health map[string]string) Response {
 			Version:          health["redis_version"],
 			Mode:             health["redis_mode"],
 			ConnectedClients: health["redis_connected_clients"],
+			// Better formatting it should be raw "%.2f"
 			UsedMemory: MemoryUsage{
-				MB: fmt.Sprintf("%.2f MB", usedMemoryMB),
-				GB: fmt.Sprintf("%.2f GB", usedMemoryGB),
+				MB: fmt.Sprintf("%.2f", usedMemoryMB),
+				GB: fmt.Sprintf("%.2f", usedMemoryGB),
 			},
+			// Better formatting it should be raw "%.2f"
 			PeakUsedMemory: MemoryUsage{
-				MB: fmt.Sprintf("%.2f MB", peakUsedMemoryMB),
-				GB: fmt.Sprintf("%.2f GB", peakUsedMemoryGB),
+				MB: fmt.Sprintf("%.2f", peakUsedMemoryMB),
+				GB: fmt.Sprintf("%.2f", peakUsedMemoryGB),
 			},
 			UptimeStats: uptimeStats,
 			Uptime:      uptime,
