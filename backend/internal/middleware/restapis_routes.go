@@ -7,6 +7,7 @@ package middleware
 import (
 	"h0llyw00dz-template/backend/internal/database"
 	"h0llyw00dz-template/backend/pkg/restapis/server/health"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -74,8 +75,11 @@ func serverAPIs(v1 fiber.Router, db database.Service, rateLimiterRESTAPIs fiber.
 			RateLimiter: rateLimiterRESTAPIs, // This is an optional example.
 			Routes: []APIRoute{
 				{
-					Path:    "/db",
-					Method:  fiber.MethodGet,
+					Path: "/db",
+					// Note: This approach allows defining multiple HTTP methods (e.g., GET, POST, PUT, DELETE) for a single handler & path.
+					Method: strings.Join([]string{
+						fiber.MethodGet,
+					}, ","),
 					Handler: health.DBHandler(db),
 				},
 			},
