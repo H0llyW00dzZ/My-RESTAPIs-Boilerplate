@@ -5,6 +5,8 @@
 package health
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 
 	"h0llyw00dz-template/backend/internal/database"
@@ -68,9 +70,13 @@ func DBHandler(db database.Service) fiber.Handler {
 
 		// Log the Redis health status
 		if response.RedisHealth.Status == "up" {
-			log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Connected Clients: %s, Used Memory: %s, Peak Used Memory: %s, Uptime: %s seconds",
+			// Convert used memory and peak used memory to megabytes (MB)
+			usedMemoryMB := bytesToMB(response.RedisHealth.UsedMemory)
+			peakUsedMemoryMB := bytesToMB(response.RedisHealth.PeakUsedMemory)
+
+			log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Connected Clients: %s, Used Memory: %.2f MB, Peak Used Memory: %.2f MB, Uptime: %s seconds",
 				response.RedisHealth.Message, response.RedisHealth.Version, response.RedisHealth.Mode,
-				response.RedisHealth.ConnectedClients, response.RedisHealth.UsedMemory, response.RedisHealth.PeakUsedMemory,
+				response.RedisHealth.ConnectedClients, usedMemoryMB, peakUsedMemoryMB,
 				response.RedisHealth.Uptime)
 		} else {
 			// If the Redis status key is missing, log an error
@@ -87,6 +93,10 @@ func DBHandler(db database.Service) fiber.Handler {
 
 // createHealthResponse creates a Response struct from the provided health statistics.
 func createHealthResponse(health map[string]string) Response {
+	// Convert used memory and peak used memory to megabytes (MB)
+	usedMemoryMB := bytesToMB(health["redis_used_memory"])
+	peakUsedMemoryMB := bytesToMB(health["redis_used_memory_peak"])
+
 	// Note: By structuring the code this way, it is easily maintainable for customization,etc.
 	// Also note that, this method no need to use pointer to match into struct,
 	// as pointers are typically recommended for database interfaces
@@ -109,8 +119,8 @@ func createHealthResponse(health map[string]string) Response {
 			Version:          health["redis_version"],
 			Mode:             health["redis_mode"],
 			ConnectedClients: health["redis_connected_clients"],
-			UsedMemory:       health["redis_used_memory"],
-			PeakUsedMemory:   health["redis_used_memory_peak"],
+			UsedMemory:       fmt.Sprintf("%.2f MB", usedMemoryMB),
+			PeakUsedMemory:   fmt.Sprintf("%.2f MB", peakUsedMemoryMB),
 			Uptime:           health["redis_uptime_in_seconds"],
 		},
 	}
