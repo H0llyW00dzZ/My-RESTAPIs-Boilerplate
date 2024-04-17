@@ -16,7 +16,7 @@ func bytesToMB(bytesStr string) float64 {
 }
 
 // formatUptime converts the uptime from seconds to a more readable format (days, hours, minutes)
-func formatUptime(uptimeSeconds string) string {
+func formatUptime(uptimeSeconds string) (string, []map[string]string) {
 	// Parse the uptime seconds string to a float64
 	seconds, _ := strconv.ParseFloat(uptimeSeconds, 64)
 
@@ -32,6 +32,16 @@ func formatUptime(uptimeSeconds string) string {
 	minutes := int(seconds) / 60
 	seconds -= float64(minutes * 60)
 
-	// Return the formatted uptime string
-	return fmt.Sprintf("%d days, %d hours, %d minutes", days, hours, minutes)
+	// Create the formatted uptime string
+	uptimeStats := fmt.Sprintf("%d days, %d hours, %d minutes", days, hours, minutes)
+
+	// Create an array of objects with labels and values for days, hours, and minutes
+	uptime := []map[string]string{
+		{"day": strconv.Itoa(days)},
+		{"hour": strconv.Itoa(hours)},
+		{"minute": strconv.Itoa(minutes)},
+	}
+
+	// Return the formatted uptime string and the array of uptime objects
+	return uptimeStats, uptime
 }
