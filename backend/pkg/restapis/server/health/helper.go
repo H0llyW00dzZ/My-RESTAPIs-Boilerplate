@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-// bytesToMB converts bytes to megabytes (MB) and gigabytes (GB)
+// bytesToMBGB converts bytes to megabytes (MB) and gigabytes (GB)
 func bytesToMBGB(bytesStr string) (float64, float64) {
 	// Note: Error handling is omitted here as it would unnecessarily complicate the code
 	// for a simple conversion/reformatting operation.
