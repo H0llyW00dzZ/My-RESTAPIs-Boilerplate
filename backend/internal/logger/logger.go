@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -22,21 +23,60 @@ type Logger struct {
 	crashLogger   *log.Logger
 }
 
-// NewLogger creates a new Logger instance with custom prefixes and colors.
-func NewLogger(out io.Writer, appName, appNameColor, infoColor, visitorColor, errorColor, fatalColor, crashColor string) *Logger {
-	infoPrefix := fmt.Sprintf("[%s%s%s] [%sINFO%s] ", appNameColor, appName, ColorReset, infoColor, ColorReset)
-	visitorPrefix := fmt.Sprintf("[%s%s%s] [%sVISITOR%s] ", appNameColor, appName, ColorReset, visitorColor, ColorReset)
-	errorPrefix := fmt.Sprintf("[%s%s%s] [%sERROR%s] ", appNameColor, appName, ColorReset, errorColor, ColorReset)
-	fatalPrefix := fmt.Sprintf("[%s%s%s] [%sFATAL%s] ", appNameColor, appName, ColorReset, fatalColor, ColorReset)
-	crashPrefix := fmt.Sprintf("[%s%s%s] [%sCRASH%s] ", appNameColor, appName, ColorReset, crashColor, ColorReset)
+// NewLogger creates a new Logger instance with custom prefixes, colors, and time format.
+func NewLogger(out io.Writer, appName, appNameColor, infoColor, visitorColor, errorColor, fatalColor, crashColor, timeFormat string) *Logger {
+	// Set the desired time format for the loggers
+	var flags int
+	var timeFormatter func(t time.Time) string
+
+	if timeFormat == "unix" {
+		flags = log.Lmsgprefix
+		timeFormatter = func(t time.Time) string {
+			return fmt.Sprintf("[%d]", t.Unix())
+		}
+	} else {
+		flags = log.Ldate | log.Ltime | log.Lmsgprefix
+		timeFormatter = func(t time.Time) string {
+			return ""
+		}
+	}
+
+	infoLogger := log.New(NewLogWriter(out, timeFormatter), fmt.Sprintf("[%s%s%s] [%sINFO%s] ", appNameColor, appName, ColorReset, infoColor, ColorReset), flags)
+	visitorLogger := log.New(NewLogWriter(out, timeFormatter), fmt.Sprintf("[%s%s%s] [%sVISITOR%s] ", appNameColor, appName, ColorReset, visitorColor, ColorReset), flags)
+	errorLogger := log.New(NewLogWriter(out, timeFormatter), fmt.Sprintf("[%s%s%s] [%sERROR%s] ", appNameColor, appName, ColorReset, errorColor, ColorReset), flags)
+	fatalLogger := log.New(NewLogWriter(out, timeFormatter), fmt.Sprintf("[%s%s%s] [%sFATAL%s] ", appNameColor, appName, ColorReset, fatalColor, ColorReset), flags)
+	crashLogger := log.New(NewLogWriter(out, timeFormatter), fmt.Sprintf("[%s%s%s] [%sCRASH%s] ", appNameColor, appName, ColorReset, crashColor, ColorReset), flags)
 
 	return &Logger{
-		infoLogger:    log.New(out, infoPrefix, log.Ldate|log.Ltime|log.Lmsgprefix),
-		visitorLogger: log.New(out, visitorPrefix, log.Ldate|log.Ltime|log.Lmsgprefix),
-		errorLogger:   log.New(out, errorPrefix, log.Ldate|log.Ltime|log.Lmsgprefix),
-		fatalLogger:   log.New(out, fatalPrefix, log.Ldate|log.Ltime|log.Lmsgprefix),
-		crashLogger:   log.New(out, crashPrefix, log.Ldate|log.Ltime|log.Lmsgprefix),
+		infoLogger:    infoLogger,
+		visitorLogger: visitorLogger,
+		errorLogger:   errorLogger,
+		fatalLogger:   fatalLogger,
+		crashLogger:   crashLogger,
 	}
+}
+
+// LogWriter is a custom writer that adds the formatted time to the log output.
+type LogWriter struct {
+	out           io.Writer
+	timeFormatter func(t time.Time) string
+}
+
+// NewLogWriter creates a new LogWriter instance with the specified output writer and time formatter.
+func NewLogWriter(out io.Writer, timeFormatter func(t time.Time) string) *LogWriter {
+	return &LogWriter{
+		out:           out,
+		timeFormatter: timeFormatter,
+	}
+}
+
+// Write writes the log message with the formatted time to the output writer.
+func (w *LogWriter) Write(p []byte) (n int, err error) {
+	formattedTime := w.timeFormatter(time.Now())
+	if formattedTime != "" {
+		formattedTime += " "
+	}
+	return w.out.Write([]byte(formattedTime + string(p)))
 }
 
 // Panic logs panic messages.
@@ -93,8 +133,8 @@ func (l *Logger) Errorf(format string, v ...interface{}) {
 // It is initialized using the InitializeLogger function.
 var customLogger *Logger
 
-// InitializeLogger sets up the custom logger with the application name.
-func InitializeLogger(appName string) {
+// InitializeLogger sets up the custom logger with the application name and time format.
+func InitializeLogger(appName, timeFormat string) {
 	customLogger = NewLogger(
 		os.Stdout,
 		appName,
@@ -104,6 +144,7 @@ func InitializeLogger(appName string) {
 		ColorRed,       // Color for ERROR level
 		ColorMagenta,   // Color for FATAL level
 		ColorBrightRed, // Color for PANIC level
+		timeFormat,     // Time format for the loggers
 	)
 }
 

@@ -21,21 +21,46 @@ import (
 // It relies on environment variables to customize the application's behavior,
 // and it starts the server with graceful shutdown capabilities.
 func main() {
-	appName, port, monitorPath, readTimeout, writeTimeout, shutdownTimeout := getEnvVariables()
+	appName, port, monitorPath, timeFormat, readTimeout, writeTimeout, shutdownTimeout := getEnvVariables()
 	app := setupFiber(appName, readTimeout, writeTimeout)
 
 	// Start the server with graceful shutdown and monitor
-	startServer(app, appName, port, monitorPath, shutdownTimeout)
+	startServer(app, appName, port, monitorPath, timeFormat, shutdownTimeout)
 }
 
 // getEnvVariables retrieves essential configuration settings from environment variables.
-// It provides default values for the application name, port, monitoring path, and timeouts
+// It provides default values for the application name, port, monitoring path, time format, and timeouts
 // to ensure the application has sensible defaults if environment variables are not set.
-func getEnvVariables() (appName, port, monitorPath string, readTimeout, writeTimeout, shutdownTimeout time.Duration) {
+//
+// The following environment variables are used:
+//
+//   - APP_NAME: The name of the application (default: "Gopher").
+//
+//   - PORT: The port number on which the server will listen (default: "8080").
+//
+//   - MONITOR_PATH: The path for the server monitoring endpoint (default: "/monitor").
+//
+//   - TIME_FORMAT: The format for logging timestamps (default: "unix").
+//
+//     Available options:
+//
+//   - "unix": Unix timestamp format (e.g., [1713355079]).
+//
+//   - "default": Default timestamp format (e.g., 2024/04/17 15:04:05).
+//
+//   - READ_TIMEOUT: The maximum duration for reading the entire request, including the body (default: "5s").
+//
+//   - WRITE_TIMEOUT: The maximum duration before timing out writes of the response (default: "5s").
+//
+//   - SHUTDOWN_TIMEOUT: The maximum duration to wait for active connections to finish during server shutdown (default: "5s").
+func getEnvVariables() (appName, port, monitorPath, timeFormat string, readTimeout, writeTimeout, shutdownTimeout time.Duration) {
 	// Get the APP_NAME, PORT, and MONITOR_PATH from environment variables or use default values.
 	appName = getEnv("APP_NAME", "Gopher")
 	port = getEnv("PORT", "8080")
 	monitorPath = getEnv("MONITOR_PATH", "/monitor")
+	// Get the TIME_FORMAT from environment variables or use default value
+	// Note: List Time Format Available: unix,default
+	timeFormat = getEnv("TIME_FORMAT", "unix")
 
 	// Get the READ_TIMEOUT, WRITE_TIMEOUT, and SHUTDOWN_TIMEOUT from environment variables or use default values.
 	// Note: These default timeout values (5 seconds) are set to help prevent potential deadlocks/hangs.
@@ -76,9 +101,9 @@ func setupFiber(appName string, readTimeout, writeTimeout time.Duration) *fiber.
 // startServer configures and starts the Fiber web server.
 // It initializes logging, determines the server address, and calls the server start function
 // with graceful shutdown handling.
-func startServer(app *fiber.App, appName, port, monitorPath string, shutdownTimeout time.Duration) {
+func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, shutdownTimeout time.Duration) {
 	// Initialize the logger with the AppName from the environment variable
-	log.InitializeLogger(app.Config().AppName)
+	log.InitializeLogger(app.Config().AppName, timeFormat)
 
 	// Define server address
 	addr := fmt.Sprintf(":%s", port) // Use the port from the environment variable
