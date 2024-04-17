@@ -39,12 +39,16 @@ type RedisHealth struct {
 	Version          string              `json:"version,omitempty"`
 	Mode             string              `json:"mode,omitempty"`
 	ConnectedClients string              `json:"connected_clients,omitempty"`
-	UsedMemoryMB     string              `json:"used_memory_mb,omitempty"`
-	UsedMemoryGB     string              `json:"used_memory_gb,omitempty"`
-	PeakUsedMemoryMB string              `json:"peak_used_memory_mb,omitempty"`
-	PeakUsedMemoryGB string              `json:"peak_used_memory_gb,omitempty"`
+	UsedMemory       MemoryUsage         `json:"used_memory,omitempty"`
+	PeakUsedMemory   MemoryUsage         `json:"peak_used_memory,omitempty"`
 	UptimeStats      string              `json:"uptime_stats,omitempty"`
 	Uptime           []map[string]string `json:"uptime,omitempty"`
+}
+
+// MemoryUsage represents memory usage in both megabytes and gigabytes.
+type MemoryUsage struct {
+	MB string `json:"mb,omitempty"`
+	GB string `json:"gb,omitempty"`
 }
 
 // DBHandler is a Fiber handler that checks the health of the database and Redis.
@@ -75,8 +79,8 @@ func DBHandler(db database.Service) fiber.Handler {
 		if response.RedisHealth.Status == "up" {
 			log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Connected Clients: %s, Used Memory: %s (%s), Peak Used Memory: %s (%s), Uptime: %s",
 				response.RedisHealth.Message, response.RedisHealth.Version, response.RedisHealth.Mode,
-				response.RedisHealth.ConnectedClients, response.RedisHealth.UsedMemoryMB, response.RedisHealth.UsedMemoryGB,
-				response.RedisHealth.PeakUsedMemoryMB, response.RedisHealth.PeakUsedMemoryGB, response.RedisHealth.UptimeStats)
+				response.RedisHealth.ConnectedClients, response.RedisHealth.UsedMemory.MB, response.RedisHealth.UsedMemory.GB,
+				response.RedisHealth.PeakUsedMemory.MB, response.RedisHealth.PeakUsedMemory.GB, response.RedisHealth.UptimeStats)
 		} else {
 			// If the Redis status key is missing, log an error
 			log.LogErrorf("Redis Error: %v", response.RedisHealth.Error)
@@ -121,13 +125,16 @@ func createHealthResponse(health map[string]string) Response {
 			Version:          health["redis_version"],
 			Mode:             health["redis_mode"],
 			ConnectedClients: health["redis_connected_clients"],
-			// TODO: Implement Object Array for "UsedMemoryMB & UsedMemoryGB" smiliar "Uptime"
-			UsedMemoryMB:     fmt.Sprintf("%.2f MB", usedMemoryMB),
-			UsedMemoryGB:     fmt.Sprintf("%.2f GB", usedMemoryGB),
-			PeakUsedMemoryMB: fmt.Sprintf("%.2f MB", peakUsedMemoryMB),
-			PeakUsedMemoryGB: fmt.Sprintf("%.2f GB", peakUsedMemoryGB),
-			UptimeStats:      uptimeStats,
-			Uptime:           uptime,
+			UsedMemory: MemoryUsage{
+				MB: fmt.Sprintf("%.2f MB", usedMemoryMB),
+				GB: fmt.Sprintf("%.2f GB", usedMemoryGB),
+			},
+			PeakUsedMemory: MemoryUsage{
+				MB: fmt.Sprintf("%.2f MB", peakUsedMemoryMB),
+				GB: fmt.Sprintf("%.2f GB", peakUsedMemoryGB),
+			},
+			UptimeStats: uptimeStats,
+			Uptime:      uptime,
 		},
 	}
 }
