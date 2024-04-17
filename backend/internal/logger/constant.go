@@ -14,3 +14,18 @@ const (
 	ColorMagenta   = "\033[35m"
 	ColorBrightRed = "\033[91m"
 )
+
+// Define log levels.
+const (
+	LevelInfo    = "INFO"
+	LevelVisitor = "VISITOR"
+	LevelError   = "ERROR"
+	LevelFatal   = "FATAL"
+	LevelCrash   = "CRASH"
+)
+
+// Define time formats.
+const (
+	TimeFormatUnix    = "unix"
+	TimeFormatDefault = "default"
+)

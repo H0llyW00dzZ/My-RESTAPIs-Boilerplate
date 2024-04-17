@@ -24,12 +24,12 @@ type Logger struct {
 }
 
 // NewLogger creates a new Logger instance with custom prefixes, colors, and time format.
-func NewLogger(out io.Writer, appName, appNameColor, infoColor, visitorColor, errorColor, fatalColor, crashColor, timeFormat string) *Logger {
+func NewLogger(out io.Writer, appName, appNameColor, timeFormat string) *Logger {
 	// Set the desired time format for the loggers
 	var flags int
 	var timeFormatter func(t time.Time) string
 
-	if timeFormat == "unix" {
+	if timeFormat == TimeFormatUnix {
 		flags = log.Lmsgprefix
 		timeFormatter = func(t time.Time) string {
 			return fmt.Sprintf("[%d]", t.Unix())
@@ -41,11 +41,11 @@ func NewLogger(out io.Writer, appName, appNameColor, infoColor, visitorColor, er
 		}
 	}
 
-	infoLogger := log.New(NewLogWriter(out, timeFormatter), fmt.Sprintf("[%s%s%s] [%sINFO%s] ", appNameColor, appName, ColorReset, infoColor, ColorReset), flags)
-	visitorLogger := log.New(NewLogWriter(out, timeFormatter), fmt.Sprintf("[%s%s%s] [%sVISITOR%s] ", appNameColor, appName, ColorReset, visitorColor, ColorReset), flags)
-	errorLogger := log.New(NewLogWriter(out, timeFormatter), fmt.Sprintf("[%s%s%s] [%sERROR%s] ", appNameColor, appName, ColorReset, errorColor, ColorReset), flags)
-	fatalLogger := log.New(NewLogWriter(out, timeFormatter), fmt.Sprintf("[%s%s%s] [%sFATAL%s] ", appNameColor, appName, ColorReset, fatalColor, ColorReset), flags)
-	crashLogger := log.New(NewLogWriter(out, timeFormatter), fmt.Sprintf("[%s%s%s] [%sCRASH%s] ", appNameColor, appName, ColorReset, crashColor, ColorReset), flags)
+	infoLogger := log.New(NewLogWriter(out, timeFormatter), fmt.Sprintf("[%s%s%s] [%s%s%s] ", appNameColor, appName, ColorReset, ColorGreen, LevelInfo, ColorReset), flags)
+	visitorLogger := log.New(NewLogWriter(out, timeFormatter), fmt.Sprintf("[%s%s%s] [%s%s%s] ", appNameColor, appName, ColorReset, ColorYellow, LevelVisitor, ColorReset), flags)
+	errorLogger := log.New(NewLogWriter(out, timeFormatter), fmt.Sprintf("[%s%s%s] [%s%s%s] ", appNameColor, appName, ColorReset, ColorRed, LevelError, ColorReset), flags)
+	fatalLogger := log.New(NewLogWriter(out, timeFormatter), fmt.Sprintf("[%s%s%s] [%s%s%s] ", appNameColor, appName, ColorReset, ColorMagenta, LevelFatal, ColorReset), flags)
+	crashLogger := log.New(NewLogWriter(out, timeFormatter), fmt.Sprintf("[%s%s%s] [%s%s%s] ", appNameColor, appName, ColorReset, ColorBrightRed, LevelCrash, ColorReset), flags)
 
 	return &Logger{
 		infoLogger:    infoLogger,
@@ -138,13 +138,8 @@ func InitializeLogger(appName, timeFormat string) {
 	customLogger = NewLogger(
 		os.Stdout,
 		appName,
-		ColorBlue,      // Color for the application name
-		ColorGreen,     // Color for INFO level
-		ColorYellow,    // Color for VISITOR level
-		ColorRed,       // Color for ERROR level
-		ColorMagenta,   // Color for FATAL level
-		ColorBrightRed, // Color for PANIC level
-		timeFormat,     // Time format for the loggers
+		ColorBlue,  // Color for the application name
+		timeFormat, // Time format for the loggers
 	)
 }
 
