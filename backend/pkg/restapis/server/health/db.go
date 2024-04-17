@@ -33,15 +33,16 @@ type MySQLHealth struct {
 
 // RedisHealth represents the health statistics for Redis.
 type RedisHealth struct {
-	Status           string `json:"status"`
-	Message          string `json:"message"`
-	Error            string `json:"error,omitempty"`
-	Version          string `json:"version,omitempty"`
-	Mode             string `json:"mode,omitempty"`
-	ConnectedClients string `json:"connected_clients,omitempty"`
-	UsedMemory       string `json:"used_memory,omitempty"`
-	PeakUsedMemory   string `json:"peak_used_memory,omitempty"`
-	Uptime           string `json:"uptime,omitempty"`
+	Status           string              `json:"status"`
+	Message          string              `json:"message"`
+	Error            string              `json:"error,omitempty"`
+	Version          string              `json:"version,omitempty"`
+	Mode             string              `json:"mode,omitempty"`
+	ConnectedClients string              `json:"connected_clients,omitempty"`
+	UsedMemory       string              `json:"used_memory,omitempty"`
+	PeakUsedMemory   string              `json:"peak_used_memory,omitempty"`
+	UptimeStats      string              `json:"uptime_stats,omitempty"`
+	Uptime           []map[string]string `json:"uptime,omitempty"`
 }
 
 // DBHandler is a Fiber handler that checks the health of the database and Redis.
@@ -73,7 +74,7 @@ func DBHandler(db database.Service) fiber.Handler {
 			log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Connected Clients: %s, Used Memory: %s, Peak Used Memory: %s, Uptime: %s",
 				response.RedisHealth.Message, response.RedisHealth.Version, response.RedisHealth.Mode,
 				response.RedisHealth.ConnectedClients, response.RedisHealth.UsedMemory, response.RedisHealth.PeakUsedMemory,
-				response.RedisHealth.Uptime)
+				response.RedisHealth.UptimeStats)
 		} else {
 			// If the Redis status key is missing, log an error
 			log.LogErrorf("Redis Error: %v", response.RedisHealth.Error)
@@ -93,7 +94,7 @@ func createHealthResponse(health map[string]string) Response {
 	usedMemoryMB := bytesToMB(health["redis_used_memory"])
 	peakUsedMemoryMB := bytesToMB(health["redis_used_memory_peak"])
 	// Format the uptime
-	formattedUptime := formatUptime(health["redis_uptime_in_seconds"])
+	uptimeStats, uptime := formatUptime(health["redis_uptime_in_seconds"])
 
 	// Note: By structuring the code this way, it is easily maintainable for customization,etc.
 	// Also note that, this method no need to use pointer to match into struct,
@@ -119,7 +120,8 @@ func createHealthResponse(health map[string]string) Response {
 			ConnectedClients: health["redis_connected_clients"],
 			UsedMemory:       fmt.Sprintf("%.2f MB", usedMemoryMB),
 			PeakUsedMemory:   fmt.Sprintf("%.2f MB", peakUsedMemoryMB),
-			Uptime:           formattedUptime,
+			UptimeStats:      uptimeStats,
+			Uptime:           uptime,
 		},
 	}
 }
