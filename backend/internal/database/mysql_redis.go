@@ -149,7 +149,7 @@ func (s *service) Health(filter string) map[string]string {
 	}
 
 	if filter == "" || filter == "redis" {
-		stats = s.checkRedisHealth(ctx, stats)
+		stats = s.checkRedisHealth(stats)
 	}
 
 	return stats
@@ -207,9 +207,11 @@ func (s *service) evaluateMySQLStats(dbStats sql.DBStats, stats map[string]strin
 }
 
 // checkRedisHealth checks the health of the Redis server and adds the relevant statistics to the stats map.
-func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string) map[string]string {
+func (s *service) checkRedisHealth(stats map[string]string) map[string]string {
 	// Ping the Redis server
-	pong, err := s.redisClient.Ping(ctx).Result()
+	// Note: The Redis client must use the method "context.Background()" because
+	// the context with timeout may cause unexpected behavior during health checks.
+	pong, err := s.redisClient.Ping(context.Background()).Result()
 	if err != nil {
 		stats["redis_status"] = "down"
 		stats["redis_error"] = fmt.Sprintf("Redis is down: %v", err)
@@ -221,7 +223,7 @@ func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string)
 		stats["redis_ping_response"] = pong
 
 		// Get Redis server information
-		info, err := s.redisClient.Info(ctx).Result()
+		info, err := s.redisClient.Info(context.Background()).Result()
 		if err != nil {
 			stats["redis_info_error"] = fmt.Sprintf("Failed to retrieve Redis info: %v", err)
 		} else {
