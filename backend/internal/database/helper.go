@@ -40,7 +40,7 @@ func parseRedisInfo(info string) map[string]string {
 
 // convertStringToInterface converts a slice of strings to a slice of interfaces.
 //
-// Note: This is pretty useful for big queries, as it can be used with goroutines for MySQL queries.
+// Note: This is pretty useful for big queries, as it can be used with single goroutines or multipe goroutines along with semaphore for MySQL queries.
 // Only advanced/master Go developers know how this helper works.
 func convertStringToInterface(strs []string) []interface{} {
 	interfaces := make([]interface{}, len(strs))
