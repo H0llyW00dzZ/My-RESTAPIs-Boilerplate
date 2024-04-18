@@ -59,7 +59,7 @@ func DBHandler(db database.Service) fiber.Handler {
 
 		// Check if the filter is valid
 		if !isValidFilter(filter) {
-			// TODO: Handle Log Error
+			// TODO: Deal with log errors. Typically, I wouldn't tackle this for StatusBadRequest or StatusNotFound. 🤷‍♂️ 🤪
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Invalid filter parameter. Allowed values: mysql, redis",
 			})
