@@ -5,8 +5,6 @@
 package health
 
 import (
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
 
 	"h0llyw00dz-template/backend/internal/database"
@@ -15,8 +13,8 @@ import (
 
 // Response represents the structured response for the health statistics.
 type Response struct {
-	MySQLHealth MySQLHealth `json:"mysql_health"`
-	RedisHealth RedisHealth `json:"redis_health"`
+	MySQLHealth *MySQLHealth `json:"mysql_health,omitempty"`
+	RedisHealth *RedisHealth `json:"redis_health,omitempty"`
 }
 
 // MySQLHealth represents the health statistics for MySQL.
@@ -56,35 +54,28 @@ type MemoryUsage struct {
 // The detailed health statistics are returned as a structured JSON response.
 func DBHandler(db database.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// Log the user activity
-		log.LogUserActivity(c, "viewed the health of the database and Redis")
+		// Get the filter parameter from the query string
+		filter := c.Query("filter")
+
+		// Check if the filter is valid
+		if !isValidFilter(filter) {
+			// TODO: Handle Log Error
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid filter parameter. Allowed values: mysql, redis",
+			})
+		}
+
+		// Log the user activity based on the filter
+		logUserActivity(c, filter)
 
 		// Get the health status from the database service
-		health := db.Health()
+		health := db.Health(filter)
 
 		// Create the response struct using the createHealthResponse function
-		response := createHealthResponse(health)
+		response := createHealthResponse(health, filter)
 
-		// Log the MySQL health status
-		if response.MySQLHealth.Status == "up" {
-			log.LogInfof("MySQL Status: %s, Stats: Open Connections: %s, In Use: %s, Idle: %s, Wait Count: %s, Wait Duration: %s",
-				response.MySQLHealth.Message, response.MySQLHealth.OpenConnections, response.MySQLHealth.InUse,
-				response.MySQLHealth.Idle, response.MySQLHealth.WaitCount, response.MySQLHealth.WaitDuration)
-		} else {
-			// If the MySQL status key is missing, log an error
-			log.LogErrorf("MySQL Error: %v", response.MySQLHealth.Error)
-		}
-
-		// Log the Redis health status
-		if response.RedisHealth.Status == "up" {
-			log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Connected Clients: %s, Used Memory: %s MB (%s GB), Peak Used Memory: %s MB (%s GB), Uptime: %s",
-				response.RedisHealth.Message, response.RedisHealth.Version, response.RedisHealth.Mode,
-				response.RedisHealth.ConnectedClients, response.RedisHealth.UsedMemory.MB, response.RedisHealth.UsedMemory.GB,
-				response.RedisHealth.PeakUsedMemory.MB, response.RedisHealth.PeakUsedMemory.GB, response.RedisHealth.UptimeStats)
-		} else {
-			// If the Redis status key is missing, log an error
-			log.LogErrorf("Redis Error: %v", response.RedisHealth.Error)
-		}
+		// Log the health status based on the filter
+		logHealthStatus(response, filter)
 
 		// Return the structured health statistics as JSON
 		// Note: The "c.JSON" method uses the sonic package (related to main configuration) for JSON encoding and decoding,
@@ -94,49 +85,30 @@ func DBHandler(db database.Service) fiber.Handler {
 	}
 }
 
-// createHealthResponse creates a Response struct from the provided health statistics.
-func createHealthResponse(health map[string]string) Response {
-	// Convert used memory and peak used memory to megabytes (MB) and gigabytes (GB)
-	// Note: gigabytes will be showing 0.00GB if under 100MB usage
-	usedMemoryMB, usedMemoryGB := bytesToMBGB(health["redis_used_memory"])
-	peakUsedMemoryMB, peakUsedMemoryGB := bytesToMBGB(health["redis_used_memory_peak"])
-	// Format the uptime
-	uptimeStats, uptime := formatUptime(health["redis_uptime_in_seconds"])
-
-	// Note: By structuring the code this way, it is easily maintainable for customization,etc.
-	// Also note that, this method no need to use pointer to match into struct,
-	// as pointers are typically recommended for database interfaces
-	// (e.g., implementing database interfaces for viewing table data and values in JSON format, such as in real-time database systems).
-	return Response{
-		MySQLHealth: MySQLHealth{
-			Status:          health["mysql_status"],
-			Message:         health["mysql_message"],
-			Error:           health["mysql_error"],
-			OpenConnections: health["mysql_open_connections"],
-			InUse:           health["mysql_in_use"],
-			Idle:            health["mysql_idle"],
-			WaitCount:       health["mysql_wait_count"],
-			WaitDuration:    health["mysql_wait_duration"],
-		},
-		RedisHealth: RedisHealth{
-			Status:           health["redis_status"],
-			Message:          health["redis_message"],
-			Error:            health["redis_error"],
-			Version:          health["redis_version"],
-			Mode:             health["redis_mode"],
-			ConnectedClients: health["redis_connected_clients"],
-			// Better formatting it should be raw "%.2f"
-			UsedMemory: MemoryUsage{
-				MB: fmt.Sprintf("%.2f", usedMemoryMB),
-				GB: fmt.Sprintf("%.2f", usedMemoryGB),
-			},
-			// Better formatting it should be raw "%.2f"
-			PeakUsedMemory: MemoryUsage{
-				MB: fmt.Sprintf("%.2f", peakUsedMemoryMB),
-				GB: fmt.Sprintf("%.2f", peakUsedMemoryGB),
-			},
-			UptimeStats: uptimeStats,
-			Uptime:      uptime,
-		},
+// logUserActivity logs the user activity based on the filter.
+func logUserActivity(c *fiber.Ctx, filter string) {
+	switch filter {
+	case "mysql":
+		log.LogUserActivity(c, "viewed the health of the MySQL database")
+	case "redis":
+		log.LogUserActivity(c, "viewed the health of Redis")
+	default:
+		log.LogUserActivity(c, "viewed the health of the database and Redis")
 	}
+}
+
+// createHealthResponse creates a Response struct from the provided health statistics.
+func createHealthResponse(health map[string]string, filter string) Response {
+	// Note: By structuring the code this way, it is easily maintainable for customization, etc.
+	response := Response{}
+
+	if filter == "" || filter == "mysql" {
+		response.MySQLHealth = createMySQLHealthResponse(health)
+	}
+
+	if filter == "" || filter == "redis" {
+		response.RedisHealth = createRedisHealthResponse(health)
+	}
+
+	return response
 }
