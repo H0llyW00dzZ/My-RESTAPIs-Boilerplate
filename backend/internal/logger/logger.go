@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -193,12 +194,23 @@ func LogErrorf(format string, v ...interface{}) {
 	customLogger.Errorf(format, v...)
 }
 
-// LogUserActivity logs a user activity message along with the HTTP method, client IP, and User-Agent.
+// LogUserActivity logs a user activity message along with the HTTP method, client IP, User-Agent, and query parameters (if any).
 func LogUserActivity(c *fiber.Ctx, activity string) {
 	httpMethod := c.Method() // Get the HTTP method of the request
 	clientIP := c.IP()
 	userAgent := c.Get("User-Agent")
+	originalURL := c.OriginalURL() // This gets the full original URL including query parameters
+	// TODO: Will implement more features as required. Keep improving, keep coding in Go.
 
-	// Log the activity with the HTTP method, IP, and User-Agent.
-	LogVisitorf("Method: %s, Activity: %s - IP: %s, User-Agent: %s", httpMethod, activity, clientIP, userAgent)
+	// Extract the query string from the original URL and format it.
+	queryMessage := ""
+	if idx := strings.Index(originalURL, "?"); idx != -1 {
+		query := originalURL[idx+1:] // Get the substring after the '?' character
+		if query != "" {
+			queryMessage = fmt.Sprintf(", Query: %s", query)
+		}
+	}
+
+	// Log the activity with the HTTP method, IP, User-Agent, and query parameters (if any).
+	LogVisitorf("Method: %s%s, Activity: %s - IP: %s, User-Agent: %s", httpMethod, queryMessage, activity, clientIP, userAgent)
 }
