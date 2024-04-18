@@ -26,7 +26,7 @@ import (
 // Service defines the interface for database operations that can be performed.
 type Service interface {
 	// Health checks the health of the database connection.
-	Health() map[string]string
+	Health(filter string) map[string]string
 
 	// Close terminates the database connection.
 	Close() error
@@ -138,12 +138,25 @@ func (s *service) Close() error {
 
 // Health checks the health of the database and Redis connections.
 // It returns a map with keys indicating various health statistics.
-func (s *service) Health() map[string]string {
+func (s *service) Health(filter string) map[string]string {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
 	stats := make(map[string]string)
 
+	if filter == "" || filter == "mysql" {
+		stats = s.checkMySQLHealth(ctx, stats)
+	}
+
+	if filter == "" || filter == "redis" {
+		stats = s.checkRedisHealth(ctx, stats)
+	}
+
+	return stats
+}
+
+// checkMySQLHealth checks the health of the MySQL database and adds the relevant statistics to the stats map.
+func (s *service) checkMySQLHealth(ctx context.Context, stats map[string]string) map[string]string {
 	// Ping the MySQL database
 	err := s.db.PingContext(ctx)
 	if err != nil {
@@ -166,25 +179,37 @@ func (s *service) Health() map[string]string {
 		stats["mysql_max_lifetime_closed"] = strconv.FormatInt(dbStats.MaxLifetimeClosed, 10)
 
 		// Evaluate MySQL stats to provide a health message
-		if dbStats.OpenConnections > 40 { // Assuming 50 is the max for this example
-			stats["mysql_message"] = MsgDBHeavyLoad
-		}
-
-		if dbStats.WaitCount > 1000 {
-			stats["mysql_message"] = MsgDBHighWaitEvents
-		}
-
-		if dbStats.MaxIdleClosed > int64(dbStats.OpenConnections)/2 {
-			stats["mysql_message"] = MsgDBManyIdleConnections
-		}
-
-		if dbStats.MaxLifetimeClosed > int64(dbStats.OpenConnections)/2 {
-			stats["mysql_message"] = MsgDBManyMaxLifetimeClosures
-		}
+		stats = s.evaluateMySQLStats(dbStats, stats)
 	}
 
+	return stats
+}
+
+// evaluateMySQLStats evaluates the MySQL database statistics and updates the stats map with the appropriate health message.
+func (s *service) evaluateMySQLStats(dbStats sql.DBStats, stats map[string]string) map[string]string {
+	if dbStats.OpenConnections > 40 { // Assuming 50 is the max for this example
+		stats["mysql_message"] = MsgDBHeavyLoad
+	}
+
+	if dbStats.WaitCount > 1000 {
+		stats["mysql_message"] = MsgDBHighWaitEvents
+	}
+
+	if dbStats.MaxIdleClosed > int64(dbStats.OpenConnections)/2 {
+		stats["mysql_message"] = MsgDBManyIdleConnections
+	}
+
+	if dbStats.MaxLifetimeClosed > int64(dbStats.OpenConnections)/2 {
+		stats["mysql_message"] = MsgDBManyMaxLifetimeClosures
+	}
+
+	return stats
+}
+
+// checkRedisHealth checks the health of the Redis server and adds the relevant statistics to the stats map.
+func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string) map[string]string {
 	// Ping the Redis server
-	pong, err := s.redisClient.Ping(context.Background()).Result()
+	pong, err := s.redisClient.Ping(ctx).Result()
 	if err != nil {
 		stats["redis_status"] = "down"
 		stats["redis_error"] = fmt.Sprintf("Redis is down: %v", err)
@@ -196,7 +221,7 @@ func (s *service) Health() map[string]string {
 		stats["redis_ping_response"] = pong
 
 		// Get Redis server information
-		info, err := s.redisClient.Info(context.Background()).Result()
+		info, err := s.redisClient.Info(ctx).Result()
 		if err != nil {
 			stats["redis_info_error"] = fmt.Sprintf("Failed to retrieve Redis info: %v", err)
 		} else {

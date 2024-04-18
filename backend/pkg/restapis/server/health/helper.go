@@ -6,6 +6,7 @@ package health
 
 import (
 	"fmt"
+	log "h0llyw00dz-template/backend/internal/logger"
 	"strconv"
 )
 
@@ -55,4 +56,37 @@ func formatUptime(uptimeSeconds string) (string, []map[string]string) {
 
 	// Return the formatted uptime string and the array of uptime objects
 	return uptimeStats, uptime
+}
+
+// isValidFilter checks if the provided filter is valid.
+func isValidFilter(filter string) bool {
+	return filter == "" || filter == "mysql" || filter == "redis"
+}
+
+// logHealthStatus logs the health status based on the filter.
+func logHealthStatus(response Response, filter string) {
+	if filter == "" || filter == "mysql" {
+		// Log the MySQL health status
+		if response.MySQLHealth.Status == "up" {
+			log.LogInfof("MySQL Status: %s, Stats: Open Connections: %s, In Use: %s, Idle: %s, Wait Count: %s, Wait Duration: %s",
+				response.MySQLHealth.Message, response.MySQLHealth.OpenConnections, response.MySQLHealth.InUse,
+				response.MySQLHealth.Idle, response.MySQLHealth.WaitCount, response.MySQLHealth.WaitDuration)
+		} else {
+			// If the MySQL status key is missing, log an error
+			log.LogErrorf("MySQL Error: %v", response.MySQLHealth.Error)
+		}
+	}
+
+	if filter == "" || filter == "redis" {
+		// Log the Redis health status
+		if response.RedisHealth.Status == "up" {
+			log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Connected Clients: %s, Used Memory: %s MB (%s GB), Peak Used Memory: %s MB (%s GB), Uptime: %s",
+				response.RedisHealth.Message, response.RedisHealth.Version, response.RedisHealth.Mode,
+				response.RedisHealth.ConnectedClients, response.RedisHealth.UsedMemory.MB, response.RedisHealth.UsedMemory.GB,
+				response.RedisHealth.PeakUsedMemory.MB, response.RedisHealth.PeakUsedMemory.GB, response.RedisHealth.UptimeStats)
+		} else {
+			// If the Redis status key is missing, log an error
+			log.LogErrorf("Redis Error: %v", response.RedisHealth.Error)
+		}
+	}
 }
