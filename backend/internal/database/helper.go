@@ -43,6 +43,8 @@ func parseRedisInfo(info string) map[string]string {
 // Note: This is pretty useful for big queries, as it can be used with single goroutines or multiple goroutines along with semaphore for MySQL queries.
 // Only advanced/master Go developers know how this helper works.
 func convertStringToInterface(strs []string) []interface{} {
+	// Note: This won't significantly impact performance cost,
+	// as it depends on the number of queries (e.g., 1 billion queries will create 1 billion interfaces)
 	interfaces := make([]interface{}, len(strs))
 	for i, str := range strs {
 		interfaces[i] = str
