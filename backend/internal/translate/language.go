@@ -12,6 +12,8 @@ import (
 )
 
 // Translations is a map of language codes to their respective translation maps.
+//
+// Note: There is a performance cost to using this translation mechanism, as it can grow easily if there is a lot of data (approximately 1MB or more).
 var Translations map[string]map[string]string
 
 // LoadTranslations loads translations from a single JSON file.
