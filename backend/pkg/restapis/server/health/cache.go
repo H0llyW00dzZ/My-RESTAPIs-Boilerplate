@@ -26,7 +26,7 @@ func generateValidFiltersKey(storage fiber.Storage, ipAddress string) (string, e
 		if errRetrieve == nil && existingKey != "" {
 			validFiltersKey = existingKey
 		} else {
-			// If no existing key or error, generate a new one
+			// If no existing key is found or an error occurs, generate a new one
 			randomUUID := uuid.New().String()
 			validFiltersKey = validFiltersKeyPrefix + randomUUID
 			// Save the new IP-key mapping
