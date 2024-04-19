@@ -144,6 +144,7 @@ func (s *service) Health(filter string) map[string]string {
 
 	stats := make(map[string]string)
 
+	// TODO: Improve by using a "Map of Functions" to reduce complexity (caused by if-else statements) when handling multiple databases in the future.
 	if filter == "" || filter == "mysql" {
 		stats = s.checkMySQLHealth(ctx, stats)
 	}
