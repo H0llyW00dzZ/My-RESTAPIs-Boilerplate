@@ -19,6 +19,9 @@ var validFilters = map[string]string{
 	"redis": "viewed the health of Redis",
 }
 
+// validFiltersSlice is a slice that holds the valid filter keys.
+var validFiltersSlice = initValidFiltersSlice()
+
 // bytesToMBGB converts bytes to megabytes (MB) and gigabytes (GB)
 func bytesToMBGB(bytesStr string) (float64, float64) {
 	// Note: Error handling is omitted here as it would unnecessarily complicate the code
@@ -71,6 +74,17 @@ func formatUptime(uptimeSeconds string) (string, []map[string]string) {
 func isValidFilter(filter string) bool {
 	_, valid := validFilters[filter]
 	return valid
+}
+
+// initValidFiltersSlice initializes the slice of valid filter keys based on the validFilters map.
+func initValidFiltersSlice() []string {
+	filters := make([]string, 0, len(validFilters))
+	for filter := range validFilters {
+		if filter != "" {
+			filters = append(filters, filter)
+		}
+	}
+	return filters
 }
 
 // logUserActivity logs the user activity based on the filter.
