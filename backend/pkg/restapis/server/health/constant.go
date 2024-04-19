@@ -25,5 +25,5 @@ var (
 	// cacheExpiration is the duration for which the valid filters are cached in Redis.
 	// After this duration, the cached data will be automatically expired and removed from Redis.
 	// Adjust this value based on your application's requirements and the frequency of updates to the valid filters.
-	cacheExpiration = 1 * time.Hour
+	cacheExpiration = 24 * time.Hour
 )
