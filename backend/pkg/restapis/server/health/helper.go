@@ -8,7 +8,16 @@ import (
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"strconv"
+
+	"github.com/gofiber/fiber/v2"
 )
+
+// validFilters is a map that defines the valid filters and their corresponding log messages.
+var validFilters = map[string]string{
+	"":      "viewed the health of the database and Redis",
+	"mysql": "viewed the health of the MySQL database",
+	"redis": "viewed the health of Redis",
+}
 
 // bytesToMBGB converts bytes to megabytes (MB) and gigabytes (GB)
 func bytesToMBGB(bytesStr string) (float64, float64) {
@@ -60,7 +69,16 @@ func formatUptime(uptimeSeconds string) (string, []map[string]string) {
 
 // isValidFilter checks if the provided filter is valid.
 func isValidFilter(filter string) bool {
-	return filter == "" || filter == "mysql" || filter == "redis"
+	_, valid := validFilters[filter]
+	return valid
+}
+
+// logUserActivity logs the user activity based on the filter.
+func logUserActivity(c *fiber.Ctx, filter string) {
+	activity, ok := validFilters[filter]
+	if ok {
+		log.LogUserActivity(c, activity)
+	}
 }
 
 // logHealthStatus logs the health status based on the filter.

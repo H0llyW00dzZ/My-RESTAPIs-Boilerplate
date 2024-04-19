@@ -5,48 +5,18 @@
 package health
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
 
 	"h0llyw00dz-template/backend/internal/database"
-	log "h0llyw00dz-template/backend/internal/logger"
 )
 
 // Response represents the structured response for the health statistics.
 type Response struct {
 	MySQLHealth *MySQLHealth `json:"mysql_health,omitempty"`
 	RedisHealth *RedisHealth `json:"redis_health,omitempty"`
-}
-
-// MySQLHealth represents the health statistics for MySQL.
-type MySQLHealth struct {
-	Status          string `json:"status"`
-	Message         string `json:"message"`
-	Error           string `json:"error,omitempty"`
-	OpenConnections string `json:"open_connections,omitempty"`
-	InUse           string `json:"in_use,omitempty"`
-	Idle            string `json:"idle,omitempty"`
-	WaitCount       string `json:"wait_count,omitempty"`
-	WaitDuration    string `json:"wait_duration,omitempty"`
-}
-
-// RedisHealth represents the health statistics for Redis.
-type RedisHealth struct {
-	Status           string              `json:"status"`
-	Message          string              `json:"message"`
-	Error            string              `json:"error,omitempty"`
-	Version          string              `json:"version,omitempty"`
-	Mode             string              `json:"mode,omitempty"`
-	ConnectedClients string              `json:"connected_clients,omitempty"`
-	UsedMemory       MemoryUsage         `json:"used_memory,omitempty"`
-	PeakUsedMemory   MemoryUsage         `json:"peak_used_memory,omitempty"`
-	UptimeStats      string              `json:"uptime_stats,omitempty"`
-	Uptime           []map[string]string `json:"uptime,omitempty"`
-}
-
-// MemoryUsage represents memory usage in both megabytes and gigabytes.
-type MemoryUsage struct {
-	MB string `json:"mb,omitempty"`
-	GB string `json:"gb,omitempty"`
 }
 
 // DBHandler is a Fiber handler that checks the health of the database and Redis.
@@ -61,7 +31,7 @@ func DBHandler(db database.Service) fiber.Handler {
 		if !isValidFilter(filter) {
 			// TODO: Deal with log errors. Typically, I wouldn't tackle this for StatusBadRequest or StatusNotFound. 🤷‍♂️ 🤪
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Invalid filter parameter. Allowed values: mysql, redis",
+				"error": fmt.Sprintf("Invalid filter parameter. Allowed values: %s", strings.Join(getValidFilters(), ", ")),
 			})
 		}
 
@@ -85,30 +55,52 @@ func DBHandler(db database.Service) fiber.Handler {
 	}
 }
 
-// logUserActivity logs the user activity based on the filter.
-func logUserActivity(c *fiber.Ctx, filter string) {
-	switch filter {
-	case "mysql":
-		log.LogUserActivity(c, "viewed the health of the MySQL database")
-	case "redis":
-		log.LogUserActivity(c, "viewed the health of Redis")
-	default:
-		log.LogUserActivity(c, "viewed the health of the database and Redis")
+// getValidFilters returns a slice of valid filter values.
+func getValidFilters() []string {
+	filters := make([]string, 0, len(validFilters))
+	for filter := range validFilters {
+		if filter != "" {
+			filters = append(filters, filter)
+		}
 	}
+	return filters
 }
 
 // createHealthResponse creates a Response struct from the provided health statistics.
 func createHealthResponse(health map[string]string, filter string) Response {
 	// Note: By structuring the code this way, it is easily maintainable for customization, etc.
-	response := Response{}
-
-	if filter == "" || filter == "mysql" {
-		response.MySQLHealth = createMySQLHealthResponse(health)
+	// Define a map of filter-specific response creation functions
+	responseCreators := map[string]func(map[string]string) interface{}{
+		"mysql": func(h map[string]string) interface{} {
+			return createMySQLHealthResponse(h)
+		},
+		"redis": func(h map[string]string) interface{} {
+			return createRedisHealthResponse(h)
+		},
 	}
 
-	if filter == "" || filter == "redis" {
-		response.RedisHealth = createRedisHealthResponse(health)
+	response := Response{}
+
+	// Check if the filter is empty or exists in the responseCreators map
+	if filter == "" {
+		// If the filter is empty, create responses for all available filters
+		for _, creator := range responseCreators {
+			applyHealthResponse(&response, creator(health))
+		}
+	} else if creator, ok := responseCreators[filter]; ok {
+		// If the filter exists in the responseCreators map, create the corresponding response
+		applyHealthResponse(&response, creator(health))
 	}
 
 	return response
+}
+
+// applyHealthResponse applies the health response to the Response struct based on the type of response.
+func applyHealthResponse(response *Response, healthResponse interface{}) {
+	switch r := healthResponse.(type) {
+	case *MySQLHealth:
+		response.MySQLHealth = r
+	case *RedisHealth:
+		response.RedisHealth = r
+	}
 }
