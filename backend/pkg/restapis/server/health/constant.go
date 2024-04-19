@@ -13,7 +13,7 @@ var (
 	// validFiltersKeyPrefix is the prefix used for the key to store the valid filters for database health checks in Redis.
 	// It is a descriptive prefix that clearly indicates the purpose of the cached data.
 	// Using a descriptive prefix improves clarity, avoids naming conflicts, and enhances maintainability.
-	validFiltersKeyPrefix = "Database health check valid filters TrackID:"
+	validFiltersKeyPrefix = "DBHealthCheckTrackID:"
 
 	// validFiltersKey is the unique key used to store the valid filters in Redis.
 	// It is generated once and reused for subsequent cache operations.
