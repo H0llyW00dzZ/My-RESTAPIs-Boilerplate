@@ -79,6 +79,10 @@ func isValidFilter(filter string) bool {
 }
 
 // initValidFiltersSlice initializes the slice of valid filter keys based on the validFilters map.
+// It attempts to retrieve the valid filters from the cache using the provided storage and IP address.
+// If the retrieval is successful, it returns early without generating or storing the filters.
+// If the retrieval fails or the filters are not found in the cache, it generates the valid filters
+// based on the IP address and stores them in the cache for future use.
 func initValidFiltersSlice(storage fiber.Storage, ipAddress string) {
 	// Attempt to retrieve valid filters from cache
 	if ok, _ := retrieveValidFiltersFromCache(storage, ipAddress); ok {

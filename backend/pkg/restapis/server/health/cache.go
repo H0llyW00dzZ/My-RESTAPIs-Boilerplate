@@ -16,6 +16,8 @@ import (
 // generateValidFiltersKey generates a unique key for storing the valid filters in Redis.
 // It combines the validFiltersKeyPrefix with a random UUID to ensure uniqueness.
 // The key is generated only once and reused for subsequent cache operations.
+// It attempts to retrieve an existing key for the given IP address from the cache.
+// If no existing key is found or an error occurs, a new key is generated and saved.
 func generateValidFiltersKey(storage fiber.Storage, ipAddress string) (string, error) {
 	var err error
 	validFiltersKeyOnce.Do(func() {
@@ -35,6 +37,9 @@ func generateValidFiltersKey(storage fiber.Storage, ipAddress string) (string, e
 }
 
 // retrieveValidFiltersFromCache attempts to retrieve valid filters from cache.
+// It generates the valid filters key based on the provided IP address and
+// retrieves the cached data using the generated key.
+// Returns a boolean indicating whether the retrieval was successful and any error encountered.
 func retrieveValidFiltersFromCache(storage fiber.Storage, ipAddress string) (bool, error) {
 	validFiltersKey, err := generateValidFiltersKey(storage, ipAddress)
 	if err != nil {
@@ -45,6 +50,9 @@ func retrieveValidFiltersFromCache(storage fiber.Storage, ipAddress string) (boo
 }
 
 // storeValidFiltersInCache stores the valid filters in cache.
+// It generates the valid filters key based on the provided IP address and
+// stores the valid filters data in the cache using the generated key.
+// Returns any error encountered during the process.
 func storeValidFiltersInCache(storage fiber.Storage, ipAddress string) error {
 	validFiltersKey, err := generateValidFiltersKey(storage, ipAddress)
 	if err != nil {
