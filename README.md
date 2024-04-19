@@ -29,7 +29,7 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 > 
 > For example, `%d days, %d hours, %d minutes, %d seconds` (`English`) would be translated to `%d hari, %d jam, %d menit, %d detik` (`Indonesian`).
 >
-> The reason for implementing this feature and marking it as a TODO is to avoid having to rewrite the same strings in multiple `constant.go` files.
+> The reason for implementing this feature and marking it as a TODO is to avoid having to rewrite and recompile the same strings in multiple `constant.go` files.
 
 
 ## Supported Additional Features
