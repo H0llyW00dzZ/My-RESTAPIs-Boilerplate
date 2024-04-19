@@ -20,7 +20,9 @@ var validFilters = map[string]string{
 }
 
 // validFiltersSlice is a slice that holds the valid filter keys.
-var validFiltersSlice = initValidFiltersSlice()
+// It is initialized by the initValidFiltersSlice function using the validFilters map.
+// The valid filters are cached in Redis to avoid regenerating them on each request.
+var validFiltersSlice []string
 
 // bytesToMBGB converts bytes to megabytes (MB) and gigabytes (GB)
 func bytesToMBGB(bytesStr string) (float64, float64) {
@@ -77,14 +79,28 @@ func isValidFilter(filter string) bool {
 }
 
 // initValidFiltersSlice initializes the slice of valid filter keys based on the validFilters map.
-func initValidFiltersSlice() []string {
-	filters := make([]string, 0, len(validFilters))
+func initValidFiltersSlice(storage fiber.Storage) {
+	// Attempt to retrieve valid filters from cache
+	if retrieveValidFiltersFromCache(storage) {
+		return
+	}
+
+	// Generate valid filters slice
+	generateValidFilters()
+
+	// Store valid filters in cache
+	storeValidFiltersInCache(storage)
+}
+
+// generateValidFilters generates the valid filters slice.
+func generateValidFilters() {
+	validFiltersSlice = make([]string, 0, len(validFilters))
 	for filter := range validFilters {
 		if filter != "" {
-			filters = append(filters, filter)
+			validFiltersSlice = append(validFiltersSlice, filter)
 		}
 	}
-	return filters
+	log.LogInfof("Generated valid filters: %v", validFiltersSlice)
 }
 
 // logUserActivity logs the user activity based on the filter.
