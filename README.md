@@ -18,6 +18,10 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 ## TODO Features
 
 - [ ] Custom Monitoring Integration with Kubernetes ecosystems, such as Grafana, etc. at the top level
+
+> [!NOTE]  
+> Additional features will be added later as my primary focus is on using this with the Fiber framework.
+
 - [ ] Translate to any language
 
 > [!NOTE]
@@ -27,8 +31,6 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 >
 > The reason for implementing this feature and marking it as a TODO is to avoid having to rewrite the same strings in multiple `constant.go` files.
 
-> [!NOTE]  
-> Additional features will be added later as my primary focus is on using this with the Fiber framework.
 
 ## Supported Additional Features
 
