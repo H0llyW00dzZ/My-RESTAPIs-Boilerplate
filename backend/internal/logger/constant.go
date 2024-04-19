@@ -6,13 +6,13 @@ package logger
 
 // Define ANSI color codes.
 const (
-	ColorReset     = "\033[0m"
-	ColorRed       = "\033[31m"
-	ColorGreen     = "\033[32m"
-	ColorYellow    = "\033[33m"
-	ColorBlue      = "\033[34m"
-	ColorMagenta   = "\033[35m"
-	ColorBrightRed = "\033[91m"
+	ColorReset     = "\x1b[0m"
+	ColorRed       = "\x1b[31m"
+	ColorGreen     = "\x1b[32m"
+	ColorYellow    = "\x1b[33m"
+	ColorBlue      = "\x1b[34m"
+	ColorMagenta   = "\x1b[35m"
+	ColorBrightRed = "\x1b[91m"
 )
 
 // Define log levels.
