@@ -9,10 +9,12 @@ import (
 	"io"
 	"log"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/mattn/go-colorable"
 )
 
 // Logger is a custom logger with different levels of logging.
@@ -26,6 +28,11 @@ type Logger struct {
 
 // NewLogger creates a new Logger instance with custom prefixes, colors, and time format.
 func NewLogger(out io.Writer, appName, appNameColor, timeFormat string) *Logger {
+	// Enable color output on Windows
+	if runtime.GOOS == "windows" {
+		out = colorable.NewColorableStdout()
+	}
+
 	// Set the desired time format for the loggers
 	var flags int
 	var timeFormatter func(t time.Time) string
