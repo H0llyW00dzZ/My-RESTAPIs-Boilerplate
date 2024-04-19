@@ -4,6 +4,18 @@
 
 package health
 
+// MySQLHealth represents the health statistics for MySQL.
+type MySQLHealth struct {
+	Status          string `json:"status"`
+	Message         string `json:"message"`
+	Error           string `json:"error,omitempty"`
+	OpenConnections string `json:"open_connections,omitempty"`
+	InUse           string `json:"in_use,omitempty"`
+	Idle            string `json:"idle,omitempty"`
+	WaitCount       string `json:"wait_count,omitempty"`
+	WaitDuration    string `json:"wait_duration,omitempty"`
+}
+
 // createMySQLHealthResponse creates a MySQLHealth struct from the provided health statistics.
 func createMySQLHealthResponse(health map[string]string) *MySQLHealth {
 	return &MySQLHealth{

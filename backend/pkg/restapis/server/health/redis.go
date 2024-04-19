@@ -6,6 +6,26 @@ package health
 
 import "fmt"
 
+// RedisHealth represents the health statistics for Redis.
+type RedisHealth struct {
+	Status           string              `json:"status"`
+	Message          string              `json:"message"`
+	Error            string              `json:"error,omitempty"`
+	Version          string              `json:"version,omitempty"`
+	Mode             string              `json:"mode,omitempty"`
+	ConnectedClients string              `json:"connected_clients,omitempty"`
+	UsedMemory       MemoryUsage         `json:"used_memory,omitempty"`
+	PeakUsedMemory   MemoryUsage         `json:"peak_used_memory,omitempty"`
+	UptimeStats      string              `json:"uptime_stats,omitempty"`
+	Uptime           []map[string]string `json:"uptime,omitempty"`
+}
+
+// MemoryUsage represents memory usage in both megabytes and gigabytes.
+type MemoryUsage struct {
+	MB string `json:"mb,omitempty"`
+	GB string `json:"gb,omitempty"`
+}
+
 // createRedisHealthResponse creates a RedisHealth struct from the provided health statistics.
 func createRedisHealthResponse(health map[string]string) *RedisHealth {
 	// Convert used memory and peak used memory to megabytes (MB) and gigabytes (GB)
