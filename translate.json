@@ -1,15 +1,4 @@
 {
-  "en": {
-    "uptimeStats": "%d days, %d hours, %d minutes, %d seconds",
-    "day": "day",
-    "hour": "hour",
-    "minute": "minute",
-    "second": "second",
-    "mysqlStatus": "MySQL Status: %s, Stats: Open Connections: %s, In Use: %s, Idle: %s, Wait Count: %s, Wait Duration: %s",
-    "mysqlError": "MySQL Error: %v",
-    "redisStatus": "Redis Status: %s, Stats: Version: %s, Mode: %s, Connected Clients: %s, Used Memory: %s MB (%s GB), Peak Used Memory: %s MB (%s GB), Uptime: %s",
-    "redisError": "Redis Error: %v"
-  },
   "id": {
     "uptimeStats": "%d hari, %d jam, %d menit, %d detik",
     "day": "hari",
