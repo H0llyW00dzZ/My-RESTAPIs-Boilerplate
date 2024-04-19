@@ -57,13 +57,8 @@ func DBHandler(db database.Service) fiber.Handler {
 
 // getValidFilters returns a slice of valid filter values.
 func getValidFilters() []string {
-	filters := make([]string, 0, len(validFilters))
-	for filter := range validFilters {
-		if filter != "" {
-			filters = append(filters, filter)
-		}
-	}
-	return filters
+	// Note: this kind of optimization is part of a strategy called "premature optimization"
+	return validFiltersSlice
 }
 
 // createHealthResponse creates a Response struct from the provided health statistics.
