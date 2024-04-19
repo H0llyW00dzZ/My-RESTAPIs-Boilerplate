@@ -19,17 +19,10 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 
 - [ ] Custom Monitoring Integration with Kubernetes ecosystems, such as Grafana, etc. at the top level
 
+- [X] Translate to any language
+
 > [!NOTE]  
 > Additional features will be added later as my primary focus is on using this with the Fiber framework.
-
-- [ ] Translate to any language
-
-> [!NOTE]
-> The `Translate to any language` feature is designed to translate strings to any language.
-> 
-> For example, `%d days, %d hours, %d minutes, %d seconds` (`English`) would be translated to `%d hari, %d jam, %d menit, %d detik` (`Indonesian`).
->
-> The reason for implementing this feature and marking it as a TODO is to avoid having to rewrite and recompile the same strings in multiple `constant.go` files.
 
 
 ## Supported Additional Features
