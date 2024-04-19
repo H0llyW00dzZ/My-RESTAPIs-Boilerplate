@@ -4,7 +4,10 @@
 
 package health
 
-import "fmt"
+import (
+	"fmt"
+	log "h0llyw00dz-template/backend/internal/logger"
+)
 
 // RedisHealth represents the health statistics for Redis.
 type RedisHealth struct {
@@ -54,5 +57,17 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 		},
 		UptimeStats: uptimeStats,
 		Uptime:      uptime,
+	}
+}
+
+// logRedisHealthStatus logs the Redis health status.
+func logRedisHealthStatus(response Response) {
+	if response.RedisHealth.Status == "up" {
+		log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Connected Clients: %s, Used Memory: %s MB (%s GB), Peak Used Memory: %s MB (%s GB), Uptime: %s",
+			response.RedisHealth.Message, response.RedisHealth.Version, response.RedisHealth.Mode,
+			response.RedisHealth.ConnectedClients, response.RedisHealth.UsedMemory.MB, response.RedisHealth.UsedMemory.GB,
+			response.RedisHealth.PeakUsedMemory.MB, response.RedisHealth.PeakUsedMemory.GB, response.RedisHealth.UptimeStats)
+	} else {
+		log.LogErrorf("Redis Error: %v", response.RedisHealth.Error)
 	}
 }

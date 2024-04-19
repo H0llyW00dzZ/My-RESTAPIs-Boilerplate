@@ -4,6 +4,8 @@
 
 package health
 
+import log "h0llyw00dz-template/backend/internal/logger"
+
 // MySQLHealth represents the health statistics for MySQL.
 type MySQLHealth struct {
 	Status          string `json:"status"`
@@ -27,5 +29,16 @@ func createMySQLHealthResponse(health map[string]string) *MySQLHealth {
 		Idle:            health["mysql_idle"],
 		WaitCount:       health["mysql_wait_count"],
 		WaitDuration:    health["mysql_wait_duration"],
+	}
+}
+
+// logMySQLHealthStatus logs the MySQL health status.
+func logMySQLHealthStatus(response Response) {
+	if response.MySQLHealth.Status == "up" {
+		log.LogInfof("MySQL Status: %s, Stats: Open Connections: %s, In Use: %s, Idle: %s, Wait Count: %s, Wait Duration: %s",
+			response.MySQLHealth.Message, response.MySQLHealth.OpenConnections, response.MySQLHealth.InUse,
+			response.MySQLHealth.Idle, response.MySQLHealth.WaitCount, response.MySQLHealth.WaitDuration)
+	} else {
+		log.LogErrorf("MySQL Error: %v", response.MySQLHealth.Error)
 	}
 }

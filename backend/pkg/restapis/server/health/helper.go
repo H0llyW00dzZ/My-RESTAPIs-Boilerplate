@@ -83,28 +83,20 @@ func logUserActivity(c *fiber.Ctx, filter string) {
 
 // logHealthStatus logs the health status based on the filter.
 func logHealthStatus(response Response, filter string) {
-	if filter == "" || filter == "mysql" {
-		// Log the MySQL health status
-		if response.MySQLHealth.Status == "up" {
-			log.LogInfof("MySQL Status: %s, Stats: Open Connections: %s, In Use: %s, Idle: %s, Wait Count: %s, Wait Duration: %s",
-				response.MySQLHealth.Message, response.MySQLHealth.OpenConnections, response.MySQLHealth.InUse,
-				response.MySQLHealth.Idle, response.MySQLHealth.WaitCount, response.MySQLHealth.WaitDuration)
-		} else {
-			// If the MySQL status key is missing, log an error
-			log.LogErrorf("MySQL Error: %v", response.MySQLHealth.Error)
-		}
+	// Define a map of filter-specific logging functions
+	loggers := map[string]func(Response){
+		"mysql": logMySQLHealthStatus,
+		"redis": logRedisHealthStatus,
 	}
 
-	if filter == "" || filter == "redis" {
-		// Log the Redis health status
-		if response.RedisHealth.Status == "up" {
-			log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Connected Clients: %s, Used Memory: %s MB (%s GB), Peak Used Memory: %s MB (%s GB), Uptime: %s",
-				response.RedisHealth.Message, response.RedisHealth.Version, response.RedisHealth.Mode,
-				response.RedisHealth.ConnectedClients, response.RedisHealth.UsedMemory.MB, response.RedisHealth.UsedMemory.GB,
-				response.RedisHealth.PeakUsedMemory.MB, response.RedisHealth.PeakUsedMemory.GB, response.RedisHealth.UptimeStats)
-		} else {
-			// If the Redis status key is missing, log an error
-			log.LogErrorf("Redis Error: %v", response.RedisHealth.Error)
+	// Check if the filter is empty or exists in the loggers map
+	if filter == "" {
+		// If the filter is empty, log the health status for all available filters
+		for _, logger := range loggers {
+			logger(response)
 		}
+	} else if logger, ok := loggers[filter]; ok {
+		// If the filter exists in the loggers map, log the corresponding health status
+		logger(response)
 	}
 }
