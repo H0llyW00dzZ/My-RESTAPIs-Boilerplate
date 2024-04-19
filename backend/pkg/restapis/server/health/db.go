@@ -24,8 +24,11 @@ type Response struct {
 // The detailed health statistics are returned as a structured JSON response.
 func DBHandler(db database.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// Initialize the valid filters slice using the fiber.Storage
-		initValidFiltersSlice(db.FiberStorage())
+		// Get the IP address from the request context
+		ipAddress := c.IP()
+
+		// Initialize the valid filters slice using the fiber.Storage and IP address
+		initValidFiltersSlice(db.FiberStorage(), ipAddress)
 		// Get the filter parameter from the query string
 		filter := c.Query("filter")
 

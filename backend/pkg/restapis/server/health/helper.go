@@ -79,28 +79,32 @@ func isValidFilter(filter string) bool {
 }
 
 // initValidFiltersSlice initializes the slice of valid filter keys based on the validFilters map.
-func initValidFiltersSlice(storage fiber.Storage) {
+// It attempts to retrieve the valid filters from the cache using the provided storage and IP address.
+// If the retrieval is successful, it returns early without generating or storing the filters.
+// If the retrieval fails or the filters are not found in the cache, it generates the valid filters
+// based on the IP address and stores them in the cache for future use.
+func initValidFiltersSlice(storage fiber.Storage, ipAddress string) {
 	// Attempt to retrieve valid filters from cache
-	if retrieveValidFiltersFromCache(storage) {
+	if ok, _ := retrieveValidFiltersFromCache(storage, ipAddress); ok {
 		return
 	}
 
 	// Generate valid filters slice
-	generateValidFilters()
+	generateValidFilters(ipAddress)
 
 	// Store valid filters in cache
-	storeValidFiltersInCache(storage)
+	storeValidFiltersInCache(storage, ipAddress)
 }
 
 // generateValidFilters generates the valid filters slice.
-func generateValidFilters() {
+func generateValidFilters(ipAddress string) {
 	validFiltersSlice = make([]string, 0, len(validFilters))
 	for filter := range validFilters {
 		if filter != "" {
 			validFiltersSlice = append(validFiltersSlice, filter)
 		}
 	}
-	log.LogInfof("Generated valid filters: %v", validFiltersSlice)
+	log.LogInfof("Generated valid filters for IP address %s: %v", ipAddress, validFiltersSlice)
 }
 
 // logUserActivity logs the user activity based on the filter.
