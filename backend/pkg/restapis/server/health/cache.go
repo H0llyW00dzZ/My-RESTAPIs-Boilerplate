@@ -22,6 +22,9 @@ func generateValidFiltersKey(storage fiber.Storage, ipAddress string) (string, e
 	var err error
 	validFiltersKeyOnce.Do(func() {
 		// Attempt to retrieve the existing key for the IP address
+		// Note: This method works well even after server restarts.
+		// It will retrieve the valid filters key associated with the client's IP address.
+		// Additionally, when running on Kubernetes along with Redis, the latency for this method will be faster.
 		existingKey, errRetrieve := retrieveIPKeyMapping(storage, ipAddress)
 		if errRetrieve == nil && existingKey != "" {
 			validFiltersKey = existingKey
