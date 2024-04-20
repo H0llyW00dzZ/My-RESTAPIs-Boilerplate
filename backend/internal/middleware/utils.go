@@ -18,6 +18,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/favicon"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
+	"github.com/google/uuid"
 )
 
 // NewCacheMiddleware creates a new cache middleware with the specified expiration time and cache control flag.
@@ -111,4 +112,56 @@ func NewPprofMiddleware(path, pprofMessage string) fiber.Handler {
 			Prefix: path,
 		})(c)
 	}
+}
+
+// NewIPBasedUUIDMiddleware creates a new middleware that generates a deterministic UUID based on the client's IP address
+// and attaches it to the Fiber context for reusability.
+func NewIPBasedUUIDMiddleware() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		// Get the client's IP address from the Fiber context
+		ipAddress := c.IP()
+
+		// Generate a deterministic UUID based on the IP address
+		uuid := generateGoogleUUIDFromIP(ipAddress)
+
+		// Attach the generated UUID to the Fiber context
+		c.Locals("ip_based_uuid", uuid)
+
+		// Continue to the next middleware or handler
+		return c.Next()
+	}
+}
+
+// generateGoogleUUIDFromIP generates a deterministic UUID based on the provided IP address.
+func generateGoogleUUIDFromIP(ipAddress string) string {
+	return uuid.NewSHA1(uuid.NameSpaceURL, []byte(ipAddress)).String()
+}
+
+// NewSignatureMiddleware creates a new middleware that generates a signature based on the client's IP address
+// and attaches it to the Fiber context for security purposes.
+func NewSignatureMiddleware() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		// Get the client's IP address from the Fiber context
+		ipAddress := c.IP()
+
+		// Generate a signature based on the IP address
+		signature := generateSignatureFromIP(ipAddress)
+
+		// Attach the generated signature to the Fiber context
+		c.Locals("signature", signature)
+
+		// Continue to the next middleware or handler
+		return c.Next()
+	}
+}
+
+// generateSignatureFromIP generates a signature based on the provided IP address.
+func generateSignatureFromIP(ipAddress string) string {
+	// Generate a UUID based on the IP address
+	uuid := uuid.NewSHA1(uuid.NameSpaceURL, []byte(ipAddress))
+
+	// Generate a signature by taking the first 8 characters of the UUID
+	signature := uuid.String()[:8]
+
+	return signature
 }
