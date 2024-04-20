@@ -102,9 +102,13 @@ func NewFaviconMiddleware(filePath, urlPath string) fiber.Handler {
 }
 
 // NewPprofMiddleware creates a new pprof middleware with a custom path.
-// It allows easy access to the pprof profiling tools.
-func NewPprofMiddleware(path string) fiber.Handler {
-	return pprof.New(pprof.Config{
-		Prefix: path,
-	})
+// It allows easy access to the pprof profiling tools and logs user activity.
+func NewPprofMiddleware(path, pprofMessage string) fiber.Handler {
+	// Example Usage: app.Use(NewPprofMiddleware("/pprof", "Accessed pprof profiling tools"))
+	return func(c *fiber.Ctx) error {
+		log.LogUserActivity(c, pprofMessage)
+		return pprof.New(pprof.Config{
+			Prefix: path,
+		})(c)
+	}
 }
