@@ -17,6 +17,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/gofiber/fiber/v2/middleware/pprof"
 )
 
 // NewCacheMiddleware creates a new cache middleware with the specified expiration time and cache control flag.
@@ -97,5 +98,13 @@ func NewFaviconMiddleware(filePath, urlPath string) fiber.Handler {
 	return favicon.New(favicon.Config{
 		File: filePath,
 		URL:  urlPath,
+	})
+}
+
+// NewPprofMiddleware creates a new pprof middleware with a custom path.
+// It allows easy access to the pprof profiling tools.
+func NewPprofMiddleware(path string) fiber.Handler {
+	return pprof.New(pprof.Config{
+		Prefix: path,
 	})
 }
