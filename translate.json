@@ -32,7 +32,17 @@
     "msgDBManyMaxLifetimeClosures": "Many connections are being closed due to max lifetime, consider increasing max lifetime or revising the connection usage pattern.",
     "msgDBNotAccessible": "The database is not accessible, please check the connection and credentials.",
     "logQuery": ", Query: %s",
-    "logVisitorInfo": "Method: %s%s, Activity: %s - IP: %s, User-Agent: %s"
+    "logVisitorInfo": "Method: %s%s, Activity: %s - IP: %s, User-Agent: %s",
+    "logFailedToGenerateValidFiltersKey": "Failed to generate valid filters key: %v",
+    "logCacheDataNotFoundForKey": "Cache data not found for key: %s",
+    "logFailedToRetrieveCacheDataForKey": "Failed to retrieve cache data for key: %s, error: %v",
+    "logCacheDataIsEmptyForKey": "Cache data is empty for key: %s",
+    "logFailedToUnmarshalCacheDataForKey": "Failed to unmarshal cache data for key: %s, error: %v",
+    "logFailedToDeleteInvalidCachedDataForKey": "Failed to delete invalid cached data for key: %s, error: %v",
+    "logCacheDataRetrievedForKey": "Cache data retrieved for key: %s",
+    "logFailedToMarshalCacheDataForKey": "Failed to marshal cache data for key: %s, error: %v",
+    "logFailedToStoreCacheDataForKey": "Failed to store cache data for key: %s, error: %v",
+    "logCacheDataStoredForKeyWithExpiration": "Cache data stored for key: %s with expiration: %v"
   },
   "id": {
     "uptimeStats": "%d hari, %d jam, %d menit, %d detik",
@@ -67,6 +77,16 @@
     "msgDBManyMaxLifetimeClosures": "Banyak koneksi ditutup karena waktu maksimum, pertimbangkan untuk meningkatkan waktu maksimum atau merevisi pola penggunaan koneksi.",
     "msgDBNotAccessible": "Database tidak dapat diakses, silakan periksa koneksi dan kredensial.",
     "logQuery": ", Kueri: %s",
-    "logVisitorInfo": "Metode: %s%s, Aktivitas: %s - IP: %s, Agen Pengguna: %s"
+    "logVisitorInfo": "Metode: %s%s, Aktivitas: %s - IP: %s, Agen Pengguna: %s",
+    "logFailedToGenerateValidFiltersKey": "Gagal menghasilkan kunci filter yang valid: %v",
+    "logCacheDataNotFoundForKey": "Data cache tidak ditemukan untuk kunci: %s",
+    "logFailedToRetrieveCacheDataForKey": "Gagal mengambil data cache untuk kunci: %s, error: %v",
+    "logCacheDataIsEmptyForKey": "Data cache kosong untuk kunci: %s",
+    "logFailedToUnmarshalCacheDataForKey": "Gagal membongkar data cache untuk kunci: %s, error: %v",
+    "logFailedToDeleteInvalidCachedDataForKey": "Gagal menghapus data cache yang tidak valid untuk kunci: %s, error: %v",
+    "logCacheDataRetrievedForKey": "Data cache diambil untuk kunci: %s",
+    "logFailedToMarshalCacheDataForKey": "Gagal memadatkan data cache untuk kunci: %s, error: %v",
+    "logFailedToStoreCacheDataForKey": "Gagal menyimpan data cache untuk kunci: %s, error: %v",
+    "logCacheDataStoredForKeyWithExpiration": "Data cache disimpan untuk kunci: %s dengan kedaluwarsa: %v"
   }
 }
