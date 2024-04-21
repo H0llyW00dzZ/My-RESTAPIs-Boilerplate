@@ -42,6 +42,10 @@ type Service interface {
 
 	// FiberStorage returns the [fiber.Storage] interface for storage middleware.
 	FiberStorage() fiber.Storage
+
+	// ScanAndDel uses the Redis SCAN command to iterate over a set of keys and delete them.
+	// It's particularly useful for deleting keys with a common pattern.
+	ScanAndDel(pattern string) error
 }
 
 // service is a concrete implementation of the Service interface.
@@ -259,4 +263,38 @@ func (s *service) QueryRow(ctx context.Context, query string, args ...interface{
 // FiberStorage returns the [fiber.Storage] interface for fiber storage middleware.
 func (s *service) FiberStorage() fiber.Storage {
 	return s.rdb
+}
+
+// ScanAndDel uses the Redis SCAN command to iterate over a set of keys and delete them.
+func (s *service) ScanAndDel(pattern string) error {
+	ctx := context.Background()
+	var cursor uint64
+	var n int
+	for {
+		// Use the SCAN command to iterate over the keys.
+		var keys []string
+		var err error
+		keys, cursor, err = s.redisClient.Scan(ctx, cursor, pattern, 0).Result()
+		if err != nil {
+			log.LogErrorf("Error retrieving keys from Redis: %v", err)
+			return err
+		}
+		n += len(keys)
+
+		// Use the DEL command to delete the keys.
+		if len(keys) > 0 {
+			_, err = s.redisClient.Del(ctx, keys...).Result()
+			if err != nil {
+				log.LogErrorf("Error deleting keys from Redis: %v", err)
+				return err
+			}
+		}
+
+		// If the cursor returned by SCAN is 0, we have iterated through all keys.
+		if cursor == 0 {
+			break
+		}
+	}
+	log.LogInfof("Deleted %d keys with pattern: %s", n, pattern)
+	return nil
 }
