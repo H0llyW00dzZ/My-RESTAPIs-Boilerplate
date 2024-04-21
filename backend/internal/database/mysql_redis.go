@@ -339,6 +339,9 @@ func (s *service) Exec(ctx context.Context, query string, args ...interface{}) (
 }
 
 // ExecWithoutRow executes a query without returning any rows.
+//
+// Note: This method is different from "Exec". Unlike "Exec", it doesn't return "sql.Result".
+// This method is better suited for initializing database schemas or running migrations before the app starts.
 func (s *service) ExecWithoutRow(ctx context.Context, query string, args ...interface{}) error {
 	_, err := s.db.ExecContext(ctx, query, args...)
 	if err != nil {
