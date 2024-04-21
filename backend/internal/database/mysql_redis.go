@@ -166,6 +166,13 @@ func New() Service {
 	db.SetMaxIdleConns(50)
 	db.SetMaxOpenConns(50)
 
+	// Note: This configuration is better for starters and provides stability.
+	// Tested on Node Spec:
+	// 2x vCPU
+	// 4x ~ 8x Compute
+	// 1 GB RAM
+	maxConnections := 2 * runtime.NumCPU()
+
 	// Create a new Redis client for health checks
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", redisAddress, redisPort),
@@ -174,6 +181,7 @@ func New() Service {
 		TLSConfig: &tls.Config{
 			MinVersion: tls.VersionTLS12,
 		},
+		PoolSize: maxConnections,
 	})
 
 	// Initialize the Redis storage for rate limiting or any that needed in middleware
@@ -186,7 +194,7 @@ func New() Service {
 		TLSConfig: &tls.Config{
 			MinVersion: tls.VersionTLS12,
 		},
-		PoolSize: 10 * runtime.GOMAXPROCS(10), // Adjust the pool size as needed
+		PoolSize: maxConnections, // Adjust the pool size as needed
 	})
 
 	dbInstance = &service{
