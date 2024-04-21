@@ -23,18 +23,23 @@ type PoolingStats struct {
 	Active string `json:"active,omitempty"`
 }
 
+// MemoryStats represents the memory usage statistics.
+type MemoryStats struct {
+	Used       MemoryUsage `json:"used,omitempty"`
+	Peak       MemoryUsage `json:"peak,omitempty"`
+	Percentage string      `json:"percentage,omitempty"`
+	Free       MemoryUsage `json:"free,omitempty"`
+}
+
 // RedisStats groups the statistics related to Redis.
 type RedisStats struct {
 	Version          string              `json:"version,omitempty"`
 	Mode             string              `json:"mode,omitempty"`
 	ConnectedClients string              `json:"connected_clients,omitempty"`
-	UsedMemory       MemoryUsage         `json:"used_memory,omitempty"`
-	PeakUsedMemory   MemoryUsage         `json:"peak_used_memory,omitempty"`
+	Memory           MemoryStats         `json:"memory,omitempty"`
 	UptimeStats      string              `json:"uptime_stats,omitempty"`
 	Uptime           []map[string]string `json:"uptime,omitempty"`
 	Pooling          PoolingStats        `json:"pooling,omitempty"`
-	ServerFreeMemory MemoryUsage         `json:"server_free_memory,omitempty"`
-	MemoryUsage      string              `json:"memory_usage,omitempty"`
 }
 
 // RedisHealth represents the health statistics for Redis.
@@ -58,10 +63,17 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 		// Convert used memory and peak used memory to megabytes (MB) and gigabytes (GB)
 		// Note: The gigabyte value will show a nonzero value starting from 0.01GB, which is approximately 10MB.
 		usedMemoryMB, usedMemoryGB := bytesToMBGB(health["redis_used_memory"])
-		peakUsedMemoryMB, peakUsedMemoryGB := bytesToMBGB(health["redis_used_memory_peak"])
-		serverFreeMemoryMB, serverFreeMemoryGB := bytesToMBGB(health["redis_max_memory"])
+		peakMemoryMB, peakMemoryGB := bytesToMBGB(health["redis_used_memory_peak"])
+		freeMemoryMB, freeMemoryGB := bytesToMBGB(health["redis_max_memory"])
+
+		// Calculate the memory usage percentage
+		usedMemory, _ := strconv.ParseInt(health["redis_used_memory"], 10, 64)
+		maxMemory, _ := strconv.ParseInt(health["redis_max_memory"], 10, 64)
+		memoryUsage := calculateMemoryUsage(usedMemory, maxMemory)
+
 		// Format the uptime
 		uptimeStats, uptime := formatUptime(health["redis_uptime_in_seconds"])
+
 		// Create PoolingStats from the health statistics
 		poolingStats := PoolingStats{
 			Total:  health["redis_total_connections"],
@@ -69,34 +81,31 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 			Active: health["redis_active_connections"],
 		}
 
-		// Calculate the memory usage percentage
-		usedMemory, _ := strconv.ParseInt(health["redis_used_memory"], 10, 64)
-		maxMemory, _ := strconv.ParseInt(health["redis_max_memory"], 10, 64)
-		memoryUsage := calculateMemoryUsage(usedMemory, maxMemory)
-
 		redisHealth.Stats = RedisStats{
 			Version:          health["redis_version"],
 			Mode:             health["redis_mode"],
 			ConnectedClients: health["redis_connected_clients"],
-			// Better formatting it should be raw "%.2f"
-			UsedMemory: MemoryUsage{
-				MB: fmt.Sprintf("%.2f", usedMemoryMB),
-				GB: fmt.Sprintf("%.2f", usedMemoryGB),
-			},
-			// Better formatting it should be raw "%.2f"
-			PeakUsedMemory: MemoryUsage{
-				MB: fmt.Sprintf("%.2f", peakUsedMemoryMB),
-				GB: fmt.Sprintf("%.2f", peakUsedMemoryGB),
+			Memory: MemoryStats{
+				Used: MemoryUsage{
+					// Better formatting it should be raw "%.2f"
+					MB: fmt.Sprintf("%.2f", usedMemoryMB),
+					GB: fmt.Sprintf("%.2f", usedMemoryGB),
+				},
+				Peak: MemoryUsage{
+					// Better formatting it should be raw "%.2f"
+					MB: fmt.Sprintf("%.2f", peakMemoryMB),
+					GB: fmt.Sprintf("%.2f", peakMemoryGB),
+				},
+				Percentage: memoryUsage,
+				Free: MemoryUsage{
+					// Better formatting it should be raw "%.2f"
+					MB: fmt.Sprintf("%.2f", freeMemoryMB),
+					GB: fmt.Sprintf("%.2f", freeMemoryGB),
+				},
 			},
 			UptimeStats: uptimeStats,
 			Uptime:      uptime,
 			Pooling:     poolingStats,
-			// Better formatting it should be raw "%.2f"
-			ServerFreeMemory: MemoryUsage{
-				MB: fmt.Sprintf("%.2f", serverFreeMemoryMB),
-				GB: fmt.Sprintf("%.2f", serverFreeMemoryGB),
-			},
-			MemoryUsage: memoryUsage,
 		}
 	}
 
@@ -106,12 +115,14 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 // logRedisHealthStatus logs the Redis health status.
 func logRedisHealthStatus(response Response) {
 	if response.RedisHealth.Status == "up" {
-		log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Used Memory: %s MB (%s GB), Peak Used Memory: %s MB (%s GB), Uptime: %s, Total Connections: %s, Active Connections: %s, Idle Connections: %s, Server Free Memory: %s MB (%s GB), Memory Usage: %s",
+		log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Used Memory: %s MB (%s GB), Peak Memory: %s MB (%s GB), Memory Usage: %s, Free Memory: %s MB (%s GB), Uptime: %s, Total Connections: %s, Active Connections: %s, Idle Connections: %s",
 			response.RedisHealth.Message, response.RedisHealth.Stats.Version, response.RedisHealth.Stats.Mode,
-			response.RedisHealth.Stats.UsedMemory.MB, response.RedisHealth.Stats.UsedMemory.GB,
-			response.RedisHealth.Stats.PeakUsedMemory.MB, response.RedisHealth.Stats.PeakUsedMemory.GB, response.RedisHealth.Stats.UptimeStats,
-			response.RedisHealth.Stats.Pooling.Total, response.RedisHealth.Stats.Pooling.Active, response.RedisHealth.Stats.Pooling.Idle,
-			response.RedisHealth.Stats.ServerFreeMemory.MB, response.RedisHealth.Stats.ServerFreeMemory.GB, response.RedisHealth.Stats.MemoryUsage)
+			response.RedisHealth.Stats.Memory.Used.MB, response.RedisHealth.Stats.Memory.Used.GB,
+			response.RedisHealth.Stats.Memory.Peak.MB, response.RedisHealth.Stats.Memory.Peak.GB,
+			response.RedisHealth.Stats.Memory.Percentage,
+			response.RedisHealth.Stats.Memory.Free.MB, response.RedisHealth.Stats.Memory.Free.GB,
+			response.RedisHealth.Stats.UptimeStats,
+			response.RedisHealth.Stats.Pooling.Total, response.RedisHealth.Stats.Pooling.Active, response.RedisHealth.Stats.Pooling.Idle)
 	} else {
 		log.LogErrorf("Redis Error: %v", response.RedisHealth.Error)
 	}
