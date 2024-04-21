@@ -250,7 +250,7 @@ func (s *service) checkRedisHealth(stats map[string]string) map[string]string {
 }
 
 // evaluateRedisStats evaluates the Redis server statistics and updates the stats map with the appropriate health message.
-func (s *service) evaluateRedisStats(redisInfo map[string]string, stats map[string]string) map[string]string {
+func (s *service) evaluateRedisStats(redisInfo, stats map[string]string) map[string]string {
 	connectedClients, _ := strconv.Atoi(redisInfo["connected_clients"])
 	if connectedClients > 40 { // Assuming 50 is the max for this example
 		stats["redis_message"] = MsgRedisHighConnectedClients
