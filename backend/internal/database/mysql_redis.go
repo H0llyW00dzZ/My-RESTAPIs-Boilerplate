@@ -322,7 +322,6 @@ func (s *service) checkRedisHealth(stats map[string]string) map[string]string {
 			stats["redis_max_memory"] = redisInfo["maxmemory"] // Raw max memory in bytes
 
 			// Evaluate Redis stats to provide a health message
-			// TODO: Improve this "evaluateRedisStats"
 			stats = s.evaluateRedisStats(redisInfo, stats)
 		}
 	}
@@ -332,16 +331,26 @@ func (s *service) checkRedisHealth(stats map[string]string) map[string]string {
 
 // evaluateRedisStats evaluates the Redis server statistics and updates the stats map with the appropriate health message.
 func (s *service) evaluateRedisStats(redisInfo, stats map[string]string) map[string]string {
+	// Check the number of connected clients
 	connectedClients, _ := strconv.Atoi(redisInfo["connected_clients"])
 	if connectedClients > 40 { // Assuming 50 is the max for this example
 		stats["redis_message"] = MsgRedisHighConnectedClients
 	}
 
+	// Check if used memory is close to the maximum memory
 	usedMemory, _ := strconv.ParseInt(redisInfo["used_memory"], 10, 64)
-	if usedMemory > 1024*1024*1024 { // 1 GB
-		stats["redis_message"] = MsgRedisHighMemoryUsage
+	maxMemory, _ := strconv.ParseInt(redisInfo["maxmemory"], 10, 64)
+	if maxMemory > 0 {
+		// Calculate the percentage of used memory
+		usedMemoryPercentage := float64(usedMemory) / float64(maxMemory) * 100
+		// If used memory is greater than or equal to 90% of the maximum memory,
+		// set the redis_health_message to indicate high memory usage
+		if usedMemoryPercentage >= 90 {
+			stats["redis_message"] = MsgRedisHighMemoryUsage
+		}
 	}
 
+	// Check the uptime of the Redis server
 	uptimeInSeconds, _ := strconv.ParseInt(redisInfo["uptime_in_seconds"], 10, 64)
 	if uptimeInSeconds < 3600 { // 1 hour
 		stats["redis_message"] = MsgRedisRecentlyRestarted
