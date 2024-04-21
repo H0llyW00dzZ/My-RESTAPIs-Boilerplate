@@ -346,6 +346,18 @@ func (s *service) ExecWithoutRow(ctx context.Context, query string, args ...inte
 }
 
 // EnsureTransactionClosure is a deferred function to handle transaction rollback or commit.
+//
+// Note: This method requires the database service to be initialized in the "func init()"
+// before it can be used.
+//
+// Example usage in init function:
+//
+//	func init() {
+//	    // Initialize the database service
+//	    db = database.New().GopherService()
+//	}
+//
+// For example usage, see the documentation for the EnsureTransactionClosure method in the Service Interface.
 func (s *service) EnsureTransactionClosure(tx *sql.Tx, err *error) {
 	if p := recover(); p != nil {
 		if rollbackErr := tx.Rollback(); rollbackErr != nil {
