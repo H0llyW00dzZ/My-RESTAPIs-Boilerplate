@@ -333,11 +333,14 @@ func (s *service) checkRedisHealth(stats map[string]string) map[string]string {
 func (s *service) evaluateRedisStats(redisInfo, stats map[string]string) map[string]string {
 	// Check the number of connected clients
 	connectedClients, _ := strconv.Atoi(redisInfo["connected_clients"])
+	// TODO: Improve this to make it more dynamic depending on the pool,
+	// as it seems possible by using generic methods
 	if connectedClients > 40 { // Assuming 50 is the max for this example
 		stats["redis_message"] = MsgRedisHighConnectedClients
 	}
 
 	// Check if used memory is close to the maximum memory
+	// Note: this is now more dynamic instead of hardcoded static 🤪
 	usedMemory, _ := strconv.ParseInt(redisInfo["used_memory"], 10, 64)
 	maxMemory, _ := strconv.ParseInt(redisInfo["maxmemory"], 10, 64)
 	if maxMemory > 0 {
