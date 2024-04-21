@@ -322,6 +322,7 @@ func (s *service) checkRedisHealth(stats map[string]string) map[string]string {
 			stats["redis_max_memory"] = redisInfo["maxmemory"] // Raw max memory in bytes
 
 			// Evaluate Redis stats to provide a health message
+			// TODO: Improve this "evaluateRedisStats"
 			stats = s.evaluateRedisStats(redisInfo, stats)
 		}
 	}
