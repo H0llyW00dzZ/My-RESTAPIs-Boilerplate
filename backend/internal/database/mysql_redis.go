@@ -34,6 +34,21 @@ type Service interface {
 	// Exec executes a SQL query with the provided arguments and returns the result.
 	Exec(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
 
+	// ExecWithoutRow executes a query that doesn't return any rows, such as
+	// CREATE, ALTER, DROP, INSERT, UPDATE, or DELETE statements.
+	// It's useful for initializing database schemas, migrations, or any other
+	// queries that don't require retrieving rows.
+	//
+	// Example Usage:
+	//
+	//	ctx := context.Background()
+	//	query := "CREATE TABLE users (id INT, name VARCHAR(255))"
+	//	err := db.ExecWithoutRow(ctx, query)
+	//	if err != nil {
+	//	    // Handle the error
+	//	}
+	ExecWithoutRow(ctx context.Context, query string, args ...interface{}) error
+
 	// BeginTx starts a new database transaction with the specified options.
 	BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error)
 
@@ -279,6 +294,16 @@ func (s *service) evaluateRedisStats(redisInfo, stats map[string]string) map[str
 // Exec executes a SQL query with the provided arguments.
 func (s *service) Exec(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
 	return s.db.ExecContext(ctx, query, args...)
+}
+
+// ExecWithoutRow executes a query without returning any rows.
+func (s *service) ExecWithoutRow(ctx context.Context, query string, args ...interface{}) error {
+	_, err := s.db.ExecContext(ctx, query, args...)
+	if err != nil {
+		log.LogErrorf("Error executing query: %v", err)
+		return err
+	}
+	return nil
 }
 
 func (s *service) BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error) {
