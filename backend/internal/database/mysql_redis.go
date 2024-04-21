@@ -364,6 +364,7 @@ func (s *service) EnsureTransactionClosure(tx *sql.Tx, err *error) {
 	}
 }
 
+// BeginTx starts a new transaction.
 func (s *service) BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error) {
 	return s.db.BeginTx(ctx, opts)
 }
