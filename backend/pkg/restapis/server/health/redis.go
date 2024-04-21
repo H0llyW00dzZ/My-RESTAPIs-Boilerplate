@@ -32,7 +32,7 @@ type MemoryUsage struct {
 // createRedisHealthResponse creates a RedisHealth struct from the provided health statistics.
 func createRedisHealthResponse(health map[string]string) *RedisHealth {
 	// Convert used memory and peak used memory to megabytes (MB) and gigabytes (GB)
-	// Note: gigabytes will be showing 0.00GB if under 100MB usage
+	// Note: The gigabyte value will show a nonzero value starting from 0.01GB, which is approximately 10MB.
 	usedMemoryMB, usedMemoryGB := bytesToMBGB(health["redis_used_memory"])
 	peakUsedMemoryMB, peakUsedMemoryGB := bytesToMBGB(health["redis_used_memory_peak"])
 	// Format the uptime
