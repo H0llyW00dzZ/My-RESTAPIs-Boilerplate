@@ -17,26 +17,32 @@ type ConnectionStats struct {
 
 // MySQLHealth represents the health statistics for MySQL.
 type MySQLHealth struct {
-	Status  string          `json:"status"`
-	Message string          `json:"message"`
-	Error   string          `json:"error,omitempty"`
-	Stats   ConnectionStats `json:"stats,omitempty"` // Nested stats
+	Status  string           `json:"status"`
+	Message string           `json:"message"`
+	Error   string           `json:"error,omitempty"`
+	Stats   *ConnectionStats `json:"stats,omitempty"`
 }
 
 // createMySQLHealthResponse creates a MySQLHealth struct from the provided health statistics.
 func createMySQLHealthResponse(health map[string]string) *MySQLHealth {
-	return &MySQLHealth{
+	mysqlHealth := &MySQLHealth{
 		Status:  health["mysql_status"],
 		Message: health["mysql_message"],
 		Error:   health["mysql_error"],
-		Stats: ConnectionStats{
+	}
+
+	// Only populate the Stats field if MySQL is up and running
+	if health["mysql_status"] == "up" {
+		mysqlHealth.Stats = &ConnectionStats{
 			Open:      health["mysql_open_connections"],
 			InUse:     health["mysql_in_use"],
 			Idle:      health["mysql_idle"],
 			WaitCount: health["mysql_wait_count"],
 			Duration:  health["mysql_wait_duration"],
-		},
+		}
 	}
+
+	return mysqlHealth
 }
 
 // logMySQLHealthStatus logs the MySQL health status.

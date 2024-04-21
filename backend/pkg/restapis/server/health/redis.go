@@ -45,51 +45,54 @@ type RedisHealth struct {
 
 // createRedisHealthResponse creates a RedisHealth struct from the provided health statistics.
 func createRedisHealthResponse(health map[string]string) *RedisHealth {
-	// Convert used memory and peak used memory to megabytes (MB) and gigabytes (GB)
-	// Note: The gigabyte value will show a nonzero value starting from 0.01GB, which is approximately 10MB.
-	usedMemoryMB, usedMemoryGB := bytesToMBGB(health["redis_used_memory"])
-	peakUsedMemoryMB, peakUsedMemoryGB := bytesToMBGB(health["redis_used_memory_peak"])
-	serverFreeMemoryMB, serverFreeMemoryGB := bytesToMBGB(health["redis_max_memory"])
-	// Format the uptime
-	uptimeStats, uptime := formatUptime(health["redis_uptime_in_seconds"])
-	// Create PoolingStats from the health statistics
-	poolingStats := PoolingStats{
-		Total:  health["redis_total_connections"],
-		Idle:   health["redis_idle_connections"],
-		Active: health["redis_active_connections"],
-	}
-
-	// Create RedisStats from the health statistics
-	redisStats := RedisStats{
-		Version:          health["redis_version"],
-		Mode:             health["redis_mode"],
-		ConnectedClients: health["redis_connected_clients"],
-		// Better formatting it should be raw "%.2f"
-		UsedMemory: MemoryUsage{
-			MB: fmt.Sprintf("%.2f", usedMemoryMB),
-			GB: fmt.Sprintf("%.2f", usedMemoryGB),
-		},
-		// Better formatting it should be raw "%.2f"
-		PeakUsedMemory: MemoryUsage{
-			MB: fmt.Sprintf("%.2f", peakUsedMemoryMB),
-			GB: fmt.Sprintf("%.2f", peakUsedMemoryGB),
-		},
-		UptimeStats: uptimeStats,
-		Uptime:      uptime,
-		Pooling:     poolingStats,
-		// Better formatting it should be raw "%.2f"
-		ServerFreeMemory: MemoryUsage{
-			MB: fmt.Sprintf("%.2f", serverFreeMemoryMB),
-			GB: fmt.Sprintf("%.2f", serverFreeMemoryGB),
-		},
-	}
-
-	return &RedisHealth{
+	redisHealth := &RedisHealth{
 		Status:  health["redis_status"],
 		Message: health["redis_message"],
 		Error:   health["redis_error"],
-		Stats:   redisStats, // This now contains all the Redis related stats
 	}
+
+	// Only populate the Stats field if Redis is up and running
+	if health["redis_status"] == "up" {
+		// Convert used memory and peak used memory to megabytes (MB) and gigabytes (GB)
+		// Note: The gigabyte value will show a nonzero value starting from 0.01GB, which is approximately 10MB.
+		usedMemoryMB, usedMemoryGB := bytesToMBGB(health["redis_used_memory"])
+		peakUsedMemoryMB, peakUsedMemoryGB := bytesToMBGB(health["redis_used_memory_peak"])
+		serverFreeMemoryMB, serverFreeMemoryGB := bytesToMBGB(health["redis_max_memory"])
+		// Format the uptime
+		uptimeStats, uptime := formatUptime(health["redis_uptime_in_seconds"])
+		// Create PoolingStats from the health statistics
+		poolingStats := PoolingStats{
+			Total:  health["redis_total_connections"],
+			Idle:   health["redis_idle_connections"],
+			Active: health["redis_active_connections"],
+		}
+
+		redisHealth.Stats = RedisStats{
+			Version:          health["redis_version"],
+			Mode:             health["redis_mode"],
+			ConnectedClients: health["redis_connected_clients"],
+			// Better formatting it should be raw "%.2f"
+			UsedMemory: MemoryUsage{
+				MB: fmt.Sprintf("%.2f", usedMemoryMB),
+				GB: fmt.Sprintf("%.2f", usedMemoryGB),
+			},
+			// Better formatting it should be raw "%.2f"
+			PeakUsedMemory: MemoryUsage{
+				MB: fmt.Sprintf("%.2f", peakUsedMemoryMB),
+				GB: fmt.Sprintf("%.2f", peakUsedMemoryGB),
+			},
+			UptimeStats: uptimeStats,
+			Uptime:      uptime,
+			Pooling:     poolingStats,
+			// Better formatting it should be raw "%.2f"
+			ServerFreeMemory: MemoryUsage{
+				MB: fmt.Sprintf("%.2f", serverFreeMemoryMB),
+				GB: fmt.Sprintf("%.2f", serverFreeMemoryGB),
+			},
+		}
+	}
+
+	return redisHealth
 }
 
 // logRedisHealthStatus logs the Redis health status.
