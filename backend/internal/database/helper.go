@@ -5,9 +5,12 @@
 package database
 
 import (
+	"errors"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"strings"
 	"time"
+
+	"github.com/go-sql-driver/mysql"
 )
 
 // parseDateAdded parses the date_added field from a byte slice.
@@ -50,4 +53,34 @@ func convertStringToInterface(strs []string) []interface{} {
 		interfaces[i] = str
 	}
 	return interfaces
+}
+
+// isDuplicateEntryError checks if an error is a MySQL duplicate entry error.
+//
+// This function is useful when performing MySQL queries and the goal is to handle duplicate entry errors specifically.
+// It takes an error as input and returns a boolean indicating whether the error is a duplicate entry error or not.
+//
+// Example Usage:
+//
+//	err := db.Exec("INSERT INTO users (username) VALUES (?)", "gopher")
+//	if isDuplicateEntryError(err) {
+//	    // Handle duplicate entry error
+//	} else if err != nil {
+//	    // Handle other errors
+//	}
+//
+// When performing MySQL queries, if an attempt is made to insert a duplicate entry into a unique index or primary key,
+// MySQL will return an error with the error number 1062. This function checks if the provided error is a MySQL error
+// and if its error number is 1062, indicating a duplicate entry error.
+//
+// By using this function, duplicate entry errors can be easily identified and handled in MySQL queries without
+// the need for string comparisons or manual error code checks.
+//
+// Note: This function relies on the [github.com/go-sql-driver/mysql] package for the MySQLError type.
+func isDuplicateEntryError(err error) bool {
+	var mysqlErr *mysql.MySQLError
+	if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
+		return true
+	}
+	return false
 }

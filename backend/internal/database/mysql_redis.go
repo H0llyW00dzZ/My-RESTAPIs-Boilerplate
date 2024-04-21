@@ -34,6 +34,60 @@ type Service interface {
 	// Exec executes a SQL query with the provided arguments and returns the result.
 	Exec(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
 
+	// ExecWithoutRow executes a query that doesn't return any rows, such as
+	// CREATE, ALTER, DROP, INSERT, UPDATE, or DELETE statements.
+	// It's useful for initializing database schemas, migrations, or any other
+	// queries that don't require retrieving rows.
+	//
+	// Example Usage:
+	//
+	//	ctx := context.Background()
+	//	query := "CREATE TABLE users (id INT, name VARCHAR(255))"
+	//	err := db.ExecWithoutRow(ctx, query)
+	//	if err != nil {
+	//	    // Handle the error
+	//	}
+	ExecWithoutRow(ctx context.Context, query string, args ...interface{}) error
+
+	// EnsureTransactionClosure is a deferred function to handle transaction rollback or commit.
+	// It can be used in goroutines along with an interval, such as in a scheduler.
+	//
+	// Example Usage:
+	//
+	//	func schedulerTask(interval time.Duration) {
+	//	    for {
+	//	        ctx := context.Background()
+	//	        tx, err := db.BeginTx(ctx, nil)
+	//	        if err != nil {
+	//	            log.LogErrorf("Failed to start transaction: %v", err)
+	//	            continue
+	//	        }
+	//	        defer db.EnsureTransactionClosure(tx, &err)
+	//
+	//	        // Perform database operations within the transaction
+	//	        // ...
+	//
+	//	        time.Sleep(interval)
+	//	    }
+	//	}
+	//
+	//	go schedulerTask(1 * time.Minute)
+	//
+	// In the example above, EnsureTransactionClosure is used within a goroutine that runs
+	// a scheduler task. The task is executed at a specified interval.
+	//
+	// The goroutine starts a new transaction using BeginTx in each iteration. EnsureTransactionClosure
+	// is deferred immediately after starting the transaction to handle the transaction closure.
+	//
+	// If an error occurs during the transaction or if a panic is encountered, EnsureTransactionClosure
+	// will rollback the transaction. If no errors occur, it will commit the transaction.
+	//
+	// The function also logs any errors that occur during the rollback or commit process.
+	//
+	// Note: Make sure to handle errors appropriately and adjust the interval as needed
+	// based on your specific requirements.
+	EnsureTransactionClosure(tx *sql.Tx, err *error)
+
 	// BeginTx starts a new database transaction with the specified options.
 	BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error)
 
@@ -281,6 +335,36 @@ func (s *service) Exec(ctx context.Context, query string, args ...interface{}) (
 	return s.db.ExecContext(ctx, query, args...)
 }
 
+// ExecWithoutRow executes a query without returning any rows.
+func (s *service) ExecWithoutRow(ctx context.Context, query string, args ...interface{}) error {
+	_, err := s.db.ExecContext(ctx, query, args...)
+	if err != nil {
+		log.LogErrorf("Error executing query: %v", err)
+		return err
+	}
+	return nil
+}
+
+// EnsureTransactionClosure is a deferred function to handle transaction rollback or commit.
+func (s *service) EnsureTransactionClosure(tx *sql.Tx, err *error) {
+	if p := recover(); p != nil {
+		if rollbackErr := tx.Rollback(); rollbackErr != nil {
+			log.LogErrorf("Error rolling back transaction: %v", rollbackErr)
+		}
+		panic(p) // re-throw panic after Rollback
+	} else if *err != nil {
+		if rollbackErr := tx.Rollback(); rollbackErr != nil {
+			log.LogErrorf("Error rolling back transaction: %v", rollbackErr)
+		}
+	} else {
+		if commitErr := tx.Commit(); commitErr != nil {
+			log.LogErrorf("Error committing transaction: %v", commitErr)
+			*err = commitErr // capture commit error
+		}
+	}
+}
+
+// BeginTx starts a new transaction.
 func (s *service) BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error) {
 	return s.db.BeginTx(ctx, opts)
 }
