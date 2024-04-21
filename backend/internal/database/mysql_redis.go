@@ -107,6 +107,9 @@ type Service interface {
 	//		return err
 	//	}
 	ScanAndDel(pattern string) error
+
+	// PrepareInsertStatement prepares a SQL insert statement for the transaction.
+	PrepareInsertStatement(ctx context.Context, tx *sql.Tx, query string) (*sql.Stmt, error)
 }
 
 // service is a concrete implementation of the Service interface.
@@ -423,4 +426,40 @@ func (s *service) ScanAndDel(pattern string) error {
 	}
 	log.LogInfof("Deleted %d keys with pattern: %s", n, pattern)
 	return nil
+}
+
+// PrepareInsertStatement prepares a SQL insert statement for the transaction.
+// The query parameter should be a valid SQL insert statement.
+//
+// Example Usage:
+//
+//	ctx := context.Background()
+//	tx, err := db.BeginTx(ctx, nil)
+//	if err != nil {
+//	    log.LogErrorf("Failed to start transaction: %v", err)
+//	    return err
+//	}
+//	defer db.EnsureTransactionClosure(tx, &err)
+//
+//	query := "INSERT INTO users (name, email) VALUES (?, ?)"
+//	stmt, err := db.PrepareInsertStatement(ctx, tx, query)
+//	if err != nil {
+//	    log.LogErrorf("Failed to prepare insert statement: %v", err)
+//	    return err
+//	}
+//	defer stmt.Close()
+//
+//	// Use the prepared statement to execute the insert
+//	_, err = stmt.ExecContext(ctx, "Gopher", "gopher@go.dev")
+//	if err != nil {
+//	    log.LogErrorf("Failed to insert user: %v", err)
+//	    return err
+//	}
+func (s *service) PrepareInsertStatement(ctx context.Context, tx *sql.Tx, query string) (*sql.Stmt, error) {
+	stmt, err := tx.PrepareContext(ctx, query)
+	if err != nil {
+		log.LogErrorf("Error preparing insert statement: %v", err)
+		return nil, err
+	}
+	return stmt, nil
 }
