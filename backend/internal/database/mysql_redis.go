@@ -240,7 +240,30 @@ func (s *service) checkRedisHealth(stats map[string]string) map[string]string {
 			stats["redis_used_memory"] = redisInfo["used_memory"]
 			stats["redis_used_memory_peak"] = redisInfo["used_memory_peak"]
 			stats["redis_uptime_in_seconds"] = redisInfo["uptime_in_seconds"]
+
+			// Evaluate Redis stats to provide a health message
+			stats = s.evaluateRedisStats(redisInfo, stats)
 		}
+	}
+
+	return stats
+}
+
+// evaluateRedisStats evaluates the Redis server statistics and updates the stats map with the appropriate health message.
+func (s *service) evaluateRedisStats(redisInfo map[string]string, stats map[string]string) map[string]string {
+	connectedClients, _ := strconv.Atoi(redisInfo["connected_clients"])
+	if connectedClients > 40 { // Assuming 50 is the max for this example
+		stats["redis_message"] = MsgRedisHighConnectedClients
+	}
+
+	usedMemory, _ := strconv.ParseInt(redisInfo["used_memory"], 10, 64)
+	if usedMemory > 1024*1024*1024 { // 1 GB
+		stats["redis_message"] = MsgRedisHighMemoryUsage
+	}
+
+	uptimeInSeconds, _ := strconv.ParseInt(redisInfo["uptime_in_seconds"], 10, 64)
+	if uptimeInSeconds < 3600 { // 1 hour
+		stats["redis_message"] = MsgRedisRecentlyRestarted
 	}
 
 	return stats
