@@ -7,6 +7,7 @@ package health
 import (
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
+	"strconv"
 )
 
 // MemoryUsage represents memory usage in both megabytes and gigabytes.
@@ -33,6 +34,7 @@ type RedisStats struct {
 	Uptime           []map[string]string `json:"uptime,omitempty"`
 	Pooling          PoolingStats        `json:"pooling,omitempty"`
 	ServerFreeMemory MemoryUsage         `json:"server_free_memory,omitempty"`
+	MemoryUsage      string              `json:"memory_usage,omitempty"`
 }
 
 // RedisHealth represents the health statistics for Redis.
@@ -67,6 +69,11 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 			Active: health["redis_active_connections"],
 		}
 
+		// Calculate the memory usage percentage
+		usedMemory, _ := strconv.ParseInt(health["redis_used_memory"], 10, 64)
+		maxMemory, _ := strconv.ParseInt(health["redis_max_memory"], 10, 64)
+		memoryUsage := calculateMemoryUsage(usedMemory, maxMemory)
+
 		redisHealth.Stats = RedisStats{
 			Version:          health["redis_version"],
 			Mode:             health["redis_mode"],
@@ -89,6 +96,7 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 				MB: fmt.Sprintf("%.2f", serverFreeMemoryMB),
 				GB: fmt.Sprintf("%.2f", serverFreeMemoryGB),
 			},
+			MemoryUsage: memoryUsage,
 		}
 	}
 
@@ -98,12 +106,12 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 // logRedisHealthStatus logs the Redis health status.
 func logRedisHealthStatus(response Response) {
 	if response.RedisHealth.Status == "up" {
-		log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Used Memory: %s MB (%s GB), Peak Used Memory: %s MB (%s GB), Uptime: %s, Total Connections: %s, Active Connections: %s, Idle Connections: %s, Server Free Memory: %s MB (%s GB)",
+		log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Used Memory: %s MB (%s GB), Peak Used Memory: %s MB (%s GB), Uptime: %s, Total Connections: %s, Active Connections: %s, Idle Connections: %s, Server Free Memory: %s MB (%s GB), Memory Usage: %s",
 			response.RedisHealth.Message, response.RedisHealth.Stats.Version, response.RedisHealth.Stats.Mode,
 			response.RedisHealth.Stats.UsedMemory.MB, response.RedisHealth.Stats.UsedMemory.GB,
 			response.RedisHealth.Stats.PeakUsedMemory.MB, response.RedisHealth.Stats.PeakUsedMemory.GB, response.RedisHealth.Stats.UptimeStats,
 			response.RedisHealth.Stats.Pooling.Total, response.RedisHealth.Stats.Pooling.Active, response.RedisHealth.Stats.Pooling.Idle,
-			response.RedisHealth.Stats.ServerFreeMemory.MB, response.RedisHealth.Stats.ServerFreeMemory.GB)
+			response.RedisHealth.Stats.ServerFreeMemory.MB, response.RedisHealth.Stats.ServerFreeMemory.GB, response.RedisHealth.Stats.MemoryUsage)
 	} else {
 		log.LogErrorf("Redis Error: %v", response.RedisHealth.Error)
 	}

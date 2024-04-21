@@ -134,3 +134,12 @@ func logHealthStatus(response Response, filter string) {
 		logger(response)
 	}
 }
+
+// calculateMemoryUsage calculates the memory usage percentage based on used memory and max memory.
+func calculateMemoryUsage(usedMemory, maxMemory int64) string {
+	if maxMemory > 0 {
+		usedMemoryPercentage := float64(usedMemory) / float64(maxMemory) * 100
+		return fmt.Sprintf("%.2f%%", usedMemoryPercentage)
+	}
+	return "N/A"
+}
