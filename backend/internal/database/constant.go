@@ -40,3 +40,11 @@ const (
 	EnvRedisDBPort     = "RDB_PORT"
 	EnvRedisDBHost     = "RDB_ADDRESS"
 )
+
+// Message constants for Redis-related operations.
+const (
+	MsgRedisHealthy              = "Redis is healthy"
+	MsgRedisHighConnectedClients = "Redis has a high number of connected clients"
+	MsgRedisHighMemoryUsage      = "Redis is using a significant amount of memory"
+	MsgRedisRecentlyRestarted    = "Redis has been recently restarted"
+)
