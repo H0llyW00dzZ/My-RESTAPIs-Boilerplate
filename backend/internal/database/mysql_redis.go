@@ -45,6 +45,13 @@ type Service interface {
 
 	// ScanAndDel uses the Redis SCAN command to iterate over a set of keys and delete them.
 	// It's particularly useful for deleting keys with a common pattern.
+	//
+	// Example Usage:
+	//
+	//	if err := db.ScanAndDel("gopher_key:*"); err != nil {
+	//		Log.LogErrorf("Failed to clear gopher keys cache: %v", err)
+	//		return err
+	//	}
 	ScanAndDel(pattern string) error
 }
 
