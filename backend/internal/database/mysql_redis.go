@@ -305,6 +305,22 @@ func (s *service) checkRedisHealth(stats map[string]string) map[string]string {
 			stats["redis_used_memory_peak"] = redisInfo["used_memory_peak"]
 			stats["redis_uptime_in_seconds"] = redisInfo["uptime_in_seconds"]
 
+			// Get the pool stats of the Redis client
+			poolStats := s.redisClient.PoolStats()
+
+			// Extract the total number of connections in the pool
+			stats["redis_total_connections"] = strconv.FormatUint(uint64(poolStats.TotalConns), 10)
+
+			// Extract the number of idle connections in the pool
+			stats["redis_idle_connections"] = strconv.FormatUint(uint64(poolStats.IdleConns), 10)
+
+			// Extract the number of active connections (TotalConns - IdleConns gives us the ActiveConns)
+			activeConns := poolStats.TotalConns - poolStats.IdleConns
+			stats["redis_active_connections"] = strconv.FormatUint(uint64(activeConns), 10)
+
+			// Get the used memory of the Redis server in bytes
+			stats["redis_max_memory"] = redisInfo["maxmemory"] // Raw max memory in bytes
+
 			// Evaluate Redis stats to provide a health message
 			stats = s.evaluateRedisStats(redisInfo, stats)
 		}
