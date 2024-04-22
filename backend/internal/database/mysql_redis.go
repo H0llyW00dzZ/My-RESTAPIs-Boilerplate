@@ -173,7 +173,7 @@ func New() Service {
 	// 1 GB RAM
 	maxConnections := 2 * runtime.NumCPU()
 
-	// Create a new Redis client for health checks
+	// Create a new Redis client for health checks or for any other needs in middleware that do not involve using Fiber's storage.
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", redisAddress, redisPort),
 		Password: redisPassword,
@@ -184,17 +184,17 @@ func New() Service {
 		PoolSize: maxConnections,
 	})
 
-	// Initialize the Redis storage for rate limiting or any that needed in middleware
+	// Initialize Redis storage for rate limiting or for any other needs in middleware.
 	redisStorage := redisStorage.New(redisStorage.Config{
 		Host:     redisAddress,
 		Port:     portDB,
 		Password: redisPassword,
 		Database: redisDB,
-		Reset:    false, // Set to true if you want to clear the storage upon connection
+		Reset:    false, // Set to true to clear the storage upon establishing a connection.
 		TLSConfig: &tls.Config{
 			MinVersion: tls.VersionTLS12,
 		},
-		PoolSize: maxConnections, // Adjust the pool size as needed
+		PoolSize: maxConnections, // Adjust the pool size as necessary.
 	})
 
 	dbInstance = &service{
