@@ -203,7 +203,7 @@ func LogErrorf(format string, v ...interface{}) {
 
 // LogUserActivity logs a user activity message along with the HTTP method, client IP, User-Agent, and query parameters (if any).
 func LogUserActivity(c *fiber.Ctx, activity string) {
-	httpMethod := c.Method() // Get the HTTP method of the request.
+	httpMethod := c.Method() // Get the HTTP method of the request
 	clientIP := c.IP()
 	userAgent := c.Get("User-Agent")
 	originalURL := c.OriginalURL() // This gets the full original URL including query parameters
