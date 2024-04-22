@@ -19,12 +19,7 @@ const (
 
 // Constants for MySQL connection string and response messages.
 const (
-	MySQLConnect = "%s:%s@tcp(%s:%s)/%s"
-	Msgs         = "message"
-)
-
-// Constants for MySQL driver name and environment variable names.
-const (
+	MySQLConnect       = "%s:%s@tcp(%s:%s)/%s"
 	dbMYSQL            = "mysql"
 	EnvMYSQLDBName     = "DB_DATABASE"
 	EnvMYSQLDBPassword = "DB_PASSWORD"
@@ -43,7 +38,6 @@ const (
 
 // Message constants for Redis-related operations.
 const (
-	MsgRedisHealthy              = "Redis is healthy"
 	MsgRedisHighConnectedClients = "Redis has a high number of connected clients"
 	MsgRedisHighMemoryUsage      = "Redis is using a significant amount of memory"
 	MsgRedisRecentlyRestarted    = "Redis has been recently restarted"
