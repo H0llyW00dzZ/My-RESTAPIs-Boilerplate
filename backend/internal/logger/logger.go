@@ -89,12 +89,12 @@ func (w *LogWriter) Write(p []byte) (n int, err error) {
 
 // Panic logs panic messages.
 func (l *Logger) Panic(v ...interface{}) {
-	l.crashLogger.Println(v...)
+	l.crashLogger.Panic(v...)
 }
 
 // Panicf logs formatted panic messages.
 func (l *Logger) Panicf(format string, v ...interface{}) {
-	l.crashLogger.Printf(format, v...)
+	l.crashLogger.Panicf(format, v...)
 }
 
 // Fatal logs fatal messages and exits the program with status code 1.
