@@ -291,12 +291,12 @@ func (s *service) checkRedisHealth(stats map[string]string) map[string]string {
 	pong, err := s.redisClient.Ping(context.Background()).Result()
 	if err != nil {
 		stats["redis_status"] = "down"
-		stats["redis_error"] = fmt.Sprintf("Redis is down: %v", err)
+		stats["redis_error"] = fmt.Sprintf(ErrDBDown, err)
 		stats["redis_message"] = fmt.Sprintf("%v", err)
 	} else {
 		// Redis is up
 		stats["redis_status"] = "up"
-		stats["redis_message"] = "Redis is healthy"
+		stats["redis_message"] = MsgDBItsHealthy
 		stats["redis_ping_response"] = pong
 
 		// Get Redis server information
