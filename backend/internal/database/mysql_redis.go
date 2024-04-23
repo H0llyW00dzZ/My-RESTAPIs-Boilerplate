@@ -127,16 +127,17 @@ type service struct {
 
 // dbConfig holds the environment variables for the database connection.
 var (
-	dbname        = os.Getenv(EnvMYSQLDBName)
-	password      = os.Getenv(EnvMYSQLDBPassword)
-	username      = os.Getenv(EnvMYSQLDBUsername)
-	port          = os.Getenv(EnvMYSQLDBPort)
-	host          = os.Getenv(EnvMYSQLDBHost)
-	redisAddress  = os.Getenv(EnvRedisDBHost)
-	redisPort     = os.Getenv(EnvRedisDBPort)
-	redisPassword = os.Getenv(EnvRedisDBPassword)
-	redisDatabase = os.Getenv(EnvRedisDBName)
-	dbInstance    *service
+	dbname           = os.Getenv(EnvMYSQLDBName)
+	password         = os.Getenv(EnvMYSQLDBPassword)
+	username         = os.Getenv(EnvMYSQLDBUsername)
+	port             = os.Getenv(EnvMYSQLDBPort)
+	host             = os.Getenv(EnvMYSQLDBHost)
+	redisAddress     = os.Getenv(EnvRedisDBHost)
+	redisPort        = os.Getenv(EnvRedisDBPort)
+	redisPassword    = os.Getenv(EnvRedisDBPassword)
+	redisDatabase    = os.Getenv(EnvRedisDBName)
+	redisPoolTimeout = os.Getenv(EnvRedisDBPoolTimeout)
+	dbInstance       *service
 )
 
 // New creates a new instance of the Service interface.
@@ -152,9 +153,17 @@ func New() Service {
 	if err != nil {
 		log.LogFatal("Invalid Redis database index:", err)
 	}
+
+	// Parse redis port from the environment variable
 	portDB, err := strconv.Atoi(redisPort)
 	if err != nil {
 		log.LogFatal("Invalid Redis database index:", err)
+	}
+
+	// Parse pool timeout from the environment variable
+	poolTimeout, err := time.ParseDuration(redisPoolTimeout)
+	if err != nil {
+		log.LogFatal("Invalid Redis pool timeout value:", err)
 	}
 
 	// Opening a driver typically will not attempt to connect to the database.
@@ -187,7 +196,9 @@ func New() Service {
 		TLSConfig: &tls.Config{
 			MinVersion: tls.VersionTLS12,
 		},
-		PoolSize: maxConnections,
+		PoolSize:              maxConnections,
+		PoolTimeout:           poolTimeout,
+		ContextTimeoutEnabled: true,
 	})
 
 	// Initialize Redis storage for rate limiting or for any other needs in middleware.
@@ -212,10 +223,27 @@ func New() Service {
 	return dbInstance
 }
 
-// Close closes the database connection.
+// Close closes the database connection and the Redis client.
 func (s *service) Close() error {
+	// Close the Redis client connection
+	if err := s.redisClient.Close(); err != nil {
+		log.LogErrorf("Error closing Redis client: %v", err)
+		// Don't return yet because we also need to close the SQL database connection.
+	}
+
+	// Log information about closing the Redis connection
+	log.LogInfo("Redis connection closed.")
+
+	// Close the SQL database connection
+	if err := s.db.Close(); err != nil {
+		log.LogErrorf("Error closing database connection: %v", err)
+		return err
+	}
+
+	// Log information about closing the database connection
 	log.LogInfof(MsgDBDisconnected, dbname)
-	return s.db.Close()
+
+	return nil
 }
 
 // Health checks the health of the database and Redis connections.
@@ -232,7 +260,7 @@ func (s *service) Health(filter string) map[string]string {
 	}
 
 	if filter == "" || filter == "redis" {
-		stats = s.checkRedisHealth(stats)
+		stats = s.checkRedisHealth(ctx, stats)
 	}
 
 	return stats
@@ -290,11 +318,11 @@ func (s *service) evaluateMySQLStats(dbStats sql.DBStats, stats map[string]strin
 }
 
 // checkRedisHealth checks the health of the Redis server and adds the relevant statistics to the stats map.
-func (s *service) checkRedisHealth(stats map[string]string) map[string]string {
+func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string) map[string]string {
 	// Ping the Redis server
 	// Note: The Redis client must use the method "context.Background()" because
 	// the context with timeout may cause unexpected behavior during health checks.
-	pong, err := s.redisClient.Ping(context.Background()).Result()
+	pong, err := s.redisClient.Ping(ctx).Result()
 	if err != nil {
 		stats["redis_status"] = "down"
 		stats["redis_error"] = fmt.Sprintf(ErrDBDown, err)
@@ -306,7 +334,7 @@ func (s *service) checkRedisHealth(stats map[string]string) map[string]string {
 		stats["redis_ping_response"] = pong
 
 		// Get Redis server information
-		info, err := s.redisClient.Info(context.Background()).Result()
+		info, err := s.redisClient.Info(ctx).Result()
 		if err != nil {
 			stats["redis_info_error"] = fmt.Sprintf("Failed to retrieve Redis info: %v", err)
 		} else {
