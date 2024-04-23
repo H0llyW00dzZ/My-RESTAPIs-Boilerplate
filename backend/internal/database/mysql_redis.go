@@ -399,7 +399,9 @@ func (s *service) evaluateRedisStats(redisInfo, stats map[string]string) map[str
 		stats["redis_message"] = MsgRedisHighConnectedClients
 	}
 
-	// Check for any stale connections and append a warning if found
+	// Check for any stale connections and set a warning if any are found
+	// Note: This can sometimes happen, especially with Unix clients.
+	// It might be less common when connecting from Linux (client) to Linux (server), as opposed to Unix (client) to Linux (server).
 	if poolStats.StaleConns > 0 {
 		staleConns := uint64(poolStats.StaleConns)
 		stats["redis_message"] = fmt.Sprintf(MsgRedisHasStaleConnections, staleConns)
