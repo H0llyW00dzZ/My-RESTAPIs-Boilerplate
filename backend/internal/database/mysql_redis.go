@@ -110,6 +110,12 @@ type Service interface {
 
 	// PrepareInsertStatement prepares a SQL insert statement for the transaction.
 	PrepareInsertStatement(ctx context.Context, tx *sql.Tx, query string) (*sql.Stmt, error)
+
+	// ScanKeys returns a slice of keys for a given pattern starting at the cursor.
+	ScanKeys(ctx context.Context, pattern string, cursor uint64) ([]string, uint64, error)
+
+	// DeleteKeys deletes a slice of keys from Redis and returns the updated count.
+	DeleteKeys(ctx context.Context, keys []string, totalDeleted int) (int, error)
 }
 
 // service is a concrete implementation of the Service interface.
@@ -437,35 +443,53 @@ func (s *service) FiberStorage() fiber.Storage {
 // ScanAndDel uses the Redis SCAN command to iterate over a set of keys and delete them.
 func (s *service) ScanAndDel(pattern string) error {
 	ctx := context.Background()
-	var cursor uint64
-	var n int
-	for {
-		// Use the SCAN command to iterate over the keys.
+	var totalDeleted int
+	var scanComplete bool
+	var err error
+
+	for !scanComplete {
 		var keys []string
-		var err error
-		keys, cursor, err = s.redisClient.Scan(ctx, cursor, pattern, 0).Result()
+		var cursor uint64
+
+		keys, cursor, err = s.ScanKeys(ctx, pattern, cursor)
 		if err != nil {
 			log.LogErrorf("Error retrieving keys from Redis: %v", err)
 			return err
 		}
-		n += len(keys)
 
-		// Use the DEL command to delete the keys.
+		// Skip deletion if no keys are found, but continue scanning if not finished.
 		if len(keys) > 0 {
-			_, err = s.redisClient.Del(ctx, keys...).Result()
+			totalDeleted, err = s.DeleteKeys(ctx, keys, totalDeleted)
 			if err != nil {
 				log.LogErrorf("Error deleting keys from Redis: %v", err)
 				return err
 			}
 		}
 
-		// If the cursor returned by SCAN is 0, we have iterated through all keys.
-		if cursor == 0 {
-			break
-		}
+		scanComplete = (cursor == 0)
 	}
-	log.LogInfof("Deleted %d keys with pattern: %s", n, pattern)
+
+	if totalDeleted > 0 {
+		log.LogInfof("Deleted %d keys with pattern: %s", totalDeleted, pattern)
+	} else {
+		log.LogInfof("No keys found with pattern: %s", pattern)
+	}
+
 	return nil
+}
+
+// ScanKeys returns a slice of keys for a given pattern starting at the cursor.
+func (s *service) ScanKeys(ctx context.Context, pattern string, cursor uint64) ([]string, uint64, error) {
+	return s.redisClient.Scan(ctx, cursor, pattern, 0).Result()
+}
+
+// DeleteKeys deletes a slice of keys from Redis and returns the updated count.
+func (s *service) DeleteKeys(ctx context.Context, keys []string, totalDeleted int) (int, error) {
+	_, err := s.redisClient.Del(ctx, keys...).Result()
+	if err != nil {
+		return totalDeleted, err
+	}
+	return totalDeleted + len(keys), nil
 }
 
 // PrepareInsertStatement prepares a SQL insert statement for the transaction.
