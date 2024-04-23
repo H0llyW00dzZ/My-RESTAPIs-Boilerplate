@@ -94,33 +94,44 @@ func startServerAsync(server Server, addr, monitorPath string) {
 // waitForShutdownSignal listens for OS interrupt or SIGTERM signals to gracefully shut down the server.
 // It ensures that the server attempts to shut down gracefully within the provided timeout duration.
 func waitForShutdownSignal(shutdownTimeout time.Duration, server Server) {
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+	quit := make(chan os.Signal, 1)                    // Buffer is one to ensure the signal can be received immediately.
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM) // Notify on interrupt and SIGTERM signals.
 
-	sig := <-quit
+	sig := <-quit // Block until a signal is received.
 	log.LogInfof(MsgServerShutdown, sig)
 
 	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
-	defer cancel() // Always call cancel to release resources.
+	defer cancel() // Ensure resources are released.
 
-	// Start graceful shutdown in a separate goroutine.
+	// Note: It is important to provide a reasonable shutdownTimeout for the goroutine closure
+	// below, because if shutdownTimeout is set to 0s, the goroutine will force a shutdown
+	// regardless. Therefore, a recommended timeout is 5 seconds or more to allow for graceful
+	// shutdown activities to proceed.
 	go func() {
+		defer cancel() // Cancel the context when this goroutine completes.
 		if err := server.Shutdown(ctx); err != nil {
+			// Handle shutdown error.
 			log.LogErrorf(MsgErrorDuringShutdown, err)
 		}
-
 		if err := server.CleanupDB(); err != nil {
+			// Handle cleanup error.
 			log.LogErrorf(MsgDatabaseCleanupFailed, err)
 		}
-
-		cancel() // Signal shutdown completion.
 	}()
 
-	select {
-	case <-ctx.Done():
+	// Block until the context is done, which occurs when cancel is called or the shutdownTimeout is exceeded.
+	<-ctx.Done()
+	err := ctx.Err()
+	switch err {
+	case context.Canceled:
 		log.LogInfo(MsgServerShutdownCompleted)
-	case <-time.After(shutdownTimeout):
+	case context.DeadlineExceeded:
 		log.LogError(MsgServerShutdownExceedTimeout)
-		cancel() // Ensure resources are released.
+	default:
+		// Typically this shouldn't happen as ctx.Err() should only return nil, context.Canceled,
+		// or context.DeadlineExceeded according to the current context package implementation
+		// Logging the unexpected error for diagnostic purposes
+		log.LogErrorf("An unexpected error occurred during shutdown: %v", err)
 	}
+
 }
