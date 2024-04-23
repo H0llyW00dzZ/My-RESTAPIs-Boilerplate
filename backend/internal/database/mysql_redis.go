@@ -320,8 +320,6 @@ func (s *service) evaluateMySQLStats(dbStats sql.DBStats, stats map[string]strin
 // checkRedisHealth checks the health of the Redis server and adds the relevant statistics to the stats map.
 func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string) map[string]string {
 	// Ping the Redis server
-	// Note: The Redis client must use the method "context.Background()" because
-	// the context with timeout may cause unexpected behavior during health checks.
 	pong, err := s.redisClient.Ping(ctx).Result()
 	if err != nil {
 		stats["redis_status"] = "down"
