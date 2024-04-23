@@ -19,6 +19,7 @@ type MemoryUsage struct {
 // PoolingStats represents the statistics of the current connection pooling state.
 type PoolingStats struct {
 	Total              string `json:"total,omitempty"`
+	Stale              string `json:"stale,omitempty"`
 	Idle               string `json:"idle,omitempty"`
 	Active             string `json:"active,omitempty"`
 	PoolSizePercentage string `json:"percentage,omitempty"`
@@ -116,7 +117,7 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 // logRedisHealthStatus logs the Redis health status.
 func logRedisHealthStatus(response Response) {
 	if response.RedisHealth.Status == "up" {
-		log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Used Memory: %s MB (%s GB), Peak Memory: %s MB (%s GB), Memory Usage: %s, Free Memory: %s MB (%s GB), Uptime: %s, Total Connections: %s, Active Connections: %s, Idle Connections: %s, Pool Size Usage: %s",
+		log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Used Memory: %s MB (%s GB), Peak Memory: %s MB (%s GB), Memory Usage: %s, Free Memory: %s MB (%s GB), Uptime: %s, Total Connections: %s, Active Connections: %s, Idle Connections: %s, Stale Connections: %s, Pool Size Usage: %s",
 			response.RedisHealth.Message, response.RedisHealth.Stats.Version, response.RedisHealth.Stats.Mode,
 			response.RedisHealth.Stats.Memory.Used.MB, response.RedisHealth.Stats.Memory.Used.GB,
 			response.RedisHealth.Stats.Memory.Peak.MB, response.RedisHealth.Stats.Memory.Peak.GB,
@@ -124,7 +125,7 @@ func logRedisHealthStatus(response Response) {
 			response.RedisHealth.Stats.Memory.Free.MB, response.RedisHealth.Stats.Memory.Free.GB,
 			response.RedisHealth.Stats.UptimeStats,
 			response.RedisHealth.Stats.Pooling.Total, response.RedisHealth.Stats.Pooling.Active, response.RedisHealth.Stats.Pooling.Idle,
-			response.RedisHealth.Stats.Pooling.PoolSizePercentage)
+			response.RedisHealth.Stats.Pooling.Stale, response.RedisHealth.Stats.Pooling.PoolSizePercentage)
 	} else {
 		log.LogErrorf("Redis Error: %v", response.RedisHealth.Error)
 	}
