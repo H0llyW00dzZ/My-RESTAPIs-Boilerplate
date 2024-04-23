@@ -60,16 +60,23 @@ func (s *FiberServer) Shutdown(ctx context.Context) error {
 	return s.app.ShutdownWithContext(ctx)
 }
 
-// CleanupDB closes the database connection and logs the outcome.
+// CleanupDB closes the database connection and Redis client, then logs the outcome.
 func (s *FiberServer) CleanupDB() error {
+	var err error
+
+	// If the database service is present, close it which will close both the SQL db and Redis connections
 	if s.db != nil {
-		if err := s.db.Close(); err != nil {
-			log.LogErrorf(ErrorClosingTheDatabase, err)
-			return err
+		err = s.db.Close()
+		if err != nil {
+			log.LogErrorf("Error closing the database service: %v", err)
+			// Do not return here yet, to ensure all cleanup is attempted
+		} else {
+			log.LogInfo("Database service connections closed.")
 		}
-		log.LogInfo(MsgDatabaseConnectionClosed)
 	}
-	return nil
+
+	// Return the last error encountered, if any
+	return err
 }
 
 // StartServer initializes and starts the server, then waits for a shutdown signal.
