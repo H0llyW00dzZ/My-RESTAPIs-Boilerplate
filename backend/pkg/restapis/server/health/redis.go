@@ -45,10 +45,10 @@ type RedisStats struct {
 
 // RedisHealth represents the health statistics for Redis.
 type RedisHealth struct {
-	Status  string     `json:"status"`
-	Message string     `json:"message"`
-	Error   string     `json:"error,omitempty"`
-	Stats   RedisStats `json:"stats,omitempty"`
+	Status  string      `json:"status"`
+	Message string      `json:"message"`
+	Error   string      `json:"error,omitempty"`
+	Stats   *RedisStats `json:"stats,omitempty"`
 }
 
 // createRedisHealthResponse creates a RedisHealth struct from the provided health statistics.
@@ -82,7 +82,7 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 			Active: health["redis_active_connections"],
 		}
 
-		redisHealth.Stats = RedisStats{
+		redisHealth.Stats = &RedisStats{
 			Version:          health["redis_version"],
 			Mode:             health["redis_mode"],
 			ConnectedClients: health["redis_connected_clients"],
