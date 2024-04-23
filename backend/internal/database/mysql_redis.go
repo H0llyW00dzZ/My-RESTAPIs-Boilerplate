@@ -356,6 +356,9 @@ func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string)
 			// Extract the number of idle connections in the pool
 			stats["redis_idle_connections"] = strconv.FormatUint(uint64(poolStats.IdleConns), 10)
 
+			// Extract the number of stale connections in the pool
+			stats["redis_stale_connections"] = strconv.FormatUint(uint64(poolStats.StaleConns), 10)
+
 			// Extract the number of active connections (TotalConns - IdleConns gives us the ActiveConns)
 			activeConns := poolStats.TotalConns - poolStats.IdleConns
 			stats["redis_active_connections"] = strconv.FormatUint(uint64(activeConns), 10)
@@ -382,6 +385,9 @@ func (s *service) evaluateRedisStats(redisInfo, stats map[string]string) map[str
 	// Retrieve the pool size from the Redis client configuration
 	poolSize := s.redisClient.Options().PoolSize
 
+	// Get the pool stats of the Redis client
+	poolStats := s.redisClient.PoolStats()
+
 	// Check the number of connected clients
 	connectedClients, _ := strconv.Atoi(redisInfo["connected_clients"])
 
@@ -391,6 +397,12 @@ func (s *service) evaluateRedisStats(redisInfo, stats map[string]string) map[str
 	// Check if connected clients exceed the high connection threshold
 	if float64(connectedClients) > highConnectionThreshold {
 		stats["redis_message"] = MsgRedisHighConnectedClients
+	}
+
+	// Check for any stale connections and append a warning if found
+	if poolStats.StaleConns > 0 {
+		staleConns := uint64(poolStats.StaleConns)
+		stats["redis_message"] = fmt.Sprintf(MsgRedisHasStaleConnections, staleConns)
 	}
 
 	// Check if used memory is close to the maximum memory

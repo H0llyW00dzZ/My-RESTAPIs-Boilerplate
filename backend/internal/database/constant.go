@@ -42,4 +42,5 @@ const (
 	MsgRedisHighConnectedClients = "Redis has a high number of connected clients"
 	MsgRedisHighMemoryUsage      = "Redis is using a significant amount of memory"
 	MsgRedisRecentlyRestarted    = "Redis has been recently restarted"
+	MsgRedisHasStaleConnections  = "Redis has %d stale connections."
 )
