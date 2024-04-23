@@ -177,9 +177,11 @@ func New() Service {
 	// Log the successful database connection
 	log.LogInfof(MsgDBConnected, dbname)
 
-	db.SetConnMaxLifetime(0)
-	db.SetMaxIdleConns(50)
-	db.SetMaxOpenConns(50)
+	// Set MySQL connection pool parameters.
+	// TODO: Refine the MySQL setup and statistics tracking to align with the enhancements previously implemented for Redis.
+	db.SetConnMaxLifetime(0) // Connections are not closed due to being idle too long.
+	db.SetMaxIdleConns(50)   // Maximum number of connections in the idle connection pool.
+	db.SetMaxOpenConns(50)   // Maximum number of open connections to the database.
 
 	// Note: This configuration is better for starters and provides stability.
 	// Tested on Node Spec:
