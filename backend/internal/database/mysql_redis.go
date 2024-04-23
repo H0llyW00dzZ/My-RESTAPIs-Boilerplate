@@ -512,6 +512,10 @@ func (s *service) ScanAndDel(pattern string) error {
 	if totalDeleted > 0 {
 		log.LogInfof("Deleted %d keys with pattern: %s", totalDeleted, pattern)
 	} else {
+		// TODO: Define and implement custom error types, such as 'KeyNotFoundError', to provide
+		// more granular error information when no keys are found for deletion.
+		// This enhancement follows best practices for error handling by allowing more specific error
+		// responses and the potential for error handling strategies based on error types.
 		log.LogInfof("No keys found with pattern: %s", pattern)
 	}
 
