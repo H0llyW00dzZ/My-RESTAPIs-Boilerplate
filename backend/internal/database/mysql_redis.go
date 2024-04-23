@@ -335,6 +335,12 @@ func (s *service) checkRedisHealth(stats map[string]string) map[string]string {
 			// Get the used memory of the Redis server in bytes
 			stats["redis_max_memory"] = redisInfo["maxmemory"] // Raw max memory in bytes
 
+			// Get the pool size percentage
+			poolSize := s.redisClient.Options().PoolSize
+			connectedClients, _ := strconv.Atoi(redisInfo["connected_clients"])
+			poolSizePercentage := float64(connectedClients) / float64(poolSize) * 100
+			stats["redis_pool_size_percentage"] = fmt.Sprintf("%.2f%%", poolSizePercentage)
+
 			// Evaluate Redis stats to provide a health message
 			stats = s.evaluateRedisStats(redisInfo, stats)
 		}
@@ -345,11 +351,17 @@ func (s *service) checkRedisHealth(stats map[string]string) map[string]string {
 
 // evaluateRedisStats evaluates the Redis server statistics and updates the stats map with the appropriate health message.
 func (s *service) evaluateRedisStats(redisInfo, stats map[string]string) map[string]string {
+	// Retrieve the pool size from the Redis client configuration
+	poolSize := s.redisClient.Options().PoolSize
+
 	// Check the number of connected clients
 	connectedClients, _ := strconv.Atoi(redisInfo["connected_clients"])
-	// TODO: Improve this to make it more dynamic depending on the pool,
-	// as it seems possible by using generic methods
-	if connectedClients > 40 { // Assuming 50 is the max for this example
+
+	// Determine a high connection threshold, let's say 80% of the pool size because 20% is must be free (genius thinking 🤪)
+	highConnectionThreshold := float64(poolSize) * 0.8
+
+	// Check if connected clients exceed the high connection threshold
+	if float64(connectedClients) > highConnectionThreshold {
 		stats["redis_message"] = MsgRedisHighConnectedClients
 	}
 
