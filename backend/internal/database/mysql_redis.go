@@ -249,7 +249,7 @@ func (s *service) Close() error {
 // Health checks the health of the database and Redis connections.
 // It returns a map with keys indicating various health statistics.
 func (s *service) Health(filter string) map[string]string {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	stats := make(map[string]string)
