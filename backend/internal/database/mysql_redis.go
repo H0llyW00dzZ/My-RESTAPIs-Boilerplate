@@ -357,6 +357,9 @@ func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string)
 			poolStats := s.redisClient.PoolStats()
 
 			// Extract the number of hits (free times) connections in the pool
+			// TODO: Implement a helper function to extract and format numerical values from health stats.
+			// This will eliminate the need for repeated `strconv.FormatUint` calls, ensuring consistency
+			// across the frontend REST API responses.
 			stats["redis_hits_connections"] = strconv.FormatUint(uint64(poolStats.Hits), 10)
 
 			// Extract the number of misses (not found) connections in the pool
