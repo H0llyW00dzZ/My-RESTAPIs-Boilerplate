@@ -3,7 +3,7 @@ module h0llyw00dz-template
 go 1.22.2
 
 require (
-	github.com/bytedance/sonic v1.11.5
+	github.com/bytedance/sonic v1.11.6
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gofiber/fiber/v2 v2.52.4
 	github.com/gofiber/storage/redis/v3 v3.1.1
@@ -18,7 +18,7 @@ require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/cloudwego/base64x v0.1.3 // indirect
+	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/klauspost/compress v1.17.8 // indirect
