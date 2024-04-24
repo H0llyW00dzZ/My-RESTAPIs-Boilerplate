@@ -342,7 +342,7 @@ func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string)
 		// Get Redis server information
 		info, err := s.redisClient.Info(ctx).Result()
 		if err != nil {
-			stats["redis_info_error"] = fmt.Sprintf("Failed to retrieve Redis info: %v", err)
+			stats["redis_message"] = fmt.Sprintf("Failed to retrieve Redis info: %v", err)
 		} else {
 			// Parse the Redis info response
 			redisInfo := parseRedisInfo(info)
