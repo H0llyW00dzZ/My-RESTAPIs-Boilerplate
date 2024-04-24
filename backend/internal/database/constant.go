@@ -43,4 +43,5 @@ const (
 	MsgRedisHighMemoryUsage      = "Redis is using a significant amount of memory"
 	MsgRedisRecentlyRestarted    = "Redis has been recently restarted"
 	MsgRedisHasStaleConnections  = "Redis has %d stale connections."
+	MsgRedisFailedToRetrieveInfo = "Failed to retrieve Redis info: %v"
 )
