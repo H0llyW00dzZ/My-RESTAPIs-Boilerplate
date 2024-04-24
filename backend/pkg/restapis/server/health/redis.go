@@ -78,6 +78,8 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 		freeMemoryMB, freeMemoryGB := bytesToMBGB(health["redis_max_memory"])
 
 		// Calculate the memory usage percentage
+		// TODO: Implement a helper function to parse numerical values. This will avoid repeated calls
+		// to `strconv.ParseInt` across the frontend REST APIs when the base and bits size are consistent.
 		usedMemory, _ := strconv.ParseInt(health["redis_used_memory"], 10, 64)
 		maxMemory, _ := strconv.ParseInt(health["redis_max_memory"], 10, 64)
 		memoryUsage := calculateMemoryUsage(usedMemory, maxMemory)
@@ -86,6 +88,9 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 		uptimeStats, uptime := formatUptime(health["redis_uptime_in_seconds"])
 
 		// Parse numerical values from the health stats for calculation
+		// TODO: Implement a helper function to parse numerical values from the health stats, which will
+		// prevent the need for repeated `strconv.ParseUint` calls across the frontend REST APIs when the base
+		// and bit size remain the same.
 		hits, _ := strconv.ParseUint(health["redis_hits_connections"], 10, 64)
 		misses, _ := strconv.ParseUint(health["redis_misses_connections"], 10, 64)
 		timeouts, _ := strconv.ParseUint(health["redis_timeouts_connections"], 10, 64)
