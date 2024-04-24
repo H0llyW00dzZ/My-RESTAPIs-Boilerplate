@@ -47,11 +47,20 @@ func createMySQLHealthResponse(health map[string]string) *MySQLHealth {
 
 // logMySQLHealthStatus logs the MySQL health status.
 func logMySQLHealthStatus(response Response) {
-	if response.MySQLHealth.Status == "up" {
+	// Extract mysqlHealth from the response
+	mysqlHealth := response.MySQLHealth
+
+	if mysqlHealth != nil && mysqlHealth.Status == "up" {
+		// Log general MySQL status
 		log.LogInfof("MySQL Status: %s, Stats: Open Connections: %s, In Use: %s, Idle: %s, Wait Count: %s, Duration: %s",
-			response.MySQLHealth.Message, response.MySQLHealth.Stats.Open, response.MySQLHealth.Stats.InUse,
-			response.MySQLHealth.Stats.Idle, response.MySQLHealth.Stats.WaitCount, response.MySQLHealth.Stats.Duration)
+			response.MySQLHealth.Message,
+			response.MySQLHealth.Stats.Open,
+			response.MySQLHealth.Stats.InUse,
+			response.MySQLHealth.Stats.Idle,
+			response.MySQLHealth.Stats.WaitCount,
+			response.MySQLHealth.Stats.Duration)
 	} else {
-		log.LogErrorf("MySQL Error: %v", response.MySQLHealth.Error)
+		// Log the error if MySQL is not up or if mysqlHealth is nil
+		log.LogErrorf("MySQL Error: %v", mysqlHealth.Error)
 	}
 }

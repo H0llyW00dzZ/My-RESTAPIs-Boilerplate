@@ -16,13 +16,22 @@ type MemoryUsage struct {
 	GB string `json:"gb,omitempty"`
 }
 
-// PoolingStats represents the statistics of the current connection pooling state.
+// ConnectionFigures represents the numerical statistics associated with Redis connections.
+type ConnectionFigures struct {
+	Hits       string `json:"hits,omitempty"`
+	Misses     string `json:"misses,omitempty"`
+	Timeouts   string `json:"timeouts,omitempty"`
+	Total      string `json:"total,omitempty"`
+	Stale      string `json:"stale,omitempty"`
+	Idle       string `json:"idle,omitempty"`
+	Active     string `json:"active,omitempty"`
+	Percentage string `json:"percentage,omitempty"`
+}
+
+// PoolingStats now contains a ConnectionFigures struct, representing a part of the pooling stats.
 type PoolingStats struct {
-	Total              string `json:"total,omitempty"`
-	Stale              string `json:"stale,omitempty"`
-	Idle               string `json:"idle,omitempty"`
-	Active             string `json:"active,omitempty"`
-	PoolSizePercentage string `json:"percentage,omitempty"`
+	Figures       ConnectionFigures `json:"figures,omitempty"`
+	ObservedTotal string            `json:"observed_total,omitempty"`
 }
 
 // MemoryStats represents the memory usage statistics.
@@ -76,11 +85,31 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 		// Format the uptime
 		uptimeStats, uptime := formatUptime(health["redis_uptime_in_seconds"])
 
+		// Parse numerical values from the health stats for calculation
+		hits, _ := strconv.ParseUint(health["redis_hits_connections"], 10, 64)
+		misses, _ := strconv.ParseUint(health["redis_misses_connections"], 10, 64)
+		timeouts, _ := strconv.ParseUint(health["redis_timeouts_connections"], 10, 64)
+		activeConns, _ := strconv.ParseUint(health["redis_active_connections"], 10, 64)
+		StaleConns, _ := strconv.ParseUint(health["redis_stale_connections"], 10, 64)
+		idleConns, _ := strconv.ParseUint(health["redis_idle_connections"], 10, 64)
+
+		// Calculate the observed total connections
+		observedTotalConns := hits + misses + timeouts + StaleConns + activeConns + idleConns
+		observedTotal := strconv.FormatUint(observedTotalConns, 10)
+
 		// Create PoolingStats from the health statistics
 		poolingStats := PoolingStats{
-			Total:  health["redis_total_connections"],
-			Idle:   health["redis_idle_connections"],
-			Active: health["redis_active_connections"],
+			Figures: ConnectionFigures{
+				Total:      health["redis_total_connections"],
+				Stale:      health["redis_stale_connections"],
+				Idle:       health["redis_idle_connections"],
+				Active:     health["redis_active_connections"],
+				Hits:       health["redis_hits_connections"],
+				Misses:     health["redis_misses_connections"],
+				Timeouts:   health["redis_timeouts_connections"],
+				Percentage: health["redis_pool_size_percentage"],
+			},
+			ObservedTotal: observedTotal,
 		}
 
 		redisHealth.Stats = &RedisStats{
@@ -114,19 +143,42 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 	return redisHealth
 }
 
-// logRedisHealthStatus logs the Redis health status.
+// logRedisHealthStatus logs the Redis health status with detailed stats.
 func logRedisHealthStatus(response Response) {
-	if response.RedisHealth.Status == "up" {
-		log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s, Used Memory: %s MB (%s GB), Peak Memory: %s MB (%s GB), Memory Usage: %s, Free Memory: %s MB (%s GB), Uptime: %s, Total Connections: %s, Active Connections: %s, Idle Connections: %s, Stale Connections: %s, Pool Size Usage: %s",
-			response.RedisHealth.Message, response.RedisHealth.Stats.Version, response.RedisHealth.Stats.Mode,
-			response.RedisHealth.Stats.Memory.Used.MB, response.RedisHealth.Stats.Memory.Used.GB,
-			response.RedisHealth.Stats.Memory.Peak.MB, response.RedisHealth.Stats.Memory.Peak.GB,
-			response.RedisHealth.Stats.Memory.Percentage,
-			response.RedisHealth.Stats.Memory.Free.MB, response.RedisHealth.Stats.Memory.Free.GB,
-			response.RedisHealth.Stats.UptimeStats,
-			response.RedisHealth.Stats.Pooling.Total, response.RedisHealth.Stats.Pooling.Active, response.RedisHealth.Stats.Pooling.Idle,
-			response.RedisHealth.Stats.Pooling.Stale, response.RedisHealth.Stats.Pooling.PoolSizePercentage)
+	// Extract redisHealth from the response
+	redisHealth := response.RedisHealth
+
+	if redisHealth != nil && redisHealth.Status == "up" {
+		// Log general Redis status
+		log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s",
+			redisHealth.Message, redisHealth.Stats.Version, redisHealth.Stats.Mode)
+
+		// Log memory usage
+		log.LogInfof("Redis Memory Usage: Used: %s MB (%s GB), Peak: %s MB (%s GB), Percentage: %s, Free: %s MB (%s GB)",
+			redisHealth.Stats.Memory.Used.MB, redisHealth.Stats.Memory.Used.GB,
+			redisHealth.Stats.Memory.Peak.MB, redisHealth.Stats.Memory.Peak.GB,
+			redisHealth.Stats.Memory.Percentage,
+			redisHealth.Stats.Memory.Free.MB, redisHealth.Stats.Memory.Free.GB)
+
+		// Log uptime stats
+		log.LogInfof("Redis Uptime: %s, Pooling Connections: %s, Connected Clients: %s",
+			redisHealth.Stats.UptimeStats,
+			redisHealth.Stats.Pooling.ObservedTotal,
+			redisHealth.Stats.ConnectedClients)
+
+		// Log detailed pooling stats
+		log.LogInfof("Redis Pooling Figures: Hits: %s, Misses: %s, Timeouts: %s, Total: %s, Stale: %s, Idle: %s, Active: %s, Pool Size Usage: %s, Observed Total: %s",
+			redisHealth.Stats.Pooling.Figures.Hits,
+			redisHealth.Stats.Pooling.Figures.Misses,
+			redisHealth.Stats.Pooling.Figures.Timeouts,
+			redisHealth.Stats.Pooling.Figures.Total,
+			redisHealth.Stats.Pooling.Figures.Stale,
+			redisHealth.Stats.Pooling.Figures.Idle,
+			redisHealth.Stats.Pooling.Figures.Active,
+			redisHealth.Stats.Pooling.Figures.Percentage,
+			redisHealth.Stats.Pooling.ObservedTotal)
 	} else {
-		log.LogErrorf("Redis Error: %v", response.RedisHealth.Error)
+		// Log the error if Redis is not up or if redisHealth is nil
+		log.LogErrorf("Redis Error: %v", redisHealth.Error)
 	}
 }
