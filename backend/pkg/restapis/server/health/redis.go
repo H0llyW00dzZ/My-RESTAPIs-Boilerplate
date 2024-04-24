@@ -153,6 +153,9 @@ func logRedisHealthStatus(response Response) {
 	// Extract redisHealth from the response
 	redisHealth := response.RedisHealth
 
+	// Note: This method `Map of Function` improves data structuring for logging purposes. It provides a clear and
+	// efficient way to access the Redis health information, which is crucial for maintaining
+	// the integrity of the logged data.
 	if redisHealth != nil && redisHealth.Status == "up" {
 		// Log general Redis status
 		log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s",
