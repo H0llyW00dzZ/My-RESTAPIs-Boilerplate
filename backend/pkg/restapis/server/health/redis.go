@@ -161,7 +161,7 @@ func logRedisHealthStatus(response Response) {
 			redisHealth.Stats.Memory.Free.MB, redisHealth.Stats.Memory.Free.GB)
 
 		// Log uptime stats
-		log.LogInfof("Redis Uptime: %s, Total Connections: %s, Connected Clients: %s",
+		log.LogInfof("Redis Uptime: %s, Pooling Connections: %s, Connected Clients: %s",
 			redisHealth.Stats.UptimeStats,
 			redisHealth.Stats.Pooling.ObservedTotal,
 			redisHealth.Stats.ConnectedClients)
