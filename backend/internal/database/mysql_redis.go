@@ -350,6 +350,15 @@ func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string)
 			// Get the pool stats of the Redis client
 			poolStats := s.redisClient.PoolStats()
 
+			// Extract the number of hits (free times) connections in the pool
+			stats["redis_hits_connections"] = strconv.FormatUint(uint64(poolStats.Hits), 10)
+
+			// Extract the number of misses (not found) connections in the pool
+			stats["redis_misses_connections"] = strconv.FormatUint(uint64(poolStats.Misses), 10)
+
+			// Extract the number of timeouts (wait a timeouts) connections in the pool
+			stats["redis_timeouts_connections"] = strconv.FormatUint(uint64(poolStats.Timeouts), 10)
+
 			// Extract the total number of connections in the pool
 			stats["redis_total_connections"] = strconv.FormatUint(uint64(poolStats.TotalConns), 10)
 
