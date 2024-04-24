@@ -18,7 +18,7 @@ type ConnectionStats struct {
 // MySQLHealth represents the health statistics for MySQL.
 type MySQLHealth struct {
 	Status  string           `json:"status"`
-	Message string           `json:"message"`
+	Message string           `json:"message,omitempty"`
 	Error   string           `json:"error,omitempty"`
 	Stats   *ConnectionStats `json:"stats,omitempty"`
 }

@@ -273,9 +273,12 @@ func (s *service) checkMySQLHealth(ctx context.Context, stats map[string]string)
 	// Ping the MySQL database
 	err := s.db.PingContext(ctx)
 	if err != nil {
+		// Note: While using `log.Fatal` is an option, it is not recommended for this REST API.
+		// These APIs are designed for large-scale applications with complex infrastructure rather than
+		// small systems reliant on a single database. Using `log.Fatal` can prematurely terminate
+		// the service, which is undesirable in a distributed and resilient application environment.
 		stats["mysql_status"] = "down"
 		stats["mysql_error"] = fmt.Sprintf(ErrDBDown, err)
-		stats["mysql_message"] = fmt.Sprintf("%v", err)
 	} else {
 		// MySQL is up, add more statistics
 		stats["mysql_status"] = "up"
@@ -324,9 +327,12 @@ func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string)
 	// Ping the Redis server
 	pong, err := s.redisClient.Ping(ctx).Result()
 	if err != nil {
+		// Note: While using `log.Fatal` is an option, it is not recommended for this REST API.
+		// These APIs are designed for large-scale applications with complex infrastructure rather than
+		// small systems reliant on a single database. Using `log.Fatal` can prematurely terminate
+		// the service, which is undesirable in a distributed and resilient application environment.
 		stats["redis_status"] = "down"
 		stats["redis_error"] = fmt.Sprintf(ErrDBDown, err)
-		stats["redis_message"] = fmt.Sprintf("%v", err)
 	} else {
 		// Redis is up
 		stats["redis_status"] = "up"

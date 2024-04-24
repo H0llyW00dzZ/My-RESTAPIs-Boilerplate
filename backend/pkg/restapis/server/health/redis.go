@@ -56,7 +56,7 @@ type RedisStats struct {
 // RedisHealth represents the health statistics for Redis.
 type RedisHealth struct {
 	Status  string      `json:"status"`
-	Message string      `json:"message"`
+	Message string      `json:"message,omitempty"`
 	Error   string      `json:"error,omitempty"`
 	Stats   *RedisStats `json:"stats,omitempty"`
 }
