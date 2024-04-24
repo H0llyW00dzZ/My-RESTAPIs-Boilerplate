@@ -1,5 +1,14 @@
 # My RESTful API Boilerplate
 
+<p align="center">
+  <img src="https://i.imgur.com/Rm7I8uK.png" alt="Golang logo" width="400">
+  <br>
+  <i>Image Copyright © <a href="https://github.com/SAWARATSUKI">SAWARATSUKI</a>. All rights reserved.</i>
+  <br>
+  <i>Image used under permission from the copyright holder.</i>
+</p>
+
+
 This project provides a boilerplate for building RESTful APIs using Go. It is designed to a quick start with best practices, easy configuration, and a clear project structure.
 
 > [!WARNING]  
