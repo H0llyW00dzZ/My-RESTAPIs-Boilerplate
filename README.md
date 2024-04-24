@@ -8,7 +8,6 @@
   <i>Image used under permission from the copyright holder.</i>
 </p>
 
-
 This project provides a boilerplate for building RESTful APIs using Go. It is designed to a quick start with best practices, easy configuration, and a clear project structure.
 
 > [!WARNING]  
