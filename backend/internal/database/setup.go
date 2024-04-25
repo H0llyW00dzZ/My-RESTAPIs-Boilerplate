@@ -9,6 +9,8 @@ import (
 	"database/sql"
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
+	"runtime"
+	"strconv"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql" // MySQL driver is used for connecting to MySQL databases.
@@ -26,6 +28,8 @@ type RedisClientConfig struct {
 	PoolTimeout           time.Duration
 	ContextTimeoutEnabled bool
 	PoolSize              int
+	ConnMaxIdleTime       time.Duration
+	ConnMaxLifetime       time.Duration
 }
 
 // FiberRedisClientConfig defines the settings needed for Fiber Redis client initialization.
@@ -47,6 +51,14 @@ type MySQLConfig struct {
 	Database string
 }
 
+// Calculate the maximum number of connections based on the number of CPUs
+// Note: This configuration is better for starters and provides stability.
+// Tested on Node Spec:
+// 2x vCPU
+// 4x ~ 8x Compute
+// 1 GB RAM
+var maxConnections = 2 * runtime.NumCPU()
+
 // InitializeRedisClient initializes and returns a new Redis client.
 func InitializeRedisClient(config RedisClientConfig) *redis.Client {
 	client := redis.NewClient(&redis.Options{
@@ -60,6 +72,7 @@ func InitializeRedisClient(config RedisClientConfig) *redis.Client {
 		PoolTimeout:           config.PoolTimeout,           // PoolTimeout should already be a time.Duration
 		PoolSize:              config.PoolSize,              // adding back this for default.
 		ContextTimeoutEnabled: config.ContextTimeoutEnabled, // adding back this for default.
+		MinIdleConns:          config.PoolSize / 4,          // Set minimum idle connections to 25% of the pool size
 	})
 	return client
 }
@@ -97,4 +110,146 @@ func InitializeRedisStorage(config FiberRedisClientConfig) fiber.Storage {
 		PoolSize: config.PoolSize, // Adjust the pool size as necessary.
 	})
 	return storage
+}
+
+// parseRedisConfig parses the Redis configuration from environment variables and returns a RedisClientConfig struct.
+// It handles parsing errors and returns an error if any of the configurations are invalid.
+func parseRedisConfig() (RedisClientConfig, error) {
+	// Parse the Redis database index from the environment variable.
+	redisDB, err := strconv.Atoi(redisDatabase)
+	if err != nil {
+		return RedisClientConfig{}, fmt.Errorf("invalid Redis database index: %v", err)
+	}
+
+	// Parse Redis port from the environment variable
+	redisPortInt, err := strconv.Atoi(redisPort)
+	if err != nil {
+		return RedisClientConfig{}, fmt.Errorf("invalid Redis port: %v", err)
+	}
+
+	// Parse pool timeout from the environment variable
+	poolTimeout, err := time.ParseDuration(redisPoolTimeout)
+	if err != nil {
+		return RedisClientConfig{}, fmt.Errorf("invalid Redis pool timeout value: %v", err)
+	}
+
+	// Parse connection max life time from the environment variable
+	redisConnMaxLifetime, err := time.ParseDuration(redisConnMaxLifetime)
+	if err != nil {
+		return RedisClientConfig{}, fmt.Errorf("invalid Redis connection max life time value: %v", err)
+	}
+
+	// Parse connection max idle time from the environment variable
+	redisConnMaxIdleTime, err := time.ParseDuration(redisConnMaxIdleTime)
+	if err != nil {
+		return RedisClientConfig{}, fmt.Errorf("invalid Redis connection max idle time value: %v", err)
+	}
+
+	// Return the RedisClientConfig struct with the parsed configurations
+	return RedisClientConfig{
+		Address:               redisAddress,
+		Port:                  redisPortInt,
+		Password:              redisPassword,
+		Database:              redisDB,
+		PoolTimeout:           poolTimeout,
+		PoolSize:              maxConnections,
+		ContextTimeoutEnabled: true,
+		ConnMaxIdleTime:       redisConnMaxIdleTime,
+		ConnMaxLifetime:       redisConnMaxLifetime,
+	}, nil
+}
+
+// initializeRedisClient initializes the Redis client using the provided Redis configuration.
+// It parses the configuration from environment variables and returns a new Redis client instance.
+func initializeRedisClient() (*redis.Client, error) {
+	// Parse the Redis database index from the environment variable.
+	redisDB, err := strconv.Atoi(redisDatabase)
+	if err != nil {
+		return nil, fmt.Errorf("invalid Redis database index: %v", err)
+	}
+
+	// Parse Redis port from the environment variable
+	redisPortInt, err := strconv.Atoi(redisPort)
+	if err != nil {
+		return nil, fmt.Errorf("invalid Redis port: %v", err)
+	}
+
+	// Parse pool timeout from the environment variable
+	poolTimeout, err := time.ParseDuration(redisPoolTimeout)
+	if err != nil {
+		return nil, fmt.Errorf("invalid Redis pool timeout value: %v", err)
+	}
+
+	// Parse connection max life time from the environment variable
+	redisConnMaxLifetime, err := time.ParseDuration(redisConnMaxLifetime)
+	if err != nil {
+		return nil, fmt.Errorf("invalid Redis connection max life time value: %v", err)
+	}
+
+	// Parse connection max idle time from the environment variable
+	redisConnMaxIdleTime, err := time.ParseDuration(redisConnMaxIdleTime)
+	if err != nil {
+		return nil, fmt.Errorf("invalid Redis connection max idle time value: %v", err)
+	}
+
+	// Prepare Redis client configuration
+	redisClientConfig := RedisClientConfig{
+		Address:               redisAddress,
+		Port:                  redisPortInt,
+		Password:              redisPassword,
+		Database:              redisDB,
+		PoolTimeout:           poolTimeout,
+		ContextTimeoutEnabled: true,
+		PoolSize:              maxConnections,
+		ConnMaxLifetime:       redisConnMaxLifetime,
+		ConnMaxIdleTime:       redisConnMaxIdleTime,
+	}
+
+	// Initialize and return the Redis client using the provided configuration
+	return InitializeRedisClient(redisClientConfig), nil
+}
+
+// initializeRedisStorage initializes the Redis storage for Fiber using the provided Redis configuration.
+// It parses the configuration from environment variables and returns a new Redis storage instance.
+func initializeRedisStorage() (fiber.Storage, error) {
+	// Parse the Redis database index from the environment variable.
+	redisDB, err := strconv.Atoi(redisDatabase)
+	if err != nil {
+		return nil, fmt.Errorf("invalid Redis database index: %v", err)
+	}
+
+	// Parse Redis port from the environment variable
+	redisPortInt, err := strconv.Atoi(redisPort)
+	if err != nil {
+		return nil, fmt.Errorf("invalid Redis port: %v", err)
+	}
+
+	// Prepare Fiber Redis storage configuration
+	fiberRedisConfig := FiberRedisClientConfig{
+		Address:  redisAddress,
+		Port:     redisPortInt,
+		Password: redisPassword,
+		Database: redisDB,
+		PoolSize: maxConnections,
+		Reset:    false,
+	}
+
+	// Initialize and return the Redis storage using the provided configuration
+	return InitializeRedisStorage(fiberRedisConfig), nil
+}
+
+// initializeMySQLDB initializes the MySQL database using the provided MySQL configuration.
+// It prepares the configuration from environment variables and returns a new database connection.
+func initializeMySQLDB() (*sql.DB, error) {
+	// Prepare MySQL configuration
+	mysqlConfig := MySQLConfig{
+		Username: username,
+		Password: password,
+		Host:     host,
+		Port:     port,
+		Database: dbname,
+	}
+
+	// Initialize and return the MySQL database connection using the provided configuration
+	return InitializeMySQLDB(mysqlConfig)
 }

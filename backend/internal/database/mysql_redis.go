@@ -10,7 +10,6 @@ import (
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"os"
-	"runtime"
 	"strconv"
 	"sync"
 	"time"
@@ -133,17 +132,19 @@ type service struct {
 
 // dbConfig holds the environment variables for the database connection.
 var (
-	dbname           = os.Getenv(EnvMYSQLDBName)
-	password         = os.Getenv(EnvMYSQLDBPassword)
-	username         = os.Getenv(EnvMYSQLDBUsername)
-	port             = os.Getenv(EnvMYSQLDBPort)
-	host             = os.Getenv(EnvMYSQLDBHost)
-	redisAddress     = os.Getenv(EnvRedisDBHost)
-	redisPort        = os.Getenv(EnvRedisDBPort)
-	redisPassword    = os.Getenv(EnvRedisDBPassword)
-	redisDatabase    = os.Getenv(EnvRedisDBName)
-	redisPoolTimeout = os.Getenv(EnvRedisDBPoolTimeout)
-	dbInstance       *service
+	dbname               = os.Getenv(EnvMYSQLDBName)
+	password             = os.Getenv(EnvMYSQLDBPassword)
+	username             = os.Getenv(EnvMYSQLDBUsername)
+	port                 = os.Getenv(EnvMYSQLDBPort)
+	host                 = os.Getenv(EnvMYSQLDBHost)
+	redisAddress         = os.Getenv(EnvRedisDBHost)
+	redisPort            = os.Getenv(EnvRedisDBPort)
+	redisPassword        = os.Getenv(EnvRedisDBPassword)
+	redisDatabase        = os.Getenv(EnvRedisDBName)
+	redisPoolTimeout     = os.Getenv(EnvRedisDBPoolTimeout)
+	redisConnMaxIdleTime = os.Getenv(EnvRedisDBConnMaxIdleTime)
+	redisConnMaxLifetime = os.Getenv(EnvRedisDBConnMaxLifeTime)
+	dbInstance           *service
 )
 
 // New creates a new instance of the Service interface.
@@ -154,72 +155,24 @@ func New() Service {
 		return dbInstance
 	}
 
-	// Parse the Redis database index from the environment variable.
-	redisDB, err := strconv.Atoi(redisDatabase)
-	if err != nil {
-		log.LogFatal("Invalid Redis database index:", err)
-	}
-
-	// Parse Redis port from the environment variable
-	redisPortInt, err := strconv.Atoi(redisPort)
-	if err != nil {
-		log.LogFatal("Invalid Redis port:", err)
-	}
-
-	// Parse pool timeout from the environment variable
-	poolTimeout, err := time.ParseDuration(redisPoolTimeout)
-	if err != nil {
-		log.LogFatal("Invalid Redis pool timeout value:", err)
-	}
-	// Note: This configuration is better for starters and provides stability.
-	// Tested on Node Spec:
-	// 2x vCPU
-	// 4x ~ 8x Compute
-	// 1 GB RAM
-	maxConnections := 2 * runtime.NumCPU()
-
-	// Prepare Redis client configuration
-	redisClientConfig := RedisClientConfig{
-		Address:               redisAddress,
-		Port:                  redisPortInt,
-		Password:              redisPassword,
-		Database:              redisDB,
-		PoolTimeout:           poolTimeout,
-		ContextTimeoutEnabled: true,
-		PoolSize:              maxConnections,
-	}
-
 	// Initialize the Redis client
-	redisClient := InitializeRedisClient(redisClientConfig)
-
-	// Prepare Fiber Redis storage configuration
-	fiberRedisConfig := FiberRedisClientConfig{
-		Address:  redisAddress, // Reusing the same address and port as the Redis client for example.
-		Port:     redisPortInt,
-		Password: redisPassword,
-		Database: redisDB,
-		PoolSize: maxConnections,
-		Reset:    false, // Set to true to clear the storage upon establishing a connection.
+	redisClient, err := initializeRedisClient()
+	if err != nil {
+		log.LogFatal("Failed to initialize Redis client:", err)
 	}
 
 	// Initialize Redis storage for Fiber
-	redisStorage := InitializeRedisStorage(fiberRedisConfig)
-
-	// Prepare MySQL configuration
-	mysqlConfig := MySQLConfig{
-		Username: username,
-		Password: password,
-		Host:     host,
-		Port:     port,
-		Database: dbname,
+	redisStorage, err := initializeRedisStorage()
+	if err != nil {
+		log.LogFatal("Failed to initialize Redis storage:", err)
 	}
 
 	// Initialize the MySQL database
-	db, err := InitializeMySQLDB(mysqlConfig)
+	db, err := initializeMySQLDB()
 	if err != nil {
 		// This will not be a connection error, but a DSN parse error or
 		// another initialization error.
-		log.LogFatal(err)
+		log.LogFatal("Failed to initialize MySQL database:", err)
 	}
 
 	dbInstance = &service{
@@ -615,25 +568,11 @@ func (s *service) RestartRedisConnection() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// Parse the Redis database index from the environment variable.
-	redisDB, err := strconv.Atoi(redisDatabase)
+	// Parse the Redis configuration from environment variables.
+	redisConfig, err := parseRedisConfig()
 	if err != nil {
-		log.LogFatal("Invalid Redis database index:", err)
+		return err
 	}
-
-	// Parse Redis port from the environment variable
-	redisPortInt, err := strconv.Atoi(redisPort)
-	if err != nil {
-		log.LogFatal("Invalid Redis port:", err)
-	}
-
-	// Parse pool timeout from the environment variable
-	poolTimeout, err := time.ParseDuration(redisPoolTimeout)
-	if err != nil {
-		log.LogFatal("Invalid Redis pool timeout value:", err)
-	}
-
-	maxConnections := 2 * runtime.NumCPU()
 
 	// Close the existing Redis client connection.
 	if err := s.redisClient.Close(); err != nil {
@@ -642,15 +581,7 @@ func (s *service) RestartRedisConnection() error {
 	}
 
 	// Reinitialize the Redis client.
-	s.redisClient = InitializeRedisClient(RedisClientConfig{
-		Address:               redisAddress,
-		Port:                  redisPortInt,
-		Password:              redisPassword,
-		Database:              redisDB,
-		PoolTimeout:           poolTimeout,
-		ContextTimeoutEnabled: true,
-		PoolSize:              maxConnections,
-	})
+	s.redisClient = InitializeRedisClient(redisConfig)
 
 	// Log the reconnection
 	log.LogInfo("Redis connection has been restarted.")
