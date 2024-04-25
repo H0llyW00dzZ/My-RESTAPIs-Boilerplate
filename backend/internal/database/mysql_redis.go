@@ -338,6 +338,14 @@ func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string)
 
 			// Extract the number of active connections (TotalConns - IdleConns gives us the ActiveConns)
 			activeConns := poolStats.TotalConns - poolStats.IdleConns
+
+			// Check for underflow
+			if activeConns > poolStats.TotalConns {
+				stats["redis_message"] = MsgRedisActiveConnectionUnderflowDetected
+				activeConns = 0 // Reset to a sensible default or handle appropriately
+			}
+
+			// Now convert to string and assign to stats
 			stats["redis_active_connections"] = strconv.FormatUint(uint64(activeConns), 10)
 
 			// Get the used memory of the Redis server in bytes
