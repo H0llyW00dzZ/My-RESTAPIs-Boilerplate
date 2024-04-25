@@ -12,6 +12,7 @@ import (
 	"os"
 	"runtime"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -114,6 +115,12 @@ type Service interface {
 
 	// DeleteKeys deletes a slice of keys from Redis and returns the updated count.
 	DeleteKeys(ctx context.Context, keys []string, totalDeleted int) (int, error)
+
+	// RestartRedisConnection safely closes the existing connection to Redis and establishes a new one.
+	RestartRedisConnection() error
+
+	// RestartMySQLConnection safely restarts the MySQL connection.
+	RestartMySQLConnection() error
 }
 
 // service is a concrete implementation of the Service interface.
@@ -121,6 +128,7 @@ type service struct {
 	db          *sql.DB
 	rdb         fiber.Storage
 	redisClient *redis.Client
+	mu          sync.Mutex // a mutex to guard connection restarts or any that needed
 }
 
 // dbConfig holds the environment variables for the database connection.
@@ -600,4 +608,82 @@ func (s *service) PrepareInsertStatement(ctx context.Context, tx *sql.Tx, query 
 		return nil, err
 	}
 	return stmt, nil
+}
+
+// RestartRedisConnection safely closes the existing connection to Redis and establishes a new one.
+func (s *service) RestartRedisConnection() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// Parse the Redis database index from the environment variable.
+	redisDB, err := strconv.Atoi(redisDatabase)
+	if err != nil {
+		log.LogFatal("Invalid Redis database index:", err)
+	}
+
+	// Parse Redis port from the environment variable
+	redisPortInt, err := strconv.Atoi(redisPort)
+	if err != nil {
+		log.LogFatal("Invalid Redis port:", err)
+	}
+
+	// Parse pool timeout from the environment variable
+	poolTimeout, err := time.ParseDuration(redisPoolTimeout)
+	if err != nil {
+		log.LogFatal("Invalid Redis pool timeout value:", err)
+	}
+
+	maxConnections := 2 * runtime.NumCPU()
+
+	// Close the existing Redis client connection.
+	if err := s.redisClient.Close(); err != nil {
+		log.LogErrorf("Error closing Redis client: %v", err)
+		return err
+	}
+
+	// Reinitialize the Redis client.
+	s.redisClient = InitializeRedisClient(RedisClientConfig{
+		Address:     redisAddress,
+		Port:        redisPortInt,
+		Password:    redisPassword,
+		Database:    redisDB,
+		PoolTimeout: poolTimeout,
+		PoolSize:    maxConnections,
+	})
+
+	// Log the reconnection
+	log.LogInfo("Redis connection has been restarted.")
+
+	return nil
+}
+
+// RestartMySQLConnection safely closes the existing MySQL connection and establishes a new one.
+func (s *service) RestartMySQLConnection() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// Close the existing MySQL database connection.
+	if err := s.db.Close(); err != nil {
+		log.LogErrorf("Error closing MySQL database connection: %v", err)
+		return err
+	}
+
+	// Reinitialize the MySQL database connection.
+	var err error
+	s.db, err = InitializeMySQLDB(MySQLConfig{
+		Username: username,
+		Password: password,
+		Host:     host,
+		Port:     port,
+		Database: dbname,
+	})
+	if err != nil {
+		log.LogErrorf("Error reinitializing MySQL database connection: %v", err)
+		return err
+	}
+
+	// Log the reconnection.
+	log.LogInfo("MySQL connection has been restarted.")
+
+	return nil
 }
