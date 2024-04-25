@@ -39,8 +39,8 @@ type PoolingStats struct {
 type MemoryStats struct {
 	Used       MemoryUsage `json:"used,omitempty"`
 	Peak       MemoryUsage `json:"peak,omitempty"`
-	Percentage string      `json:"percentage,omitempty"`
 	Free       MemoryUsage `json:"free,omitempty"`
+	Percentage string      `json:"percentage,omitempty"`
 }
 
 // RedisStats groups the statistics related to Redis.
