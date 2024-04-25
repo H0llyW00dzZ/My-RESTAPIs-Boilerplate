@@ -7,6 +7,7 @@ package health
 import (
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
+	"h0llyw00dz-template/backend/pkg/restapis/helper"
 	"strconv"
 )
 
@@ -78,25 +79,20 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 		freeMemoryMB, freeMemoryGB := bytesToMBGB(health["redis_max_memory"])
 
 		// Calculate the memory usage percentage
-		// TODO: Implement a helper function to parse numerical values. This will avoid repeated calls
-		// to `strconv.ParseInt` across the frontend REST APIs when the base and bits size are consistent.
-		usedMemory, _ := strconv.ParseInt(health["redis_used_memory"], 10, 64)
-		maxMemory, _ := strconv.ParseInt(health["redis_max_memory"], 10, 64)
+		usedMemory := helper.ParseInt64Value(health["redis_used_memory"], 10, 64)
+		maxMemory := helper.ParseInt64Value(health["redis_max_memory"], 10, 64)
 		memoryUsage := calculateMemoryUsage(usedMemory, maxMemory)
 
 		// Format the uptime
 		uptimeStats, uptime := formatUptime(health["redis_uptime_in_seconds"])
 
 		// Parse numerical values from the health stats for calculation
-		// TODO: Implement a helper function to parse numerical values from the health stats, which will
-		// prevent the need for repeated `strconv.ParseUint` calls across the frontend REST APIs when the base
-		// and bit size remain the same.
-		hits, _ := strconv.ParseUint(health["redis_hits_connections"], 10, 64)
-		misses, _ := strconv.ParseUint(health["redis_misses_connections"], 10, 64)
-		timeouts, _ := strconv.ParseUint(health["redis_timeouts_connections"], 10, 64)
-		activeConns, _ := strconv.ParseUint(health["redis_active_connections"], 10, 64)
-		StaleConns, _ := strconv.ParseUint(health["redis_stale_connections"], 10, 64)
-		idleConns, _ := strconv.ParseUint(health["redis_idle_connections"], 10, 64)
+		hits := helper.ParseNumericalValue(health["redis_hits_connections"], 10, 64)
+		misses := helper.ParseNumericalValue(health["redis_misses_connections"], 10, 64)
+		timeouts := helper.ParseNumericalValue(health["redis_timeouts_connections"], 10, 64)
+		activeConns := helper.ParseNumericalValue(health["redis_active_connections"], 10, 64)
+		StaleConns := helper.ParseNumericalValue(health["redis_stale_connections"], 10, 64)
+		idleConns := helper.ParseNumericalValue(health["redis_idle_connections"], 10, 64)
 
 		// Calculate the observed total connections
 		observedTotalConns := hits + misses + timeouts + StaleConns + activeConns + idleConns
