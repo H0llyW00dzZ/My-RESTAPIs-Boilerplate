@@ -13,7 +13,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql" // MySQL driver is used for connecting to MySQL databases.
 	"github.com/gofiber/fiber/v2"
-	redisStorage "github.com/gofiber/storage/redis/v3"
+	redisStorage "github.com/gofiber/storage/redis/v3" // Alias the import to avoid conflict
 	"github.com/redis/go-redis/v9"
 )
 
