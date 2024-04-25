@@ -53,7 +53,7 @@ func InitializeRedisClient(config RedisClientConfig) *redis.Client {
 		Addr:     fmt.Sprintf("%s:%d", config.Address, config.Port),
 		Password: config.Password,
 		DB:       config.Database,
-		// Note: TLSConfig it's optional a but I don't recommended it so better use it
+		// Note: TLSConfig is optional, but it is recommended for better security, so it's advisable to use it.
 		TLSConfig: &tls.Config{
 			MinVersion: tls.VersionTLS12,
 		},
@@ -88,7 +88,7 @@ func InitializeRedisStorage(config FiberRedisClientConfig) fiber.Storage {
 		Password: config.Password,
 		Database: config.Database,
 		Reset:    config.Reset,
-		// Note: TLSConfig it's optional a but I don't recommended it so better use it
+		// Note: TLSConfig is optional, but it is recommended for better security, so it's advisable to use it.
 		TLSConfig: &tls.Config{
 			MinVersion: tls.VersionTLS12,
 		},
