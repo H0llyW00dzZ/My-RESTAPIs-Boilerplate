@@ -473,15 +473,21 @@ func (s *service) FiberStorage() fiber.Storage {
 
 // ScanAndDel uses the Redis SCAN command to iterate over a set of keys and delete them.
 func (s *service) ScanAndDel(pattern string) error {
-	ctx := context.Background()
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// Use a context with a timeout to avoid hanging indefinitely
+	// Note: This should fix an issue where the function hangs when using RedisClientConfig with "ContextTimeoutEnabled" set to true.
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
+	var cursor uint64
 	var totalDeleted int
-	var scanComplete bool
 	var err error
 
-	for !scanComplete {
+	for {
+		// Retrieve keys matching the pattern
 		var keys []string
-		var cursor uint64
-
 		keys, cursor, err = s.ScanKeys(ctx, pattern, cursor)
 		if err != nil {
 			log.LogErrorf("Error retrieving keys from Redis: %v", err)
@@ -490,14 +496,19 @@ func (s *service) ScanAndDel(pattern string) error {
 
 		// Skip deletion if no keys are found, but continue scanning if not finished.
 		if len(keys) > 0 {
-			totalDeleted, err = s.DeleteKeys(ctx, keys, totalDeleted)
+			var deleted int
+			deleted, err = s.DeleteKeys(ctx, keys, totalDeleted)
 			if err != nil {
 				log.LogErrorf("Error deleting keys from Redis: %v", err)
 				return err
 			}
+			totalDeleted += deleted
 		}
 
-		scanComplete = (cursor == 0)
+		// Stop scanning if the cursor returned by SCAN is 0 (iteration complete)
+		if cursor == 0 {
+			break
+		}
 	}
 
 	if totalDeleted > 0 {
