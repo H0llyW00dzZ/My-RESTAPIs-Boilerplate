@@ -6,7 +6,6 @@ package database
 
 import (
 	"context"
-	"crypto/tls"
 	"database/sql"
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
@@ -16,7 +15,6 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	redisStorage "github.com/gofiber/storage/redis/v3" // Alias the import to avoid conflict
 	"github.com/redis/go-redis/v9"
 
 	_ "github.com/go-sql-driver/mysql" // MySQL driver is used for connecting to MySQL databases.
@@ -154,10 +152,10 @@ func New() Service {
 		log.LogFatal("Invalid Redis database index:", err)
 	}
 
-	// Parse redis port from the environment variable
-	portDB, err := strconv.Atoi(redisPort)
+	// Parse Redis port from the environment variable
+	redisPortInt, err := strconv.Atoi(redisPort)
 	if err != nil {
-		log.LogFatal("Invalid Redis database index:", err)
+		log.LogFatal("Invalid Redis port:", err)
 	}
 
 	// Parse pool timeout from the environment variable
@@ -165,24 +163,6 @@ func New() Service {
 	if err != nil {
 		log.LogFatal("Invalid Redis pool timeout value:", err)
 	}
-
-	// Opening a driver typically will not attempt to connect to the database.
-	db, err := sql.Open(dbMYSQL, fmt.Sprintf(MySQLConnect, username, password, host, port, dbname))
-	if err != nil {
-		// This will not be a connection error, but a DSN parse error or
-		// another initialization error.
-		log.LogFatal(err)
-	}
-
-	// Log the successful database connection
-	log.LogInfof(MsgDBConnected, dbname)
-
-	// Set MySQL connection pool parameters.
-	// TODO: Refine the MySQL setup and statistics tracking to align with the enhancements previously implemented for Redis.
-	db.SetConnMaxLifetime(0) // Connections are not closed due to being idle too long.
-	db.SetMaxIdleConns(50)   // Maximum number of connections in the idle connection pool.
-	db.SetMaxOpenConns(50)   // Maximum number of open connections to the database.
-
 	// Note: This configuration is better for starters and provides stability.
 	// Tested on Node Spec:
 	// 2x vCPU
@@ -190,35 +170,53 @@ func New() Service {
 	// 1 GB RAM
 	maxConnections := 2 * runtime.NumCPU()
 
-	// Create a new Redis client for health checks or for any other needs in middleware that do not involve using Fiber's storage.
-	redisClient := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%s", redisAddress, redisPort),
-		Password: redisPassword,
-		DB:       redisDB,
-		TLSConfig: &tls.Config{
-			MinVersion: tls.VersionTLS12,
-		},
-		PoolSize:              maxConnections,
+	// Prepare Redis client configuration
+	redisClientConfig := RedisClientConfig{
+		Address:               redisAddress,
+		Port:                  redisPortInt,
+		Password:              redisPassword,
+		Database:              redisDB,
 		PoolTimeout:           poolTimeout,
 		ContextTimeoutEnabled: true,
-	})
+		PoolSize:              maxConnections,
+	}
 
-	// Initialize Redis storage for rate limiting or for any other needs in middleware.
-	redisStorage := redisStorage.New(redisStorage.Config{
-		Host:     redisAddress,
-		Port:     portDB,
+	// Initialize the Redis client
+	redisClient := InitializeRedisClient(redisClientConfig)
+
+	// Prepare Fiber Redis storage configuration
+	fiberRedisConfig := FiberRedisClientConfig{
+		Address:  redisAddress, // Reusing the same address and port as the Redis client for example.
+		Port:     redisPortInt,
 		Password: redisPassword,
 		Database: redisDB,
+		PoolSize: maxConnections,
 		Reset:    false, // Set to true to clear the storage upon establishing a connection.
-		TLSConfig: &tls.Config{
-			MinVersion: tls.VersionTLS12,
-		},
-		PoolSize: maxConnections, // Adjust the pool size as necessary.
-	})
+	}
+
+	// Initialize Redis storage for Fiber
+	redisStorage := InitializeRedisStorage(fiberRedisConfig)
+
+	// Prepare MySQL configuration
+	mysqlConfig := MySQLConfig{
+		Username: username,
+		Password: password,
+		Host:     host,
+		Port:     port,
+		Database: dbname,
+	}
+
+	// Initialize the MySQL database
+	db, err := InitializeMySQLDB(mysqlConfig)
+	if err != nil {
+		// This will not be a connection error, but a DSN parse error or
+		// another initialization error.
+		log.LogFatal(err)
+	}
 
 	dbInstance = &service{
 		db:          db,
-		rdb:         redisStorage, // Use the Redis storage for rate limiting or any that needed in middleware
+		rdb:         redisStorage, // use redisStorage for rate limiting or any other needs in middleware
 		redisClient: redisClient,
 	}
 
