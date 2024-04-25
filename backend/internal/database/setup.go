@@ -58,6 +58,7 @@ func InitializeRedisClient(config RedisClientConfig) *redis.Client {
 			MinVersion: tls.VersionTLS12,
 		},
 		PoolTimeout: config.PoolTimeout, // PoolTimeout should already be a time.Duration
+		PoolSize:    config.PoolSize,    // adding back this for default.
 	})
 	return client
 }
