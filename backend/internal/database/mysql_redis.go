@@ -643,12 +643,13 @@ func (s *service) RestartRedisConnection() error {
 
 	// Reinitialize the Redis client.
 	s.redisClient = InitializeRedisClient(RedisClientConfig{
-		Address:     redisAddress,
-		Port:        redisPortInt,
-		Password:    redisPassword,
-		Database:    redisDB,
-		PoolTimeout: poolTimeout,
-		PoolSize:    maxConnections,
+		Address:               redisAddress,
+		Port:                  redisPortInt,
+		Password:              redisPassword,
+		Database:              redisDB,
+		PoolTimeout:           poolTimeout,
+		ContextTimeoutEnabled: true,
+		PoolSize:              maxConnections,
 	})
 
 	// Log the reconnection
