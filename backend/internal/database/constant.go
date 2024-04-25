@@ -30,11 +30,13 @@ const (
 
 // Constants for Redis NoSQL name and environment variable names.
 const (
-	EnvRedisDBName        = "RDB_DATABASE"
-	EnvRedisDBPassword    = "RDB_PASSWORD"
-	EnvRedisDBPort        = "RDB_PORT"
-	EnvRedisDBHost        = "RDB_ADDRESS"
-	EnvRedisDBPoolTimeout = "RDB_POOL_TIMEOUT"
+	EnvRedisDBName            = "RDB_DATABASE"
+	EnvRedisDBPassword        = "RDB_PASSWORD"
+	EnvRedisDBPort            = "RDB_PORT"
+	EnvRedisDBHost            = "RDB_ADDRESS"
+	EnvRedisDBPoolTimeout     = "RDB_POOL_TIMEOUT"
+	EnvRedisDBConnMaxIdleTime = "REDIS_MAXCONN_IDLE_TIME"
+	EnvRedisDBConnMaxLifeTime = "REDIS_MAXCONN_LIFE_TIME"
 )
 
 // Message constants for Redis-related operations.
