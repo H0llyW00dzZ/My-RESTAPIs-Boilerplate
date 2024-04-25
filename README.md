@@ -29,6 +29,7 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 
 - [X] Translate strings to any language
 - [ ] Optimize Memory Usage for `Translate strings to any language` by storing translated strings in Redis cache
+- [ ] Implement the `goroutine` scheduler task to more intelligently manage health check monitoring, akin to human-like decision-making, and subsequently report results to Slack.
 
 > [!NOTE]  
 > Additional features will be added later as my primary focus is on using this with the Fiber framework.
