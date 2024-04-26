@@ -11,6 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"h0llyw00dz-template/backend/internal/database"
+	"h0llyw00dz-template/backend/pkg/restapis/helper"
 )
 
 // Response represents the structured response for the health statistics.
@@ -35,9 +36,8 @@ func DBHandler(db database.Service) fiber.Handler {
 		// Check if the filter is valid
 		if !isValidFilter(filter) {
 			// TODO: Deal with log errors. Typically, I wouldn't tackle this for StatusBadRequest or StatusNotFound. 🤷‍♂️ 🤪
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": fmt.Sprintf("Invalid filter parameter. Allowed values: %s", strings.Join(getValidFilters(), ", ")),
-			})
+			badRequestMsg := fmt.Sprintf("Invalid filter parameter. Allowed values: %s", strings.Join(getValidFilters(), ", "))
+			return helper.SendErrorResponse(c, fiber.StatusBadRequest, badRequestMsg)
 		}
 
 		// Log the user activity based on the filter
