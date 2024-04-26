@@ -337,16 +337,15 @@ func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string)
 			stats["redis_stale_connections"] = strconv.FormatUint(uint64(poolStats.StaleConns), 10)
 
 			// Extract the number of active connections (TotalConns - IdleConns gives us the ActiveConns)
-			activeConns := poolStats.TotalConns - poolStats.IdleConns
-
-			// Check for underflow
-			if activeConns > poolStats.TotalConns {
+			// Ensure that TotalConns is greater than or equal to IdleConns before subtracting to prevent underflow.
+			if poolStats.TotalConns >= poolStats.IdleConns {
+				activeConns := poolStats.TotalConns - poolStats.IdleConns
+				// Now convert to string and assign to stats
+				stats["redis_active_connections"] = strconv.FormatUint(uint64(activeConns), 10)
+			} else {
 				stats["redis_message"] = MsgRedisActiveConnectionUnderflowDetected
-				activeConns = 0 // Reset to a sensible default or handle appropriately
+				stats["redis_active_connections"] = "0" // Set to 0 or handle appropriately
 			}
-
-			// Now convert to string and assign to stats
-			stats["redis_active_connections"] = strconv.FormatUint(uint64(activeConns), 10)
 
 			// Get the used memory of the Redis server in bytes
 			stats["redis_max_memory"] = redisInfo["maxmemory"] // Raw max memory in bytes
@@ -377,19 +376,17 @@ func (s *service) evaluateRedisStats(redisInfo, stats map[string]string) map[str
 	connectedClients, _ := strconv.Atoi(redisInfo["connected_clients"])
 
 	// Determine a high connection threshold, let's say 80% of the pool size because 20% is must be free (genius thinking 🤪)
-	highConnectionThreshold := float64(poolSize) * 0.8
+	highConnectionThreshold := int(float64(poolSize) * 0.8)
 
 	// Check if connected clients exceed the high connection threshold
-	if float64(connectedClients) > highConnectionThreshold {
+	if connectedClients > highConnectionThreshold {
 		stats["redis_message"] = MsgRedisHighConnectedClients
 	}
 
-	// Check for any stale connections and set a warning if any are found
-	// Note: This can sometimes happen, especially with Unix clients.
-	// It might be less common when connecting from Linux (client) to Linux (server), as opposed to Unix (client) to Linux (server).
-	if poolStats.StaleConns > 0 {
-		staleConns := uint64(poolStats.StaleConns)
-		stats["redis_message"] = fmt.Sprintf(MsgRedisHasStaleConnections, staleConns)
+	// Check for stale connections and append a warning if they exceed a minimum threshold
+	minStaleConnectionsThreshold := 500 // Adjust this value as needed
+	if int(poolStats.StaleConns) > minStaleConnectionsThreshold {
+		stats["redis_message"] = fmt.Sprintf(MsgRedisHasStaleConnections, poolStats.StaleConns)
 	}
 
 	// Check if used memory is close to the maximum memory
@@ -410,6 +407,22 @@ func (s *service) evaluateRedisStats(redisInfo, stats map[string]string) map[str
 	uptimeInSeconds, _ := strconv.ParseInt(redisInfo["uptime_in_seconds"], 10, 64)
 	if uptimeInSeconds < 3600 { // 1 hour
 		stats["redis_message"] = MsgRedisRecentlyRestarted
+	}
+
+	// Check the number of idle connections
+	idleConns := int(poolStats.IdleConns)
+	// Determine a high idle connection threshold, let's say 70% of the pool size
+	highIdleConnectionThreshold := int(float64(poolSize) * 0.7)
+	if idleConns > highIdleConnectionThreshold {
+		stats["redis_message"] = MsgRedisHighIdleConnections
+	}
+
+	// Check the pool utilization
+	poolUtilization := float64(poolStats.TotalConns-poolStats.IdleConns) / float64(poolSize) * 100
+	// Determine a high pool utilization threshold, let's say 90%
+	highPoolUtilizationThreshold := 90.0
+	if poolUtilization > highPoolUtilizationThreshold {
+		stats["redis_message"] = MsgRedisHighPoolUtilization
 	}
 
 	return stats
