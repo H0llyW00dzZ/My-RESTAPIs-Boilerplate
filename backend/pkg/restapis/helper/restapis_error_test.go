@@ -209,3 +209,31 @@ func TestSendErrorResponse_InternalServerError(t *testing.T) {
 		t.Errorf("Expected error message '%s', got '%s'", expectedErrorMessage, errorResponse.Error)
 	}
 }
+
+func TestSendErrorResponse_TooManyRequests(t *testing.T) {
+	app := fiber.New()
+	app.Get("/gopher/test", func(c *fiber.Ctx) error {
+		return helper.SendErrorResponse(c, fiber.StatusTooManyRequests, "Too many requests")
+	})
+
+	req := httptest.NewRequest("GET", "/gopher/test", nil)
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	if resp.StatusCode != fiber.StatusTooManyRequests {
+		t.Errorf("Expected status code %d, got %d", fiber.StatusTooManyRequests, resp.StatusCode)
+	}
+
+	var errorResponse helper.ErrorResponse
+	err = sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse)
+	if err != nil {
+		t.Fatalf("Failed to parse response body: %v", err)
+	}
+
+	expectedErrorMessage := "Too many requests"
+	if errorResponse.Error != expectedErrorMessage {
+		t.Errorf("Expected error message '%s', got '%s'", expectedErrorMessage, errorResponse.Error)
+	}
+}
