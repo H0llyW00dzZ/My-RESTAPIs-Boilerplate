@@ -47,4 +47,6 @@ const (
 	MsgRedisHasStaleConnections               = "Redis has %d stale connections."
 	MsgRedisFailedToRetrieveInfo              = "Failed to retrieve Redis info: %v"
 	MsgRedisActiveConnectionUnderflowDetected = "Active connections calculation underflow detected"
+	MsgRedisHighIdleConnections               = "Redis has a high number of idle connections"
+	MsgRedisHighPoolUtilization               = "Redis connection pool utilization is high"
 )
