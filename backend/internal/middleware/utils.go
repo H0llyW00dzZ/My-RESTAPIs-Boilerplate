@@ -69,6 +69,8 @@ func NewRateLimiter(db database.Service, max int, expiration time.Duration, limi
 	// Retrieve the Redis storage interface from the database service.
 	rateLimiterService := db.FiberStorage()
 	// Create a new rate limiter middleware with the desired configuration.
+	// TODO: Implement a custom key generator for any sensitive data such as API keys or OAuth tokens,
+	// since the default rate limiter key in Fiber is based on c.IP()
 	return limiter.New(limiter.Config{
 		Storage:    rateLimiterService,
 		Max:        max,
