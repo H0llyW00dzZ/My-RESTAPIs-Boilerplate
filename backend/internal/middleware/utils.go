@@ -5,7 +5,9 @@
 package middleware
 
 import (
+	"fmt"
 	"h0llyw00dz-template/backend/internal/database"
+	"hash/fnv"
 	"strings"
 	"time"
 
@@ -164,4 +166,33 @@ func generateSignatureFromIP(ipAddress string) string {
 	signature := uuid.String()[:8]
 
 	return signature
+}
+
+// hashForSignature creates a hash from the IP and User-Agent to use in generating a UUID.
+func hashForSignature(toHash string) string {
+	h := fnv.New64a()
+	h.Write([]byte(toHash))
+	return fmt.Sprintf("%x", h.Sum64())
+}
+
+// CustomKeyGenerator generates a custom cache key based on the request and logs the visitor activity.
+func CustomKeyGenerator(c *fiber.Ctx) string {
+	// Get client's IP and User-Agent
+	clientIP := c.IP()
+	userAgent := c.Get(fiber.HeaderUserAgent)
+
+	// Create a string to hash
+	toHash := fmt.Sprintf("%s-%s", clientIP, userAgent)
+
+	// Create a fnv hash and write our string to it
+	signature := hashForSignature(toHash)
+
+	// Generate a UUID based on the hash
+	signatureUUID := uuid.NewSHA1(uuid.NameSpaceOID, []byte(signature))
+
+	// Log visitor activity with the signature for the frontend
+	log.LogVisitorf("Frontend cache generated for visitor activity: IP [%s], User-Agent [%s], Signature [%s], UUID [%s]", clientIP, userAgent, signature, signatureUUID.String())
+
+	// Generate a custom cache key with the hashed signature and UUID
+	return fmt.Sprintf("cache_front_end:%s:%s:%s", signature, signatureUUID.String(), c.Path())
 }
