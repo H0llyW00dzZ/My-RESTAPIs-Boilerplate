@@ -125,3 +125,87 @@ func TestSendErrorResponse_NotFound(t *testing.T) {
 		t.Errorf("Expected error message '%s', got '%s'", expectedErrorMessage, errorResponse.Error)
 	}
 }
+
+func TestSendErrorResponse_Conflict(t *testing.T) {
+	app := fiber.New()
+	app.Get("/gopher/test", func(c *fiber.Ctx) error {
+		return helper.SendErrorResponse(c, fiber.StatusConflict, "Duplicate resource")
+	})
+
+	req := httptest.NewRequest("GET", "/gopher/test", nil)
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	if resp.StatusCode != fiber.StatusConflict {
+		t.Errorf("Expected status code %d, got %d", fiber.StatusConflict, resp.StatusCode)
+	}
+
+	var errorResponse helper.ErrorResponse
+	err = sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse)
+	if err != nil {
+		t.Fatalf("Failed to parse response body: %v", err)
+	}
+
+	expectedErrorMessage := "Duplicate resource"
+	if errorResponse.Error != expectedErrorMessage {
+		t.Errorf("Expected error message '%s', got '%s'", expectedErrorMessage, errorResponse.Error)
+	}
+}
+
+func TestSendErrorResponse_BadGateway(t *testing.T) {
+	app := fiber.New()
+	app.Get("/gopher/test", func(c *fiber.Ctx) error {
+		return helper.SendErrorResponse(c, fiber.StatusBadGateway, "Bad gateway")
+	})
+
+	req := httptest.NewRequest("GET", "/gopher/test", nil)
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	if resp.StatusCode != fiber.StatusBadGateway {
+		t.Errorf("Expected status code %d, got %d", fiber.StatusBadGateway, resp.StatusCode)
+	}
+
+	var errorResponse helper.ErrorResponse
+	err = sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse)
+	if err != nil {
+		t.Fatalf("Failed to parse response body: %v", err)
+	}
+
+	expectedErrorMessage := "Bad gateway"
+	if errorResponse.Error != expectedErrorMessage {
+		t.Errorf("Expected error message '%s', got '%s'", expectedErrorMessage, errorResponse.Error)
+	}
+}
+
+func TestSendErrorResponse_InternalServerError(t *testing.T) {
+	app := fiber.New()
+	app.Get("/gopher/test", func(c *fiber.Ctx) error {
+		return helper.SendErrorResponse(c, fiber.StatusInternalServerError, "Internal server error")
+	})
+
+	req := httptest.NewRequest("GET", "/gopher/test", nil)
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	if resp.StatusCode != fiber.StatusInternalServerError {
+		t.Errorf("Expected status code %d, got %d", fiber.StatusInternalServerError, resp.StatusCode)
+	}
+
+	var errorResponse helper.ErrorResponse
+	err = sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse)
+	if err != nil {
+		t.Fatalf("Failed to parse response body: %v", err)
+	}
+
+	expectedErrorMessage := "Internal server error"
+	if errorResponse.Error != expectedErrorMessage {
+		t.Errorf("Expected error message '%s', got '%s'", expectedErrorMessage, errorResponse.Error)
+	}
+}
