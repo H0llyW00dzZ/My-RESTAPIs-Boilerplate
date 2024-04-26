@@ -23,17 +23,42 @@ import (
 	"github.com/google/uuid"
 )
 
-// NewCacheMiddleware creates a new cache middleware with the specified expiration time and cache control flag.
-// It retrieves the Redis storage interface from the provided database service and configures the cache middleware accordingly.
-func NewCacheMiddleware(db database.Service, expiration time.Duration, cacheControl bool) fiber.Handler {
+// NewCacheMiddleware creates a new cache middleware with the specified expiration time, cache control flag,
+// and an optional custom key generator. It retrieves the Redis storage interface from the provided database
+// service and configures the cache middleware accordingly.
+//
+// If a custom key generator is provided, it will be used to generate cache keys based on the request context.
+// Otherwise, the default key generation mechanism of the Fiber cache middleware will be used, which generates
+// cache keys based on the request method and path.
+//
+// Parameters:
+//
+//	db: The database service instance that provides the Redis storage interface.
+//	expiration: The expiration time for cached entries.
+//	cacheControl: A boolean flag indicating whether to include cache control headers in the response.
+//	keyGenerator: An optional custom key generator function that takes the request context and returns a string key.
+//
+// Returns:
+//
+//	A Fiber handler function representing the configured cache middleware.
+func NewCacheMiddleware(db database.Service, expiration time.Duration, cacheControl bool, keyGenerator ...func(*fiber.Ctx) string) fiber.Handler {
 	// Retrieve the Redis storage interface from the database service.
 	cacheMiddlewareService := db.FiberStorage()
-	// Create a new cache middleware with the desired configuration.
-	return cache.New(cache.Config{
+
+	// Create a new cache middleware configuration.
+	config := cache.Config{
 		Expiration:   expiration,
 		CacheControl: cacheControl,
 		Storage:      cacheMiddlewareService,
-	})
+	}
+
+	// Check if a custom key generator is provided.
+	if len(keyGenerator) > 0 {
+		config.KeyGenerator = keyGenerator[0]
+	}
+
+	// Create a new cache middleware with the configured options.
+	return cache.New(config)
 }
 
 // NewRateLimiter creates a new rate limiter middleware with the specified maximum number of requests,
