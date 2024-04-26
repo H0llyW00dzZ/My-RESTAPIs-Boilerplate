@@ -7,6 +7,7 @@ package middleware
 import (
 	"fmt"
 	"h0llyw00dz-template/backend/internal/database"
+	"h0llyw00dz-template/backend/pkg/restapis/helper"
 	"hash/fnv"
 	"strings"
 	"time"
@@ -74,9 +75,7 @@ func NewRateLimiter(db database.Service, max int, expiration time.Duration, limi
 		Expiration: expiration,
 		LimitReached: func(c *fiber.Ctx) error {
 			log.LogUserActivity(c, limitReachedMessage)
-			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
-				"error": fiber.ErrTooManyRequests.Message,
-			})
+			return helper.SendErrorResponse(c, fiber.StatusTooManyRequests, fiber.ErrTooManyRequests.Message)
 		},
 	})
 }
