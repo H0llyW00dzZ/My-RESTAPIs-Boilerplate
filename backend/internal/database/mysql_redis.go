@@ -112,7 +112,7 @@ type Service interface {
 	//		Log.LogErrorf("Failed to clear keys cache: %v", err)
 	//		return err
 	//	}
-	ScanAndDel(pattern ...string) error
+	ScanAndDel(patterns ...string) error
 
 	// PrepareInsertStatement prepares a SQL insert statement for the transaction.
 	PrepareInsertStatement(ctx context.Context, tx *sql.Tx, query string) (*sql.Stmt, error)
