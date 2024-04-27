@@ -140,7 +140,7 @@ type service struct {
 
 // dbConfig holds the environment variables for the database connection.
 //
-// Note: Regarding this Using environment variables in global variables, if you think this high risky you are fucking stupid as developer or security.
+// Note: Regarding this Using environment variables in global variables, if you think this high risk you are fucking stupid as developer or security.
 var (
 	dbname               = os.Getenv(EnvMYSQLDBName)
 	password             = os.Getenv(EnvMYSQLDBPassword)
