@@ -227,7 +227,7 @@ func CustomKeyGenerator(c *fiber.Ctx) string {
 	log.LogVisitorf("Frontend cache initiated for visitor activity: IP [%s], User-Agent [%s], Signature [%s], UUID [%s]", clientIP, userAgent, signature, signatureUUID.String())
 
 	// Generate a custom cache key with the hashed signature and UUID for fiber storage operations (e.g., get, set, delete, reset, close).
-	return fmt.Sprintf("cache_front_end:%s:%s:%s", utils.CopyString(signature), utils.CopyString(signatureUUID.String()), utils.CopyString(c.Path()))
+	return fmt.Sprintf(utils.CopyString("cache_front_end:%s:%s:%s"), signature, signatureUUID.String(), c.Path())
 }
 
 // CustomCacheSkipper is a function that determines whether to skip caching for a given request path.
