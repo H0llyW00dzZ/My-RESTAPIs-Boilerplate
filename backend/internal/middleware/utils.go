@@ -222,9 +222,10 @@ func CustomKeyGenerator(c *fiber.Ctx) string {
 	signatureUUID := uuid.NewSHA1(uuid.NameSpaceOID, []byte(signature))
 
 	// Log visitor activity with the signature for the frontend
-	log.LogVisitorf("Frontend cache generated for visitor activity: IP [%s], User-Agent [%s], Signature [%s], UUID [%s]", clientIP, userAgent, signature, signatureUUID.String())
+	// Note: Rename "generated" to "initiated" because This cache is used for fiber storage operations (e.g., get, set, delete, reset, close).
+	log.LogVisitorf("Frontend cache initiated for visitor activity: IP [%s], User-Agent [%s], Signature [%s], UUID [%s]", clientIP, userAgent, signature, signatureUUID.String())
 
-	// Generate a custom cache key with the hashed signature and UUID
+	// Generate a custom cache key with the hashed signature and UUID for fiber storage operations (e.g., get, set, delete, reset, close).
 	return fmt.Sprintf("cache_front_end:%s:%s:%s", signature, signatureUUID.String(), c.Path())
 }
 
