@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"h0llyw00dz-template/backend/internal/database"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
-	"hash/fnv"
 	"strings"
 	"time"
 
@@ -25,24 +24,41 @@ import (
 )
 
 // NewCacheMiddleware creates a new cache middleware with the specified expiration time, cache control flag,
-// and an optional custom key generator. It retrieves the Redis storage interface from the provided database
+// and optional custom configuration options. It retrieves the Redis storage interface from the provided database
 // service and configures the cache middleware accordingly.
 //
-// If a custom key generator is provided, it will be used to generate cache keys based on the request context.
-// Otherwise, the default key generation mechanism of the Fiber cache middleware will be used, which generates
-// cache keys based on the request method and path.
+// The cache middleware is built on top of the Fiber cache middleware and provides additional customization options.
+// It allows you to specify a custom key generator function to generate cache keys based on the request context,
+// as well as a custom cache skipper function to determine whether to skip caching for specific requests.
 //
 // Parameters:
 //
 //	db: The database service instance that provides the Redis storage interface.
 //	expiration: The expiration time for cached entries.
 //	cacheControl: A boolean flag indicating whether to include cache control headers in the response.
-//	keyGenerator: An optional custom key generator function that takes the request context and returns a string key.
+//	options: Optional functions that can be used to customize the cache middleware configuration.
+//	         Available options include:
+//	         - WithKeyGenerator(keyGenerator func(*fiber.Ctx) string): Sets a custom key generator function.
+//	         - WithCacheSkipper(cacheSkipper func(*fiber.Ctx) bool): Sets a custom cache skipper function.
 //
 // Returns:
 //
 //	A Fiber handler function representing the configured cache middleware.
-func NewCacheMiddleware(db database.Service, expiration time.Duration, cacheControl bool, keyGenerator ...func(*fiber.Ctx) string) fiber.Handler {
+//
+// Example usage:
+//
+//	// Create a cache middleware with default options
+//	cacheMiddleware := NewCacheMiddleware(db, expiration, cacheControl)
+//
+//	// Create a cache middleware with a custom key generator
+//	cacheMiddleware := NewCacheMiddleware(db, expiration, cacheControl, WithKeyGenerator(customKeyGenerator))
+//
+//	// Create a cache middleware with a custom cache skipper
+//	cacheMiddleware := NewCacheMiddleware(db, expiration, cacheControl, WithCacheSkipper(customCacheSkipper))
+//
+//	// Create a cache middleware with both custom key generator and cache skipper
+//	cacheMiddleware := NewCacheMiddleware(db, expiration, cacheControl, WithKeyGenerator(customKeyGenerator), WithCacheSkipper(customCacheSkipper))
+func NewCacheMiddleware(db database.Service, expiration time.Duration, cacheControl bool, options ...func(*cache.Config)) fiber.Handler {
 	// Retrieve the Redis storage interface from the database service.
 	cacheMiddlewareService := db.FiberStorage()
 
@@ -53,13 +69,16 @@ func NewCacheMiddleware(db database.Service, expiration time.Duration, cacheCont
 		Storage:      cacheMiddlewareService,
 	}
 
-	// Check if a custom key generator is provided.
-	if len(keyGenerator) > 0 {
-		config.KeyGenerator = keyGenerator[0]
+	// Apply any additional options to the cache configuration.
+	for _, option := range options {
+		option(&config)
 	}
 
-	// Create a new cache middleware with the configured options.
-	return cache.New(config)
+	// Create the cache middleware with the configured options.
+	cacheMiddleware := cache.New(config)
+
+	// Return the cache middleware.
+	return cacheMiddleware
 }
 
 // NewRateLimiter creates a new rate limiter middleware with the specified maximum number of requests,
@@ -160,11 +179,6 @@ func NewIPBasedUUIDMiddleware() fiber.Handler {
 	}
 }
 
-// generateGoogleUUIDFromIP generates a deterministic UUID based on the provided IP address.
-func generateGoogleUUIDFromIP(ipAddress string) string {
-	return uuid.NewSHA1(uuid.NameSpaceURL, []byte(ipAddress)).String()
-}
-
 // NewSignatureMiddleware creates a new middleware that generates a signature based on the client's IP address
 // and attaches it to the Fiber context for security purposes.
 func NewSignatureMiddleware() fiber.Handler {
@@ -181,24 +195,6 @@ func NewSignatureMiddleware() fiber.Handler {
 		// Continue to the next middleware or handler
 		return c.Next()
 	}
-}
-
-// generateSignatureFromIP generates a signature based on the provided IP address.
-func generateSignatureFromIP(ipAddress string) string {
-	// Generate a UUID based on the IP address
-	uuid := uuid.NewSHA1(uuid.NameSpaceURL, []byte(ipAddress))
-
-	// Generate a signature by taking the first 8 characters of the UUID
-	signature := uuid.String()[:8]
-
-	return signature
-}
-
-// hashForSignature creates a hash from the IP and User-Agent to use in generating a UUID.
-func hashForSignature(toHash string) string {
-	h := fnv.New64a()
-	h.Write([]byte(toHash))
-	return fmt.Sprintf("%x", h.Sum64())
 }
 
 // CustomKeyGenerator generates a custom cache key based on the request and logs the visitor activity.
@@ -221,4 +217,17 @@ func CustomKeyGenerator(c *fiber.Ctx) string {
 
 	// Generate a custom cache key with the hashed signature and UUID
 	return fmt.Sprintf("cache_front_end:%s:%s:%s", signature, signatureUUID.String(), c.Path())
+}
+
+// CustomCacheSkipper is a function that determines whether to skip caching for a given request path.
+// It returns true if the request path starts with any of the specified prefixes.
+func CustomCacheSkipper(prefixes ...string) func(*fiber.Ctx) bool {
+	return func(c *fiber.Ctx) bool {
+		for _, prefix := range prefixes {
+			if strings.HasPrefix(c.Path(), prefix) {
+				return true
+			}
+		}
+		return false
+	}
 }
