@@ -77,8 +77,17 @@ func NewCacheMiddleware(db database.Service, expiration time.Duration, cacheCont
 	// Create the cache middleware with the configured options.
 	cacheMiddleware := cache.New(config)
 
-	// Return the cache middleware.
-	return cacheMiddleware
+	// Return a custom middleware that conditionally applies the cache middleware.
+	return func(c *fiber.Ctx) error {
+		// Check if caching should be skipped for the current request path.
+		if config.Next != nil && config.Next(c) {
+			// Caching is skipped, so don't generate a cache key and proceed to the next middleware.
+			return c.Next()
+		}
+
+		// Caching is not skipped, so apply the cache middleware.
+		return cacheMiddleware(c)
+	}
 }
 
 // NewRateLimiter creates a new rate limiter middleware with the specified maximum number of requests,
