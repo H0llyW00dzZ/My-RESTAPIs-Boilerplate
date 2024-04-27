@@ -31,7 +31,7 @@ func registerRouteConfigMiddleware(app *fiber.App) {
 
 	// Favicon front end setup
 	// Note: this just an example
-	favicon := NewFaviconMiddleware("./frontend/public/assets/images/favicon.ico", "/styles/images/favicon.ico")
+	favicon := NewFaviconMiddleware("./frontend/public/assets/images/favicon.ico", "/favicon.ico")
 
 	// Recovery middleware setup
 	recoverMiddleware := recover.New(recover.Config{
@@ -45,5 +45,5 @@ func registerRouteConfigMiddleware(app *fiber.App) {
 	})
 
 	// Apply the recover middleware
-	app.Use(favicon, recoverMiddleware)
+	app.Use(recoverMiddleware, favicon)
 }
