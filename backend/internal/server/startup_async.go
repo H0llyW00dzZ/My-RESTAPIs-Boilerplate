@@ -6,6 +6,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -23,6 +24,8 @@ type Server interface {
 	Start(addr, monitorPath string)
 	Shutdown(ctx context.Context) error
 	CleanupDB() error
+	Mount(prefix string, app interface{})
+	MountPath(path string, handler interface{})
 }
 
 // FiberServer implements the Server interface for a Fiber application.
@@ -38,11 +41,12 @@ func NewFiberServer(app *fiber.App, appName, monitorPath string) *FiberServer {
 	// because they follow the singleton pattern. Without the singleton pattern, it would be unsafe
 	// as it would create multiple database connections, leading to potential resource exhaustion.
 	db := database.New()
-	middleware.RegisterRoutes(app, appName, monitorPath, db)
-	return &FiberServer{
+	s := &FiberServer{
 		app: app,
 		db:  db,
 	}
+	middleware.RegisterRoutes(app, appName, monitorPath, db)
+	return s
 }
 
 // Start runs the Fiber server in a separate goroutine to listen for incoming requests.
@@ -77,6 +81,32 @@ func (s *FiberServer) CleanupDB() error {
 
 	// Return the last error encountered, if any
 	return err
+}
+
+// Mount mounts a Fiber application or a group of routes onto the main application.
+func (s *FiberServer) Mount(prefix string, app interface{}) {
+	switch v := app.(type) {
+	case *fiber.App:
+		s.app.Mount(prefix, v)
+	case func(router fiber.Router):
+		group := s.app.Group(prefix)
+		v(group)
+	default:
+		panic(fmt.Errorf("unknown type for mounting: %T", v))
+	}
+}
+
+// MountPath mounts a Fiber handler or a group of routes onto the main application at a specific path.
+func (s *FiberServer) MountPath(path string, handler interface{}) {
+	switch v := handler.(type) {
+	case fiber.Handler:
+		s.app.Get(path, v)
+	case func(router fiber.Router):
+		group := s.app.Group(path)
+		v(group)
+	default:
+		panic(fmt.Errorf("unknown type for mounting path: %T", v))
+	}
 }
 
 // StartServer initializes and starts the server, then waits for a shutdown signal.
