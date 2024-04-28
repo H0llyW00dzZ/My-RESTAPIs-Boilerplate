@@ -10,6 +10,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
+	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/google/uuid"
 )
 
@@ -47,5 +48,40 @@ func WithKeyGenerator(keyGenerator func(*fiber.Ctx) string) func(*cache.Config) 
 func WithCacheSkipper(cacheSkipper func(*fiber.Ctx) bool) func(*cache.Config) {
 	return func(config *cache.Config) {
 		config.Next = cacheSkipper
+	}
+}
+
+// WithValidator is an option function for NewKeyAuthMiddleware that sets a custom validator.
+func WithValidator(validator func(*fiber.Ctx, string) (bool, error)) func(*keyauth.Config) {
+	return func(config *keyauth.Config) {
+		config.Validator = validator
+	}
+}
+
+// WithErrorHandler is an option function for NewKeyAuthMiddleware that sets a custom error handler.
+func WithErrorHandler(errorHandler func(*fiber.Ctx, error) error) func(*keyauth.Config) {
+	return func(config *keyauth.Config) {
+		config.ErrorHandler = errorHandler
+	}
+}
+
+// WithSuccessHandler is an option function for NewKeyAuthMiddleware that sets a custom success handler.
+func WithSuccessHandler(successHandler func(*fiber.Ctx) error) func(*keyauth.Config) {
+	return func(config *keyauth.Config) {
+		config.SuccessHandler = successHandler
+	}
+}
+
+// WithKeyLookup is an option function for NewKeyAuthMiddleware that sets a custom key lookup.
+func WithKeyLookup(keyLookup string) func(*keyauth.Config) {
+	return func(config *keyauth.Config) {
+		config.KeyLookup = keyLookup
+	}
+}
+
+// WithContextKey is an option function for NewKeyAuthMiddleware that sets a custom context key.
+func WithContextKey(contextKey string) func(*keyauth.Config) {
+	return func(config *keyauth.Config) {
+		config.ContextKey = contextKey
 	}
 }

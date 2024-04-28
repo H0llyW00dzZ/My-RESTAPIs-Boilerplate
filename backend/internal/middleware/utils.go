@@ -18,6 +18,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
+	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
 	"github.com/gofiber/fiber/v2/utils"
@@ -241,4 +242,25 @@ func CustomCacheSkipper(prefixes ...string) func(*fiber.Ctx) bool {
 		}
 		return false
 	}
+}
+
+// NewKeyAuthMiddleware creates a new key authentication middleware with the provided configuration.
+func NewKeyAuthMiddleware(db database.Service, options ...func(*keyauth.Config)) fiber.Handler {
+	// Create a new key authentication middleware configuration.
+	config := keyauth.Config{
+		KeyLookup:  "header:" + fiber.HeaderAuthorization,
+		AuthScheme: "Bearer",
+		ContextKey: "token",
+	}
+
+	// Apply any additional options to the key authentication configuration.
+	for _, option := range options {
+		option(&config)
+	}
+
+	// Create the key authentication middleware with the configured options.
+	keyAuthMiddleware := keyauth.New(config)
+
+	// Return the key authentication middleware.
+	return keyAuthMiddleware
 }
