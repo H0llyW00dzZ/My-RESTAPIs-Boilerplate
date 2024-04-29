@@ -7,7 +7,6 @@ package middleware
 import (
 	"fmt"
 	"h0llyw00dz-template/backend/internal/database"
-	"h0llyw00dz-template/backend/pkg/restapis/helper"
 	"strings"
 	"time"
 
@@ -95,21 +94,25 @@ func NewCacheMiddleware(db database.Service, expiration time.Duration, cacheCont
 // NewRateLimiter creates a new rate limiter middleware with the specified maximum number of requests,
 // expiration time, and a custom message to log when the rate limit is reached.
 // It retrieves the Redis storage interface from the provided database service and configures the rate limiter middleware accordingly.
-func NewRateLimiter(db database.Service, max int, expiration time.Duration, limitReachedMessage string) fiber.Handler {
+func NewRateLimiter(db database.Service, options ...func(*limiter.Config)) fiber.Handler {
 	// Retrieve the Redis storage interface from the database service.
 	rateLimiterService := db.FiberStorage()
-	// Create a new rate limiter middleware with the desired configuration.
-	// TODO: Implement a custom key generator for any sensitive data such as API keys or OAuth tokens,
-	// since the default rate limiter key in Fiber is based on c.IP()
-	return limiter.New(limiter.Config{
-		Storage:    rateLimiterService,
-		Max:        max,
-		Expiration: expiration,
-		LimitReached: func(c *fiber.Ctx) error {
-			log.LogUserActivity(c, limitReachedMessage)
-			return helper.SendErrorResponse(c, fiber.StatusTooManyRequests, fiber.ErrTooManyRequests.Message)
-		},
-	})
+
+	// Create a new rate limiter middleware configuration.
+	config := limiter.Config{
+		Storage: rateLimiterService,
+	}
+
+	// Apply any additional options to the rate limiter configuration.
+	for _, option := range options {
+		option(&config)
+	}
+
+	// Create the rate limiter middleware with the configured options.
+	rateLimiterMiddleware := limiter.New(config)
+
+	// Return the rate limiter middleware.
+	return rateLimiterMiddleware
 }
 
 // NewCORSMiddleware creates a new CORS middleware with a better configuration.
