@@ -42,19 +42,24 @@ func hashForSignature(toHash string) string {
 }
 
 // ratelimiterMsg is a custom handler function for the rate limiter middleware.
-// It logs a message indicating that a visitor has been rate limited and sends an error response
-// with a "Too Many Requests" status code and an appropriate error message.
+// It returns a closure that logs a message indicating that a visitor has been rate limited
+// and sends an error response with a "Too Many Requests" status code and an appropriate error message.
 //
 // Parameters:
 //
-//	c: The Fiber context representing the current request.
+//	customMessage: A custom message to be logged when a visitor is rate limited.
 //
 // Returns:
 //
-//	An error indicating that the rate limit has been reached.
-func ratelimiterMsg(c *fiber.Ctx) error {
-	log.LogUserActivity(c, MsgRESTAPIsVisitorGotRateLimited)
-	return helper.SendErrorResponse(c, fiber.StatusTooManyRequests, fiber.ErrTooManyRequests.Message)
+//	A closure that takes a Fiber context and returns an error.
+//	The closure logs the custom message and sends an error response indicating that the rate limit has been reached.
+func ratelimiterMsg(customMessage string) func(*fiber.Ctx) error {
+	return func(c *fiber.Ctx) error {
+		log.LogUserActivity(c, customMessage)
+		// Note: Custom messages for the "Too Many Requests" HTTP response will not be implemented due to lazy 🤪.
+		// The default error message provided by Fiber will be used instead.
+		return helper.SendErrorResponse(c, fiber.StatusTooManyRequests, fiber.ErrTooManyRequests.Message)
+	}
 }
 
 // WithKeyGenerator is an option function for NewCacheMiddleware and NewRateLimiter that sets a custom key generator.
