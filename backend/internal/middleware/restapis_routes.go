@@ -51,7 +51,7 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 	rateLimiterRESTAPIs := NewRateLimiter(db,
 		WithMax(maxRequestRESTAPIsRateLimiter),
 		WithExpiration(maxExpirationRESTAPIsRateLimiter),
-		WithLimitReached(ratelimiterMsg))
+		WithLimitReached(ratelimiterMsg(MsgRESTAPIsVisitorGotRateLimited)))
 
 	// Register server APIs routes
 	serverAPIs(v1, db, rateLimiterRESTAPIs)
