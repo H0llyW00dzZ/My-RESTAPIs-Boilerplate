@@ -76,6 +76,8 @@ func ratelimiterMsg(c *fiber.Ctx) error {
 // Returns:
 //
 //	A closure that takes a middleware configuration and sets the key generator based on the configuration type.
+//
+// TODO: Implement additional key generators for other middleware configurations besides NewCacheMiddleware and NewRateLimiter
 func WithKeyGenerator(keyGenerator func(*fiber.Ctx) string) interface{} {
 	return func(config interface{}) {
 		// Note: This a better switch-statement, it doesn't matter if there is so many switch (e.g, 1 billion switch case)
