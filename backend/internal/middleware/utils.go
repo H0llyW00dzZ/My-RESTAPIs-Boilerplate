@@ -37,10 +37,11 @@ import (
 //	db: The database service instance that provides the Redis storage interface.
 //	expiration: The expiration time for cached entries.
 //	cacheControl: A boolean flag indicating whether to include cache control headers in the response.
-//	options: Optional functions that can be used to customize the cache middleware configuration.
+//	options: Optional configuration options that can be used to customize the cache middleware.
 //	         Available options include:
 //	         - WithKeyGenerator(keyGenerator func(*fiber.Ctx) string): Sets a custom key generator function.
 //	         - WithCacheSkipper(cacheSkipper func(*fiber.Ctx) bool): Sets a custom cache skipper function.
+//	         The options are passed as interface{} and are type-asserted within the function.
 //
 // Returns:
 //
@@ -59,7 +60,7 @@ import (
 //
 //	// Create a cache middleware with both custom key generator and cache skipper
 //	cacheMiddleware := NewCacheMiddleware(db, expiration, cacheControl, WithKeyGenerator(customKeyGenerator), WithCacheSkipper(customCacheSkipper))
-func NewCacheMiddleware(db database.Service, expiration time.Duration, cacheControl bool, options ...func(*cache.Config)) fiber.Handler {
+func NewCacheMiddleware(db database.Service, expiration time.Duration, cacheControl bool, options ...interface{}) fiber.Handler {
 	// Retrieve the Redis storage interface from the database service.
 	cacheMiddlewareService := db.FiberStorage()
 
@@ -72,7 +73,9 @@ func NewCacheMiddleware(db database.Service, expiration time.Duration, cacheCont
 
 	// Apply any additional options to the cache configuration.
 	for _, option := range options {
-		option(&config)
+		if optFunc, ok := option.(func(*cache.Config)); ok {
+			optFunc(&config)
+		}
 	}
 
 	// Create the cache middleware with the configured options.
@@ -91,10 +94,46 @@ func NewCacheMiddleware(db database.Service, expiration time.Duration, cacheCont
 	}
 }
 
-// NewRateLimiter creates a new rate limiter middleware with the specified maximum number of requests,
-// expiration time, and a custom message to log when the rate limit is reached.
-// It retrieves the Redis storage interface from the provided database service and configures the rate limiter middleware accordingly.
-func NewRateLimiter(db database.Service, options ...func(*limiter.Config)) fiber.Handler {
+// NewRateLimiter creates a new rate limiter middleware with optional custom configuration options.
+// It retrieves the Redis storage interface from the provided database service and configures the
+// rate limiter middleware accordingly.
+//
+// The rate limiter middleware is built on top of the Fiber rate limiter middleware and provides
+// additional customization options. It allows you to specify the maximum number of requests allowed
+// within a given time period, the expiration time for the rate limit, and a custom message to log
+// when the rate limit is reached.
+//
+// Parameters:
+//
+//	db: The database service instance that provides the Redis storage interface.
+//	options: Optional configuration options that can be used to customize the rate limiter middleware.
+//	         Available options include:
+//	         - WithMax(max int): Sets the maximum number of requests allowed within the time period.
+//	         - WithExpiration(expiration time.Duration): Sets the expiration time for the rate limit.
+//	         - WithLimitReached(handler fiber.Handler): Sets a custom handler to execute when the rate limit is reached.
+//	         The options are passed as interface{} and are type-asserted within the function.
+//
+// Returns:
+//
+//	A Fiber handler function representing the configured rate limiter middleware.
+//
+// Example usage:
+//
+//	// Create a rate limiter middleware with default options
+//	rateLimiter := NewRateLimiter(db)
+//
+//	// Create a rate limiter middleware with a custom maximum number of requests
+//	rateLimiter := NewRateLimiter(db, WithMax(100))
+//
+//	// Create a rate limiter middleware with a custom expiration time
+//	rateLimiter := NewRateLimiter(db, WithExpiration(time.Minute))
+//
+//	// Create a rate limiter middleware with a custom limit reached handler
+//	rateLimiter := NewRateLimiter(db, WithLimitReached(customLimitReachedHandler))
+//
+//	// Create a rate limiter middleware with multiple custom options
+//	rateLimiter := NewRateLimiter(db, WithMax(100), WithExpiration(time.Minute), WithLimitReached(customLimitReachedHandler))
+func NewRateLimiter(db database.Service, options ...interface{}) fiber.Handler {
 	// Retrieve the Redis storage interface from the database service.
 	rateLimiterService := db.FiberStorage()
 
@@ -105,7 +144,9 @@ func NewRateLimiter(db database.Service, options ...func(*limiter.Config)) fiber
 
 	// Apply any additional options to the rate limiter configuration.
 	for _, option := range options {
-		option(&config)
+		if optFunc, ok := option.(func(*limiter.Config)); ok {
+			optFunc(&config)
+		}
 	}
 
 	// Create the rate limiter middleware with the configured options.
