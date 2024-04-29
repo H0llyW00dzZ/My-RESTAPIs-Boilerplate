@@ -6,11 +6,15 @@ package middleware
 
 import (
 	"fmt"
+	log "h0llyw00dz-template/backend/internal/logger"
+	"h0llyw00dz-template/backend/pkg/restapis/helper"
 	"hash/fnv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/google/uuid"
 )
 
@@ -37,10 +41,54 @@ func hashForSignature(toHash string) string {
 	return fmt.Sprintf("%x", h.Sum64())
 }
 
-// WithKeyGenerator is an option function for NewCacheMiddleware that sets a custom key generator.
-func WithKeyGenerator(keyGenerator func(*fiber.Ctx) string) func(*cache.Config) {
-	return func(config *cache.Config) {
-		config.KeyGenerator = keyGenerator
+// ratelimiterMsg is a custom handler function for the rate limiter middleware.
+// It logs a message indicating that a visitor has been rate limited and sends an error response
+// with a "Too Many Requests" status code and an appropriate error message.
+//
+// Parameters:
+//
+//	c: The Fiber context representing the current request.
+//
+// Returns:
+//
+//	An error indicating that the rate limit has been reached.
+func ratelimiterMsg(c *fiber.Ctx) error {
+	log.LogUserActivity(c, MsgRESTAPIsVisitorGotRateLimited)
+	return helper.SendErrorResponse(c, fiber.StatusTooManyRequests, fiber.ErrTooManyRequests.Message)
+}
+
+// WithKeyGenerator is an option function for NewCacheMiddleware and NewRateLimiter that sets a custom key generator.
+// It takes a keyGenerator function that generates a unique key based on the Fiber context and returns a closure
+// that configures the key generator for the specified middleware configuration.
+//
+// The function uses a type switch to determine the type of the middleware configuration and sets the appropriate
+// key generator field. It supports cache.Config and limiter.Config types. If an unsupported config type is passed,
+// it panics with an appropriate error message.
+//
+// The use of a type switch in this function is considered a better approach than using multiple if-else statements,
+// as it provides a cleaner and more concise way to handle different configuration types, even if there are a large
+// number of cases.
+//
+// Parameters:
+//
+//	keyGenerator: A function that takes a Fiber context and returns a unique key string.
+//
+// Returns:
+//
+//	A closure that takes a middleware configuration and sets the key generator based on the configuration type.
+func WithKeyGenerator(keyGenerator func(*fiber.Ctx) string) interface{} {
+	return func(config interface{}) {
+		// Note: This a better switch-statement, it doesn't matter if there is so many switch (e.g, 1 billion switch case)
+		switch cfg := config.(type) {
+		case *cache.Config:
+			cfg.KeyGenerator = keyGenerator
+			// TODO: Implement a custom key generator for any sensitive data such as API keys or OAuth tokens,
+			// since the default rate limiter key in Fiber is based on c.IP()
+		case *limiter.Config:
+			cfg.KeyGenerator = keyGenerator
+		default:
+			panic(fmt.Sprintf("unsupported config type: %T", config))
+		}
 	}
 }
 
@@ -83,5 +131,26 @@ func WithKeyLookup(keyLookup string) func(*keyauth.Config) {
 func WithContextKey(contextKey string) func(*keyauth.Config) {
 	return func(config *keyauth.Config) {
 		config.ContextKey = contextKey
+	}
+}
+
+// WithMax is an option function for NewRateLimiter that sets the maximum number of requests.
+func WithMax(max int) func(*limiter.Config) {
+	return func(config *limiter.Config) {
+		config.Max = max
+	}
+}
+
+// WithExpiration is an option function for NewRateLimiter that sets the expiration time.
+func WithExpiration(expiration time.Duration) func(*limiter.Config) {
+	return func(config *limiter.Config) {
+		config.Expiration = expiration
+	}
+}
+
+// WithLimitReached is an option function for NewRateLimiter that sets a custom limit reached handler.
+func WithLimitReached(limitReached func(*fiber.Ctx) error) func(*limiter.Config) {
+	return func(config *limiter.Config) {
+		config.LimitReached = limitReached
 	}
 }

@@ -47,7 +47,11 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 	})
 
 	// Apply the rate limiter middleware directly to the REST API routes
-	rateLimiterRESTAPIs := NewRateLimiter(db, maxRequestRESTAPIsRateLimiter, maxExpirationRESTAPIsRateLimiter, MsgRESTAPIsVisitorGotRateLimited)
+	// Note: This method is called "higher-order function" which is better than (if-else statement which is bad)
+	rateLimiterRESTAPIs := NewRateLimiter(db,
+		WithMax(maxRequestRESTAPIsRateLimiter),
+		WithExpiration(maxExpirationRESTAPIsRateLimiter),
+		WithLimitReached(ratelimiterMsg))
 
 	// Register server APIs routes
 	serverAPIs(v1, db, rateLimiterRESTAPIs)
