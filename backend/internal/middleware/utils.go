@@ -289,6 +289,9 @@ func CustomCacheSkipper(prefixes ...string) func(*fiber.Ctx) bool {
 }
 
 // NewKeyAuthMiddleware creates a new key authentication middleware with the provided configuration.
+//
+// TODO: Implement a custom "Next" function that can skip authorization for admin/security roles,
+// as they utilize another highly secure authentication mechanism with zero vulnerabilities and exploits 💀.
 func NewKeyAuthMiddleware(db database.Service, options ...func(*keyauth.Config)) fiber.Handler {
 	// Create a new key authentication middleware configuration.
 	config := keyauth.Config{
