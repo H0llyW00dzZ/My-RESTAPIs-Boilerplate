@@ -47,6 +47,8 @@ import (
 //		)
 //	}
 func InitializeTables(db database.Service) error {
+	// Note: This approach provides a more flexible and scalable way to initialize database tables compared to using an ORM system.
+	// It allows for easy initialization or migration of tables, and can handle a large number of database schemas (e.g, 1 billion database schemas 🔥) without limitations.
 	return createTables(db)
 
 }
