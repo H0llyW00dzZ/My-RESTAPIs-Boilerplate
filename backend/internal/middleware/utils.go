@@ -82,6 +82,7 @@ func NewCacheMiddleware(db database.Service, expiration time.Duration, cacheCont
 	cacheMiddleware := cache.New(config)
 
 	// Return a custom middleware that conditionally applies the cache middleware.
+	// Note: This safely integrates with the context (e.g., fiber ctx or std library ctx).
 	return func(c *fiber.Ctx) error {
 		// Check if caching should be skipped for the current request path.
 		if config.Next != nil && config.Next(c) {
@@ -208,6 +209,7 @@ func NewFaviconMiddleware(filePath, urlPath string) fiber.Handler {
 // It allows easy access to the pprof profiling tools and logs user activity.
 func NewPprofMiddleware(path, pprofMessage string) fiber.Handler {
 	// Example Usage: app.Use(NewPprofMiddleware("/pprof", "Accessed pprof profiling tools"))
+	// Note: This safely integrates with the context (e.g., fiber ctx or std library ctx).
 	return func(c *fiber.Ctx) error {
 		log.LogUserActivity(c, pprofMessage)
 		return pprof.New(pprof.Config{
@@ -278,6 +280,7 @@ func CustomKeyGenerator(c *fiber.Ctx) string {
 // CustomCacheSkipper is a function that determines whether to skip caching for a given request path.
 // It returns true if the request path starts with any of the specified prefixes.
 func CustomCacheSkipper(prefixes ...string) func(*fiber.Ctx) bool {
+	// Note: This safely integrates with the context (e.g., fiber ctx or std library ctx).
 	return func(c *fiber.Ctx) bool {
 		for _, prefix := range prefixes {
 			if strings.HasPrefix(c.Path(), prefix) {
@@ -289,6 +292,20 @@ func CustomCacheSkipper(prefixes ...string) func(*fiber.Ctx) bool {
 }
 
 // NewKeyAuthMiddleware creates a new key authentication middleware with the provided configuration.
+//
+// WARNING: Do not try to modify this by integrating it with the context (e.g., fiber ctx or std library ctx).
+// Doing so may lead to high vulnerability if not handled correctly for each handler. It's better to keep it as is.
+// For example (for advanced Go developers only), if you want to modify this to integrate it with the context (e.g., fiber ctx or std library ctx),
+// each handler must have this function:
+//
+//	// Retrieve the authenticated API key from the request context
+//
+// apiKey, ok := c.Locals("token").(string)
+//
+//	if !ok {
+//		log.LogUserActivity(c, "Invalid API key")
+//		return helper.SendErrorResponse(c, fiber.StatusUnauthorized, "Missing or invalid API key")
+//	}
 //
 // TODO: Implement a custom "Next" function that can skip authorization for admin/security roles,
 // as they utilize another highly secure authentication mechanism with zero vulnerabilities and exploits 💀.
