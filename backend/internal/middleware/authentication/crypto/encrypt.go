@@ -35,8 +35,7 @@ var (
 func EncryptData(data string) (string, error) {
 	// Generate a random salt
 	salt := make([]byte, 16)
-	_, err := rand.Read(salt)
-	if err != nil {
+	if _, err := rand.Read(salt); err != nil {
 		return "", err
 	}
 
@@ -64,9 +63,11 @@ func EncryptData(data string) (string, error) {
 	// Encrypt the data using the GCM mode and the generated nonce
 	ciphertext := gcm.Seal(nil, nonce, []byte(data), nil)
 
-	// Concatenate the salt, nonce, and ciphertext
-	encryptedData := append(salt, nonce...)
-	encryptedData = append(encryptedData, ciphertext...)
+	// Allocate a buffer to store the salt, nonce, and ciphertext
+	encryptedData := make([]byte, 16+len(nonce)+len(ciphertext))
+	copy(encryptedData[:16], salt)
+	copy(encryptedData[16:16+len(nonce)], nonce)
+	copy(encryptedData[16+len(nonce):], ciphertext)
 
 	// Encode the encrypted data to base64 and return it
 	return base64.StdEncoding.EncodeToString(encryptedData), nil
@@ -108,7 +109,6 @@ func DecryptData(encryptedData string) (string, error) {
 	ciphertext := encryptedBytes[16+nonceSize:]
 
 	// Decrypt the ciphertext using the nonce and the derived encryption key
-	// The Open function returns the decrypted plaintext
 	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
 		return "", err
