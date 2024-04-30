@@ -1,3 +1,7 @@
+// Copyright (c) 2024 H0llyW00dz All rights reserved.
+//
+// License: BSD 3-Clause License
+
 package crypto
 
 import (
@@ -9,6 +13,9 @@ import (
 	"io"
 	"os"
 
+	// Import the godotenv package for loading environment variables from a .env file
+	// The "_" blank identifier is used to import the package for its side effects (auto-loading .env file)
+	_ "github.com/joho/godotenv/autoload"
 	"golang.org/x/crypto/argon2"
 )
 
