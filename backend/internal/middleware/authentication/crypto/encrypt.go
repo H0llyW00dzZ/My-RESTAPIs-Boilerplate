@@ -91,6 +91,9 @@ func decrypt(ciphertext []byte, key []byte) ([]byte, error) {
 // EncryptData encrypts the given data using AES encryption with a derived encryption key.
 // It returns the base64-encoded ciphertext, which consists of the salt and encrypted data.
 // If useArgon2 is true, it uses Argon2 key derivation function to derive the encryption key.
+//
+// Note: This method still uses a salt even when Argon2 is set to false. The resulting ciphertext is different
+// compared to encryption without a salt.
 func EncryptData(data string, useArgon2 bool) (string, error) {
 	salt := make([]byte, 16)
 	if _, err := rand.Read(salt); err != nil {
@@ -110,6 +113,9 @@ func EncryptData(data string, useArgon2 bool) (string, error) {
 // DecryptData decrypts the given encrypted data using AES decryption with the same derived encryption key used during encryption.
 // It expects the encrypted data to be base64-encoded and contains the salt and ciphertext.
 // If useArgon2 is true, it uses Argon2 key derivation function to derive the decryption key.
+//
+// Note: This method still uses a salt even when Argon2 is set to false. The resulting ciphertext is different
+// compared to encryption without a salt.
 func DecryptData(encryptedData string, useArgon2 bool) (string, error) {
 	encryptedBytes, err := base64.StdEncoding.DecodeString(encryptedData)
 	if err != nil {
@@ -169,6 +175,9 @@ func processLargeData(src io.Reader, dst io.Writer, useArgon2 bool, processor fu
 // EncryptLargeData encrypts large data using AES encryption with a derived encryption key.
 // It reads the data from the provided io.Reader and writes the encrypted data to the provided io.Writer.
 // If useArgon2 is true, it uses Argon2 key derivation function to derive the encryption key.
+//
+// Note: This method still uses a salt even when Argon2 is set to false. The resulting ciphertext is different
+// compared to encryption without a salt.
 func EncryptLargeData(src io.Reader, dst io.Writer, useArgon2 bool) error {
 	return processLargeData(src, dst, useArgon2, encrypt)
 }
@@ -176,6 +185,9 @@ func EncryptLargeData(src io.Reader, dst io.Writer, useArgon2 bool) error {
 // DecryptLargeData decrypts large data using AES decryption with the same derived encryption key used during encryption.
 // It reads the encrypted data from the provided io.Reader and writes the decrypted data to the provided io.Writer.
 // If useArgon2 is true, it uses Argon2 key derivation function to derive the decryption key.
+//
+// Note: This method still uses a salt even when Argon2 is set to false. The resulting ciphertext is different
+// compared to encryption without a salt.
 func DecryptLargeData(src io.Reader, dst io.Writer, useArgon2 bool) error {
 	return processLargeData(src, dst, useArgon2, decrypt)
 }
