@@ -40,6 +40,7 @@ func EncryptData(data string) (string, error) {
 	}
 
 	// Derive a secure encryption key using Argon2 key derivation function
+	// Note: this so expensive the price.
 	key := argon2.IDKey([]byte(secryptkey), salt, 1, 64*1024, 4, 32)
 
 	// Create a new AES cipher block using the derived encryption key
@@ -86,6 +87,7 @@ func DecryptData(encryptedData string) (string, error) {
 	salt := encryptedBytes[:16]
 
 	// Derive the encryption key using Argon2 key derivation function with the extracted salt
+	// Note: this so expensive the price.
 	key := argon2.IDKey([]byte(secryptkey), salt, 1, 64*1024, 4, 32)
 
 	// Create a new AES cipher block using the derived encryption key
