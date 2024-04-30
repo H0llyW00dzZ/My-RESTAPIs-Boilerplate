@@ -193,8 +193,15 @@ func New() Service {
 		db:          db,
 		rdb:         redisStorage, // use redisStorage for rate limiting or any other needs in middleware
 		redisClient: redisClient,
-		// Note: This method is safe, even with a large number of services (e.g., 1 billion instances) due to the singleton pattern.
-		// Also MySQL should be used as the primary database, while Redis should be used for caching (e.g., data flow: main database -> Redis -> repeat).
+		// Note: This method is safe, even with a large number of service instances (e.g., 1 billion) due to the singleton pattern.
+		// Also MySQL should be used as the primary database, while Redis should be used for caching.
+		// Here an example data flow is:
+		// 1. For read operations: service -> Redis (if not found in Redis) -> get from main database -> putting back in Redis -> repeat.
+		// 2. For insert/update operations: service -> main database -> repeat.
+		// Then Redis will handle caching for read operations, while write operations will directly interact with the main database.
+		// Also note that these example data flows are highly stable, and the reason for this logic is because traditional SQL databases (e.g., MySQL) have limited open connections,
+		// unlike NoSQL databases (e.g., Redis), which are capable of up to 10K connections with basically no limits.
+		// So Redis is perfect for connection pooling because the most important factor for interacting with it is the connection itself.
 		auth: NewServiceAuth(db, redisStorage),
 	}
 
