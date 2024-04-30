@@ -128,6 +128,9 @@ type Service interface {
 
 	// RestartMySQLConnection safely restarts the MySQL connection.
 	RestartMySQLConnection() error
+
+	// AuthUser returns the ServiceAuth interface for managing user authentication-related database operations.
+	Auth() ServiceAuth
 }
 
 // service is a concrete implementation of the Service interface.
@@ -666,4 +669,9 @@ func (s *service) RestartMySQLConnection() error {
 	log.LogInfo("MySQL connection has been restarted.")
 
 	return nil
+}
+
+// AuthUser returns the ServiceAuth interface for managing user authentication-related database operations.
+func (s *service) Auth() ServiceAuth {
+	return s.auth
 }
