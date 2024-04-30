@@ -5,9 +5,36 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"crypto/subtle"
+	"errors"
 	"io"
+	"os"
 
 	"golang.org/x/crypto/argon2"
+)
+
+var (
+	// secryptkey holds the secret encryption key.
+	//
+	// NOTE: In production, this key should be kept secret and not stored in an environment variable.
+	// The reason it is set from an environment variable here is for ease of testing.
+	// Retrieve the secret encryption key from the environment variable "SECRETCRYPT_KEY".
+	secryptkey = os.Getenv("SECRETCRYPT_KEY")
+
+	// signkey holds the secret signing key.
+	//
+	// NOTE: In production, this key should be kept secret and not stored in an environment variable.
+	// The reason it is set from an environment variable here is for ease of testing.
+	// Retrieve the secret signing key from the environment variable "SIGN_KEY".
+	signkey = os.Getenv("SIGN_KEY")
+)
+
+var (
+	// ErrorInvalidCipherText is a custom error variable that represents an error
+	// which occurs when the ciphertext (encrypted text) is invalid or malformed.
+	ErrorInvalidCipherText = errors.New("invalid ciphertext")
+	// ErrorInvalidSignature is a custom error variable that represents an error
+	// which occurs when the signature is invalid or does not match the expected signature.
+	ErrorInvalidSignature = errors.New("invalid signature")
 )
 
 // signData generates an HMAC signature for the given data using the signing key.

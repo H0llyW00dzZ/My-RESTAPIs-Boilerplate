@@ -9,39 +9,12 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
-	"errors"
 	"io"
-	"os"
 
 	// Import the godotenv package for loading environment variables from a .env file
 	// The "_" blank identifier is used to import the package for its side effects (auto-loading .env file)
 	_ "github.com/joho/godotenv/autoload"
 	"golang.org/x/crypto/chacha20poly1305"
-)
-
-var (
-	// secryptkey holds the secret encryption key.
-	//
-	// NOTE: In production, this key should be kept secret and not stored in an environment variable.
-	// The reason it is set from an environment variable here is for ease of testing.
-	// Retrieve the secret encryption key from the environment variable "SECRETCRYPT_KEY".
-	secryptkey = os.Getenv("SECRETCRYPT_KEY")
-
-	// signkey holds the secret signing key.
-	//
-	// NOTE: In production, this key should be kept secret and not stored in an environment variable.
-	// The reason it is set from an environment variable here is for ease of testing.
-	// Retrieve the secret signing key from the environment variable "SIGN_KEY".
-	signkey = os.Getenv("SIGN_KEY")
-)
-
-var (
-	// ErrorInvalidCipherText is a custom error variable that represents an error
-	// which occurs when the ciphertext (encrypted text) is invalid or malformed.
-	ErrorInvalidCipherText = errors.New("invalid ciphertext")
-	// ErrorInvalidSignature is a custom error variable that represents an error
-	// which occurs when the signature is invalid or does not match the expected signature.
-	ErrorInvalidSignature = errors.New("invalid signature")
 )
 
 // encrypt encrypts the given data using a cascade of ciphers.
