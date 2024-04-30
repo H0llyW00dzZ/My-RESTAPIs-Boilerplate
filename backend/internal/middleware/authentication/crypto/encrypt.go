@@ -19,6 +19,7 @@ import (
 )
 
 var (
+	// secryptkey holds the secret encryption key retrieved from the environment variable "SECRETCRYPT_KEY"
 	secryptkey = os.Getenv("SECRETCRYPT_KEY")
 )
 
@@ -30,32 +31,37 @@ var (
 
 // EncryptData encrypts the given token using AES encryption with the provided encryption key.
 // It returns the base64-encoded ciphertext, which consists of the nonce concatenated with the encrypted data.
-func EncryptData(token string) (string, error) {
+func EncryptData(data string) (string, error) {
+	// Create a new AES cipher block using the encryption key
 	block, err := aes.NewCipher([]byte(secryptkey))
 	if err != nil {
 		return "", err
 	}
 
+	// Create a new GCM mode instance for encryption
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return "", err
 	}
 
+	// Generate a random nonce (number used once) for each encryption
 	nonce := make([]byte, gcm.NonceSize())
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
 		return "", err
 	}
 
-	ciphertext := gcm.Seal(nonce, nonce, []byte(token), nil)
+	// Encrypt the data using the GCM mode and the generated nonce
+	ciphertext := gcm.Seal(nonce, nonce, []byte(data), nil)
 
+	// Encode the ciphertext (nonce + encrypted data) to base64 and return it
 	return base64.StdEncoding.EncodeToString(ciphertext), nil
 }
 
-// DecryptData decrypts the given encrypted token using AES decryption with the same encryption key used during encryption.
-// It expects the encrypted token to be base64-encoded and returns the decrypted plaintext data.
-func DecryptData(encryptedToken string) (string, error) {
+// DecryptData decrypts the given encrypted data using AES decryption with the same encryption key used during encryption.
+// It expects the encrypted data to be base64-encoded and returns the decrypted plaintext data.
+func DecryptData(encryptedData string) (string, error) {
 	// Decode the base64-encoded ciphertext to obtain the original ciphertext
-	ciphertext, err := base64.StdEncoding.DecodeString(encryptedToken)
+	ciphertext, err := base64.StdEncoding.DecodeString(encryptedData)
 	if err != nil {
 		return "", err
 	}
