@@ -16,6 +16,7 @@ import (
 	// Import the godotenv package for loading environment variables from a .env file
 	// The "_" blank identifier is used to import the package for its side effects (auto-loading .env file)
 	_ "github.com/joho/godotenv/autoload"
+	"golang.org/x/crypto/argon2"
 )
 
 var (
@@ -29,11 +30,14 @@ var (
 	ErrorInvalidCipherText = errors.New("invalid ciphertext")
 )
 
-// EncryptData encrypts the given token using AES encryption with the provided encryption key.
+// EncryptData encrypts the given data using AES encryption with a derived encryption key.
 // It returns the base64-encoded ciphertext, which consists of the nonce concatenated with the encrypted data.
 func EncryptData(data string) (string, error) {
-	// Create a new AES cipher block using the encryption key
-	block, err := aes.NewCipher([]byte(secryptkey))
+	// Derive a secure encryption key using Argon2 key derivation function
+	key := argon2.IDKey([]byte(secryptkey), nil, 1, 64*1024, 4, 32)
+
+	// Create a new AES cipher block using the derived encryption key
+	block, err := aes.NewCipher(key)
 	if err != nil {
 		return "", err
 	}
@@ -57,7 +61,7 @@ func EncryptData(data string) (string, error) {
 	return base64.StdEncoding.EncodeToString(ciphertext), nil
 }
 
-// DecryptData decrypts the given encrypted data using AES decryption with the same encryption key used during encryption.
+// DecryptData decrypts the given encrypted data using AES decryption with the same derived encryption key used during encryption.
 // It expects the encrypted data to be base64-encoded and returns the decrypted plaintext data.
 func DecryptData(encryptedData string) (string, error) {
 	// Decode the base64-encoded ciphertext to obtain the original ciphertext
@@ -66,8 +70,11 @@ func DecryptData(encryptedData string) (string, error) {
 		return "", err
 	}
 
-	// Create a new AES cipher block using the same encryption key used during encryption
-	block, err := aes.NewCipher([]byte(secryptkey))
+	// Derive the same encryption key using Argon2 key derivation function
+	key := argon2.IDKey([]byte(secryptkey), nil, 1, 64*1024, 4, 32)
+
+	// Create a new AES cipher block using the derived encryption key
+	block, err := aes.NewCipher(key)
 	if err != nil {
 		return "", err
 	}
@@ -87,7 +94,7 @@ func DecryptData(encryptedData string) (string, error) {
 	nonce := ciphertext[:nonceSize]
 	ciphertext = ciphertext[nonceSize:]
 
-	// Decrypt the ciphertext using the nonce and the same encryption key
+	// Decrypt the ciphertext using the nonce and the derived encryption key
 	// The Open function returns the decrypted plaintext
 	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
