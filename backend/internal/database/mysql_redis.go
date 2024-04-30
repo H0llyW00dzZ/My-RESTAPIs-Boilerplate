@@ -136,6 +136,7 @@ type service struct {
 	rdb         fiber.Storage
 	redisClient *redis.Client
 	mu          sync.Mutex // a mutex to guard connection restarts or any that needed
+	auth        ServiceAuth
 }
 
 // dbConfig holds the environment variables for the database connection.
@@ -189,6 +190,7 @@ func New() Service {
 		db:          db,
 		rdb:         redisStorage, // use redisStorage for rate limiting or any other needs in middleware
 		redisClient: redisClient,
+		auth:        NewServiceAuth(db, redisStorage),
 	}
 
 	return dbInstance
