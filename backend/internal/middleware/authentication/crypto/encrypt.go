@@ -31,10 +31,17 @@ var (
 )
 
 // EncryptData encrypts the given data using AES encryption with a derived encryption key.
-// It returns the base64-encoded ciphertext, which consists of the nonce concatenated with the encrypted data.
+// It returns the base64-encoded ciphertext, which consists of the salt, nonce, and encrypted data.
 func EncryptData(data string) (string, error) {
+	// Generate a random salt
+	salt := make([]byte, 16)
+	_, err := rand.Read(salt)
+	if err != nil {
+		return "", err
+	}
+
 	// Derive a secure encryption key using Argon2 key derivation function
-	key := argon2.IDKey([]byte(secryptkey), nil, 1, 64*1024, 4, 32)
+	key := argon2.IDKey([]byte(secryptkey), salt, 1, 64*1024, 4, 32)
 
 	// Create a new AES cipher block using the derived encryption key
 	block, err := aes.NewCipher(key)
@@ -55,23 +62,30 @@ func EncryptData(data string) (string, error) {
 	}
 
 	// Encrypt the data using the GCM mode and the generated nonce
-	ciphertext := gcm.Seal(nonce, nonce, []byte(data), nil)
+	ciphertext := gcm.Seal(nil, nonce, []byte(data), nil)
 
-	// Encode the ciphertext (nonce + encrypted data) to base64 and return it
-	return base64.StdEncoding.EncodeToString(ciphertext), nil
+	// Concatenate the salt, nonce, and ciphertext
+	encryptedData := append(salt, nonce...)
+	encryptedData = append(encryptedData, ciphertext...)
+
+	// Encode the encrypted data to base64 and return it
+	return base64.StdEncoding.EncodeToString(encryptedData), nil
 }
 
 // DecryptData decrypts the given encrypted data using AES decryption with the same derived encryption key used during encryption.
-// It expects the encrypted data to be base64-encoded and returns the decrypted plaintext data.
+// It expects the encrypted data to be base64-encoded and contains the salt, nonce, and ciphertext.
 func DecryptData(encryptedData string) (string, error) {
-	// Decode the base64-encoded ciphertext to obtain the original ciphertext
-	ciphertext, err := base64.StdEncoding.DecodeString(encryptedData)
+	// Decode the base64-encoded encrypted data
+	encryptedBytes, err := base64.StdEncoding.DecodeString(encryptedData)
 	if err != nil {
 		return "", err
 	}
 
-	// Derive the same encryption key using Argon2 key derivation function
-	key := argon2.IDKey([]byte(secryptkey), nil, 1, 64*1024, 4, 32)
+	// Extract the salt from the encrypted data
+	salt := encryptedBytes[:16]
+
+	// Derive the encryption key using Argon2 key derivation function with the extracted salt
+	key := argon2.IDKey([]byte(secryptkey), salt, 1, 64*1024, 4, 32)
 
 	// Create a new AES cipher block using the derived encryption key
 	block, err := aes.NewCipher(key)
@@ -85,14 +99,13 @@ func DecryptData(encryptedData string) (string, error) {
 		return "", err
 	}
 
-	// Extract the nonce from the ciphertext
-	// The nonce is prepended to the ciphertext during encryption and is required for decryption
+	// Extract the nonce and ciphertext from the encrypted data
 	nonceSize := gcm.NonceSize()
-	if len(ciphertext) < nonceSize {
+	if len(encryptedBytes) < nonceSize+16 {
 		return "", ErrorInvalidCipherText
 	}
-	nonce := ciphertext[:nonceSize]
-	ciphertext = ciphertext[nonceSize:]
+	nonce := encryptedBytes[16 : 16+nonceSize]
+	ciphertext := encryptedBytes[16+nonceSize:]
 
 	// Decrypt the ciphertext using the nonce and the derived encryption key
 	// The Open function returns the decrypted plaintext
