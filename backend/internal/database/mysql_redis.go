@@ -193,7 +193,9 @@ func New() Service {
 		db:          db,
 		rdb:         redisStorage, // use redisStorage for rate limiting or any other needs in middleware
 		redisClient: redisClient,
-		auth:        NewServiceAuth(db, redisStorage),
+		// Note: This method is safe, even with a large number of services (e.g., 1 billion instances) due to the singleton pattern.
+		// Also MySQL should be used as the primary database, while Redis should be used for caching (e.g., data flow: main database -> Redis -> repeat).
+		auth: NewServiceAuth(db, redisStorage),
 	}
 
 	return dbInstance
