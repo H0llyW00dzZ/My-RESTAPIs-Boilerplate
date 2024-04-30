@@ -30,92 +30,152 @@ var (
 	ErrorInvalidCipherText = errors.New("invalid ciphertext")
 )
 
+// deriveKey derives an encryption key using Argon2 key derivation function or returns the secryptkey directly.
+func deriveKey(salt []byte, useArgon2 bool) []byte {
+	if useArgon2 {
+		// Note: this so expensive the cost.
+		return argon2.IDKey([]byte(secryptkey), salt, 1, 64*1024, 4, 32)
+	}
+	return []byte(secryptkey)
+}
+
+// encrypt encrypts the given data using AES encryption with the provided key and returns the ciphertext.
+func encrypt(data []byte, key []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+
+	nonce := make([]byte, gcm.NonceSize())
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		return nil, err
+	}
+
+	ciphertext := gcm.Seal(nil, nonce, data, nil)
+	return append(nonce, ciphertext...), nil
+}
+
+// decrypt decrypts the given ciphertext using AES decryption with the provided key and returns the plaintext.
+func decrypt(ciphertext []byte, key []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+
+	nonceSize := gcm.NonceSize()
+	if len(ciphertext) < nonceSize {
+		return nil, ErrorInvalidCipherText
+	}
+
+	nonce := ciphertext[:nonceSize]
+	ciphertext = ciphertext[nonceSize:]
+
+	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return plaintext, nil
+}
+
 // EncryptData encrypts the given data using AES encryption with a derived encryption key.
-// It returns the base64-encoded ciphertext, which consists of the salt, nonce, and encrypted data.
-func EncryptData(data string) (string, error) {
-	// Generate a random salt
+// It returns the base64-encoded ciphertext, which consists of the salt and encrypted data.
+// If useArgon2 is true, it uses Argon2 key derivation function to derive the encryption key.
+func EncryptData(data string, useArgon2 bool) (string, error) {
 	salt := make([]byte, 16)
 	if _, err := rand.Read(salt); err != nil {
 		return "", err
 	}
 
-	// Derive a secure encryption key using Argon2 key derivation function
-	// Note: this so expensive the price.
-	key := argon2.IDKey([]byte(secryptkey), salt, 1, 64*1024, 4, 32)
-
-	// Create a new AES cipher block using the derived encryption key
-	block, err := aes.NewCipher(key)
+	key := deriveKey(salt, useArgon2)
+	ciphertext, err := encrypt([]byte(data), key)
 	if err != nil {
 		return "", err
 	}
 
-	// Create a new GCM mode instance for encryption
-	gcm, err := cipher.NewGCM(block)
-	if err != nil {
-		return "", err
-	}
-
-	// Generate a random nonce (number used once) for each encryption
-	nonce := make([]byte, gcm.NonceSize())
-	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		return "", err
-	}
-
-	// Encrypt the data using the GCM mode and the generated nonce
-	ciphertext := gcm.Seal(nil, nonce, []byte(data), nil)
-
-	// Allocate a buffer to store the salt, nonce, and ciphertext
-	encryptedData := make([]byte, 16+len(nonce)+len(ciphertext))
-	copy(encryptedData[:16], salt)
-	copy(encryptedData[16:16+len(nonce)], nonce)
-	copy(encryptedData[16+len(nonce):], ciphertext)
-
-	// Encode the encrypted data to base64 and return it
+	encryptedData := append(salt, ciphertext...)
 	return base64.StdEncoding.EncodeToString(encryptedData), nil
 }
 
 // DecryptData decrypts the given encrypted data using AES decryption with the same derived encryption key used during encryption.
-// It expects the encrypted data to be base64-encoded and contains the salt, nonce, and ciphertext.
-func DecryptData(encryptedData string) (string, error) {
-	// Decode the base64-encoded encrypted data
+// It expects the encrypted data to be base64-encoded and contains the salt and ciphertext.
+// If useArgon2 is true, it uses Argon2 key derivation function to derive the decryption key.
+func DecryptData(encryptedData string, useArgon2 bool) (string, error) {
 	encryptedBytes, err := base64.StdEncoding.DecodeString(encryptedData)
 	if err != nil {
 		return "", err
 	}
 
-	// Extract the salt from the encrypted data
 	salt := encryptedBytes[:16]
+	ciphertext := encryptedBytes[16:]
 
-	// Derive the encryption key using Argon2 key derivation function with the extracted salt
-	// Note: this so expensive the price.
-	key := argon2.IDKey([]byte(secryptkey), salt, 1, 64*1024, 4, 32)
-
-	// Create a new AES cipher block using the derived encryption key
-	block, err := aes.NewCipher(key)
+	key := deriveKey(salt, useArgon2)
+	plaintext, err := decrypt(ciphertext, key)
 	if err != nil {
 		return "", err
 	}
 
-	// Create a new GCM mode instance for decryption
-	gcm, err := cipher.NewGCM(block)
-	if err != nil {
-		return "", err
-	}
-
-	// Extract the nonce and ciphertext from the encrypted data
-	nonceSize := gcm.NonceSize()
-	if len(encryptedBytes) < nonceSize+16 {
-		return "", ErrorInvalidCipherText
-	}
-	nonce := encryptedBytes[16 : 16+nonceSize]
-	ciphertext := encryptedBytes[16+nonceSize:]
-
-	// Decrypt the ciphertext using the nonce and the derived encryption key
-	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
-	if err != nil {
-		return "", err
-	}
-
-	// Convert the decrypted plaintext bytes to a string and return it
 	return string(plaintext), nil
+}
+
+// processLargeData is a higher-order function that processes large data using the provided processor function.
+// It reads the data from the provided io.Reader and writes the processed data to the provided io.Writer.
+// The processor function is responsible for encrypting or decrypting the data.
+func processLargeData(src io.Reader, dst io.Writer, useArgon2 bool, processor func([]byte, []byte) ([]byte, error)) error {
+	salt := make([]byte, 16)
+	if _, err := rand.Read(salt); err != nil {
+		return err
+	}
+
+	key := deriveKey(salt, useArgon2)
+
+	if _, err := dst.Write(salt); err != nil {
+		return err
+	}
+
+	buf := make([]byte, 4096)
+	for {
+		n, err := src.Read(buf)
+		if err != nil && err != io.EOF {
+			return err
+		}
+		if n == 0 {
+			break
+		}
+
+		processed, err := processor(buf[:n], key)
+		if err != nil {
+			return err
+		}
+
+		if _, err := dst.Write(processed); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// EncryptLargeData encrypts large data using AES encryption with a derived encryption key.
+// It reads the data from the provided io.Reader and writes the encrypted data to the provided io.Writer.
+// If useArgon2 is true, it uses Argon2 key derivation function to derive the encryption key.
+func EncryptLargeData(src io.Reader, dst io.Writer, useArgon2 bool) error {
+	return processLargeData(src, dst, useArgon2, encrypt)
+}
+
+// DecryptLargeData decrypts large data using AES decryption with the same derived encryption key used during encryption.
+// It reads the encrypted data from the provided io.Reader and writes the decrypted data to the provided io.Writer.
+// If useArgon2 is true, it uses Argon2 key derivation function to derive the decryption key.
+func DecryptLargeData(src io.Reader, dst io.Writer, useArgon2 bool) error {
+	return processLargeData(src, dst, useArgon2, decrypt)
 }
