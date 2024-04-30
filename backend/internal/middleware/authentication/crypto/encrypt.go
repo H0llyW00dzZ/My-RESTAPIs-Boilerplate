@@ -52,6 +52,8 @@ func verifySignature(data, signature []byte) bool {
 
 // deriveKey derives an encryption key using Argon2 key derivation function or returns the secryptkey directly.
 func deriveKey(salt []byte, useArgon2 bool) []byte {
+	// Note: Using Argon2 is expensive (100MB+ per encrypt/decrypt) the cost, which is not recommended.
+	// I might try to introduce cryptographic techniques to implement a similar but cheaper approach and a new cipher from scratch later.
 	if useArgon2 {
 		return argon2.IDKey([]byte(secryptkey), salt, 1, 64*1024, 4, 32)
 	}
