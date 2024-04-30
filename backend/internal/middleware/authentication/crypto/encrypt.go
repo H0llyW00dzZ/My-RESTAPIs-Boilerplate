@@ -265,3 +265,27 @@ func DecryptLargeData(src io.Reader, dst io.Writer, useArgon2 bool) error {
 
 	return nil
 }
+
+// VerifyCiphertext verifies the integrity of the ciphertext without decrypting it.
+// It checks if the ciphertext has a valid structure and matches the expected format.
+// It expects the encrypted data and signature to be base64-encoded.
+// It returns true if the ciphertext is valid, false otherwise.
+func VerifyCiphertext(encryptedData, signature string) bool {
+	decodedData, err := base64.StdEncoding.DecodeString(encryptedData)
+	if err != nil {
+		return false
+	}
+
+	decodedSignature, err := base64.StdEncoding.DecodeString(signature)
+	if err != nil {
+		return false
+	}
+
+	if len(decodedData) < 16 {
+		return false
+	}
+
+	expectedSignature := signData(decodedData)
+
+	return hmac.Equal(decodedSignature, expectedSignature)
+}
