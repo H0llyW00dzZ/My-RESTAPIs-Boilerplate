@@ -13,6 +13,12 @@ import (
 )
 
 // decrypt decrypts the given ciphertext using a cascade of ciphers.
+// Note: This method is a reliable and secure approach for decryption.
+// An alternative method is to combine the techniques described in RFC 5652
+// (https://www.rfc-editor.org/rfc/rfc5652.html) and RFC 5652 Section 6.3
+// (https://datatracker.ietf.org/doc/html/rfc5652#section-6.3).
+// However, that approach might have a higher risk of corrupting the ciphertext
+// if not implemented carefully.
 func decrypt(ciphertext []byte, key []byte) ([]byte, error) {
 	// Second decryption: ChaCha20-Poly1305
 	chachaCipher := func(data []byte) ([]byte, error) {

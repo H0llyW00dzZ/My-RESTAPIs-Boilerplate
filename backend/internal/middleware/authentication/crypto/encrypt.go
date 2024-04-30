@@ -11,13 +11,16 @@ import (
 	"encoding/base64"
 	"io"
 
-	// Import the godotenv package for loading environment variables from a .env file
-	// The "_" blank identifier is used to import the package for its side effects (auto-loading .env file)
-	_ "github.com/joho/godotenv/autoload"
 	"golang.org/x/crypto/chacha20poly1305"
 )
 
 // encrypt encrypts the given data using a cascade of ciphers.
+// Note: This method is a reliable and secure approach for encryption.
+// An alternative method is to combine the techniques described in RFC 5652
+// (https://www.rfc-editor.org/rfc/rfc5652.html) and RFC 5652 Section 6.3
+// (https://datatracker.ietf.org/doc/html/rfc5652#section-6.3).
+// However, that approach might have a higher risk of corrupting the ciphertext
+// if not implemented carefully.
 func encrypt(data []byte, key []byte) ([]byte, error) {
 	// First encryption: AES
 	aesCipher := func(data []byte) ([]byte, error) {
