@@ -77,20 +77,20 @@ func encrypt(data []byte, key []byte) ([]byte, error) {
 // EncryptData encrypts the given data using AES encryption with a derived encryption key and signs the ciphertext.
 // It returns the base64-encoded ciphertext and signature.
 // If useArgon2 is true, it uses Argon2 key derivation function to derive the encryption key.
-func EncryptData(data string, useArgon2 bool) (string, string, error) {
+func EncryptData(data string, useArgon2 bool, secryptKey, signKey string) (string, string, error) {
 	salt := make([]byte, 16)
 	if _, err := rand.Read(salt); err != nil {
 		return "", "", err
 	}
 
-	key := deriveKey(salt, useArgon2)
+	key := deriveKey(salt, useArgon2, secryptKey)
 	ciphertext, err := encrypt([]byte(data), key)
 	if err != nil {
 		return "", "", err
 	}
 
 	encryptedData := append(salt, ciphertext...)
-	signature := signData(encryptedData)
+	signature := signData(encryptedData, signKey)
 
 	encodedData := base64.StdEncoding.EncodeToString(encryptedData)
 	encodedSignature := base64.StdEncoding.EncodeToString(signature)

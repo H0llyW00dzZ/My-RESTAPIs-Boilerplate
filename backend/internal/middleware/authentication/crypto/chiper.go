@@ -31,7 +31,7 @@ func decryptWithCipher(ciphertext []byte, cipher func([]byte) ([]byte, error)) (
 // It checks if the ciphertext has a valid structure and matches the expected format.
 // It expects the encrypted data and signature to be base64-encoded.
 // It returns true if the ciphertext is valid, false otherwise.
-func VerifyCiphertext(encryptedData, signature string) bool {
+func VerifyCiphertext(encryptedData, signature, signKey string) bool {
 	decodedData, err := base64.StdEncoding.DecodeString(encryptedData)
 	if err != nil {
 		return false
@@ -46,7 +46,7 @@ func VerifyCiphertext(encryptedData, signature string) bool {
 		return false
 	}
 
-	expectedSignature := signData(decodedData)
+	expectedSignature := signData(decodedData, signKey)
 
 	return subtle.ConstantTimeCompare(decodedSignature, expectedSignature) == 1
 }
