@@ -13,6 +13,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
+	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/google/uuid"
@@ -159,5 +160,26 @@ func WithExpiration(expiration time.Duration) func(*limiter.Config) {
 func WithLimitReached(limitReached func(*fiber.Ctx) error) func(*limiter.Config) {
 	return func(config *limiter.Config) {
 		config.LimitReached = limitReached
+	}
+}
+
+// WithKey is an option function for NewEncryptedCookieMiddleware that sets the encryption key.
+func WithKey(key string) func(*encryptcookie.Config) {
+	return func(config *encryptcookie.Config) {
+		config.Key = key
+	}
+}
+
+// WithEncryptor is an option function for NewEncryptedCookieMiddleware that sets a custom encryptor function.
+func WithEncryptor(encryptor func(decryptedString, key string) (string, error)) func(*encryptcookie.Config) {
+	return func(config *encryptcookie.Config) {
+		config.Encryptor = encryptor
+	}
+}
+
+// WithDecryptor is an option function for NewEncryptedCookieMiddleware that sets a custom decryptor function.
+func WithDecryptor(decryptor func(encryptedString, key string) (string, error)) func(*encryptcookie.Config) {
+	return func(config *encryptcookie.Config) {
+		config.Decryptor = decryptor
 	}
 }
