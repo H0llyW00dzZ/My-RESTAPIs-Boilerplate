@@ -183,3 +183,22 @@ func WithDecryptor(decryptor func(encryptedString, key string) (string, error)) 
 		config.Decryptor = decryptor
 	}
 }
+
+// useNonNilMiddleware registers non-nil middlewares to the fiber.Router.
+func useNonNilMiddleware(g fiber.Router, middlewares ...fiber.Handler) {
+	for _, middleware := range middlewares {
+		if middleware != nil {
+			g.Use(middleware)
+		}
+	}
+}
+
+// appendNonNilHandler appends non-nil handlers to the handlers slice.
+func appendNonNilHandler(handlers []fiber.Handler, handlerFuncs ...fiber.Handler) []fiber.Handler {
+	for _, handlerFunc := range handlerFuncs {
+		if handlerFunc != nil {
+			handlers = append(handlers, handlerFunc)
+		}
+	}
+	return handlers
+}

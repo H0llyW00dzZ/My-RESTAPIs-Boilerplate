@@ -131,15 +131,6 @@ func registerGroupMiddlewares(g fiber.Router, group APIGroup) {
 	)
 }
 
-// useNonNilMiddleware registers non-nil middlewares to the fiber.Router.
-func useNonNilMiddleware(g fiber.Router, middlewares ...fiber.Handler) {
-	for _, middleware := range middlewares {
-		if middleware != nil {
-			g.Use(middleware)
-		}
-	}
-}
-
 // registerGroupRoutes registers the routes for an API group.
 func registerGroupRoutes(g fiber.Router, group APIGroup) {
 	for _, route := range group.Routes {
@@ -171,15 +162,5 @@ func getRouteHandlers(route APIRoute) []fiber.Handler {
 
 	handlers = append(handlers, route.Handler)
 
-	return handlers
-}
-
-// appendNonNilHandler appends non-nil handlers to the handlers slice.
-func appendNonNilHandler(handlers []fiber.Handler, handlerFuncs ...fiber.Handler) []fiber.Handler {
-	for _, handlerFunc := range handlerFuncs {
-		if handlerFunc != nil {
-			handlers = append(handlers, handlerFunc)
-		}
-	}
 	return handlers
 }
