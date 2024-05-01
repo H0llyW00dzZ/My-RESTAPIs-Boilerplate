@@ -22,6 +22,8 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 - Scalable project structure
 - Dual-licensed under BSD 3-Clause and MIT (specific files)
 - High Performance (Thanks to the [`Sonic JSON serializing & deserializing library`](https://github.com/bytedance/sonic))
+- Cryptography Techniques
+- High Quality Go Codes
 
 ## TODO Features
 
