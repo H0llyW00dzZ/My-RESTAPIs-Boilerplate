@@ -15,6 +15,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
@@ -327,4 +328,26 @@ func NewKeyAuthMiddleware(db database.Service, options ...func(*keyauth.Config))
 
 	// Return the key authentication middleware.
 	return keyAuthMiddleware
+}
+
+// NewEncryptedCookieMiddleware creates a new encrypted cookie middleware with optional custom configuration options.
+//
+// Note: This can integrate with authentication Cryptography Techniques
+// that Last Enhance uses double encryption & decryption.
+func NewEncryptedCookieMiddleware(options ...interface{}) fiber.Handler {
+	// Create a new encrypted cookie middleware configuration.
+	config := encryptcookie.Config{}
+
+	// Apply any additional options to the encrypted cookie configuration.
+	for _, option := range options {
+		if optFunc, ok := option.(func(*encryptcookie.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create the encrypted cookie middleware with the configured options.
+	encryptedCookieMiddleware := encryptcookie.New(config)
+
+	// Return the encrypted cookie middleware.
+	return encryptedCookieMiddleware
 }
