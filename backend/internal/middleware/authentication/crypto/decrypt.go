@@ -88,7 +88,7 @@ func decrypt(ciphertext []byte, key []byte) ([]byte, error) {
 // It expects the encrypted data and signature to be base64-encoded.
 // It verifies the signature before decrypting the data.
 // If useArgon2 is true, it uses Argon2 key derivation function to derive the decryption key.
-func DecryptData(encryptedData, signature string, useArgon2 bool) (string, error) {
+func DecryptData(encryptedData, signature string, useArgon2 bool, secryptKey, signKey string) (string, error) {
 	encryptedBytes, err := base64.StdEncoding.DecodeString(encryptedData)
 	if err != nil {
 		return "", err
@@ -99,14 +99,14 @@ func DecryptData(encryptedData, signature string, useArgon2 bool) (string, error
 		return "", err
 	}
 
-	if !verifySignature(encryptedBytes, signatureBytes) {
+	if !verifySignature(encryptedBytes, signatureBytes, signKey) {
 		return "", ErrorInvalidSignature
 	}
 
 	salt := encryptedBytes[:16]
 	ciphertext := encryptedBytes[16:]
 
-	key := deriveKey(salt, useArgon2)
+	key := deriveKey(salt, useArgon2, secryptKey)
 	plaintext, err := decrypt(ciphertext, key)
 	if err != nil {
 		return "", err

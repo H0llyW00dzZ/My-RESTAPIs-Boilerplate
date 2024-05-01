@@ -15,13 +15,13 @@ import (
 // If useArgon2 is true, it uses Argon2 key derivation function to derive the decryption key.
 //
 // TODO: Improve this.
-func DecryptLargeData(src io.Reader, dst io.Writer, useArgon2 bool) error {
+func DecryptLargeData(src io.Reader, dst io.Writer, useArgon2 bool, secryptKey, signKey string) error {
 	salt := make([]byte, 16)
 	if _, err := io.ReadFull(src, salt); err != nil {
 		return err
 	}
 
-	key := deriveKey(salt, useArgon2)
+	key := deriveKey(salt, useArgon2, secryptKey)
 
 	hash := sha256.New()
 	buf := make([]byte, 4096)
@@ -51,7 +51,7 @@ func DecryptLargeData(src io.Reader, dst io.Writer, useArgon2 bool) error {
 		return err
 	}
 
-	if !verifySignature(hash.Sum(nil), signature) {
+	if !verifySignature(hash.Sum(nil), signature, signKey) {
 		return ErrorInvalidSignature
 	}
 

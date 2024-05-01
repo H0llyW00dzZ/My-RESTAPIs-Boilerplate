@@ -12,6 +12,6 @@ import "io"
 // If useArgon2 is true, it uses Argon2 key derivation function to derive the encryption key.
 //
 // TODO: Improve this.
-func EncryptLargeData(src io.Reader, dst io.Writer, useArgon2 bool) error {
-	return processLargeData(src, dst, useArgon2, encrypt)
+func EncryptLargeData(src io.Reader, dst io.Writer, useArgon2 bool, secryptKey, signKey string) error {
+	return processLargeData(src, dst, useArgon2, secryptKey, signKey, encrypt)
 }
