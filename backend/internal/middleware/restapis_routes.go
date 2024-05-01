@@ -15,18 +15,24 @@ import (
 // APIRoute represents a single API route, containing the path, HTTP method,
 // handler function, and an optional rate limiter.
 type APIRoute struct {
-	Path        string
-	Method      string
-	Handler     fiber.Handler
-	RateLimiter fiber.Handler
+	Path                      string
+	Method                    string
+	Handler                   fiber.Handler
+	RateLimiter               fiber.Handler
+	KeyAuth                   fiber.Handler
+	RequestID                 fiber.Handler
+	EncryptedCookieMiddleware fiber.Handler
 }
 
 // APIGroup represents a group of API routes under a common prefix.
 // It also allows for a group-wide rate limiter.
 type APIGroup struct {
-	Prefix      string
-	Routes      []APIRoute
-	RateLimiter fiber.Handler
+	Prefix                    string
+	Routes                    []APIRoute
+	RateLimiter               fiber.Handler
+	KeyAuth                   fiber.Handler
+	RequestID                 fiber.Handler
+	EncryptedCookieMiddleware fiber.Handler
 }
 
 // registerRESTAPIsRoutes registers the REST API routes for the application.
@@ -72,7 +78,7 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 func serverAPIs(v1 fiber.Router, db database.Service, rateLimiterRESTAPIs fiber.Handler) {
 	// Define the API groups and routes
 	// Note: By refactoring like this, it allows for an unlimited number of handlers and easy maintainability,
-	// as I've had over 500 handlers across around 250 files.
+	// as I've had over 600 handlers across around 351 files.
 	apiGroups := []APIGroup{
 		{ // Note: Example https://localhost:8080/v1/server/health/db
 			Prefix:      "/server/health",
@@ -105,15 +111,75 @@ func serverAPIs(v1 fiber.Router, db database.Service, rateLimiterRESTAPIs fiber.
 func registerGroup(router fiber.Router, group APIGroup) {
 	g := router.Group(group.Prefix)
 
-	if group.RateLimiter != nil {
-		g.Use(group.RateLimiter)
-	}
+	registerGroupMiddlewares(g, group)
+	registerGroupRoutes(g, group)
+}
 
-	for _, route := range group.Routes {
-		if route.RateLimiter != nil {
-			g.Add(route.Method, route.Path, route.RateLimiter, route.Handler)
-		} else {
-			g.Add(route.Method, route.Path, route.Handler)
+// registerGroupMiddlewares registers the middlewares for an API group.
+func registerGroupMiddlewares(g fiber.Router, group APIGroup) {
+
+	// Note: This approach uses a "higher-order function" called useNonNilMiddleware.
+	// Also Note that Higher-order functions are powerful especially for "Cryptography Technique" and can handle multiple functions as arguments.
+	// They provide a more concise and expressive way to work with functions compared to
+	// using multiple if-else statements or switch cases.
+	useNonNilMiddleware(
+		g,
+		group.RateLimiter,
+		group.KeyAuth,
+		group.RequestID,
+		group.EncryptedCookieMiddleware,
+	)
+}
+
+// useNonNilMiddleware registers non-nil middlewares to the fiber.Router.
+func useNonNilMiddleware(g fiber.Router, middlewares ...fiber.Handler) {
+	for _, middleware := range middlewares {
+		if middleware != nil {
+			g.Use(middleware)
 		}
 	}
+}
+
+// registerGroupRoutes registers the routes for an API group.
+func registerGroupRoutes(g fiber.Router, group APIGroup) {
+	for _, route := range group.Routes {
+		registerRoute(g, route)
+	}
+}
+
+// registerRoute registers a single API route with its middlewares and handler.
+func registerRoute(g fiber.Router, route APIRoute) {
+	handlers := getRouteHandlers(route)
+	g.Add(route.Method, route.Path, handlers...)
+}
+
+// getRouteHandlers returns the handlers for an API route.
+func getRouteHandlers(route APIRoute) []fiber.Handler {
+	handlers := make([]fiber.Handler, 0, 5)
+
+	// Note: This approach uses a "higher-order function" called appendNonNilHandler.
+	// Also Note that Higher-order functions are powerful especially for "Cryptography Technique" and can handle multiple functions as arguments.
+	// They provide a more concise and expressive way to work with functions compared to
+	// using multiple if-else statements or switch cases.
+	handlers = appendNonNilHandler(
+		handlers,
+		route.RateLimiter,
+		route.KeyAuth,
+		route.RequestID,
+		route.EncryptedCookieMiddleware,
+	)
+
+	handlers = append(handlers, route.Handler)
+
+	return handlers
+}
+
+// appendNonNilHandler appends non-nil handlers to the handlers slice.
+func appendNonNilHandler(handlers []fiber.Handler, handlerFuncs ...fiber.Handler) []fiber.Handler {
+	for _, handlerFunc := range handlerFuncs {
+		if handlerFunc != nil {
+			handlers = append(handlers, handlerFunc)
+		}
+	}
+	return handlers
 }
