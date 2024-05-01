@@ -35,6 +35,8 @@ type cryptoService struct {
 // New creates a new instance of the crypto service.
 // If useArgon2 is true, it uses Argon2 key derivation function to derive the encryption key.
 func New(useArgon2 bool, secryptKey, signKey string) Service {
+	// TODO: Implement additional crypto algorithms based on my learning and knowledge.
+	// Consider implementing the "labyrinth algorithm" (hahaha) or other cryptographic techniques.
 	return &cryptoService{
 		useArgon2:  useArgon2,
 		secryptKey: secryptKey,
