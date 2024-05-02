@@ -6,7 +6,6 @@ package crypto
 
 import (
 	"crypto/aes"
-	"encoding/binary"
 	"io"
 
 	"golang.org/x/crypto/chacha20poly1305"
@@ -25,28 +24,10 @@ func HybridDecryptStream(input io.Reader, output io.Writer, aesKey, chachaKey []
 	}
 
 	for {
-		// Read the size of the encrypted chunk from the input stream.
-		chunkSizeBuf := make([]byte, 2)
-		if _, err := io.ReadFull(input, chunkSizeBuf); err != nil {
-			if err == io.EOF {
-				break
-			}
-			return err
-		}
-		chunkSize := binary.BigEndian.Uint16(chunkSizeBuf)
-
-		chachaNonce := make([]byte, chacha.NonceSize())
-		if _, err := io.ReadFull(input, chachaNonce); err != nil {
-			return err
-		}
-
-		encryptedChunk := make([]byte, chunkSize)
-		if _, err := io.ReadFull(input, encryptedChunk); err != nil {
-			return err
-		}
-
-		chunk, err := decryptChunk(aesBlock, chacha, chachaNonce, encryptedChunk)
-		if err != nil {
+		chunk, err := readAndDecryptChunk(aesBlock, chacha, input)
+		if err == io.EOF {
+			break
+		} else if err != nil {
 			return err
 		}
 
