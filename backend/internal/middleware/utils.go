@@ -158,35 +158,32 @@ func NewRateLimiter(db database.Service, options ...interface{}) fiber.Handler {
 	return rateLimiterMiddleware
 }
 
-// NewCORSMiddleware creates a new CORS middleware with a better configuration.
-// It allows specific origins, methods, headers, and credentials, and sets the maximum age for preflight requests.
-func NewCORSMiddleware() fiber.Handler {
+// NewCORSMiddleware creates a new CORS middleware with optional custom configuration options.
+//
+// Example Usage:
+//
+//	corsMiddleware := NewCORSMiddleware(
+//	WithAllowOrigins("https://example.com, https://api.example.com"),
+//	WithAllowMethods("GET, POST, PUT, DELETE"),
+//	WithAllowHeaders("Content-Type, Authorization"),
+//	WithExposeHeaders("Content-Length"),
+//	WithAllowCredentials(true),
+//	WithMaxAge(3600),
+//
+// )
+func NewCORSMiddleware(options ...CORSOption) fiber.Handler {
 	// Note: In the Fiber framework v3, this CORS middleware configuration provides better security and low overhead.
 	// For example, it allows blocking internal IPs by setting `AllowPrivateNetwork` to false (read more: https://docs.gofiber.io/api/middleware/cors).
-	return cors.New(cors.Config{
-		// Better Formatting
-		AllowOrigins: strings.Join([]string{
-			"https://example.com",
-			"https://api.example.com",
-		}, ","),
-		AllowMethods: strings.Join([]string{
-			fiber.MethodGet,
-			fiber.MethodPost,
-			fiber.MethodHead,
-			fiber.MethodPut,
-			fiber.MethodDelete,
-			fiber.MethodOptions,
-		}, ","),
-		AllowHeaders: strings.Join([]string{
-			"Content-Type",
-			"Authorization",
-		}, ","),
-		ExposeHeaders: strings.Join([]string{
-			"Content-Length",
-		}, ","),
-		AllowCredentials: true,
-		MaxAge:           86400, // 24 hours
-	})
+	// Create a new CORS middleware configuration with default values
+	config := cors.Config{}
+
+	// Apply any additional options to the CORS configuration
+	for _, option := range options {
+		option(&config)
+	}
+
+	// Create the CORS middleware with the configured options
+	return cors.New(config)
 }
 
 // NewETagMiddleware creates a new ETag middleware with the default configuration.
