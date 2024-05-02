@@ -13,11 +13,15 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/google/uuid"
 )
+
+// CORSOption is a function that configures the CORS middleware.
+type CORSOption func(*cors.Config)
 
 // generateGoogleUUIDFromIP generates a deterministic UUID based on the provided IP address.
 func generateGoogleUUIDFromIP(ipAddress string) string {
@@ -201,4 +205,46 @@ func appendNonNilHandler(handlers []fiber.Handler, handlerFuncs ...fiber.Handler
 		}
 	}
 	return handlers
+}
+
+// WithAllowOrigins sets the allowed origins for CORS requests.
+func WithAllowOrigins(origins string) CORSOption {
+	return func(config *cors.Config) {
+		config.AllowOrigins = origins
+	}
+}
+
+// WithAllowMethods sets the allowed HTTP methods for CORS requests.
+func WithAllowMethods(methods string) CORSOption {
+	return func(config *cors.Config) {
+		config.AllowMethods = methods
+	}
+}
+
+// WithAllowHeaders sets the allowed headers for CORS requests.
+func WithAllowHeaders(headers string) CORSOption {
+	return func(config *cors.Config) {
+		config.AllowHeaders = headers
+	}
+}
+
+// WithExposeHeaders sets the headers that should be exposed to the client.
+func WithExposeHeaders(headers string) CORSOption {
+	return func(config *cors.Config) {
+		config.ExposeHeaders = headers
+	}
+}
+
+// WithAllowCredentials sets whether credentials are allowed for CORS requests.
+func WithAllowCredentials(allow bool) CORSOption {
+	return func(config *cors.Config) {
+		config.AllowCredentials = allow
+	}
+}
+
+// WithMaxAge sets the maximum age (in seconds) for preflight requests.
+func WithMaxAge(maxAge int) CORSOption {
+	return func(config *cors.Config) {
+		config.MaxAge = maxAge
+	}
 }
