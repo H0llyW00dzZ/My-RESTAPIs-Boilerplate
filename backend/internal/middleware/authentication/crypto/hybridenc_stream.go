@@ -6,7 +6,6 @@ package crypto
 
 import (
 	"crypto/aes"
-	"encoding/binary"
 	"io"
 
 	"golang.org/x/crypto/chacha20poly1305"
@@ -30,27 +29,11 @@ func HybridEncryptStream(input io.Reader, output io.Writer, aesKey, chachaKey []
 		if err != nil && err != io.EOF {
 			return err
 		}
-		if n == 0 {
-			break
-		}
 
-		chachaNonce, encryptedChunk, err := encryptChunk(aesBlock, chacha, chunk[:n])
-		if err != nil {
-			return err
-		}
-
-		// Write the size of the encrypted chunk to the output stream.
-		chunkSizeBuf := make([]byte, 2)
-		binary.BigEndian.PutUint16(chunkSizeBuf, uint16(len(encryptedChunk)))
-
-		if _, err := output.Write(chunkSizeBuf); err != nil {
-			return err
-		}
-		if _, err := output.Write(chachaNonce); err != nil {
-			return err
-		}
-		if _, err := output.Write(encryptedChunk); err != nil {
-			return err
+		if n > 0 {
+			if err := encryptAndWriteChunk(aesBlock, chacha, chunk[:n], output); err != nil {
+				return err
+			}
 		}
 
 		if err == io.EOF {

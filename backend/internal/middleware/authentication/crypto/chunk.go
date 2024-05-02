@@ -7,6 +7,10 @@ package crypto
 import (
 	"crypto/cipher"
 	"crypto/rand"
+	"encoding/binary"
+	"io"
+
+	"golang.org/x/crypto/chacha20poly1305"
 )
 
 const (
@@ -60,4 +64,78 @@ func decryptChunk(aesBlock cipher.Block, chacha cipher.AEAD, chachaNonce, chacha
 	aesStream.XORKeyStream(chunk, aesEncryptedChunk)
 
 	return chunk, nil
+}
+
+// encryptAndWriteChunk encrypts a chunk and writes it to the output stream.
+func encryptAndWriteChunk(aesBlock cipher.Block, chacha cipher.AEAD, chunk []byte, output io.Writer) error {
+	chachaNonce, encryptedChunk, err := encryptChunk(aesBlock, chacha, chunk)
+	if err != nil {
+		return err
+	}
+
+	if err := writeChunk(encryptedChunk, chachaNonce, output); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// readAndDecryptChunk reads an encrypted chunk from the input stream and decrypts it.
+func readAndDecryptChunk(aesBlock cipher.Block, chacha cipher.AEAD, input io.Reader) ([]byte, error) {
+	chunkSize, chachaNonce, err := readChunkMetadata(input)
+	if err != nil {
+		return nil, err
+	}
+
+	encryptedChunk := make([]byte, chunkSize)
+	if _, err := io.ReadFull(input, encryptedChunk); err != nil {
+		return nil, err
+	}
+
+	chunk, err := decryptChunk(aesBlock, chacha, chachaNonce, encryptedChunk)
+	if err != nil {
+		return nil, err
+	}
+
+	return chunk, nil
+}
+
+// writeChunk writes the encrypted chunk and its metadata to the output stream.
+func writeChunk(encryptedChunk, chachaNonce []byte, output io.Writer) error {
+	chunkSizeBuf := make([]byte, 2)
+	binary.BigEndian.PutUint16(chunkSizeBuf, uint16(len(encryptedChunk)))
+
+	if _, err := output.Write(chunkSizeBuf); err != nil {
+		return err
+	}
+	if _, err := output.Write(chachaNonce); err != nil {
+		return err
+	}
+	if _, err := output.Write(encryptedChunk); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// readChunkMetadata reads the chunk size and ChaCha20-Poly1305 nonce from the input stream.
+func readChunkMetadata(input io.Reader) (uint16, []byte, error) {
+	chunkSizeBuf := make([]byte, 2)
+	if _, err := io.ReadFull(input, chunkSizeBuf); err != nil {
+		if err == io.EOF {
+			return 0, nil, err
+		}
+		return 0, nil, err
+	}
+	chunkSize := binary.BigEndian.Uint16(chunkSizeBuf)
+
+	chachaNonce := make([]byte, chacha20poly1305.NonceSize)
+	if _, err := io.ReadFull(input, chachaNonce); err != nil {
+		if err == io.EOF {
+			return 0, nil, err
+		}
+		return 0, nil, err
+	}
+
+	return chunkSize, chachaNonce, nil
 }
