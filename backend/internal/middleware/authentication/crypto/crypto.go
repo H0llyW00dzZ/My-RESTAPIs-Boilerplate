@@ -4,6 +4,8 @@
 
 package crypto
 
+import "io"
+
 // Service is the interface for the crypto service.
 // It provides methods for encryption, decryption, and ciphertext verification.
 type Service interface {
@@ -23,6 +25,14 @@ type Service interface {
 	// It expects the encrypted data and signature to be base64-encoded.
 	// It returns true if the ciphertext is valid, false otherwise.
 	VerifyCiphertext(encryptedData, signature string) bool
+
+	// HybridEncryptStream encrypts data from an input stream using AES-CTR and ChaCha20-Poly1305,
+	// writing the encrypted data to an output stream.
+	HybridEncryptStream(input io.Reader, output io.Writer, aesKey, chachaKey []byte) error
+
+	// HybridDecryptStream decrypts data from an input stream using ChaCha20-Poly1305 and AES-CTR,
+	// writing the decrypted data to an output stream.
+	HybridDecryptStream(input io.Reader, output io.Writer, aesKey, chachaKey []byte) error
 }
 
 // cryptoService is an implementation of the crypto Service interface.
@@ -65,4 +75,14 @@ func (s *cryptoService) Decrypt(encryptedData, signature string) (string, error)
 // It returns true if the ciphertext is valid, false otherwise.
 func (s *cryptoService) VerifyCiphertext(encryptedData, signature string) bool {
 	return VerifyCiphertext(encryptedData, signature, s.signKey)
+}
+
+// HybridDecryptStream reads from the input stream, decrypts the data using ChaCha20-Poly1305 and AES-CTR, and writes it to the output stream.
+func (s *cryptoService) HybridDecryptStream(input io.Reader, output io.Writer, aesKey, chachaKey []byte) error {
+	return HybridDecryptStream(input, output, aesKey, chachaKey)
+}
+
+// HybridEncryptStream reads from the input stream, encrypts the data using AES-CTR and ChaCha20-Poly1305, and writes it to the output stream.
+func (s *cryptoService) HybridEncryptStream(input io.Reader, output io.Writer, aesKey, chachaKey []byte) error {
+	return HybridEncryptStream(input, output, aesKey, chachaKey)
 }
