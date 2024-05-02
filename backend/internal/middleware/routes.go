@@ -14,6 +14,18 @@ import (
 	log "h0llyw00dz-template/backend/internal/logger"
 )
 
+// Note: This method works well Docs: https://github.com/gofiber/fiber/issues/750
+// Also note that There is no limit to this feature. For example, you can add a billion domains or subdomains.
+type (
+	// Host represents a subdomain or domain host configuration.
+	// It contains a reference to a Fiber application instance.
+	Host struct {
+		// Fiber is a pointer to a Fiber application instance.
+		// It represents the Fiber app associated with the subdomain or domain host.
+		Fiber *fiber.App
+	}
+)
+
 // RegisterRoutes sets up the API routing for the application.
 // It organizes routes into versioned groups for better API version management (Currently unimplemented for this boilerplate).
 func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Service) {
@@ -46,4 +58,17 @@ func registerRouteConfigMiddleware(app *fiber.App) {
 
 	// Apply the recover middleware
 	app.Use(recoverMiddleware, favicon)
+}
+
+// DomainRouter is a middleware function that handles subdomain or domain routing.
+// It takes a map of subdomain or domain hosts and routes the request to the corresponding Fiber app.
+func DomainRouter(hosts map[string]*Host) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		host := hosts[c.Hostname()]
+		if host == nil {
+			return c.SendStatus(fiber.StatusNotFound)
+		}
+		host.Fiber.Handler()(c.Context())
+		return nil
+	}
 }
