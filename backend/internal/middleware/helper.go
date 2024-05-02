@@ -248,3 +248,31 @@ func WithMaxAge(maxAge int) CORSOption {
 		config.MaxAge = maxAge
 	}
 }
+
+// WithAllowOriginsFunc sets a custom function to determine the allowed origins for CORS requests.
+//
+// Example Usage:
+//
+//	func isAllowedOrigin(origin string) bool {
+//		allowedOrigins := []string{
+//			"https://example.com",
+//			"https://api.example.com",
+//		}
+//		for _, allowedOrigin := range allowedOrigins {
+//			if origin == allowedOrigin {
+//				return true
+//			}
+//		}
+//			return false
+//		}
+//
+//	corsMiddleware := NewCORSMiddleware(
+//	WithAllowOriginsFunc(isAllowedOrigin),
+//	// Other options...
+//
+//	)
+func WithAllowOriginsFunc(allowOriginsFunc func(string) bool) CORSOption {
+	return func(config *cors.Config) {
+		config.AllowOriginsFunc = allowOriginsFunc
+	}
+}
