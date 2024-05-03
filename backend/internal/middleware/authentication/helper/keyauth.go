@@ -22,7 +22,7 @@ func GetAPIKeyStatusFromCache(db database.ServiceAuth, key string) (string, erro
 
 // UpdateCacheWithExpiredStatus updates the Redis cache with the expired status.
 func UpdateCacheWithExpiredStatus(db database.ServiceAuth, key string) {
-	err := db.FiberStorage().Set(key, []byte("expired"), 30*time.Minute)
+	err := db.FiberStorage().Set(key, []byte("expired"), 5*time.Minute)
 	if err != nil {
 		log.LogErrorf("Failed to update Redis cache for expired API key: %v", err)
 	}
@@ -30,7 +30,8 @@ func UpdateCacheWithExpiredStatus(db database.ServiceAuth, key string) {
 
 // UpdateCacheWithActiveStatus updates the Redis cache with the active status and expiration time.
 func UpdateCacheWithActiveStatus(db database.ServiceAuth, key string, expirationDate time.Time) {
-	ttl := time.Until(expirationDate)
+	// Note: This should be set 5 minute as minimum, because it will covered by rate limiter.
+	ttl := 5 * time.Minute
 	err := db.FiberStorage().Set(key, []byte("active"), ttl)
 	if err != nil {
 		log.LogErrorf("Failed to update Redis cache for active API key: %v", err)
