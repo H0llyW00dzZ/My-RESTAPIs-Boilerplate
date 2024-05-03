@@ -37,7 +37,8 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 	api := fiber.New()
 	// Register the REST APIs Routes
 	registerRESTAPIsRoutes(app, db)
-	// Note: This is just an example. In production, replace `api.localhost:8080` with a specific domain/subdomain, such as api.example.com
+	// Note: This is just an example. In production, replace `api.localhost:8080` with a specific domain/subdomain, such as api.example.com.
+	// Similarly, for the frontend, specify a domain like `hosts["example.com"] = &Host{frontend}`.
 	hosts["api.localhost:8080"] = &Host{api}
 	// Register the Static Frontend Routes
 	registerStaticFrontendRoutes(app, appName, db)
@@ -74,7 +75,10 @@ func DomainRouter(hosts map[string]*Host) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		host := hosts[c.Hostname()]
 		if host == nil {
-			return c.SendStatus(fiber.StatusNotFound)
+			// Note: Returning a new error is a better approach instead of returning directly,
+			// as it allows the error to be handled by the caller somewhere else in the codebase,
+			// especially when the codebase grows larger.
+			return fiber.NewError(fiber.StatusNotFound)
 		}
 		host.Fiber.Handler()(c.Context())
 		return nil
