@@ -16,6 +16,7 @@ import (
 
 // Note: This method works well Docs: https://github.com/gofiber/fiber/issues/750
 // Also note that There is no limit to this feature. For example, you can add a billion domains or subdomains.
+// Another note: When running this in a container with Kubernetes, make sure to have a configuration for allow internal IPs (e.g., 10.0.0.0/24).
 type (
 	// Host represents a subdomain or domain host configuration.
 	// It contains a reference to a Fiber application instance.
