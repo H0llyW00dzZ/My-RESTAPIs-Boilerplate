@@ -29,12 +29,20 @@ type (
 // RegisterRoutes sets up the API routing for the application.
 // It organizes routes into versioned groups for better API version management (Currently unimplemented for this boilerplate).
 func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Service) {
+	// Hosts
+	hosts := map[string]*Host{}
 	// Apply the combined middlewares
 	registerRouteConfigMiddleware(app)
+	// API subdomain
+	api := fiber.New()
 	// Register the REST APIs Routes
 	registerRESTAPIsRoutes(app, db)
+	// Note: This is just an example. In production, replace `api.localhost:8080` with a specific domain/subdomain, such as api.example.com
+	hosts["api.localhost:8080"] = &Host{api}
 	// Register the Static Frontend Routes
 	registerStaticFrontendRoutes(app, appName, db)
+	// Apply the subdomain routing middleware
+	app.Use(DomainRouter(hosts))
 }
 
 // registerRouteConfigMiddleware applies middleware configurations to the Fiber application.
