@@ -12,6 +12,8 @@ import (
 )
 
 // GenerateHMACSignatureFromFile generates an HMAC signature for the given file content and secret key.
+//
+// Note: This function is suitable for automatically generated files such as backups, code generation, or mirrored files for frontend that are used by goroutine schedulers.
 func GenerateHMACSignatureFromFile(filePath, secretKey string) ([]byte, error) {
 	// Open the file
 	file, err := os.Open(filePath)
