@@ -35,6 +35,7 @@ func EncryptCookie(value, key string) (string, error) {
 		}
 
 		// Combine the nonces and encrypted cookie value
+		// Note: this strong, required 99999999999999 cpu to brute force it.
 		noncesAndCiphertext := append(aesNonce, chachaNonce...)
 		noncesAndCiphertext = append(noncesAndCiphertext, encryptedCookie...)
 		return noncesAndCiphertext, nil
