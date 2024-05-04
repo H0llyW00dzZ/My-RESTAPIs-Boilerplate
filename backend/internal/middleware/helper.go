@@ -17,6 +17,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/google/uuid"
 )
 
@@ -297,5 +298,90 @@ func WithRedirectRules(rules map[string]string) RedirectOption {
 func WithRedirectStatusCode(statusCode int) RedirectOption {
 	return func(config *RedirectConfig) {
 		config.StatusCode = statusCode
+	}
+}
+
+// WithSessionExpiration is an option function for NewSessionMiddleware that sets the session expiration time.
+func WithSessionExpiration(expiration time.Duration) func(*session.Config) {
+	return func(config *session.Config) {
+		config.Expiration = expiration
+	}
+}
+
+// WithSessionStorage is an option function for NewSessionMiddleware that sets the session storage backend.
+func WithSessionStorage(storage fiber.Storage) func(*session.Config) {
+	return func(config *session.Config) {
+		config.Storage = storage
+	}
+}
+
+// WithSessionKeyLookup is an option function for NewSessionMiddleware that sets the session key lookup.
+func WithSessionKeyLookup(keyLookup string) func(*session.Config) {
+	return func(config *session.Config) {
+		config.KeyLookup = keyLookup
+	}
+}
+
+// WithSessionCookieDomain is an option function for NewSessionMiddleware that sets the session cookie domain.
+func WithSessionCookieDomain(cookieDomain string) func(*session.Config) {
+	return func(config *session.Config) {
+		config.CookieDomain = cookieDomain
+	}
+}
+
+// WithSessionCookiePath is an option function for NewSessionMiddleware that sets the session cookie path.
+func WithSessionCookiePath(cookiePath string) func(*session.Config) {
+	return func(config *session.Config) {
+		config.CookiePath = cookiePath
+	}
+}
+
+// WithSessionCookieSecure is an option function for NewSessionMiddleware that sets the session cookie secure flag.
+func WithSessionCookieSecure(cookieSecure bool) func(*session.Config) {
+	return func(config *session.Config) {
+		config.CookieSecure = cookieSecure
+	}
+}
+
+// WithSessionCookieHTTPOnly is an option function for NewSessionMiddleware that sets the session cookie HTTP only flag.
+func WithSessionCookieHTTPOnly(cookieHTTPOnly bool) func(*session.Config) {
+	return func(config *session.Config) {
+		config.CookieHTTPOnly = cookieHTTPOnly
+	}
+}
+
+// WithSessionCookieSameSite is an option function for NewSessionMiddleware that sets the session cookie SameSite attribute.
+func WithSessionCookieSameSite(cookieSameSite string) func(*session.Config) {
+	return func(config *session.Config) {
+		config.CookieSameSite = cookieSameSite
+	}
+}
+
+// CleanupExpiredSessions is a goroutine that periodically cleans up expired sessions from the session store.
+// It takes a session store and a cleanup interval as parameters.
+//
+// The function starts a ticker that triggers the cleanup process at the specified interval.
+// On each tick, it calls the Reset method of the session store to remove all sessions.
+// If an error occurs during the reset process, it is logged using the b0zalLogger.
+//
+// Note: The Reset method removes all sessions from the store, not just the expired ones.
+// If more fine-grained control over removing only expired sessions is needed,
+// additional implementation may be required based on the specific storage backend being used.
+//
+// The cleanup goroutine runs indefinitely until the ticker is stopped.
+// It is typically started as a separate goroutine within the NewSessionMiddleware function.
+func CleanupExpiredSessions(store *session.Store, interval time.Duration) {
+	// Create a new ticker that triggers the cleanup process at the specified interval.
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	// Run the cleanup process indefinitely until the ticker is stopped.
+	for range ticker.C {
+		// Reset the session store to remove all sessions.
+		err := store.Reset()
+		if err != nil {
+			// Log any errors that occur during the reset process.
+			log.LogErrorf("Failed to reset session store: %v", err)
+		}
 	}
 }

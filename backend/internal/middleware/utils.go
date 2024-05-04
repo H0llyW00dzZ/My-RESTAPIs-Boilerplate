@@ -22,6 +22,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
 	"github.com/gofiber/fiber/v2/middleware/redirect"
+	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/google/uuid"
 )
@@ -378,4 +379,44 @@ func NewRedirectMiddleware(options ...RedirectOption) fiber.Handler {
 		Rules:      config.Rules,
 		StatusCode: config.StatusCode,
 	})
+}
+
+// NewSessionMiddleware creates a new session middleware with optional custom configuration options.
+func NewSessionMiddleware(options ...interface{}) fiber.Handler {
+	// Create a new session middleware configuration.
+	config := session.Config{}
+
+	// Default cleanup interval of 10 minutes.
+	cleanupInterval := 10 * time.Minute
+
+	// Apply any additional options to the session configuration.
+	for _, option := range options {
+		switch opt := option.(type) {
+		case func(*session.Config):
+			opt(&config)
+		case time.Duration:
+			cleanupInterval = opt
+		}
+	}
+
+	// Create the session store with the configured options.
+	store := session.New(config)
+
+	// Start the cleanup goroutine for expired sessions.
+	go CleanupExpiredSessions(store, cleanupInterval)
+
+	// Return the session middleware function.
+	return func(c *fiber.Ctx) error {
+		// Get the session from the context.
+		sess, err := store.Get(c)
+		if err != nil {
+			return err
+		}
+
+		// Save the session in the context for further usage.
+		c.Locals("session", sess)
+
+		// Continue to the next middleware or handler.
+		return c.Next()
+	}
 }
