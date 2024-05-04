@@ -362,7 +362,7 @@ func WithSessionCookieSameSite(cookieSameSite string) func(*session.Config) {
 //
 // The function starts a ticker that triggers the cleanup process at the specified interval.
 // On each tick, it calls the Reset method of the session store to remove all sessions.
-// If an error occurs during the reset process, it is logged using the b0zalLogger.
+// If an error occurs during the reset process, it is logged using the Logger.
 //
 // Note: The Reset method removes all sessions from the store, not just the expired ones.
 // If more fine-grained control over removing only expired sessions is needed,
@@ -370,6 +370,8 @@ func WithSessionCookieSameSite(cookieSameSite string) func(*session.Config) {
 //
 // The cleanup goroutine runs indefinitely until the ticker is stopped.
 // It is typically started as a separate goroutine within the NewSessionMiddleware function.
+//
+// TODO: Leverage this "goroutine scheduler task".
 func CleanupExpiredSessions(store *session.Store, interval time.Duration) {
 	// Create a new ticker that triggers the cleanup process at the specified interval.
 	ticker := time.NewTicker(interval)
