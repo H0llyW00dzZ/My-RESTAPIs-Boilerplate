@@ -34,6 +34,9 @@ type cryptoService struct {
 
 // New creates a new instance of the hybrid encryption service.
 // It takes the encryption key as input.
+//
+// TODO: Support Multiple Encoding (e.g., md5 which is suitable or other).
+// Also, note that this encryption is strong, unlike JWT that can still lead to high vulnerability 💀.
 func New(key string) Service {
 	return &cryptoService{
 		key: key,
