@@ -276,3 +276,26 @@ func WithAllowOriginsFunc(allowOriginsFunc func(string) bool) CORSOption {
 		config.AllowOriginsFunc = allowOriginsFunc
 	}
 }
+
+// RedirectConfig represents the configuration options for the redirect middleware.
+type RedirectConfig struct {
+	Rules      map[string]string
+	StatusCode int
+}
+
+// RedirectOption is a function that configures the redirect middleware.
+type RedirectOption func(*RedirectConfig)
+
+// WithRedirectRules sets the redirect rules for the redirect middleware.
+func WithRedirectRules(rules map[string]string) RedirectOption {
+	return func(config *RedirectConfig) {
+		config.Rules = rules
+	}
+}
+
+// WithRedirectStatusCode sets the HTTP status code for the redirect response.
+func WithRedirectStatusCode(statusCode int) RedirectOption {
+	return func(config *RedirectConfig) {
+		config.StatusCode = statusCode
+	}
+}
