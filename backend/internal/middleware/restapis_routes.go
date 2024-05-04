@@ -52,6 +52,32 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 		return c.Next()
 	})
 
+	// Create the root group and redirect middleware
+	// Note: This is a method similar to nginx/apache .htaccess, if you're familiar with it.
+	// This is just an example where it would redirect from api.localhost:8080/v1/ to api.localhost:8080.
+	// In this root API group, it is possible to set the index root path `/` (e.g., to host the Swagger UI documentation).
+	// Also, note that this method won't conflict with another path that already has a handler (e.g., api.localhost:8080/v1/server/health/db).
+	rootGroup := APIGroup{
+		Prefix: "/",
+		Routes: []APIRoute{},
+	}
+
+	redirectMiddleware := NewRedirectMiddleware(
+		WithRedirectRules(map[string]string{
+			"v1": "/",
+		}),
+		WithRedirectStatusCode(fiber.StatusMovedPermanently),
+	)
+
+	rootGroup.Routes = append(rootGroup.Routes, APIRoute{
+		Path:    "v*",
+		Method:  fiber.MethodGet,
+		Handler: redirectMiddleware,
+	})
+
+	// Register the root group
+	registerGroup(api, rootGroup)
+
 	// Apply the rate limiter middleware directly to the REST API routes
 	// Note: This method is called "higher-order function" which is better than (if-else statement which is bad)
 	rateLimiterRESTAPIs := NewRateLimiter(db,
