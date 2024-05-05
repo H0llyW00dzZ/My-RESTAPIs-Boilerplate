@@ -129,7 +129,7 @@ func readChunkMetadata(input io.Reader) (uint16, []byte, error) {
 	}
 	chunkSize := binary.BigEndian.Uint16(chunkSizeBuf)
 
-	chachaNonce := make([]byte, chacha20poly1305.NonceSize)
+	chachaNonce := make([]byte, chacha20poly1305.NonceSizeX)
 	if _, err := io.ReadFull(input, chachaNonce); err != nil {
 		if err == io.EOF {
 			return 0, nil, err

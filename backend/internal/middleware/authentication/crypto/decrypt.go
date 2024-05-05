@@ -22,7 +22,7 @@ import (
 func decrypt(ciphertext []byte, key []byte) ([]byte, error) {
 	// Second decryption: ChaCha20-Poly1305
 	chachaCipher := func(data []byte) ([]byte, error) {
-		aead, err := chacha20poly1305.New(key)
+		aead, err := chacha20poly1305.NewX(key)
 		if err != nil {
 			return nil, err
 		}

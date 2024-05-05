@@ -9,13 +9,14 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/hex"
 	"io"
 
 	"golang.org/x/crypto/chacha20poly1305"
 )
 
 // EncryptCookie encrypts a cookie value using a hybrid encryption scheme.
-func EncryptCookie(value, key string) (string, error) {
+func EncryptCookie(value, key string, encoding string) (string, error) {
 	keyDecoded, err := base64.StdEncoding.DecodeString(key)
 	if err != nil {
 		return "", ErrorInvalidKey
@@ -46,7 +47,14 @@ func EncryptCookie(value, key string) (string, error) {
 		return "", err
 	}
 
-	encodedCookie := base64.RawURLEncoding.EncodeToString(encryptedCookie)
+	var encodedCookie string
+	switch encoding {
+	case "hex":
+		encodedCookie = hex.EncodeToString(encryptedCookie)
+	default:
+		encodedCookie = base64.RawURLEncoding.EncodeToString(encryptedCookie)
+	}
+
 	return encodedCookie, nil
 }
 
@@ -72,7 +80,7 @@ func encryptAESGCM(plaintext, key []byte) ([]byte, []byte, error) {
 
 // encryptChaCha20Poly1305 encrypts the plaintext using ChaCha20-Poly1305 and returns the ciphertext and nonce.
 func encryptChaCha20Poly1305(plaintext, key []byte) ([]byte, []byte, error) {
-	aead, err := chacha20poly1305.New(key)
+	aead, err := chacha20poly1305.NewX(key)
 	if err != nil {
 		return nil, nil, err
 	}
