@@ -331,8 +331,14 @@ func NewKeyAuthMiddleware(db database.Service, options ...func(*keyauth.Config))
 
 // NewEncryptedCookieMiddleware creates a new encrypted cookie middleware with optional custom configuration options.
 //
-// Note: This can integrate with authentication Cryptography Techniques
-// that Last Enhance uses double encryption & decryption.
+// Note: This middleware can be integrated with authentication cryptography techniques
+// that use double encryption and decryption, such as the Last Enhance technique.
+//
+// WARNING: When using this middleware with custom cryptography that has already been implemented,
+// make sure to use different keys for AES-GCM and ChaCha20-Poly1305 encryption for another.
+// The current implementation of the Fiber encrypted cookie middleware only supports a single key,
+// which is likely a mistake and a limitation.
+// To enhance professional security, it's recommended to use separate keys in this function (e.g., create new keys specifically for cookies).
 func NewEncryptedCookieMiddleware(options ...interface{}) fiber.Handler {
 	// Create a new encrypted cookie middleware configuration.
 	config := encryptcookie.Config{}
