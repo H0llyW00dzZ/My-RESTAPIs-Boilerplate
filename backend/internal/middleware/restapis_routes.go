@@ -51,7 +51,7 @@ type APIGroup struct {
 //	db: The database service to be used by the API handlers.
 func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 	// Example encrypt cookie
-	// Note: This is suitable with session middleware logic, but the only thing that looks bad is the encoding using base64
+	// Note: This is suitable with session middleware logic.
 	encryptcookie := NewEncryptedCookieMiddleware(
 		WithKey(encryptcookie.GenerateKey()),
 		WithEncryptor(hybrid.EncryptCookie),
