@@ -45,13 +45,20 @@ type MemoryStats struct {
 
 // RedisStats groups the statistics related to Redis.
 type RedisStats struct {
-	Version          string              `json:"version,omitempty"`
-	Mode             string              `json:"mode,omitempty"`
-	ConnectedClients string              `json:"connected_clients,omitempty"`
-	Memory           MemoryStats         `json:"memory,omitempty"`
-	UptimeStats      string              `json:"uptime_stats,omitempty"`
-	Uptime           []map[string]string `json:"uptime,omitempty"`
-	Pooling          PoolingStats        `json:"pooling,omitempty"`
+	Version          string        `json:"version,omitempty"`
+	Mode             string        `json:"mode,omitempty"`
+	ConnectedClients string        `json:"connected_clients,omitempty"`
+	Memory           MemoryStats   `json:"memory,omitempty"`
+	Uptime           []interface{} `json:"uptime,omitempty"`
+	Pooling          PoolingStats  `json:"pooling,omitempty"`
+}
+
+// UptimeFields represents the uptime fields in a structured format.
+type UptimeFields struct {
+	Day    string `json:"day"`
+	Hour   string `json:"hour"`
+	Minute string `json:"minute"`
+	Second string `json:"second"`
 }
 
 // RedisHealth represents the health statistics for Redis.
@@ -84,7 +91,7 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 		memoryUsage := calculateMemoryUsage(usedMemory, maxMemory)
 
 		// Format the uptime
-		uptimeStats, uptime := formatUptime(health["redis_uptime_in_seconds"])
+		_, uptime := formatUptime(health["redis_uptime_in_seconds"])
 
 		// Parse numerical values from the health stats for calculation
 		hits := helper.ParseNumericalValue(health["redis_hits_connections"], 10, 64)
@@ -135,9 +142,8 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 					GB: fmt.Sprintf("%.2f", freeMemoryGB),
 				},
 			},
-			UptimeStats: uptimeStats,
-			Uptime:      uptime,
-			Pooling:     poolingStats,
+			Uptime:  uptime,
+			Pooling: poolingStats,
 		}
 	}
 
@@ -165,10 +171,14 @@ func logRedisHealthStatus(response Response) {
 			redisHealth.Stats.Memory.Free.MB, redisHealth.Stats.Memory.Free.GB)
 
 		// Log uptime stats
-		log.LogInfof("Redis Uptime: %s, Pooling Connections: %s, Connected Clients: %s",
-			redisHealth.Stats.UptimeStats,
-			redisHealth.Stats.Pooling.ObservedTotal,
-			redisHealth.Stats.ConnectedClients)
+		if len(redisHealth.Stats.Uptime) > 1 {
+			if stats, ok := redisHealth.Stats.Uptime[1].(map[string]string); ok {
+				log.LogInfof("Redis Uptime: %s, Pooling Connections: %s, Connected Clients: %s",
+					stats["stats"],
+					redisHealth.Stats.Pooling.ObservedTotal,
+					redisHealth.Stats.ConnectedClients)
+			}
+		}
 
 		// Log detailed pooling stats
 		log.LogInfof("Redis Pooling Figures: Hits: %s, Misses: %s, Timeouts: %s, Total: %s, Stale: %s, Idle: %s, Active: %s, Pool Size Usage: %s, Observed Total: %s",
