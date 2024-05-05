@@ -26,7 +26,7 @@ func ErrorHandler(c *fiber.Ctx) error {
 	// If a crash/panics occurs, return a generic error response
 	if err != nil {
 		// Note: This error is used to handle crash/panics because other errors are already handled independently.
-		return fiber.NewError(fiber.StatusInternalServerError)
+		return SendErrorResponse(c, fiber.StatusInternalServerError, fiber.ErrInternalServerError.Message)
 	}
 
 	// No errors, continue with the next middleware
