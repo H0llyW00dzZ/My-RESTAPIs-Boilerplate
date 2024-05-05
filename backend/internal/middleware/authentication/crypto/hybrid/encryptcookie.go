@@ -46,7 +46,7 @@ func EncryptCookie(value, key string) (string, error) {
 		return "", err
 	}
 
-	encodedCookie := base64.StdEncoding.EncodeToString(encryptedCookie)
+	encodedCookie := base64.RawURLEncoding.EncodeToString(encryptedCookie)
 	return encodedCookie, nil
 }
 

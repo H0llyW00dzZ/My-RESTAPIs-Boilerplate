@@ -19,7 +19,7 @@ func DecryptCookie(encodedCookie, key string) (string, error) {
 		return "", ErrorInvalidKey
 	}
 
-	decodedCookie, err := base64.StdEncoding.DecodeString(encodedCookie)
+	decodedCookie, err := base64.RawURLEncoding.DecodeString(encodedCookie)
 	if err != nil {
 		return "", ErrorInvalidCookie
 	}
