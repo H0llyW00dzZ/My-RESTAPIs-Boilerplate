@@ -18,7 +18,7 @@ func HybridDecryptStream(input io.Reader, output io.Writer, aesKey, chachaKey []
 		return err
 	}
 
-	chacha, err := chacha20poly1305.New(chachaKey)
+	chacha, err := chacha20poly1305.NewX(chachaKey)
 	if err != nil {
 		return err
 	}

@@ -26,12 +26,12 @@ func DecryptCookie(encodedCookie, key string) (string, error) {
 
 	decryptFn := func(encryptedCookie []byte) ([]byte, error) {
 		// Extract the nonces and encrypted cookie value
-		if len(encryptedCookie) < 12+chacha20poly1305.NonceSize {
+		if len(encryptedCookie) < 12+chacha20poly1305.NonceSizeX {
 			return nil, ErrorInvalidCookie
 		}
 		aesNonce := encryptedCookie[:12]
-		chachaNonce := encryptedCookie[12 : 12+chacha20poly1305.NonceSize]
-		ciphertext := encryptedCookie[12+chacha20poly1305.NonceSize:]
+		chachaNonce := encryptedCookie[12 : 12+chacha20poly1305.NonceSizeX]
+		ciphertext := encryptedCookie[12+chacha20poly1305.NonceSizeX:]
 
 		// Decrypt the cookie value using ChaCha20-Poly1305
 		aesCiphertext, err := decryptChaCha20Poly1305(ciphertext, chachaNonce, keyDecoded)
@@ -77,7 +77,7 @@ func decryptAESGCM(ciphertext, nonce, key []byte) ([]byte, error) {
 
 // decryptChaCha20Poly1305 decrypts the ciphertext using ChaCha20-Poly1305 and returns the plaintext.
 func decryptChaCha20Poly1305(ciphertext, nonce, key []byte) ([]byte, error) {
-	aead, err := chacha20poly1305.New(key)
+	aead, err := chacha20poly1305.NewX(key)
 	if err != nil {
 		return nil, err
 	}
