@@ -17,6 +17,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/gofiber/fiber/v2/middleware/redirect"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/google/uuid"
 )
@@ -278,26 +279,24 @@ func WithAllowOriginsFunc(allowOriginsFunc func(string) bool) CORSOption {
 	}
 }
 
-// RedirectConfig represents the configuration options for the redirect middleware.
-type RedirectConfig struct {
-	Rules      map[string]string
-	StatusCode int
-}
-
-// RedirectOption is a function that configures the redirect middleware.
-type RedirectOption func(*RedirectConfig)
-
 // WithRedirectRules sets the redirect rules for the redirect middleware.
-func WithRedirectRules(rules map[string]string) RedirectOption {
-	return func(config *RedirectConfig) {
+func WithRedirectRules(rules map[string]string) func(*redirect.Config) {
+	return func(config *redirect.Config) {
 		config.Rules = rules
 	}
 }
 
 // WithRedirectStatusCode sets the HTTP status code for the redirect response.
-func WithRedirectStatusCode(statusCode int) RedirectOption {
-	return func(config *RedirectConfig) {
+func WithRedirectStatusCode(statusCode int) func(*redirect.Config) {
+	return func(config *redirect.Config) {
 		config.StatusCode = statusCode
+	}
+}
+
+// WithRedirectNext sets the function to determine whether to skip the redirect for a given request.
+func WithRedirectNext(next func(*fiber.Ctx) bool) func(*redirect.Config) {
+	return func(config *redirect.Config) {
+		config.Next = next
 	}
 }
 
