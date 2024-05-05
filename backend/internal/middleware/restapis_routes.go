@@ -6,10 +6,13 @@ package middleware
 
 import (
 	"h0llyw00dz-template/backend/internal/database"
+	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid"
 	"h0llyw00dz-template/backend/pkg/restapis/server/health"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
+	"github.com/google/uuid"
 )
 
 // APIRoute represents a single API route, containing the path, HTTP method,
@@ -47,8 +50,21 @@ type APIGroup struct {
 //	api: The Fiber router to register the routes on.
 //	db: The database service to be used by the API handlers.
 func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
+	// Example encrypt cookie
+	// Note: This is suitable with session middleware logic, but the only thing that looks bad is the encoding using base64
+	encryptcookie := NewEncryptedCookieMiddleware(
+		WithKey(encryptcookie.GenerateKey()),
+		WithEncryptor(hybrid.EncryptCookie),
+		WithDecryptor(hybrid.DecryptCookie),
+	)
+
 	v1 := api.Group("/v1", func(c *fiber.Ctx) error { // '/v1/' prefix
 		c.Set("Version", "v1")
+		// Set Cookie for group "v1"
+		c.Cookie(&fiber.Cookie{
+			Name:  "GhoperCookie",
+			Value: uuid.NewSHA1(uuid.NameSpaceURL, []byte(c.IP())).String(),
+		})
 		return c.Next()
 	})
 
@@ -58,8 +74,9 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 	// In this root API group, it is possible to set the index root path `/` (e.g., to host the Swagger UI documentation).
 	// Also, note that this method won't conflict with another path that already has a handler (e.g., api.localhost:8080/v1/server/health/db).
 	rootGroup := APIGroup{
-		Prefix: "/",
-		Routes: []APIRoute{},
+		Prefix:                    "/",
+		EncryptedCookieMiddleware: encryptcookie,
+		Routes:                    []APIRoute{},
 	}
 
 	// Note: This method is also called a "higher-order function",
