@@ -30,7 +30,7 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 Move [`here`](https://github.com/users/H0llyW00dzZ/projects/2/views/3?sliceBy%5Bvalue%5D=Todo)
 
 > [!NOTE]  
-> Additional features will be added later as my primary focus is on using this with the Fiber framework.
+> Additional features will be added later as my primary focus is on using this with the `Fiber framework` and `Cryptography Techniques`.
 
 
 ## Supported Additional Features
