@@ -62,7 +62,7 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 		c.Set("Version", "v1")
 		// Set Cookie for group "v1"
 		c.Cookie(&fiber.Cookie{
-			// This should be secure against cookie poisoning, MITM, etc, even without a hash function, because it would require 99999999999 cpu to attack.
+			// This should be safe against cookie poisoning, MITM, etc, even without a hash function, because it would require 99999999999 cpu to attack.
 			Name:  "GhoperCookie",
 			Value: uuid.NewSHA1(uuid.NameSpaceURL, []byte(c.IP())).String(),
 		})
