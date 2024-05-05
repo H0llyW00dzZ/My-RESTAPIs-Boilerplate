@@ -54,8 +54,12 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 	// Note: This is suitable with session middleware logic.
 	encryptcookie := NewEncryptedCookieMiddleware(
 		WithKey(encryptcookie.GenerateKey()),
-		WithEncryptor(hybrid.EncryptCookie),
-		WithDecryptor(hybrid.DecryptCookie),
+		WithEncryptor(func(value, key string) (string, error) {
+			return hybrid.EncryptCookie(value, key, "hex")
+		}),
+		WithDecryptor(func(encodedCookie, key string) (string, error) {
+			return hybrid.DecryptCookie(encodedCookie, key, "hex")
+		}),
 	)
 
 	v1 := api.Group("/v1", func(c *fiber.Ctx) error { // '/v1/' prefix

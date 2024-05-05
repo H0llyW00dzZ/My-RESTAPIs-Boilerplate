@@ -8,18 +8,25 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
+	"encoding/hex"
 
 	"golang.org/x/crypto/chacha20poly1305"
 )
 
 // DecryptCookie decrypts a cookie value using a hybrid decryption scheme.
-func DecryptCookie(encodedCookie, key string) (string, error) {
+func DecryptCookie(encodedCookie, key string, encoding string) (string, error) {
 	keyDecoded, err := base64.StdEncoding.DecodeString(key)
 	if err != nil {
 		return "", ErrorInvalidKey
 	}
 
-	decodedCookie, err := base64.RawURLEncoding.DecodeString(encodedCookie)
+	var decodedCookie []byte
+	switch encoding {
+	case "hex":
+		decodedCookie, err = hex.DecodeString(encodedCookie)
+	default:
+		decodedCookie, err = base64.RawURLEncoding.DecodeString(encodedCookie)
+	}
 	if err != nil {
 		return "", ErrorInvalidCookie
 	}

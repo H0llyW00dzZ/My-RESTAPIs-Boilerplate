@@ -29,7 +29,8 @@ type Service interface {
 
 // cryptoService is an implementation of the hybrid encryption Service interface.
 type cryptoService struct {
-	key string
+	key      string
+	encoding string
 }
 
 // New creates a new instance of the hybrid encryption service.
@@ -37,20 +38,21 @@ type cryptoService struct {
 //
 // TODO: Support Multiple Encoding for the encrypt value not a key (e.g., md5 which is suitable or other).
 // Also, note that this encryption is strong, unlike JWT that can still lead to high vulnerability 💀.
-func New(key string) Service {
+func New(key, encoding string) Service {
 	return &cryptoService{
-		key: key,
+		key:      key,
+		encoding: encoding,
 	}
 }
 
 // EncryptCookie encrypts a cookie value using a hybrid encryption scheme.
 // It takes the cookie value as input and returns the base64-encoded encrypted cookie.
 func (s *cryptoService) EncryptCookie(value string) (string, error) {
-	return EncryptCookie(value, s.key)
+	return EncryptCookie(value, s.key, s.encoding)
 }
 
 // DecryptCookie decrypts a cookie value using a hybrid decryption scheme.
 // It takes the base64-encoded encrypted cookie as input and returns the decrypted cookie value.
 func (s *cryptoService) DecryptCookie(encodedCookie string) (string, error) {
-	return DecryptCookie(encodedCookie, s.key)
+	return DecryptCookie(encodedCookie, s.key, s.encoding)
 }
