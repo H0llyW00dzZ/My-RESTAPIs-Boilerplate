@@ -17,3 +17,18 @@ func SendErrorResponse(c *fiber.Ctx, statusCode int, errorMessage string) error 
 		Error: errorMessage,
 	})
 }
+
+// ErrorHandler is the error handling middleware that runs after other middleware.
+func ErrorHandler(c *fiber.Ctx) error {
+	// Call the next route handler and catch any errors
+	err := c.Next()
+
+	// If a crash/panics occurs, return a generic error response
+	if err != nil {
+		// Note: This error is used to handle crash/panics because other errors are already handled independently.
+		return fiber.NewError(fiber.StatusInternalServerError)
+	}
+
+	// No errors, continue with the next middleware
+	return nil
+}
