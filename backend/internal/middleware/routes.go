@@ -12,6 +12,7 @@ import (
 
 	"h0llyw00dz-template/backend/internal/database"
 	log "h0llyw00dz-template/backend/internal/logger"
+	"h0llyw00dz-template/backend/pkg/restapis/helper"
 )
 
 // Note: This method works well Docs: https://github.com/gofiber/fiber/issues/750
@@ -67,7 +68,7 @@ func registerRouteConfigMiddleware(app *fiber.App) {
 	})
 
 	// Apply the recover middleware
-	app.Use(recoverMiddleware, favicon)
+	app.Use(helper.ErrorHandler, recoverMiddleware, favicon)
 }
 
 // DomainRouter is a middleware function that handles subdomain or domain routing.
