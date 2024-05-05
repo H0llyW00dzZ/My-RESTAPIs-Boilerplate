@@ -14,6 +14,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
@@ -383,6 +384,25 @@ func CleanupExpiredSessions(store *session.Store, interval time.Duration) {
 		if err != nil {
 			// Log any errors that occur during the reset process.
 			log.LogErrorf("Failed to reset session store: %v", err)
+		}
+	}
+}
+
+// WithStorage is an option function for any Fiber middleware that requires storage.
+// It sets the storage backend for the middleware configuration.
+func WithStorage(storage fiber.Storage) interface{} {
+	return func(config interface{}) {
+		switch cfg := config.(type) {
+		case *cache.Config:
+			cfg.Storage = storage
+		case *session.Config:
+			cfg.Storage = storage
+		case *limiter.Config:
+			cfg.Storage = storage
+		case *csrf.Config:
+			cfg.Storage = storage
+		default:
+			panic(fmt.Sprintf("unsupported config type: %T", config))
 		}
 	}
 }
