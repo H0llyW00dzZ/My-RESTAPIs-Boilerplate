@@ -85,6 +85,8 @@ func (s *FiberServer) CleanupDB() error {
 
 // Mount mounts a Fiber application or a group of routes onto the main application.
 func (s *FiberServer) Mount(prefix string, app interface{}) {
+	// Note: It seems possible to integrate it with gRPC (protoc) for internal services,
+	// but it's not really needed at the moment.
 	switch v := app.(type) {
 	case *fiber.App:
 		s.app.Mount(prefix, v)
@@ -98,6 +100,8 @@ func (s *FiberServer) Mount(prefix string, app interface{}) {
 
 // MountPath mounts a Fiber handler or a group of routes onto the main application at a specific path.
 func (s *FiberServer) MountPath(path string, handler interface{}) {
+	// Note: It seems possible to integrate it with gRPC (protoc) for internal services,
+	// but it's not really needed at the moment.
 	switch v := handler.(type) {
 	case fiber.Handler:
 		s.app.Get(path, v)
