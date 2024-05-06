@@ -18,6 +18,7 @@ import (
 // Note: This method works well Docs: https://github.com/gofiber/fiber/issues/750
 // Also note that There is no limit to this feature. For example, you can add a billion domains or subdomains.
 // Another note: When running this in a container with Kubernetes, make sure to have a configuration for allow internal IPs (e.g., 10.0.0.0/24).
+// Because this method creates an additional internal IP for handling routes (e.g., 10.0.0.1 for REST APIs, then 10.0.0.2 for the frontend).
 type (
 	// Host represents a subdomain or domain host configuration.
 	// It contains a reference to a Fiber application instance.
@@ -41,6 +42,7 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 	registerRESTAPIsRoutes(app, db)
 	// Note: This is just an example. In production, replace `api.localhost:8080` with a specific domain/subdomain, such as api.example.com.
 	// Similarly, for the frontend, specify a domain like `hosts["example.com"] = &Host{frontend}`.
+	// Additionally, instead of hard-coding the domain or subdomain, it is possible to integrate it with environment variables or other configurations.
 	hosts["api.localhost:8080"] = &Host{api}
 	// Register the Static Frontend Routes
 	registerStaticFrontendRoutes(app, appName, db)
