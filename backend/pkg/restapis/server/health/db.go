@@ -25,6 +25,8 @@ type Response struct {
 // The detailed health statistics are returned as a structured JSON response.
 func DBHandler(db database.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		// Note: It is important to call this when using encrypted cookies.
+		// If this is not called in some handlers, it can lead to high vulnerability where cookies are not being encrypted.
 		c.SendString("value=" + c.Cookies("GhoperCookie"))
 		// Get the IP address from the request context
 		ipAddress := c.IP()
