@@ -64,13 +64,16 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 
 	v1 := api.Group("/v1", func(c *fiber.Ctx) error { // '/v1/' prefix
 		c.Set("Version", "v1")
-		// Set Cookie for group "v1"
-		c.Cookie(&fiber.Cookie{
-			// This should be safe against cookie poisoning, MITM, etc, even without a hash function,
-			// because it would require 99999999999 cpu to attack this encryptcookie.
-			Name:  "GhoperCookie",
-			Value: uuid.NewSHA1(uuid.NameSpaceURL, []byte(c.IP())).String(),
-		})
+		// Set Cookie for group "v1" only if it doesn't exist
+		// Note: This fix where a cookie keep generating from server-side into client-side.
+		if c.Cookies("GhoperCookie") == "" {
+			c.Cookie(&fiber.Cookie{
+				// This should be safe against cookie poisoning, MITM, etc, even without a hash function,
+				// because it would require 99999999999 cpu to attack this encryptcookie.
+				Name:  "GhoperCookie",
+				Value: uuid.NewSHA1(uuid.NameSpaceURL, []byte(c.IP())).String(),
+			})
+		}
 		return c.Next()
 	})
 
