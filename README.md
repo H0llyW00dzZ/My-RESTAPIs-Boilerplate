@@ -62,6 +62,13 @@ This boilerplate is grounded in the Unix philosophy, emphasizing simplicity, mod
 > [!NOTE]
 > The `Resource Memory Usage` section demonstrates how `Go` has stable and low memory overhead compared to other languages, especially `Java` (See [this article](https://learn.microsoft.com/en-us/azure/spring-apps/enterprise/concepts-for-java-memory-management) for more information on Java memory management Lmao.) hahaha.
 
+- `Idle`
+
+<img src="https://i.imgur.com/1dG4E9G.png" alt="Idle">
+
+> [!NOTE]
+> The `Idle` section demonstrates the memory usage when there is no request. The maximum average memory usage is around 21.5MB. Go routines (100 goroutines) along with a semaphore are used to automatically handle high traffic situations (e.g., lots of requests).
+
 ## Architecture
 
 Below is the architecture of this boilerplate and how it looks. I created this for REST APIs about volcano 🌋 monitoring used by the government (has been done before), so it can easily monitor volcanoes in the real world.
