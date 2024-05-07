@@ -368,17 +368,22 @@ func NewEncryptedCookieMiddleware(options ...interface{}) fiber.Handler {
 //	  }),
 //	  WithRedirectStatusCode(fiber.StatusMovedPermanently),
 //	)
-func NewRedirectMiddleware(options ...func(*redirect.Config)) fiber.Handler {
+func NewRedirectMiddleware(options ...interface{}) fiber.Handler {
 	// Create a new redirect configuration with default values
 	config := redirect.Config{}
 
-	// Apply the provided options to the redirect configuration
+	// Apply any additional options to the redirect configuration.
 	for _, option := range options {
-		option(&config)
+		if optFunc, ok := option.(func(*redirect.Config)); ok {
+			optFunc(&config)
+		}
 	}
 
 	// Create the redirect middleware with the configured options
-	return redirect.New(config)
+	redirectMiddleware := redirect.New(config)
+
+	// Return the redirect middleware.
+	return redirectMiddleware
 }
 
 // NewSessionMiddleware creates a new session middleware with optional custom configuration options.
