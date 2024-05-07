@@ -110,7 +110,9 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 
 	// Apply the rate limiter middleware directly to the REST API routes
 	// Note: This method is called "higher-order function" which is better than (if-else statement which is bad)
-	rateLimiterRESTAPIs := NewRateLimiter(db,
+	gopherStorage := db.FiberStorage()
+	rateLimiterRESTAPIs := NewRateLimiter(
+		WithStorage(gopherStorage),
 		WithMax(maxRequestRESTAPIsRateLimiter),
 		WithExpiration(maxExpirationRESTAPIsRateLimiter),
 		WithLimitReached(ratelimiterMsg(MsgRESTAPIsVisitorGotRateLimited)))
