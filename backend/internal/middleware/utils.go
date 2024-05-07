@@ -15,6 +15,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
@@ -419,4 +420,23 @@ func NewSessionMiddleware(options ...interface{}) fiber.Handler {
 		// Continue to the next middleware or handler.
 		return c.Next()
 	}
+}
+
+// NewCSRFMiddleware creates a new CSRF middleware with optional custom configuration options.
+func NewCSRFMiddleware(options ...interface{}) fiber.Handler {
+	// Create a new CSRF middleware configuration.
+	config := csrf.Config{}
+
+	// Apply any additional options to the CSRF configuration.
+	for _, option := range options {
+		if optFunc, ok := option.(func(*csrf.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create the CSRF middleware with the configured options.
+	csrfMiddleware := csrf.New(config)
+
+	// Return the CSRF middleware.
+	return csrfMiddleware
 }

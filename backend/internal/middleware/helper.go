@@ -406,3 +406,136 @@ func WithStorage(storage fiber.Storage) interface{} {
 		}
 	}
 }
+
+// WithCSRFNext is an option function for NewCSRFMiddleware that sets the Next function to skip the middleware.
+func WithCSRFNext(next func(*fiber.Ctx) bool) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.Next = next
+	}
+}
+
+// WithCSRFKeyLookup is an option function for NewCSRFMiddleware that sets the key lookup for the CSRF token.
+func WithCSRFKeyLookup(keyLookup string) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.KeyLookup = keyLookup
+	}
+}
+
+// WithCSRFCookieName is an option function for NewCSRFMiddleware that sets the name of the CSRF cookie.
+func WithCSRFCookieName(cookieName string) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.CookieName = cookieName
+	}
+}
+
+// WithCSRFCookieDomain is an option function for NewCSRFMiddleware that sets the domain of the CSRF cookie.
+func WithCSRFCookieDomain(cookieDomain string) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.CookieDomain = cookieDomain
+	}
+}
+
+// WithCSRFCookiePath is an option function for NewCSRFMiddleware that sets the path of the CSRF cookie.
+func WithCSRFCookiePath(cookiePath string) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.CookiePath = cookiePath
+	}
+}
+
+// WithCSRFCookieSecure is an option function for NewCSRFMiddleware that sets the secure flag of the CSRF cookie.
+func WithCSRFCookieSecure(cookieSecure bool) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.CookieSecure = cookieSecure
+	}
+}
+
+// WithCSRFCookieHTTPOnly is an option function for NewCSRFMiddleware that sets the HTTP only flag of the CSRF cookie.
+func WithCSRFCookieHTTPOnly(cookieHTTPOnly bool) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.CookieHTTPOnly = cookieHTTPOnly
+	}
+}
+
+// WithCSRFCookieSameSite is an option function for NewCSRFMiddleware that sets the SameSite attribute of the CSRF cookie.
+func WithCSRFCookieSameSite(cookieSameSite string) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.CookieSameSite = cookieSameSite
+	}
+}
+
+// WithCSRFCookieSessionOnly is an option function for NewCSRFMiddleware that sets the session-only flag of the CSRF cookie.
+func WithCSRFCookieSessionOnly(cookieSessionOnly bool) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.CookieSessionOnly = cookieSessionOnly
+	}
+}
+
+// WithCSRFExpiration is an option function for NewCSRFMiddleware that sets the expiration time of the CSRF token.
+func WithCSRFExpiration(expiration time.Duration) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.Expiration = expiration
+	}
+}
+
+// WithCSRFSingleUseToken is an option function for NewCSRFMiddleware that sets the single-use token flag.
+func WithCSRFSingleUseToken(singleUseToken bool) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.SingleUseToken = singleUseToken
+	}
+}
+
+// WithCSRFStorage is an option function for NewCSRFMiddleware that sets the storage for the CSRF middleware.
+func WithCSRFStorage(storage fiber.Storage) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.Storage = storage
+	}
+}
+
+// WithCSRFSession is an option function for NewCSRFMiddleware that sets the session store for the CSRF middleware.
+func WithCSRFSession(session *session.Store) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.Session = session
+	}
+}
+
+// WithCSRFSessionKey is an option function for NewCSRFMiddleware that sets the session key for storing the CSRF token.
+func WithCSRFSessionKey(sessionKey string) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.SessionKey = sessionKey
+	}
+}
+
+// WithCSRFContextKey is an option function for NewCSRFMiddleware that sets the context key for storing the CSRF token.
+func WithCSRFContextKey(contextKey interface{}) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.ContextKey = contextKey
+	}
+}
+
+// WithCSRFKeyGenerator is an option function for NewCSRFMiddleware that sets the key generator function for the CSRF token.
+func WithCSRFKeyGenerator(keyGenerator func() string) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.KeyGenerator = keyGenerator
+	}
+}
+
+// WithCSRFErrorHandler is an option function for NewCSRFMiddleware that sets the error handler for the CSRF middleware.
+func WithCSRFErrorHandler(errorHandler fiber.ErrorHandler) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.ErrorHandler = errorHandler
+	}
+}
+
+// WithCSRFExtractor is an option function for NewCSRFMiddleware that sets the extractor function for retrieving the CSRF token.
+func WithCSRFExtractor(extractor func(*fiber.Ctx) (string, error)) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.Extractor = extractor
+	}
+}
+
+// WithCSRFHandlerContextKey is an option function for NewCSRFMiddleware that sets the context key for storing the CSRF handler.
+func WithCSRFHandlerContextKey(handlerContextKey interface{}) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.HandlerContextKey = handlerContextKey
+	}
+}
