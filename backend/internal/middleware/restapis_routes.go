@@ -115,7 +115,8 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 		WithStorage(gopherStorage),
 		WithMax(maxRequestRESTAPIsRateLimiter),
 		WithExpiration(maxExpirationRESTAPIsRateLimiter),
-		WithLimitReached(ratelimiterMsg(MsgRESTAPIsVisitorGotRateLimited)))
+		WithLimitReached(ratelimiterMsg(MsgRESTAPIsVisitorGotRateLimited)),
+	)
 
 	// Register server APIs routes
 	serverAPIs(v1, db, rateLimiterRESTAPIs)
