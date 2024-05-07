@@ -68,6 +68,8 @@ This boilerplate is grounded in the Unix philosophy, emphasizing simplicity, mod
 
 > [!NOTE]
 > The `Idle` section demonstrates the memory usage when there is no request. The maximum average memory usage is around 21.5MB. Go routines (100 goroutines) along with a semaphore are used to automatically handle high traffic situations (e.g., lots of requests).
+>
+> Also Note that even with high incoming traffic (e.g., `1 million requests`), the maximum average memory usage is still relatively `low`, around `100MB` (e.g., `50MB`), due to the use of the `semaphore`.
 
 ## Architecture
 
