@@ -16,6 +16,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
+	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/redirect"
@@ -530,5 +531,82 @@ func WithCSRFExtractor(extractor func(*fiber.Ctx) (string, error)) func(*csrf.Co
 func WithCSRFHandlerContextKey(handlerContextKey interface{}) func(*csrf.Config) {
 	return func(config *csrf.Config) {
 		config.HandlerContextKey = handlerContextKey
+	}
+}
+
+// WithXSSProtection is an option function for NewHelmetMiddleware that sets the X-XSS-Protection header.
+func WithXSSProtection(protection string) func(*helmet.Config) {
+	return func(config *helmet.Config) {
+		config.XSSProtection = protection
+	}
+}
+
+// WithContentTypeNosniff is an option function for NewHelmetMiddleware that sets the X-Content-Type-Options header.
+func WithContentTypeNosniff(nosniff string) func(*helmet.Config) {
+	return func(config *helmet.Config) {
+		config.ContentTypeNosniff = nosniff
+	}
+}
+
+// WithXFrameOptions is an option function for NewHelmetMiddleware that sets the X-Frame-Options header.
+func WithXFrameOptions(options string) func(*helmet.Config) {
+	return func(config *helmet.Config) {
+		config.XFrameOptions = options
+	}
+}
+
+// WithReferrerPolicy is an option function for NewHelmetMiddleware that sets the Referrer-Policy header.
+func WithReferrerPolicy(policy string) func(*helmet.Config) {
+	return func(config *helmet.Config) {
+		config.ReferrerPolicy = policy
+	}
+}
+
+// WithCrossOriginEmbedderPolicy is an option function for NewHelmetMiddleware that sets the Cross-Origin-Embedder-Policy header.
+func WithCrossOriginEmbedderPolicy(policy string) func(*helmet.Config) {
+	return func(config *helmet.Config) {
+		config.CrossOriginEmbedderPolicy = policy
+	}
+}
+
+// WithCrossOriginOpenerPolicy is an option function for NewHelmetMiddleware that sets the Cross-Origin-Opener-Policy header.
+func WithCrossOriginOpenerPolicy(policy string) func(*helmet.Config) {
+	return func(config *helmet.Config) {
+		config.CrossOriginOpenerPolicy = policy
+	}
+}
+
+// WithCrossOriginResourcePolicy is an option function for NewHelmetMiddleware that sets the Cross-Origin-Resource-Policy header.
+func WithCrossOriginResourcePolicy(policy string) func(*helmet.Config) {
+	return func(config *helmet.Config) {
+		config.CrossOriginResourcePolicy = policy
+	}
+}
+
+// WithOriginAgentCluster is an option function for NewHelmetMiddleware that sets the Origin-Agent-Cluster header.
+func WithOriginAgentCluster(value string) func(*helmet.Config) {
+	return func(config *helmet.Config) {
+		config.OriginAgentCluster = value
+	}
+}
+
+// WithXDNSPrefetchControl is an option function for NewHelmetMiddleware that sets the X-DNS-Prefetch-Control header.
+func WithXDNSPrefetchControl(control string) func(*helmet.Config) {
+	return func(config *helmet.Config) {
+		config.XDNSPrefetchControl = control
+	}
+}
+
+// WithXDownloadOptions is an option function for NewHelmetMiddleware that sets the X-Download-Options header.
+func WithXDownloadOptions(options string) func(*helmet.Config) {
+	return func(config *helmet.Config) {
+		config.XDownloadOptions = options
+	}
+}
+
+// WithXPermittedCrossDomain is an option function for NewHelmetMiddleware that sets the X-Permitted-Cross-Domain-Policies header.
+func WithXPermittedCrossDomain(policies string) func(*helmet.Config) {
+	return func(config *helmet.Config) {
+		config.XPermittedCrossDomain = policies
 	}
 }
