@@ -484,13 +484,6 @@ func WithCSRFSingleUseToken(singleUseToken bool) func(*csrf.Config) {
 	}
 }
 
-// WithCSRFStorage is an option function for NewCSRFMiddleware that sets the storage for the CSRF middleware.
-func WithCSRFStorage(storage fiber.Storage) func(*csrf.Config) {
-	return func(config *csrf.Config) {
-		config.Storage = storage
-	}
-}
-
 // WithCSRFSession is an option function for NewCSRFMiddleware that sets the session store for the CSRF middleware.
 func WithCSRFSession(session *session.Store) func(*csrf.Config) {
 	return func(config *csrf.Config) {
