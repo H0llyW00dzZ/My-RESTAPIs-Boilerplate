@@ -115,6 +115,55 @@ func WithCacheSkipper(cacheSkipper func(*fiber.Ctx) bool) func(*cache.Config) {
 	}
 }
 
+// WithCacheControl is an option function for NewCacheMiddleware that enables or disables the Cache-Control header.
+func WithCacheControl(cacheControl bool) func(*cache.Config) {
+	return func(config *cache.Config) {
+		config.CacheControl = cacheControl
+	}
+}
+
+// WithCacheExpiration is an option function for NewCacheMiddleware that sets the expiration time for cached entries.
+func WithCacheExpiration(expiration time.Duration) func(*cache.Config) {
+	return func(config *cache.Config) {
+		config.Expiration = expiration
+	}
+}
+
+// WithCacheHeader is an option function for NewCacheMiddleware that sets the cache status header.
+func WithCacheHeader(header string) func(*cache.Config) {
+	return func(config *cache.Config) {
+		config.CacheHeader = header
+	}
+}
+
+// WithCacheExpirationGenerator is an option function for NewCacheMiddleware that sets a custom expiration generator function.
+func WithCacheExpirationGenerator(generator func(*fiber.Ctx, *cache.Config) time.Duration) func(*cache.Config) {
+	return func(config *cache.Config) {
+		config.ExpirationGenerator = generator
+	}
+}
+
+// WithCacheStoreResponseHeaders is an option function for NewCacheMiddleware that enables or disables storing response headers.
+func WithCacheStoreResponseHeaders(storeHeaders bool) func(*cache.Config) {
+	return func(config *cache.Config) {
+		config.StoreResponseHeaders = storeHeaders
+	}
+}
+
+// WithCacheMaxBytes is an option function for NewCacheMiddleware that sets the maximum number of bytes to store in cache.
+func WithCacheMaxBytes(maxBytes uint) func(*cache.Config) {
+	return func(config *cache.Config) {
+		config.MaxBytes = maxBytes
+	}
+}
+
+// WithCacheMethods is an option function for NewCacheMiddleware that sets the HTTP methods to cache.
+func WithCacheMethods(methods []string) func(*cache.Config) {
+	return func(config *cache.Config) {
+		config.Methods = methods
+	}
+}
+
 // WithValidator is an option function for NewKeyAuthMiddleware that sets a custom validator.
 func WithValidator(validator func(*fiber.Ctx, string) (bool, error)) func(*keyauth.Config) {
 	return func(config *keyauth.Config) {

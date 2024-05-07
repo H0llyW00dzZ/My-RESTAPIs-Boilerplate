@@ -29,9 +29,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// NewCacheMiddleware creates a new cache middleware with the specified expiration time, cache control flag,
-// and optional custom configuration options. It retrieves the Redis storage interface from the provided database
-// service and configures the cache middleware accordingly.
+// NewCacheMiddleware creates a new cache middleware with optional custom configuration options.
 //
 // The cache middleware is built on top of the Fiber cache middleware and provides additional customization options.
 // It allows you to specify a custom key generator function to generate cache keys based on the request context,
@@ -39,13 +37,16 @@ import (
 //
 // Parameters:
 //
-//	db: The database service instance that provides the Redis storage interface.
-//	expiration: The expiration time for cached entries.
-//	cacheControl: A boolean flag indicating whether to include cache control headers in the response.
 //	options: Optional configuration options that can be used to customize the cache middleware.
 //	         Available options include:
+//	         - WithExpiration(expiration time.Duration): Sets the expiration time for cached entries.
+//	         - WithCacheControl(cacheControl bool): Enables or disables the Cache-Control header.
 //	         - WithKeyGenerator(keyGenerator func(*fiber.Ctx) string): Sets a custom key generator function.
 //	         - WithCacheSkipper(cacheSkipper func(*fiber.Ctx) bool): Sets a custom cache skipper function.
+//	         - WithStorage(storage fiber.Storage): Sets the storage backend for the cache middleware.
+//	         - WithStoreResponseHeaders(storeResponseHeaders bool): Enables or disables storing additional response headers.
+//	         - WithMaxBytes(maxBytes uint): Sets the maximum number of bytes of response bodies to store in cache.
+//	         - WithMethods(methods []string): Specifies the HTTP methods to cache.
 //	         The options are passed as interface{} and are type-asserted within the function.
 //
 // Returns:
@@ -55,26 +56,22 @@ import (
 // Example usage:
 //
 //	// Create a cache middleware with default options
-//	cacheMiddleware := NewCacheMiddleware(db, expiration, cacheControl)
+//	cacheMiddleware := NewCacheMiddleware()
 //
-//	// Create a cache middleware with a custom key generator
-//	cacheMiddleware := NewCacheMiddleware(db, expiration, cacheControl, WithKeyGenerator(customKeyGenerator))
-//
-//	// Create a cache middleware with a custom cache skipper
-//	cacheMiddleware := NewCacheMiddleware(db, expiration, cacheControl, WithCacheSkipper(customCacheSkipper))
-//
-//	// Create a cache middleware with both custom key generator and cache skipper
-//	cacheMiddleware := NewCacheMiddleware(db, expiration, cacheControl, WithKeyGenerator(customKeyGenerator), WithCacheSkipper(customCacheSkipper))
-func NewCacheMiddleware(db database.Service, expiration time.Duration, cacheControl bool, options ...interface{}) fiber.Handler {
-	// Retrieve the Redis storage interface from the database service.
-	cacheMiddlewareService := db.FiberStorage()
-
+//	// Create a cache middleware with custom options
+//	cacheMiddleware := NewCacheMiddleware(
+//	    WithExpiration(time.Minute * 5),
+//	    WithCacheControl(true),
+//	    WithKeyGenerator(customKeyGenerator),
+//	    WithCacheSkipper(customCacheSkipper),
+//	    WithStorage(customStorage),
+//	    WithStoreResponseHeaders(true),
+//	    WithMaxBytes(1024 * 1024),
+//	    WithMethods([]string{fiber.MethodGet, fiber.MethodPost}),
+//	)
+func NewCacheMiddleware(options ...interface{}) fiber.Handler {
 	// Create a new cache middleware configuration.
-	config := cache.Config{
-		Expiration:   expiration,
-		CacheControl: cacheControl,
-		Storage:      cacheMiddlewareService,
-	}
+	config := cache.Config{}
 
 	// Apply any additional options to the cache configuration.
 	for _, option := range options {
