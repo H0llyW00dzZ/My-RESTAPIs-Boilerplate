@@ -30,7 +30,7 @@ type (
 )
 
 // RegisterRoutes sets up the API routing for the application.
-// It organizes routes into versioned groups for better API version management (Currently unimplemented for this boilerplate).
+// It organizes routes into versioned groups for better API version management.
 func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Service) {
 	// Hosts
 	hosts := map[string]*Host{}
@@ -51,7 +51,7 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 }
 
 // registerRouteConfigMiddleware applies middleware configurations to the Fiber application.
-// It sets up the necessary middleware such as recovery, logging, and custom error handling for manipulate panics (Currently unimplemented for this boilerplate).
+// It sets up the necessary middleware such as recovery, logging, and custom error handling for manipulate panics.
 func registerRouteConfigMiddleware(app *fiber.App) {
 
 	// Favicon front end setup
