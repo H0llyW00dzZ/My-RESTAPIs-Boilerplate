@@ -339,6 +339,9 @@ func NewKeyAuthMiddleware(db database.Service, options ...func(*keyauth.Config))
 // The current implementation of the Fiber encrypted cookie middleware only supports a single key,
 // which is likely a mistake and a limitation.
 // To enhance professional security, it's recommended to use separate keys in this function (e.g., create new keys specifically for cookies).
+//
+// TODO: Enhance this to integrate it with a perfect hybrid cryptosystem 🛡️🔐
+// when the Fiber encrypted cookie supports multiple keys (as currently, it only supports one key)
 func NewEncryptedCookieMiddleware(options ...interface{}) fiber.Handler {
 	// Create a new encrypted cookie middleware configuration.
 	config := encryptcookie.Config{}
