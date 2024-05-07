@@ -19,6 +19,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
+	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
@@ -437,4 +438,41 @@ func NewCSRFMiddleware(options ...interface{}) fiber.Handler {
 
 	// Return the CSRF middleware.
 	return csrfMiddleware
+}
+
+// NewHelmetMiddleware creates a new Helmet middleware with optional custom configuration options.
+//
+// Example Usage:
+//
+//	helmetMiddleware := NewHelmetMiddleware(
+//	WithXSSProtection("0"),
+//	WithContentTypeNosniff("nosniff"),
+//	WithXFrameOptions("SAMEORIGIN"),
+//	WithReferrerPolicy("no-referrer"),
+//	WithCrossOriginEmbedderPolicy("require-corp"),
+//	WithCrossOriginOpenerPolicy("same-origin"),
+//	WithCrossOriginResourcePolicy("same-origin"),
+//	WithOriginAgentCluster("?1"),
+//	WithXDNSPrefetchControl("off"),
+//	WithXDownloadOptions("noopen"),
+//	WithXPermittedCrossDomain("none"),
+//	)
+//
+// Note: This suitable for frontend.
+func NewHelmetMiddleware(options ...interface{}) fiber.Handler {
+	// Create a new Helmet middleware configuration with default values
+	config := helmet.Config{}
+
+	// Apply the provided options to the Helmet configuration
+	for _, option := range options {
+		if optFunc, ok := option.(func(*helmet.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create the Helmet middleware with the configured options
+	helmetMiddleware := helmet.New(config)
+
+	// Return the Helmet middleware.
+	return helmetMiddleware
 }
