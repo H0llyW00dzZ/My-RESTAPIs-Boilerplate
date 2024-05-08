@@ -17,7 +17,7 @@ func ValidatorKeyAuthHandler(c *fiber.Ctx, key string, db database.Service) (boo
 	// Log the authentication attempt.
 	log.LogUserActivity(c, "Attempted Authentication")
 
-	// TODO: Implement this
+	// TODO: Implement the "vice versa" method for Redis (for non-browser) & Redis (for browser, aka session storage) -> database -> repeat.
 
 	return true, nil
 }
