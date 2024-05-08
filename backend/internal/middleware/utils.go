@@ -6,7 +6,6 @@ package middleware
 
 import (
 	"fmt"
-	"h0llyw00dz-template/backend/internal/database"
 	"strings"
 	"time"
 
@@ -306,17 +305,15 @@ func CustomCacheSkipper(prefixes ...string) func(*fiber.Ctx) bool {
 //
 // TODO: Implement a custom "Next" function that can skip authorization for admin/security roles,
 // as they utilize another highly secure authentication mechanism with zero vulnerabilities and exploits 💀.
-func NewKeyAuthMiddleware(db database.Service, options ...func(*keyauth.Config)) fiber.Handler {
+func NewKeyAuthMiddleware(options ...interface{}) fiber.Handler {
 	// Create a new key authentication middleware configuration.
-	config := keyauth.Config{
-		KeyLookup:  "header:" + fiber.HeaderAuthorization,
-		AuthScheme: "Bearer",
-		ContextKey: "token",
-	}
+	config := keyauth.Config{}
 
 	// Apply any additional options to the key authentication configuration.
 	for _, option := range options {
-		option(&config)
+		if optFunc, ok := option.(func(*keyauth.Config)); ok {
+			optFunc(&config)
+		}
 	}
 
 	// Create the key authentication middleware with the configured options.
