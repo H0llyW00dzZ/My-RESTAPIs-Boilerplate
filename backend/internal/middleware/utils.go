@@ -384,6 +384,11 @@ func NewRedirectMiddleware(options ...interface{}) fiber.Handler {
 }
 
 // NewSessionMiddleware creates a new session middleware with optional custom configuration options.
+//
+// Note: When using this session with session storage,
+// it is recommended to use a database that can handle high connections,
+// for example, Redis is recommended because it can handle 10K++ connections,
+// which is perfect for pooling without bottlenecks, and it's essentially unlimited connection.
 func NewSessionMiddleware(options ...interface{}) fiber.Handler {
 	// Create a new session middleware configuration.
 	config := session.Config{}
