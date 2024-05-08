@@ -18,6 +18,9 @@ func ValidatorKeyAuthHandler(c *fiber.Ctx, key string, db database.Service) (boo
 	log.LogUserActivity(c, "Attempted Authentication")
 
 	// TODO: Implement the "vice versa" method for Redis (for non-browser) & Redis (for browser, aka session storage) -> database -> repeat.
+	// Note: Won't implement JWT and their base standards, because it's easy to lead to high vulnerability.
+	// Also, the cryptography world is not small enough to rely solely on JWT. 🤪
+	// So, any package for "authentication" here will be covered with another crypto instead of JWT and their base standards.
 
 	return true, nil
 }
