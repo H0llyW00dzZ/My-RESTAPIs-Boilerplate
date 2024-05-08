@@ -121,9 +121,9 @@ func logUserActivity(c *fiber.Ctx, filter string) {
 }
 
 // logHealthStatus logs the health status based on the filter.
-func logHealthStatus(response Response, filter string) {
+func logHealthStatus(c *fiber.Ctx, response Response, filter string) error {
 	// Define a map of filter-specific logging functions
-	loggers := map[string]func(Response){
+	loggers := map[string]func(*fiber.Ctx, Response) error{
 		"mysql": logMySQLHealthStatus,
 		"redis": logRedisHealthStatus,
 	}
@@ -132,12 +132,18 @@ func logHealthStatus(response Response, filter string) {
 	if filter == "" {
 		// If the filter is empty, log the health status for all available filters
 		for _, logger := range loggers {
-			logger(response)
+			if err := logger(c, response); err != nil {
+				return err
+			}
 		}
 	} else if logger, ok := loggers[filter]; ok {
 		// If the filter exists in the loggers map, log the corresponding health status
-		logger(response)
+		if err := logger(c, response); err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
 // calculateMemoryUsage calculates the memory usage percentage based on used memory and max memory.
