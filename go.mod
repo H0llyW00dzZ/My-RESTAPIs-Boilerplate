@@ -1,6 +1,6 @@
 module h0llyw00dz-template
 
-go 1.22.2
+go 1.22.3
 
 require (
 	github.com/bytedance/sonic v1.11.6
@@ -33,6 +33,6 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.52.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/arch v0.7.0 // indirect
+	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect
 )
