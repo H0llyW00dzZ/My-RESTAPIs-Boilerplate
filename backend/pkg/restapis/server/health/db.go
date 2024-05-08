@@ -53,7 +53,7 @@ func DBHandler(db database.Service) fiber.Handler {
 		response := createHealthResponse(health, filter)
 
 		// Log the health status based on the filter
-		logHealthStatus(response, filter)
+		logHealthStatus(c, response, filter)
 
 		// Return the structured health statistics as JSON
 		// Note: The "c.JSON" method uses the sonic package (related to main configuration) for JSON encoding and decoding,

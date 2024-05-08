@@ -9,6 +9,8 @@ import (
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
 	"strconv"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 // MemoryUsage represents memory usage in both megabytes and gigabytes.
@@ -150,8 +152,8 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 	return redisHealth
 }
 
-// logRedisHealthStatus logs the Redis health status with detailed stats.
-func logRedisHealthStatus(response Response) {
+// logRedisHealthStatus logs the Redis health status and sends an error response if Redis is down.
+func logRedisHealthStatus(c *fiber.Ctx, response Response) error {
 	// Extract redisHealth from the response
 	redisHealth := response.RedisHealth
 
@@ -194,5 +196,12 @@ func logRedisHealthStatus(response Response) {
 	} else {
 		// Log the error if Redis is not up or if redisHealth is nil
 		log.LogErrorf("Redis Error: %v", redisHealth.Error)
+
+		// Send an error response
+		// Note: This is dynamic and it's not possible to set the "errorCode" because it depends on internal/database/mysql_redis.go,
+		// so it only works to set the HTTP status code as ServiceUnavailable.
+		return helper.SendErrorResponse(c, fiber.StatusServiceUnavailable, redisHealth.Error)
 	}
+
+	return nil
 }

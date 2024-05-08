@@ -4,7 +4,12 @@
 
 package health
 
-import log "h0llyw00dz-template/backend/internal/logger"
+import (
+	log "h0llyw00dz-template/backend/internal/logger"
+	"h0llyw00dz-template/backend/pkg/restapis/helper"
+
+	"github.com/gofiber/fiber/v2"
+)
 
 // ConnectionStats represents the statistics of the current database connection state.
 type ConnectionStats struct {
@@ -45,8 +50,8 @@ func createMySQLHealthResponse(health map[string]string) *MySQLHealth {
 	return mysqlHealth
 }
 
-// logMySQLHealthStatus logs the MySQL health status.
-func logMySQLHealthStatus(response Response) {
+// logMySQLHealthStatus logs the MySQL health status and sends an error response if MySQL is down.
+func logMySQLHealthStatus(c *fiber.Ctx, response Response) error {
 	// Extract mysqlHealth from the response
 	mysqlHealth := response.MySQLHealth
 
@@ -62,5 +67,12 @@ func logMySQLHealthStatus(response Response) {
 	} else {
 		// Log the error if MySQL is not up or if mysqlHealth is nil
 		log.LogErrorf("MySQL Error: %v", mysqlHealth.Error)
+
+		// Send an error response
+		// Note: This is dynamic and it's not possible to set the "errorCode" because it depends on internal/database/mysql_redis.go,
+		// so it only works to set the HTTP status code as ServiceUnavailable.
+		return helper.SendErrorResponse(c, fiber.StatusServiceUnavailable, mysqlHealth.Error)
 	}
+
+	return nil
 }
