@@ -396,6 +396,15 @@ func NewSessionMiddleware(options ...interface{}) fiber.Handler {
 	// Default cleanup interval of 10 minutes.
 	cleanupInterval := 10 * time.Minute
 
+	// Default context key for storing the session.
+	// Example Usage:
+	// sessionMiddleware := NewSessionMiddleware(
+	// 	WithSessionExpiration(time.Hour),
+	// 	WithSessionStorage(customStorage),
+	// 	"customSessionKey",
+	// )
+	contextKey := "session"
+
 	// Apply any additional options to the session configuration.
 	for _, option := range options {
 		switch opt := option.(type) {
@@ -403,6 +412,8 @@ func NewSessionMiddleware(options ...interface{}) fiber.Handler {
 			opt(&config)
 		case time.Duration:
 			cleanupInterval = opt
+		case string:
+			contextKey = opt
 		}
 	}
 
@@ -420,8 +431,8 @@ func NewSessionMiddleware(options ...interface{}) fiber.Handler {
 			return err
 		}
 
-		// Save the session in the context for further usage.
-		c.Locals("session", sess)
+		// Save the session in the context using the custom context key for further usage.
+		c.Locals(contextKey, sess)
 
 		// Continue to the next middleware or handler.
 		return c.Next()
