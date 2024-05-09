@@ -414,6 +414,9 @@ func NewSessionMiddleware(options ...interface{}) fiber.Handler {
 			cleanupInterval = opt
 		case string:
 			contextKey = opt
+			// Instead of panic/crash, return error it's better
+		default:
+			log.LogErrorf("Unknown option type passed to NewSessionMiddleware: %T", opt)
 		}
 	}
 
