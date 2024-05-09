@@ -11,6 +11,7 @@ import (
 	"hash/fnv"
 	"time"
 
+	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/cache"
@@ -106,13 +107,6 @@ func WithKeyGenerator(keyGenerator func(*fiber.Ctx) string) interface{} {
 		default:
 			panic(fmt.Sprintf("unsupported config type: %T", config))
 		}
-	}
-}
-
-// WithCacheSkipper is an option function for NewCacheMiddleware that sets a custom cache skipper.
-func WithCacheSkipper(cacheSkipper func(*fiber.Ctx) bool) func(*cache.Config) {
-	return func(config *cache.Config) {
-		config.Next = cacheSkipper
 	}
 }
 
@@ -345,13 +339,6 @@ func WithRedirectStatusCode(statusCode int) func(*redirect.Config) {
 	}
 }
 
-// WithRedirectNext sets the function to determine whether to skip the redirect for a given request.
-func WithRedirectNext(next func(*fiber.Ctx) bool) func(*redirect.Config) {
-	return func(config *redirect.Config) {
-		config.Next = next
-	}
-}
-
 // WithSessionExpiration is an option function for NewSessionMiddleware that sets the session expiration time.
 func WithSessionExpiration(expiration time.Duration) func(*session.Config) {
 	return func(config *session.Config) {
@@ -455,13 +442,6 @@ func WithStorage(storage fiber.Storage) interface{} {
 		default:
 			panic(fmt.Sprintf("unsupported config type: %T", config))
 		}
-	}
-}
-
-// WithCSRFNext is an option function for NewCSRFMiddleware that sets the Next function to skip the middleware.
-func WithCSRFNext(next func(*fiber.Ctx) bool) func(*csrf.Config) {
-	return func(config *csrf.Config) {
-		config.Next = next
 	}
 }
 
@@ -700,5 +680,62 @@ func WithContextUsername(contextUsername string) func(*basicauth.Config) {
 func WithContextPassword(contextPassword string) func(*basicauth.Config) {
 	return func(config *basicauth.Config) {
 		config.ContextPassword = contextPassword
+	}
+}
+
+// WithSwaggerBasePath is an option function for NewSwaggerMiddleware that sets the base path for the UI path.
+func WithSwaggerBasePath(basePath string) func(*swagger.Config) {
+	return func(config *swagger.Config) {
+		config.BasePath = basePath
+	}
+}
+
+// WithSwaggerFilePath is an option function for NewSwaggerMiddleware that sets the file path for the swagger.json or swagger.yaml file.
+func WithSwaggerFilePath(filePath string) func(*swagger.Config) {
+	return func(config *swagger.Config) {
+		config.FilePath = filePath
+	}
+}
+
+// WithSwaggerPath is an option function for NewSwaggerMiddleware that sets the path that combines with BasePath for the full UI path.
+func WithSwaggerPath(path string) func(*swagger.Config) {
+	return func(config *swagger.Config) {
+		config.Path = path
+	}
+}
+
+// WithSwaggerTitle is an option function for NewSwaggerMiddleware that sets the title for the documentation site.
+func WithSwaggerTitle(title string) func(*swagger.Config) {
+	return func(config *swagger.Config) {
+		config.Title = title
+	}
+}
+
+// WithSwaggerCacheAge is an option function for NewSwaggerMiddleware that sets the max-age for the Cache-Control header in seconds.
+func WithSwaggerCacheAge(cacheAge int) func(*swagger.Config) {
+	return func(config *swagger.Config) {
+		config.CacheAge = cacheAge
+	}
+}
+
+// WithNext is an option function that sets the Next function to skip the middleware when returned true.
+//
+// Note: The "Next" middleware functionality will be added based on future requirements.
+func WithNext(next func(c *fiber.Ctx) bool) interface{} {
+	return func(config interface{}) {
+		switch cfg := config.(type) {
+		case *cache.Config:
+			cfg.Next = next
+		case *cors.Config:
+			cfg.Next = next
+		case *csrf.Config:
+			cfg.Next = next
+		case *redirect.Config:
+			cfg.Next = next
+		case *swagger.Config:
+			cfg.Next = next
+		default:
+			panic(fmt.Sprintf("unsupported config type: %T", config))
+		}
 	}
 }
