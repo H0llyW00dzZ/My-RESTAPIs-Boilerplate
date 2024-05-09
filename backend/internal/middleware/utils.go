@@ -12,6 +12,7 @@ import (
 	log "h0llyw00dz-template/backend/internal/logger"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/csrf"
@@ -496,4 +497,25 @@ func NewHelmetMiddleware(options ...interface{}) fiber.Handler {
 
 	// Return the Helmet middleware.
 	return helmetMiddleware
+}
+
+// NewBasicAuthMiddleware creates a new basic authentication middleware with optional custom configuration options.
+//
+// TODO: Customize this.
+func NewBasicAuthMiddleware(options ...interface{}) fiber.Handler {
+	// Create a new basic authentication middleware configuration.
+	config := basicauth.Config{}
+
+	// Apply any additional options to the basic authentication configuration.
+	for _, option := range options {
+		if optFunc, ok := option.(func(*basicauth.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create the basic authentication middleware with the configured options.
+	basicAuthMiddleware := basicauth.New(config)
+
+	// Return the basic authentication middleware.
+	return basicAuthMiddleware
 }

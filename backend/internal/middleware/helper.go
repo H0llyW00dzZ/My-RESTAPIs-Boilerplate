@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/csrf"
@@ -657,5 +658,47 @@ func WithXDownloadOptions(options string) func(*helmet.Config) {
 func WithXPermittedCrossDomain(policies string) func(*helmet.Config) {
 	return func(config *helmet.Config) {
 		config.XPermittedCrossDomain = policies
+	}
+}
+
+// WithUsers is an option function for NewBasicAuthMiddleware that sets the authorized users.
+func WithUsers(users map[string]string) func(*basicauth.Config) {
+	return func(config *basicauth.Config) {
+		config.Users = users
+	}
+}
+
+// WithRealm is an option function for NewBasicAuthMiddleware that sets the authentication realm.
+func WithRealm(realm string) func(*basicauth.Config) {
+	return func(config *basicauth.Config) {
+		config.Realm = realm
+	}
+}
+
+// WithAuthorizer is an option function for NewBasicAuthMiddleware that sets the authorizer function.
+func WithAuthorizer(authorizer func(string, string) bool) func(*basicauth.Config) {
+	return func(config *basicauth.Config) {
+		config.Authorizer = authorizer
+	}
+}
+
+// WithUnauthorized is an option function for NewBasicAuthMiddleware that sets the unauthorized handler.
+func WithUnauthorized(unauthorized fiber.Handler) func(*basicauth.Config) {
+	return func(config *basicauth.Config) {
+		config.Unauthorized = unauthorized
+	}
+}
+
+// WithContextUsername is an option function for NewBasicAuthMiddleware that sets the context key for the authenticated username.
+func WithContextUsername(contextUsername string) func(*basicauth.Config) {
+	return func(config *basicauth.Config) {
+		config.ContextUsername = contextUsername
+	}
+}
+
+// WithContextPassword is an option function for NewBasicAuthMiddleware that sets the context key for the authenticated password.
+func WithContextPassword(contextPassword string) func(*basicauth.Config) {
+	return func(config *basicauth.Config) {
+		config.ContextPassword = contextPassword
 	}
 }
