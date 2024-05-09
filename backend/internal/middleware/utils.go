@@ -11,6 +11,7 @@ import (
 
 	log "h0llyw00dz-template/backend/internal/logger"
 
+	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/cache"
@@ -519,4 +520,23 @@ func NewBasicAuthMiddleware(options ...interface{}) fiber.Handler {
 
 	// Return the basic authentication middleware.
 	return basicAuthMiddleware
+}
+
+// NewSwaggerMiddleware creates a new Swagger middleware with optional custom configuration options.
+func NewSwaggerMiddleware(options ...interface{}) fiber.Handler {
+	// Create a new Swagger middleware configuration.
+	config := swagger.Config{}
+
+	// Apply any additional options to the Swagger configuration.
+	for _, option := range options {
+		if optFunc, ok := option.(func(*swagger.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create the Swagger middleware with the configured options.
+	swaggerMiddleware := swagger.New(config)
+
+	// Return the Swagger middleware.
+	return swaggerMiddleware
 }
