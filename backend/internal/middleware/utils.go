@@ -502,7 +502,7 @@ func NewHelmetMiddleware(options ...interface{}) fiber.Handler {
 // NewBasicAuthMiddleware creates a new basic authentication middleware with optional custom configuration options.
 //
 // TODO: Consider customizing this middleware to support alternative authentication methods like OAuth, cryptocurrency-based authentication,
-// or Single Sign-On (SSO) by modifying the username/password logic to handle session tokens or other authentication mechanisms.
+// or Single Sign-On (SSO) by modifying the username/password logic to handle session tokens or other authentication mechanisms (NOTE: NO JWT and their base standards).
 func NewBasicAuthMiddleware(options ...interface{}) fiber.Handler {
 	// Create a new basic authentication middleware configuration.
 	config := basicauth.Config{}
