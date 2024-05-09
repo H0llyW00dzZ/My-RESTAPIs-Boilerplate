@@ -43,7 +43,7 @@ import (
 //	         - WithExpiration(expiration time.Duration): Sets the expiration time for cached entries.
 //	         - WithCacheControl(cacheControl bool): Enables or disables the Cache-Control header.
 //	         - WithKeyGenerator(keyGenerator func(*fiber.Ctx) string): Sets a custom key generator function.
-//	         - WithCacheSkipper(cacheSkipper func(*fiber.Ctx) bool): Sets a custom cache skipper function.
+//	         - WithNext(cacheSkipper func(*fiber.Ctx) bool): Sets a custom cache skipper function.
 //	         - WithStorage(storage fiber.Storage): Sets the storage backend for the cache middleware.
 //	         - WithStoreResponseHeaders(storeResponseHeaders bool): Enables or disables storing additional response headers.
 //	         - WithMaxBytes(maxBytes uint): Sets the maximum number of bytes of response bodies to store in cache.
@@ -64,7 +64,7 @@ import (
 //	    WithExpiration(time.Minute * 5),
 //	    WithCacheControl(true),
 //	    WithKeyGenerator(customKeyGenerator),
-//	    WithCacheSkipper(customCacheSkipper),
+//	    WithNext(customCacheSkipper),
 //	    WithStorage(customStorage),
 //	    WithStoreResponseHeaders(true),
 //	    WithMaxBytes(1024 * 1024),
