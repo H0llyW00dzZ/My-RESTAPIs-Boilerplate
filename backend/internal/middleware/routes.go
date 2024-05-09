@@ -75,6 +75,10 @@ func registerRouteConfigMiddleware(app *fiber.App) {
 
 // DomainRouter is a middleware function that handles subdomain or domain routing.
 // It takes a map of subdomain or domain hosts and routes the request to the corresponding Fiber app.
+//
+// Note: This is useful for large Go applications, especially when running in Kubernetes,
+// as it eliminates the need for multiple containers. It also supports integration with the Kubernetes ecosystem,
+// such as pointing to CNAME/NS or manually (if not using Kubernetes).
 func DomainRouter(hosts map[string]*Host) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		host := hosts[c.Hostname()]
