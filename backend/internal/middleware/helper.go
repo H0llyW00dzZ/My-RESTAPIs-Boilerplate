@@ -18,6 +18,8 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
+	"github.com/gofiber/fiber/v2/middleware/etag"
+	"github.com/gofiber/fiber/v2/middleware/favicon"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
@@ -734,5 +736,26 @@ func WithNext(next func(c *fiber.Ctx) bool) interface{} {
 		default:
 			panic(fmt.Sprintf("unsupported config type: %T", config))
 		}
+	}
+}
+
+// WithETagWeak is an option function for NewETagMiddleware that sets the weak ETag flag.
+func WithETagWeak(weak bool) func(*etag.Config) {
+	return func(config *etag.Config) {
+		config.Weak = weak
+	}
+}
+
+// WithFaviconFile is an option function for NewFaviconMiddleware that sets the file path of the favicon.
+func WithFaviconFile(file string) func(*favicon.Config) {
+	return func(config *favicon.Config) {
+		config.File = file
+	}
+}
+
+// WithFaviconURL is an option function for NewFaviconMiddleware that sets the URL path where the favicon will be served.
+func WithFaviconURL(url string) func(*favicon.Config) {
+	return func(config *favicon.Config) {
+		config.URL = url
 	}
 }

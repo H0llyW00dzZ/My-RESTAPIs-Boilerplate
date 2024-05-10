@@ -191,21 +191,44 @@ func NewCORSMiddleware(options ...interface{}) fiber.Handler {
 	return corsMiddleware
 }
 
-// NewETagMiddleware creates a new ETag middleware with the default configuration.
+// NewETagMiddleware creates a new ETag middleware with the default and optional custom configuration options.
 // It generates strong ETags for response caching and validation.
-func NewETagMiddleware() fiber.Handler {
-	return etag.New(etag.Config{
-		Weak: false,
-	})
+func NewETagMiddleware(options ...interface{}) fiber.Handler {
+	// Create a new ETag middleware configuration.
+	config := etag.Config{}
+
+	// Apply any additional options to the ETag configuration
+	for _, option := range options {
+		if optFunc, ok := option.(func(*etag.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create the ETag middleware with the configured options
+	etagMiddleware := etag.New(config)
+
+	// Return the ETag middleware
+	return etagMiddleware
 }
 
 // NewFaviconMiddleware creates a new favicon middleware to serve a favicon file.
 // It takes the file path of the favicon and the URL path where the favicon will be served.
-func NewFaviconMiddleware(filePath, urlPath string) fiber.Handler {
-	return favicon.New(favicon.Config{
-		File: filePath,
-		URL:  urlPath,
-	})
+func NewFaviconMiddleware(options ...interface{}) fiber.Handler {
+	// Create a new favicon middleware configuration with default values
+	config := favicon.Config{}
+
+	// Apply any additional options to the favicon configuration
+	for _, option := range options {
+		if optFunc, ok := option.(func(*favicon.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create the favicon middleware with the configured options
+	faviconMiddleware := favicon.New(config)
+
+	// Return the favicon middleware
+	return faviconMiddleware
 }
 
 // NewPprofMiddleware creates a new pprof middleware with a custom path.
