@@ -184,8 +184,11 @@ func NewCORSMiddleware(options ...interface{}) fiber.Handler {
 		}
 	}
 
-	// Create the CORS middleware with the configured options
-	return cors.New(config)
+	// Create the CORS middleware with the configured options.
+	corsMiddleware := cors.New(config)
+
+	// Return the CORS middleware.
+	return corsMiddleware
 }
 
 // NewETagMiddleware creates a new ETag middleware with the default configuration.
