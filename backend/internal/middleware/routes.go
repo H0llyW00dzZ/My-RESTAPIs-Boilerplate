@@ -42,7 +42,8 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 	registerRESTAPIsRoutes(app, db)
 	// Note: This is just an example. In production, replace `api.localhost:8080` with a specific domain/subdomain, such as api.example.com.
 	// Similarly, for the frontend, specify a domain like `hosts["example.com"] = &Host{frontend}`.
-	// Additionally, instead of hard-coding the domain or subdomain, it is possible to integrate it with environment variables or other configurations.
+	// Additionally, instead of hard-coding the domain or subdomain,
+	// it is possible to integrate it with environment variables or other configurations (e.g, YAML).
 	hosts["api.localhost:8080"] = &Host{api}
 	// Register the Static Frontend Routes
 	registerStaticFrontendRoutes(app, appName, db)
