@@ -171,7 +171,7 @@ func NewRateLimiter(options ...interface{}) fiber.Handler {
 //	WithMaxAge(3600),
 //
 // )
-func NewCORSMiddleware(options ...CORSOption) fiber.Handler {
+func NewCORSMiddleware(options ...interface{}) fiber.Handler {
 	// Note: In the Fiber framework v3, this CORS middleware configuration provides better security and low overhead.
 	// For example, it allows blocking internal IPs by setting `AllowPrivateNetwork` to false (read more: https://docs.gofiber.io/api/middleware/cors).
 	// Create a new CORS middleware configuration with default values
@@ -179,7 +179,9 @@ func NewCORSMiddleware(options ...CORSOption) fiber.Handler {
 
 	// Apply any additional options to the CORS configuration
 	for _, option := range options {
-		option(&config)
+		if optFunc, ok := option.(func(*cors.Config)); ok {
+			optFunc(&config)
+		}
 	}
 
 	// Create the CORS middleware with the configured options

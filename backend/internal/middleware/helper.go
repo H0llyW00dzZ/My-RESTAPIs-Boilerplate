@@ -26,9 +26,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// CORSOption is a function that configures the CORS middleware.
-type CORSOption func(*cors.Config)
-
 // generateGoogleUUIDFromIP generates a deterministic UUID based on the provided IP address.
 func generateGoogleUUIDFromIP(ipAddress string) string {
 	return uuid.NewSHA1(uuid.NameSpaceURL, []byte(ipAddress)).String()
@@ -256,42 +253,42 @@ func appendNonNilHandler(handlers []fiber.Handler, handlerFuncs ...fiber.Handler
 }
 
 // WithAllowOrigins sets the allowed origins for CORS requests.
-func WithAllowOrigins(origins string) CORSOption {
+func WithAllowOrigins(origins string) func(*cors.Config) {
 	return func(config *cors.Config) {
 		config.AllowOrigins = origins
 	}
 }
 
 // WithAllowMethods sets the allowed HTTP methods for CORS requests.
-func WithAllowMethods(methods string) CORSOption {
+func WithAllowMethods(methods string) func(*cors.Config) {
 	return func(config *cors.Config) {
 		config.AllowMethods = methods
 	}
 }
 
 // WithAllowHeaders sets the allowed headers for CORS requests.
-func WithAllowHeaders(headers string) CORSOption {
+func WithAllowHeaders(headers string) func(*cors.Config) {
 	return func(config *cors.Config) {
 		config.AllowHeaders = headers
 	}
 }
 
 // WithExposeHeaders sets the headers that should be exposed to the client.
-func WithExposeHeaders(headers string) CORSOption {
+func WithExposeHeaders(headers string) func(*cors.Config) {
 	return func(config *cors.Config) {
 		config.ExposeHeaders = headers
 	}
 }
 
 // WithAllowCredentials sets whether credentials are allowed for CORS requests.
-func WithAllowCredentials(allow bool) CORSOption {
+func WithAllowCredentials(allow bool) func(*cors.Config) {
 	return func(config *cors.Config) {
 		config.AllowCredentials = allow
 	}
 }
 
 // WithMaxAge sets the maximum age (in seconds) for preflight requests.
-func WithMaxAge(maxAge int) CORSOption {
+func WithMaxAge(maxAge int) func(*cors.Config) {
 	return func(config *cors.Config) {
 		config.MaxAge = maxAge
 	}
@@ -319,7 +316,7 @@ func WithMaxAge(maxAge int) CORSOption {
 //	// Other options...
 //
 //	)
-func WithAllowOriginsFunc(allowOriginsFunc func(string) bool) CORSOption {
+func WithAllowOriginsFunc(allowOriginsFunc func(string) bool) func(*cors.Config) {
 	return func(config *cors.Config) {
 		config.AllowOriginsFunc = allowOriginsFunc
 	}
