@@ -55,14 +55,14 @@ This boilerplate is grounded in the Unix philosophy, emphasizing simplicity, mod
 
 ## Resource Memory Usage
 
-- `MySQL` without `Redis` + 100K `POST` Request
+- `MySQL` without `Redis` + 100K `POST` Request (`Outdated` - `go1.23.2`)
 
 <img src="https://i.imgur.com/C9hZYDz.png" alt="Memory Usage with MYSQL">
 
 > [!NOTE]
 > The `Resource Memory Usage` section demonstrates how `Go` has stable and low memory overhead compared to other languages, especially `Java` (See [this article](https://learn.microsoft.com/en-us/azure/spring-apps/enterprise/concepts-for-java-memory-management) for more information on Java memory management Lmao.) hahaha.
 
-- `Idle`
+- `Idle` (`Outdated` - `go1.23.2`)
 
 <img src="https://i.imgur.com/1dG4E9G.png" alt="Idle">
 
@@ -70,6 +70,9 @@ This boilerplate is grounded in the Unix philosophy, emphasizing simplicity, mod
 > The `Idle` section demonstrates the memory usage when there is no request. The maximum average memory usage is around 21.5MB. Go routines (100 goroutines) along with a semaphore are used to automatically handle high traffic situations (e.g., lots of requests).
 >
 > Also Note that even with high incoming traffic (e.g., `1 million requests`), the maximum average memory usage is still relatively `low`, around `100MB` (e.g., `50MB`), due to the use of the `semaphore`.
+
+> [!WARNING]
+> These resource memory usage figures are outdated due to the Go version used. An update will be provided later with the latest version.
 
 ## Architecture
 
