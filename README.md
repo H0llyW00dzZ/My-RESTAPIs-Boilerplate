@@ -90,7 +90,7 @@ sample#memory_quota=1024.00MB
 > [!NOTE]
 > The `Idle` memory usage in the latest version of `Go` is more efficient compared to the previous version, reducing to around `7.92MB`.
 >
-> Also, note that the average memory usage of `11.1MB` includes the Go routine scheduler and the load for the `front-end` website along with the `REST APIs` (`Full Stack`).
+> Also, note that the average memory usage of `11.1MB` includes the Go routine scheduler for database operations (different from 100 goroutines for handling high traffic incoming automatically along with a semaphore) and the load for the `front-end` website along with the `REST APIs` (`Full Stack`). It's stable with no performance issues (e.g., bottlenecks, memory leaks) and zero vulnerabilities.
 >
 > So Compared to other languages, especially for full-stack development, `Go` performs better.
 
