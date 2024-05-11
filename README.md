@@ -71,8 +71,28 @@ This boilerplate is grounded in the Unix philosophy, emphasizing simplicity, mod
 >
 > Also Note that even with high incoming traffic (e.g., `1 million requests`), the maximum average memory usage is still relatively `low`, around `100MB` (e.g., `50MB`), due to the use of the `semaphore`.
 
-> [!WARNING]
-> These resource memory usage figures are outdated due to the Go version used. An update will be provided later with the latest version.
+### ***Latest***
+
+- `Idle` (`Latest Go Version` - `go1.23.3`)
+
+<img src="https://i.imgur.com/9AstMIl.png" alt="Idle-go1.23.3">
+
+```sh
+sample#memory_total=8.01MB
+sample#memory_rss=7.92MB
+sample#memory_cache=0.09MB
+sample#memory_swap=0.00MB
+sample#memory_pgpgin=0pages
+sample#memory_pgpgout=0pages
+sample#memory_quota=1024.00MB
+```
+
+> [!NOTE]
+> The `Idle` memory usage in the latest version of `Go` is more efficient compared to the previous version, reducing to around `7.92MB`.
+>
+> Also, note that the average memory usage of `11.1MB` includes the Go routine scheduler and the load for the `front-end` website along with the `REST APIs` (`Full Stack`).
+>
+> So Compared to other languages, especially for full-stack development, `Go` performs better.
 
 ## Architecture
 
