@@ -371,6 +371,8 @@ func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string)
 			// Note: This fixes a potential underflow issue that may occur in certain rare cases.
 			// The problem only occurs occasionally.
 			activeConns := poolStats.TotalConns - poolStats.IdleConns
+			// TODO: Improve this. There might be another way since other uint32s don't present any issues
+			// and are accurately converted to uint64 or even float64.
 			if activeConns < 0 {
 				activeConns = 0
 			}
