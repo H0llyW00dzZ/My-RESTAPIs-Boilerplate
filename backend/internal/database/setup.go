@@ -85,7 +85,9 @@ func InitializeMySQLDB(config MySQLConfig) (*sql.DB, error) {
 		return nil, err
 	}
 	// Set MySQL connection pool parameters.
-	// TODO: Refine the MySQL setup and statistics tracking to align with the enhancements previously implemented for Redis.
+	// Note: Implementing statistics similar to those in Redis isn't feasible due to connection limitations.
+	// Even attempting to set it to unlimited will inevitably lead to a bottleneck, regardless of server specs (e.g., even on a high-spec or baremetal server).
+	// So, it's best to maintain the current configuration since Redis will handle this aspect.
 	db.SetConnMaxLifetime(0) // Connections are not closed due to being idle too long.
 	db.SetMaxIdleConns(50)   // Maximum number of connections in the idle connection pool.
 	db.SetMaxOpenConns(50)   // Maximum number of open connections to the database.
