@@ -192,6 +192,8 @@ func New() Service {
 	}
 
 	// Initialize the bcrypt
+	// Note: This operation should be inexpensive as it uses a pointer,
+	// and the garbage collector will be happy handling memory efficiently. 🤪
 	bchash := bcrypt.New()
 
 	dbInstance = &service{
