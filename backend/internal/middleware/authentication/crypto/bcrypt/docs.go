@@ -12,9 +12,11 @@
 // Usage:
 //
 //  1. Create a new instance of the bcrypt service using the New function:
+//
 //     bcryptService := bcrypt.New()
 //
 //  2. Hash a password using the HashPassword method:
+//
 //     hashedPassword, err := bcryptService.HashPassword(password)
 //     if err != nil {
 //     // Handle the error
@@ -26,6 +28,7 @@
 //     provided username or email.
 //
 //  5. Compare the user's entered password with the stored hashed password using the ComparePassword method:
+//
 //     if bcryptService.ComparePassword(enteredPassword, storedHash) {
 //     // Password is correct, authenticate the user
 //     } else {
