@@ -2,7 +2,7 @@
 //
 // License: BSD 3-Clause License
 
-package crypto
+package stream
 
 import (
 	"crypto/aes"
@@ -11,8 +11,8 @@ import (
 	"golang.org/x/crypto/chacha20poly1305"
 )
 
-// HybridEncryptStream reads from the input stream, encrypts the data using AES-CTR and ChaCha20-Poly1305, and writes it to the output stream.
-func HybridEncryptStream(input io.Reader, output io.Writer, aesKey, chachaKey []byte) error {
+// EncryptStream reads from the input stream, encrypts the data using AES-CTR and ChaCha20-Poly1305, and writes it to the output stream.
+func EncryptStream(input io.Reader, output io.Writer, aesKey, chachaKey []byte) error {
 	aesBlock, err := aes.NewCipher(aesKey)
 	if err != nil {
 		return err
