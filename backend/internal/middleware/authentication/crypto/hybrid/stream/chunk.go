@@ -2,7 +2,7 @@
 //
 // License: BSD 3-Clause License
 
-package crypto
+package stream
 
 import (
 	"crypto/cipher"

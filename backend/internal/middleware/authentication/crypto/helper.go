@@ -6,11 +6,9 @@ package crypto
 
 import (
 	"crypto/hmac"
-	"crypto/rand"
 	"crypto/sha256"
 	"crypto/subtle"
 	"errors"
-	"io"
 
 	"golang.org/x/crypto/argon2"
 )
@@ -45,51 +43,4 @@ func deriveKey(salt []byte, useArgon2 bool, secryptKey string) []byte {
 		return argon2.IDKey([]byte(secryptKey), salt, 1, 64*1024, 4, 32)
 	}
 	return []byte(secryptKey)
-}
-
-// processLargeData is a higher-order function that processes large data using the provided processor function.
-// It reads the data from the provided io.Reader and writes the processed data to the provided io.Writer.
-// The processor function is responsible for encrypting or decrypting the data.
-// It generates a signature for the processed data and appends it to the output.
-func processLargeData(src io.Reader, dst io.Writer, useArgon2 bool, secryptKey, signKey string, processor func([]byte, []byte) ([]byte, error)) error {
-	salt := make([]byte, 16)
-	if _, err := rand.Read(salt); err != nil {
-		return err
-	}
-
-	key := deriveKey(salt, useArgon2, secryptKey)
-
-	if _, err := dst.Write(salt); err != nil {
-		return err
-	}
-
-	hash := sha256.New()
-	buf := make([]byte, 4096)
-	for {
-		n, err := src.Read(buf)
-		if err != nil && err != io.EOF {
-			return err
-		}
-		if n == 0 {
-			break
-		}
-
-		processed, err := processor(buf[:n], key)
-		if err != nil {
-			return err
-		}
-
-		if _, err := dst.Write(processed); err != nil {
-			return err
-		}
-
-		hash.Write(processed)
-	}
-
-	signature := signData(hash.Sum(nil), signKey)
-	if _, err := dst.Write(signature); err != nil {
-		return err
-	}
-
-	return nil
 }
