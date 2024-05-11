@@ -41,12 +41,11 @@ const (
 
 // Message constants for Redis-related operations.
 const (
-	MsgRedisHighConnectedClients              = "Redis has a high number of connected clients"
-	MsgRedisHighMemoryUsage                   = "Redis is using a significant amount of memory"
-	MsgRedisRecentlyRestarted                 = "Redis has been recently restarted"
-	MsgRedisHasStaleConnections               = "Redis has %d stale connections."
-	MsgRedisFailedToRetrieveInfo              = "Failed to retrieve Redis info: %v"
-	MsgRedisActiveConnectionUnderflowDetected = "Active connections calculation underflow detected"
-	MsgRedisHighIdleConnections               = "Redis has a high number of idle connections"
-	MsgRedisHighPoolUtilization               = "Redis connection pool utilization is high"
+	MsgRedisHighConnectedClients = "Redis has a high number of connected clients"
+	MsgRedisHighMemoryUsage      = "Redis is using a significant amount of memory"
+	MsgRedisRecentlyRestarted    = "Redis has been recently restarted"
+	MsgRedisHasStaleConnections  = "Redis has %d stale connections."
+	MsgRedisFailedToRetrieveInfo = "Failed to retrieve Redis info: %v"
+	MsgRedisHighIdleConnections  = "Redis has a high number of idle connections"
+	MsgRedisHighPoolUtilization  = "Redis connection pool utilization is high"
 )
