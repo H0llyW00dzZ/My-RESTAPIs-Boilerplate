@@ -5,11 +5,11 @@
 // Package bcrypt provides a secure way to hash and compare passwords using the bcrypt algorithm.
 // It is suitable for basic authentication and user management when interacting with a database.
 //
-// The package offers a Service interface with methods for hashing passwords and comparing plaintext
+// The package offers a Service interface with methods for hashing passwords or other and comparing plaintext
 // passwords with stored hashes. It also provides a New function to create a new instance of the
 // bcrypt password hashing service.
 //
-// Usage:
+// Example Usage:
 //
 //  1. Create a new instance of the bcrypt service using the New function:
 //
@@ -43,8 +43,8 @@
 // bcrypt.DefaultCost constant in the HashPassword function if needed.
 //
 // It is recommended to use this package in combination with other security measures, such as HTTPS/TLS
-// for secure communication, secure session management, and protection against common vulnerabilities like
-// SQL injection and cross-site scripting (XSS).
+// for secure communication, secure session management (which is already implemented here along with better encryption/decryption that require an 99999999999 cpu for attack), and protection against common vulnerabilities like
+// SQL injection and cross-site scripting (XSS), which is already implemented here for XSS protection.
 //
 // For more information about the bcrypt algorithm and its security properties, refer to the
 // official Go documentation: https://pkg.go.dev/golang.org/x/crypto/bcrypt
