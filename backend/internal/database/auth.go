@@ -8,6 +8,8 @@ import (
 	"database/sql"
 	"errors"
 
+	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/bcrypt"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -30,14 +32,16 @@ type ServiceAuth interface {
 type serviceAuth struct {
 	db           *sql.DB
 	fiberStorage fiber.Storage
+	bcrypt       bcrypt.Service
 }
 
 // NewServiceAuth creates a new instance of the ServiceAuth interface.
 // It takes a database connection as a parameter and returns a new serviceAuth instance.
-func NewServiceAuth(db *sql.DB, fiberStorage fiber.Storage) ServiceAuth {
+func NewServiceAuth(db *sql.DB, fiberStorage fiber.Storage, bcryptService bcrypt.Service) ServiceAuth {
 	return &serviceAuth{
 		db:           db,
 		fiberStorage: fiberStorage,
+		bcrypt:       bcryptService,
 	}
 }
 

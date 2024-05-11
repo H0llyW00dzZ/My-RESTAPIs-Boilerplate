@@ -9,6 +9,7 @@ import (
 	"database/sql"
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
+	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/bcrypt"
 	"os"
 	"strconv"
 	"sync"
@@ -140,6 +141,7 @@ type service struct {
 	redisClient *redis.Client
 	mu          sync.Mutex // a mutex to guard connection restarts or any that needed
 	auth        ServiceAuth
+	bcrypt      *bcrypt.Hash
 }
 
 // dbConfig holds the environment variables for the database connection.
@@ -189,6 +191,9 @@ func New() Service {
 		log.LogFatal("Failed to initialize MySQL database:", err)
 	}
 
+	// Initialize the bcrypt
+	bchash := bcrypt.New()
+
 	dbInstance = &service{
 		db:          db,
 		rdb:         redisStorage, // use redisStorage for rate limiting or any other needs in middleware
@@ -202,7 +207,7 @@ func New() Service {
 		// Also note that these example data flows are highly stable, and the reason for this logic is because traditional SQL databases (e.g., MySQL) have limited open connections,
 		// unlike NoSQL databases (e.g., Redis), which are capable of up to 10K connections with basically no limits.
 		// So Redis is perfect for connection pooling because the most important factor for interacting with it is the connection itself.
-		auth: NewServiceAuth(db, redisStorage),
+		auth: NewServiceAuth(db, redisStorage, bchash),
 	}
 
 	return dbInstance
