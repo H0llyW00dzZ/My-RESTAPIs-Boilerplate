@@ -2,7 +2,7 @@
 //
 // License: BSD 3-Clause License
 
-// Package bcrypt provides a secure way to hash and compare passwords using the bcrypt algorithm.
+// Package bcrypt provides a secure way to hash and compare passwords using the ancient bcrypt algorithm.
 // It is suitable for basic authentication and user management when interacting with a database.
 //
 // The package offers a Service interface with methods for hashing passwords or other and comparing plaintext
