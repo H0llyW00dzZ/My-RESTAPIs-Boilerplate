@@ -7,6 +7,8 @@ package hybrid
 import (
 	"bytes"
 	"encoding/hex"
+	"strings"
+
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid/stream"
 )
 
@@ -60,7 +62,7 @@ func (s *streamService) Decrypt(encodedData string) (string, error) {
 	}
 
 	encryptedInput := bytes.NewBuffer(encryptedData)
-	decryptedOutput := &bytes.Buffer{}
+	decryptedOutput := &strings.Builder{}
 
 	err = stream.DecryptStream(encryptedInput, decryptedOutput, s.aesKey, s.chachaKey)
 	if err != nil {
