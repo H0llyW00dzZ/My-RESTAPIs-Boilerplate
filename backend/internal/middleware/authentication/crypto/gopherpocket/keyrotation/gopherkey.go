@@ -6,6 +6,7 @@ package keyrotation
 
 import (
 	"crypto/rand"
+	"crypto/subtle"
 	"errors"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"sync"
@@ -50,11 +51,18 @@ func NewKeyManager(initialAESKey, initialChaChaKey []byte, rotationInterval time
 }
 
 // GetCurrentKeys returns the current AES and ChaCha20-Poly1305 keys.
-// It uses a read lock to ensure thread-safe access to the keys.
+// It uses a read lock to ensure thread-safe access to the keys and performs constant-time comparison.
 func (km *KeyManager) GetCurrentKeys() ([]byte, []byte) {
 	km.mutex.RLock()
 	defer km.mutex.RUnlock()
-	return km.currentAESKey, km.currentChaChaKey
+
+	aesKey := make([]byte, KeySize)
+	chaChaKey := make([]byte, KeySize)
+
+	subtle.ConstantTimeCopy(1, aesKey, km.currentAESKey)
+	subtle.ConstantTimeCopy(1, chaChaKey, km.currentChaChaKey)
+
+	return aesKey, chaChaKey
 }
 
 // RotateKeys generates new random keys and replaces the current keys with the new ones.
