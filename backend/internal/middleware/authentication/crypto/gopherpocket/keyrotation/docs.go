@@ -8,7 +8,12 @@
 // The reason for including this package here is to avoid creating another repository for experimental purposes related to cryptography.
 // Implementation and API may change in future versions without backward compatibility.
 // There are no guarantees, so use it only for educational, testing, and experimental purposes related to cryptography (e.g., ciphers, secure systems).
-// Do not use this package in production environments (e.g., for encrypting sensitive data).
+//
+// Also note that Go is suitable for cryptographic systems due to its memory safety, garbage collection features, and powerful standard library.
+// It allows for both high-level and low-level programming, unlike languages like C or C++.
+// However, the ecosystem for Go cryptography is still relatively small compared to other (e.g., cloud, web).
+//
+// So do not use this package in production environments (e.g., for encrypting sensitive data). Instead, use it for educational purposes, which is a better fit.
 //
 // The keyrotation package allows you to manage the rotation of encryption keys used for
 // AES and ChaCha20-Poly1305 encryption. It provides a KeyManager struct that handles the
