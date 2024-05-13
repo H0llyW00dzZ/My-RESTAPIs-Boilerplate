@@ -52,6 +52,7 @@ type MySQLConfig struct {
 }
 
 // Calculate the maximum number of connections based on the number of CPUs
+//
 // Note: This redis configuration is better for starters and provides stability.
 //
 // Tested on Node Spec:
