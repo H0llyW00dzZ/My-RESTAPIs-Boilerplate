@@ -46,6 +46,9 @@
 // for secure communication, secure session management (which is already implemented here along with better encryption/decryption that require an 99999999999 cpu for attack), and protection against common vulnerabilities like
 // SQL injection and cross-site scripting (XSS), which is already implemented here for XSS protection.
 //
+// Additionally, regarding SQL Injection, it is easy to prevent the risk. See https://go.dev/doc/database/sql-injection for more information.
+// Instead of using an ORM like GORM, which can increase the performance costs, it is recommended to use parameterized queries or prepared statements to mitigate SQL Injection vulnerabilities.
+//
 // For more information about the bcrypt algorithm and its security properties, refer to the
 // official Go documentation: https://pkg.go.dev/golang.org/x/crypto/bcrypt
 // REF: https://gowebexamples.com/password-hashing/
