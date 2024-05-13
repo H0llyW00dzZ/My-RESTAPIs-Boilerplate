@@ -52,11 +52,23 @@ type MySQLConfig struct {
 }
 
 // Calculate the maximum number of connections based on the number of CPUs
-// Note: This configuration is better for starters and provides stability.
+// Note: This redis configuration is better for starters and provides stability.
+//
 // Tested on Node Spec:
-// 2x vCPU
-// 4x ~ 8x Compute
-// 1 GB RAM
+//
+//	2x vCPU
+//
+//	4x ~ 8x Compute
+//
+//	1 GB RAM
+//
+// Tested Env Configuration:
+//
+//	RDB_POOL_TIMEOUT - 5m
+//
+//	REDIS_MAXCONN_IDLE_TIME - 30m
+//
+//	REDIS_MAXCONN_LIFE_TIME - 1h
 var maxConnections = 2 * runtime.NumCPU()
 
 // InitializeRedisClient initializes and returns a new Redis client.
