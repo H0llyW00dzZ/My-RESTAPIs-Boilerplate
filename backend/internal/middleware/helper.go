@@ -332,13 +332,6 @@ func WithAllowOriginsFunc(allowOriginsFunc func(string) bool) func(*cors.Config)
 	}
 }
 
-// WithRedirectRules sets the redirect rules for the redirect middleware.
-func WithRedirectRules(rules map[string]string) func(*redirect.Config) {
-	return func(config *redirect.Config) {
-		config.Rules = rules
-	}
-}
-
 // WithRedirectStatusCode sets the HTTP status code for the redirect response.
 func WithRedirectStatusCode(statusCode int) func(*redirect.Config) {
 	return func(config *redirect.Config) {
@@ -875,14 +868,17 @@ func WithIdempotencyLock(lock idempotency.Locker) func(*idempotency.Config) {
 	}
 }
 
-// WithRewrite is an option function that sets the rewrite rules for the Rewrite middleware.
+// WithRules is an option function that sets the rewrite or redirect rules for the Rewrite or Redirect middleware.
 //
-// It supports the following middleware configuration:
+// It supports the following middleware configurations:
 //
 //	*rewrite.Config: Sets the rewrite rules for the Rewrite middleware.
+//	*redirect.Config: Sets the redirect rules for the Redirect middleware.
 //
-// The rewrite rules are defined as a map of string keys and values. The keys represent the URL path patterns to match,
-// and the values represent the replacement paths. Captured values can be retrieved by index using the $1, $2, etc. syntax.
+// The rules are defined as a map of string keys and values. For the Rewrite middleware, the keys represent the URL path
+// patterns to match, and the values represent the replacement paths. Captured values can be retrieved by index using the
+// $1, $2, etc. syntax. For the Redirect middleware, the keys represent the source paths, and the values represent the
+// destination paths.
 //
 // Example usage:
 //
@@ -894,15 +890,29 @@ func WithIdempotencyLock(lock idempotency.Locker) func(*idempotency.Config) {
 //	    "/users/*/orders/*": "/user/$1/order/$2",
 //	}
 //
-//	// Use the WithRewrite option function to set the rewrite rules for the Rewrite middleware
-//	rewriteMiddleware := NewRewriteMiddleware(WithRewrite(rewriteRules))
+//	// Use the WithRules option function to set the rewrite rules for the Rewrite middleware
+//	rewriteMiddleware := NewRewriteMiddleware(WithRules(rewriteRules))
+//
+//	// Define the redirect rules
+//	redirectRules := map[string]string{
+//	    "/old":              "/new",
+//	    "/api/*":            "/$1",
+//	    "/js/*":             "/public/javascripts/$1",
+//	    "/users/*/orders/*": "/user/$1/order/$2",
+//	}
+//
+//	// Use the WithRules option function to set the redirect rules for the Redirect middleware
+//	redirectMiddleware := NewRedirectMiddleware(WithRules(redirectRules))
 //
 // Note:
-//   - If an unsupported middleware configuration is passed to WithRewrite, it will panic with an error message.
-func WithRewrite(rules map[string]string) interface{} {
+//   - If an unsupported middleware configuration is passed to WithRules, it will panic with an error message.
+func WithRules(rules map[string]string) interface{} {
+	// Note: now, this reusable, get good get golang.
 	return func(config interface{}) {
 		switch cfg := config.(type) {
 		case *rewrite.Config:
+			cfg.Rules = rules
+		case *redirect.Config:
 			cfg.Rules = rules
 		default:
 			panic(fmt.Sprintf("unsupported config type: %T", config))
