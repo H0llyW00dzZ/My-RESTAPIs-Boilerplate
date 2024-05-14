@@ -25,6 +25,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/redirect"
+	"github.com/gofiber/fiber/v2/middleware/rewrite"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/google/uuid"
 )
@@ -871,5 +872,40 @@ func WithIdempotencyKeepResponseHeaders(keepResponseHeaders []string) func(*idem
 func WithIdempotencyLock(lock idempotency.Locker) func(*idempotency.Config) {
 	return func(config *idempotency.Config) {
 		config.Lock = lock
+	}
+}
+
+// WithRewrite is an option function that sets the rewrite rules for the Rewrite middleware.
+//
+// It supports the following middleware configuration:
+//
+//	*rewrite.Config: Sets the rewrite rules for the Rewrite middleware.
+//
+// The rewrite rules are defined as a map of string keys and values. The keys represent the URL path patterns to match,
+// and the values represent the replacement paths. Captured values can be retrieved by index using the $1, $2, etc. syntax.
+//
+// Example usage:
+//
+//	// Define the rewrite rules
+//	rewriteRules := map[string]string{
+//	    "/old":              "/new",
+//	    "/api/*":            "/$1",
+//	    "/js/*":             "/public/javascripts/$1",
+//	    "/users/*/orders/*": "/user/$1/order/$2",
+//	}
+//
+//	// Use the WithRewrite option function to set the rewrite rules for the Rewrite middleware
+//	rewriteMiddleware := NewRewriteMiddleware(WithRewrite(rewriteRules))
+//
+// Note:
+//   - If an unsupported middleware configuration is passed to WithRewrite, it will panic with an error message.
+func WithRewrite(rules map[string]string) interface{} {
+	return func(config interface{}) {
+		switch cfg := config.(type) {
+		case *rewrite.Config:
+			cfg.Rules = rules
+		default:
+			panic(fmt.Sprintf("unsupported config type: %T", config))
+		}
 	}
 }
