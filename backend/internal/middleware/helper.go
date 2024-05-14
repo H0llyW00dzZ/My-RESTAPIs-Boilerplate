@@ -426,8 +426,41 @@ func CleanupExpiredSessions(store *session.Store, interval time.Duration) {
 	}
 }
 
-// WithStorage is an option function for any Fiber middleware that requires storage.
-// It sets the storage backend for the middleware configuration.
+// WithStorage is an option function that sets the storage backend for various Fiber middlewares.
+//
+// It supports the following middleware configurations:
+//
+//	*cache.Config: Sets the storage backend for the cache middleware.
+//	*session.Config: Sets the storage backend for the session middleware.
+//	*limiter.Config: Sets the storage backend for the rate limiter middleware.
+//	*csrf.Config: Sets the storage backend for the CSRF middleware.
+//	*idempotency.Config: Sets the storage backend for the idempotency middleware.
+//
+// The storage backend must implement the fiber.Storage interface.
+//
+// Example usage:
+//
+//	// Create a custom storage backend
+//	storage := myCustomStorage{}
+//
+//	// Use the WithStorage option function to set the storage backend for the cache middleware
+//	cacheMiddleware := NewCacheMiddleware(WithStorage(storage))
+//
+//	// Use the WithStorage option function to set the storage backend for the session middleware
+//	sessionMiddleware := NewSessionMiddleware(WithStorage(storage))
+//
+//	// Use the WithStorage option function to set the storage backend for the rate limiter middleware
+//	rateLimiterMiddleware := NewRateLimiter(WithStorage(storage))
+//
+//	// Use the WithStorage option function to set the storage backend for the CSRF middleware
+//	csrfMiddleware := NewCSRFMiddleware(WithStorage(storage))
+//
+//	// Use the WithStorage option function to set the storage backend for the idempotency middleware
+//	idempotencyMiddleware := NewIdempotencyMiddleware(WithStorage(storage))
+//
+// Note:
+//   - If an unsupported middleware configuration is passed to WithStorage, it will panic with an error message.
+//   - Additional storage support for other middlewares will be implemented in the future as needed.
 func WithStorage(storage fiber.Storage) interface{} {
 	return func(config interface{}) {
 		switch cfg := config.(type) {
@@ -722,7 +755,44 @@ func WithSwaggerCacheAge(cacheAge int) func(*swagger.Config) {
 
 // WithNext is an option function that sets the Next function to skip the middleware when returned true.
 //
-// Note: The "Next" middleware functionality will be added based on future requirements.
+// It supports the following middleware configurations:
+//
+//	*cache.Config: Sets the Next function for the cache middleware.
+//	*cors.Config: Sets the Next function for the CORS middleware.
+//	*csrf.Config: Sets the Next function for the CSRF middleware.
+//	*redirect.Config: Sets the Next function for the redirect middleware.
+//	*swagger.Config: Sets the Next function for the Swagger middleware.
+//
+// The Next function takes a *fiber.Ctx as a parameter and returns a boolean value.
+// If the Next function returns true, the middleware will be skipped for the current request.
+//
+// Example usage:
+//
+//	// Define a custom Next function
+//	func customNext(c *fiber.Ctx) bool {
+//	    // Custom logic to determine whether to skip the middleware
+//	    // Return true to skip the middleware, false otherwise
+//	    return c.Path() == "/skip"
+//	}
+//
+//	// Use the WithNext option function to set the Next function for the cache middleware
+//	cacheMiddleware := NewCacheMiddleware(WithNext(customNext))
+//
+//	// Use the WithNext option function to set the Next function for the CORS middleware
+//	corsMiddleware := NewCORSMiddleware(WithNext(customNext))
+//
+//	// Use the WithNext option function to set the Next function for the CSRF middleware
+//	csrfMiddleware := NewCSRFMiddleware(WithNext(customNext))
+//
+//	// Use the WithNext option function to set the Next function for the redirect middleware
+//	redirectMiddleware := NewRedirectMiddleware(WithNext(customNext))
+//
+//	// Use the WithNext option function to set the Next function for the Swagger middleware
+//	swaggerMiddleware := NewSwaggerMiddleware(WithNext(customNext))
+//
+// Note:
+//   - If an unsupported middleware configuration is passed to WithNext, it will panic with an error message.
+//   - Additional "Next" functionality for other middlewares will be added based on future requirements.
 func WithNext(next func(c *fiber.Ctx) bool) interface{} {
 	return func(config interface{}) {
 		switch cfg := config.(type) {
