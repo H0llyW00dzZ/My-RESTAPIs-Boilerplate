@@ -26,6 +26,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
 	"github.com/gofiber/fiber/v2/middleware/redirect"
+	"github.com/gofiber/fiber/v2/middleware/rewrite"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/google/uuid"
@@ -586,4 +587,23 @@ func NewIdempotencyMiddleware(options ...interface{}) fiber.Handler {
 
 	// Return the idempotency middleware.
 	return idempotencyMiddleware
+}
+
+// NewRewriteMiddleware creates a new Rewrite middleware with optional custom configuration options.
+func NewRewriteMiddleware(options ...interface{}) fiber.Handler {
+	// Create a new Rewrite middleware configuration
+	config := rewrite.Config{}
+
+	// Apply any additional options to the Rewrite configuration
+	for _, option := range options {
+		if optFunc, ok := option.(func(*rewrite.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create the Rewrite middleware with the configured options
+	rewriteMiddleware := rewrite.New(config)
+
+	// Return the Rewrite middleware
+	return rewriteMiddleware
 }
