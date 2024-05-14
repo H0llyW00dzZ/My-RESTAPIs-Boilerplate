@@ -19,6 +19,8 @@ var Translations map[string]map[string]string
 // LoadTranslations loads translations from a single JSON file.
 func LoadTranslations(filePath string) error {
 	// Note: This method is better because on Windows, long paths are not allowed by default, unlike on Unix/Linux.
+	// Also note that Ignore false positives reported by code scanners (e.g., CodeQL or other scanner tools) that are not 100% accurate.
+	// For example, got detected "G304 (CWE-22): Potential file inclusion via variable".
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return err
