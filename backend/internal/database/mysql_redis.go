@@ -19,6 +19,9 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	_ "github.com/go-sql-driver/mysql" // MySQL driver is used for connecting to MySQL databases.
+	// This package automatically loads environment variables from a .env file.
+	//
+	// Note: This may trigger a false positive in any secret scanners LMAO hahaha, but it is not an actual security issue in this case.
 	_ "github.com/joho/godotenv/autoload"
 )
 
