@@ -73,27 +73,33 @@ func ratelimiterMsg(customMessage string) func(*fiber.Ctx) error {
 	}
 }
 
-// WithKeyGenerator is an option function for NewCacheMiddleware and NewRateLimiter that sets a custom key generator.
-// It takes a keyGenerator function that generates a unique key based on the Fiber context and returns a closure
-// that configures the key generator for the specified middleware configuration.
+// WithKeyGenerator is an option function that sets a custom key generator for various Fiber middlewares.
 //
-// The function uses a type switch to determine the type of the middleware configuration and sets the appropriate
-// key generator field. It supports cache.Config and limiter.Config types. If an unsupported config type is passed,
-// it panics with an appropriate error message.
+// It supports the following middleware configurations:
 //
-// The use of a type switch in this function is considered a better approach than using multiple if-else statements,
-// as it provides a cleaner and more concise way to handle different configuration types, even if there are a large
-// number of cases.
+//	*cache.Config: Sets the key generator for the cache middleware.
+//	*limiter.Config: Sets the key generator for the rate limiter middleware.
 //
-// Parameters:
+// The key generator is a function that takes a *fiber.Ctx as a parameter and returns a string key.
+// It is used to generate a unique key for each request, which is used for caching or rate limiting.
 //
-//	keyGenerator: A function that takes a Fiber context and returns a unique key string.
+// Example usage:
 //
-// Returns:
+//	// Define a custom key generator function
+//	func customKeyGenerator(c *fiber.Ctx) string {
+//	    // Custom logic to generate a unique key based on the request
+//	    return c.Path() + c.IP()
+//	}
 //
-//	A closure that takes a middleware configuration and sets the key generator based on the configuration type.
+//	// Use the WithKeyGenerator option function to set the key generator for the cache middleware
+//	cacheMiddleware := NewCacheMiddleware(WithKeyGenerator(customKeyGenerator))
 //
-// TODO: Implement additional key generators for other middleware configurations besides NewCacheMiddleware and NewRateLimiter
+//	// Use the WithKeyGenerator option function to set the key generator for the rate limiter middleware
+//	rateLimiterMiddleware := NewRateLimiter(WithKeyGenerator(customKeyGenerator))
+//
+// Note:
+//   - If an unsupported middleware configuration is passed to WithKeyGenerator, it will panic with an error message.
+//   - Additional key generator support for other middlewares will be added based on future requirements.
 func WithKeyGenerator(keyGenerator func(*fiber.Ctx) string) interface{} {
 	return func(config interface{}) {
 		// Note: This a better switch-statement, it doesn't matter if there is so many switch (e.g, 1 billion switch case)
