@@ -21,6 +21,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
+	"github.com/gofiber/fiber/v2/middleware/idempotency"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/redirect"
@@ -438,6 +439,8 @@ func WithStorage(storage fiber.Storage) interface{} {
 			cfg.Storage = storage
 		case *csrf.Config:
 			cfg.Storage = storage
+		case *idempotency.Config:
+			cfg.Storage = storage
 		default:
 			panic(fmt.Sprintf("unsupported config type: %T", config))
 		}
@@ -757,5 +760,40 @@ func WithFaviconFile(file string) func(*favicon.Config) {
 func WithFaviconURL(url string) func(*favicon.Config) {
 	return func(config *favicon.Config) {
 		config.URL = url
+	}
+}
+
+// WithIdempotencyLifetime is an option function for NewIdempotencyMiddleware that sets the maximum lifetime of an idempotency key.
+func WithIdempotencyLifetime(lifetime time.Duration) func(*idempotency.Config) {
+	return func(config *idempotency.Config) {
+		config.Lifetime = lifetime
+	}
+}
+
+// WithIdempotencyKeyHeader is an option function for NewIdempotencyMiddleware that sets the name of the header that contains the idempotency key.
+func WithIdempotencyKeyHeader(keyHeader string) func(*idempotency.Config) {
+	return func(config *idempotency.Config) {
+		config.KeyHeader = keyHeader
+	}
+}
+
+// WithIdempotencyKeyHeaderValidate is an option function for NewIdempotencyMiddleware that sets the function to validate the syntax of the idempotency header.
+func WithIdempotencyKeyHeaderValidate(keyHeaderValidate func(string) error) func(*idempotency.Config) {
+	return func(config *idempotency.Config) {
+		config.KeyHeaderValidate = keyHeaderValidate
+	}
+}
+
+// WithIdempotencyKeepResponseHeaders is an option function for NewIdempotencyMiddleware that sets the list of headers that should be kept from the original response.
+func WithIdempotencyKeepResponseHeaders(keepResponseHeaders []string) func(*idempotency.Config) {
+	return func(config *idempotency.Config) {
+		config.KeepResponseHeaders = keepResponseHeaders
+	}
+}
+
+// WithIdempotencyLock is an option function for NewIdempotencyMiddleware that sets the locker for idempotency keys.
+func WithIdempotencyLock(lock idempotency.Locker) func(*idempotency.Config) {
+	return func(config *idempotency.Config) {
+		config.Lock = lock
 	}
 }

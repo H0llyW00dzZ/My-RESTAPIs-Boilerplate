@@ -21,6 +21,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
+	"github.com/gofiber/fiber/v2/middleware/idempotency"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
@@ -564,4 +565,25 @@ func NewSwaggerMiddleware(options ...interface{}) fiber.Handler {
 
 	// Return the Swagger middleware.
 	return swaggerMiddleware
+}
+
+// NewIdempotencyMiddleware creates a new idempotency middleware with optional custom configuration options.
+//
+// Ref: https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-02
+func NewIdempotencyMiddleware(options ...interface{}) fiber.Handler {
+	// Create a new idempotency middleware configuration.
+	config := idempotency.Config{}
+
+	// Apply any additional options to the idempotency configuration.
+	for _, option := range options {
+		if optFunc, ok := option.(func(*idempotency.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create the idempotency middleware with the configured options.
+	idempotencyMiddleware := idempotency.New(config)
+
+	// Return the idempotency middleware.
+	return idempotencyMiddleware
 }
