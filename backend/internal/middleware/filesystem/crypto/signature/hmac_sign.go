@@ -18,6 +18,9 @@ func GenerateHMACSignatureFromFile(filePath, secretKey string) ([]byte, error) {
 	// Open the file
 	// Note: Ignore false positives reported by code scanners (e.g., CodeQL or other scanner tools) that are not 100% accurate.
 	// For example, got detected "G304 (CWE-22): Potential file inclusion via variable".
+	// Also note that this approach is generally safe. The only potential vulnerability to be aware of is a timing attack (in hmac_verify.go).
+	// However, the risk of a timing attack in this specific use case is minimal, as the file path and secret key are not directly dependent on user input.
+	// This approach is generally safe and does not introduce significant timing attack vulnerabilities when used properly.
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err

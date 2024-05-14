@@ -26,5 +26,6 @@ func VerifyHMACSignatureFromFile(filePath, secretKey, hexSignature string) (bool
 	}
 
 	// Compare the expected signature with the provided signature using ConstantTimeCompare
+	// Note: This is generally safe from timing attacks as it uses constant-time comparison.
 	return subtle.ConstantTimeCompare(expectedSignature, providedSignature) == 1, nil
 }
