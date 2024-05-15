@@ -15,6 +15,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/charmbracelet/bubbles/spinner"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
 
@@ -176,46 +179,80 @@ func New() Service {
 		return dbInstance
 	}
 
-	// Initialize the Redis client
-	redisClient, err := initializeRedisClient()
-	if err != nil {
-		log.LogFatal("Failed to initialize Redis client:", err)
+	// Create a new spinner model
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
+
+	// Initialize the Bubble Tea model
+	m := model{spinner: s, quitting: false}
+
+	// Start the Bubble Tea program
+	p := tea.NewProgram(m)
+
+	// Make a channel to signal when the initialization is done
+	done := make(chan struct{})
+
+	// Run the Bubble Tea program and initializations in a separate goroutine
+	go func() {
+		// Initialize the Redis client
+		redisClient, err := initializeRedisClient()
+		if err != nil {
+			log.LogFatal("Failed to initialize Redis client:", err)
+		}
+
+		// Initialize Redis storage for Fiber
+		redisStorage, err := initializeRedisStorage()
+		if err != nil {
+			log.LogFatal("Failed to initialize Redis storage:", err)
+		}
+
+		// Initialize the MySQL database
+		db, err := initializeMySQLDB()
+		if err != nil {
+			// This will not be a connection error, but a DSN parse error or
+			// another initialization error.
+			log.LogFatal("Failed to initialize MySQL database:", err)
+		}
+
+		// Initialize the bcrypt
+		// Note: This operation should be inexpensive as it uses a pointer,
+		// and the garbage collector will be happy handling memory efficiently. 🤪
+		bchash := bcrypt.New()
+
+		// Create the service instance
+		dbInstance = &service{
+			db:          db,
+			rdb:         redisStorage, // use redisStorage for rate limiting or any other needs in middleware
+			redisClient: redisClient,
+			// Note: This method is safe, even with a large number of service instances (e.g., 1 billion) due to the singleton pattern.
+			// Also MySQL should be used as the primary database, while Redis should be used for caching.
+			// Here an example data flow is:
+			// 1. For read operations: service -> Redis (if not found in Redis) -> get from main database -> putting back in Redis -> repeat.
+			// 2. For insert/update operations: service -> main database -> repeat.
+			// Then Redis will handle caching for read operations, while write operations will directly interact with the main database.
+			// Also note that these example data flows are highly stable, and the reason for this logic is because traditional SQL databases (e.g., MySQL) have limited open connections,
+			// unlike NoSQL databases (e.g., Redis), which are capable of up to 10K connections with basically no limits.
+			// So Redis is perfect for connection pooling because the most important factor for interacting with it is the connection itself.
+			auth: NewServiceAuth(db, redisStorage, bchash),
+		}
+
+		// Quit the Bubble Tea program
+		p.Quit()
+
+		close(done) // Close the channel to signal that we're done
+	}()
+
+	// Run the Bubble Tea program
+	if finalModel, err := p.Run(); err != nil {
+		log.LogFatal("Failed to run spinner:", err)
+
+		// TODO: Is this type assertion needed, or can it be removed?
+		_ = finalModel.(model)
 	}
 
-	// Initialize Redis storage for Fiber
-	redisStorage, err := initializeRedisStorage()
-	if err != nil {
-		log.LogFatal("Failed to initialize Redis storage:", err)
-	}
-
-	// Initialize the MySQL database
-	db, err := initializeMySQLDB()
-	if err != nil {
-		// This will not be a connection error, but a DSN parse error or
-		// another initialization error.
-		log.LogFatal("Failed to initialize MySQL database:", err)
-	}
-
-	// Initialize the bcrypt
-	// Note: This operation should be inexpensive as it uses a pointer,
-	// and the garbage collector will be happy handling memory efficiently. 🤪
-	bchash := bcrypt.New()
-
-	dbInstance = &service{
-		db:          db,
-		rdb:         redisStorage, // use redisStorage for rate limiting or any other needs in middleware
-		redisClient: redisClient,
-		// Note: This method is safe, even with a large number of service instances (e.g., 1 billion) due to the singleton pattern.
-		// Also MySQL should be used as the primary database, while Redis should be used for caching.
-		// Here an example data flow is:
-		// 1. For read operations: service -> Redis (if not found in Redis) -> get from main database -> putting back in Redis -> repeat.
-		// 2. For insert/update operations: service -> main database -> repeat.
-		// Then Redis will handle caching for read operations, while write operations will directly interact with the main database.
-		// Also note that these example data flows are highly stable, and the reason for this logic is because traditional SQL databases (e.g., MySQL) have limited open connections,
-		// unlike NoSQL databases (e.g., Redis), which are capable of up to 10K connections with basically no limits.
-		// So Redis is perfect for connection pooling because the most important factor for interacting with it is the connection itself.
-		auth: NewServiceAuth(db, redisStorage, bchash),
-	}
+	// Wait for the initializations to finish
+	<-done
 
 	return dbInstance
 }

@@ -13,6 +13,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/charmbracelet/bubbles/spinner"
+	tea "github.com/charmbracelet/bubbletea"
 	_ "github.com/go-sql-driver/mysql" // MySQL driver is used for connecting to MySQL databases.
 	"github.com/gofiber/fiber/v2"
 	redisStorage "github.com/gofiber/storage/redis/v3" // Alias the import to avoid conflict
@@ -267,4 +269,37 @@ func initializeMySQLDB() (*sql.DB, error) {
 
 	// Initialize and return the MySQL database connection using the provided configuration
 	return InitializeMySQLDB(mysqlConfig)
+}
+
+// model represents the Bubble Tea model for the spinner.
+type model struct {
+	spinner  spinner.Model
+	quitting bool
+}
+
+// Init initializes the model.
+func (m model) Init() tea.Cmd {
+	return m.spinner.Tick
+}
+
+// Update updates the model based on the received message.
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		if msg.Type == tea.KeyCtrlC {
+			return m, tea.Quit
+		}
+	case spinner.TickMsg:
+		var cmd tea.Cmd
+		m.spinner, cmd = m.spinner.Update(msg)
+		return m, cmd
+	case tea.QuitMsg:
+		return m, tea.Quit
+	}
+	return m, nil
+}
+
+// View renders the spinner.
+func (m model) View() string {
+	return fmt.Sprintf("\n   %s Initializing database...\n\n", m.spinner.View())
 }
