@@ -6,6 +6,7 @@ package middleware
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 
 	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -606,4 +608,46 @@ func NewRewriteMiddleware(options ...interface{}) fiber.Handler {
 
 	// Return the Rewrite middleware
 	return rewriteMiddleware
+}
+
+// NewHTTPHandlerMiddleware creates a new middleware that adapts an http.Handler to a Fiber handler.
+func NewHTTPHandlerMiddleware(handler http.Handler) fiber.Handler {
+	return adaptor.HTTPHandler(handler)
+}
+
+// NewHTTPHandlerFuncMiddleware creates a new middleware that adapts an http.HandlerFunc to a Fiber handler.
+func NewHTTPHandlerFuncMiddleware(handlerFunc http.HandlerFunc) fiber.Handler {
+	return adaptor.HTTPHandlerFunc(handlerFunc)
+}
+
+// NewHTTPMiddlewareMiddleware creates a new middleware that adapts an http.Handler middleware to a Fiber middleware.
+func NewHTTPMiddlewareMiddleware(mw func(http.Handler) http.Handler) fiber.Handler {
+	return adaptor.HTTPMiddleware(mw)
+}
+
+// NewFiberHandlerMiddleware creates a new http.Handler that adapts a Fiber handler.
+func NewFiberHandlerMiddleware(handler fiber.Handler) http.Handler {
+	return adaptor.FiberHandler(handler)
+}
+
+// NewFiberHandlerFuncMiddleware creates a new http.HandlerFunc that adapts a Fiber handler.
+func NewFiberHandlerFuncMiddleware(handler fiber.Handler) http.HandlerFunc {
+	return adaptor.FiberHandlerFunc(handler)
+}
+
+// NewFiberAppMiddleware creates a new http.HandlerFunc that adapts a Fiber application.
+func NewFiberAppMiddleware(app *fiber.App) http.HandlerFunc {
+	return adaptor.FiberApp(app)
+}
+
+// ConvertRequestMiddleware converts a Fiber context to an http.Request.
+func ConvertRequestMiddleware(forServer bool) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		req, err := adaptor.ConvertRequest(c, forServer)
+		if err != nil {
+			return err
+		}
+		c.Locals("http_request", req)
+		return c.Next()
+	}
 }
