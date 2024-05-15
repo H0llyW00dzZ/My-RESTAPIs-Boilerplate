@@ -15,6 +15,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/charmbracelet/bubbles/spinner"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
 
@@ -176,6 +179,33 @@ func New() Service {
 		return dbInstance
 	}
 
+	// Create a new spinner model
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
+
+	// Initialize the Bubble Tea model
+	m := model{spinner: s, quitting: false}
+
+	// Start the Bubble Tea program
+	p := tea.NewProgram(m)
+
+	// Make a channel to signal when the initialization is done
+	done := make(chan struct{})
+
+	// Run the Bubble Tea program in a separate goroutine
+	go func() {
+		finalModel, err := p.Run()
+		if err != nil {
+			log.LogFatal("Failed to run spinner:", err)
+		}
+
+		// TODO: Is this type assertion needed, or can it be removed?
+		_ = finalModel.(model)
+
+		close(done) // Close the channel to signal that we're done
+	}()
+
 	// Initialize the Redis client
 	redisClient, err := initializeRedisClient()
 	if err != nil {
@@ -216,6 +246,12 @@ func New() Service {
 		// So Redis is perfect for connection pooling because the most important factor for interacting with it is the connection itself.
 		auth: NewServiceAuth(db, redisStorage, bchash),
 	}
+
+	// Stop the spinner before starting the server
+	p.Send(tea.Quit())
+
+	// Wait for the Bubble Tea program to finish
+	<-done
 
 	return dbInstance
 }
