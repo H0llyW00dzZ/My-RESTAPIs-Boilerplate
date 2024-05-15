@@ -189,11 +189,17 @@ func New() Service {
 	meterSpinner.Spinner = spinner.Meter
 	meterSpinner.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 
+	ellipsisSpinner := spinner.New()
+	ellipsisSpinner.Spinner = spinner.Ellipsis
+	ellipsisSpinner.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("15"))
+
 	// Initialize the Bubble Tea model
 	m := model{
-		dotSpinner:   dotSpinner,
-		meterSpinner: meterSpinner,
-		quitting:     false,
+		dotSpinner:      dotSpinner,
+		meterSpinner:    meterSpinner,
+		ellipsisSpinner: ellipsisSpinner,
+		quitting:        false,
+		done:            false,
 	}
 
 	// Start the Bubble Tea program
@@ -246,10 +252,10 @@ func New() Service {
 			auth: NewServiceAuth(db, redisStorage, bchash),
 		}
 
-		// Quit the Bubble Tea program
+		// Signal that the initialization is done
+		m.done = true
 		p.Quit()
-
-		close(done) // Close the channel to signal that we're done
+		close(done)
 	}()
 
 	// Run the Bubble Tea program
@@ -262,6 +268,9 @@ func New() Service {
 
 	// Wait for the initializations to finish
 	<-done
+
+	// Print the final state of the spinners
+	fmt.Print(m.View())
 
 	return dbInstance
 }
