@@ -209,6 +209,7 @@ func New() Service {
 	done := make(chan struct{})
 
 	// Run the Bubble Tea program and initializations in a separate goroutine
+	// Note: This is an cheap operation in terms of CPU usage, unlike other languages that do not support synchronization in this manner hahaha.
 	go func() {
 		// Initialize the Redis client
 		redisClient, err := initializeRedisClient()
