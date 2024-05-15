@@ -641,13 +641,21 @@ func NewFiberAppMiddleware(app *fiber.App) http.HandlerFunc {
 }
 
 // ConvertRequestMiddleware converts a Fiber context to an http.Request.
-func ConvertRequestMiddleware(forServer bool) fiber.Handler {
+// It allows specifying a custom context key for storing the converted request.
+// If no custom context key is provided, it defaults to using "http_request" as the key.
+func ConvertRequestMiddleware(forServer bool, contextKey ...string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		req, err := adaptor.ConvertRequest(c, forServer)
 		if err != nil {
 			return err
 		}
-		c.Locals("http_request", req)
+
+		key := "http_request"
+		if len(contextKey) > 0 {
+			key = contextKey[0]
+		}
+
+		c.Locals(key, req)
 		return c.Next()
 	}
 }
