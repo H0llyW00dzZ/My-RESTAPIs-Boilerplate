@@ -271,15 +271,17 @@ func initializeMySQLDB() (*sql.DB, error) {
 	return InitializeMySQLDB(mysqlConfig)
 }
 
-// model represents the Bubble Tea model for the spinner.
+// model represents the Bubble Tea model for the spinners.
 type model struct {
-	spinner  spinner.Model
-	quitting bool
+	dotSpinner   spinner.Model
+	meterSpinner spinner.Model
+	progress     float64
+	quitting     bool
 }
 
 // Init initializes the model.
 func (m model) Init() tea.Cmd {
-	return m.spinner.Tick
+	return tea.Batch(m.dotSpinner.Tick, m.meterSpinner.Tick)
 }
 
 // Update updates the model based on the received message.
@@ -291,7 +293,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case spinner.TickMsg:
 		var cmd tea.Cmd
-		m.spinner, cmd = m.spinner.Update(msg)
+		m.dotSpinner, cmd = m.dotSpinner.Update(msg)
+		m.meterSpinner, _ = m.meterSpinner.Update(msg)
+
+		// Update the progress value
+		m.progress += 0.1
+		if m.progress > 1.0 {
+			m.progress = 0.0
+		}
+
 		return m, cmd
 	case tea.QuitMsg:
 		return m, tea.Quit
@@ -299,7 +309,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-// View renders the spinner.
+// View renders the spinners.
 func (m model) View() string {
-	return fmt.Sprintf("\n   %s Initializing database...\n\n", m.spinner.View())
+	// Calculate the frame index based on the progress value
+	frameIndex := int(m.progress * float64(len(m.meterSpinner.Spinner.Frames)))
+
+	// Get the current frame of the meter spinner
+	meterFrame := m.meterSpinner.Spinner.Frames[frameIndex]
+
+	// Apply the color style to the spinner frames
+	styledDotSpinner := m.dotSpinner.Style.Render(m.dotSpinner.View())
+	styledMeterFrame := m.meterSpinner.Style.Render(meterFrame)
+
+	return fmt.Sprintf("\n   %s Initializing database...   %s Progress...\n\n", styledDotSpinner, styledMeterFrame)
 }

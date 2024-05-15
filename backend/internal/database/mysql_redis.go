@@ -179,13 +179,22 @@ func New() Service {
 		return dbInstance
 	}
 
-	// Create a new spinner model
-	s := spinner.New()
-	s.Spinner = spinner.Dot
-	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
+	// Create new spinner models
+	// Note: For the best experience, use a terminal that supports ANSI escape sequences, such as zsh (unix) or bash.
+	dotSpinner := spinner.New()
+	dotSpinner.Spinner = spinner.Dot
+	dotSpinner.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
+
+	meterSpinner := spinner.New()
+	meterSpinner.Spinner = spinner.Meter
+	meterSpinner.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 
 	// Initialize the Bubble Tea model
-	m := model{spinner: s, quitting: false}
+	m := model{
+		dotSpinner:   dotSpinner,
+		meterSpinner: meterSpinner,
+		quitting:     false,
+	}
 
 	// Start the Bubble Tea program
 	p := tea.NewProgram(m)
