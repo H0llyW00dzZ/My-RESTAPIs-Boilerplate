@@ -329,6 +329,7 @@ func (m model) View() string {
 	styledEllipsisSpinner := m.ellipsisSpinner.Style.Render(m.ellipsisSpinner.View())
 
 	// Note: This looks better now.
+	// TODO: Handle initialization failure scenarios, such as connection timeouts, since this initialization is only connecting to the database.
 	if m.done {
 		return fmt.Sprintf("\r\n   ✓ Database initialization completed%s   \n\n", styledEllipsisSpinner)
 	}
