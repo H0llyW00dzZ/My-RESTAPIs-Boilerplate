@@ -301,5 +301,5 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // View renders the spinner.
 func (m model) View() string {
-	return fmt.Sprintf("\n\n   %s Initializing database...\n\n", m.spinner.View())
+	return fmt.Sprintf("\n   %s Initializing database...\n\n", m.spinner.View())
 }
