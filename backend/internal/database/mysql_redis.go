@@ -362,7 +362,10 @@ func (s *service) evaluateMySQLStats(dbStats sql.DBStats, stats map[string]strin
 		stats["mysql_message"] = MsgDBHeavyLoad
 	}
 
-	if dbStats.WaitCount > 1000 {
+	// Note: It is important to monitor the WaitCount (known as wait events) when using only a
+	// single MySQL database or multiple MySQL databases without other database types (e.g., Redis).
+	// If a high WaitCount is detected, it could indicate a potential bottleneck that may lead to a Denial of Service (DoS) scenario, which should not happen.
+	if dbStats.WaitCount > 500 { // 500 is enough, since it using redis & mysql (multiple database)
 		stats["mysql_message"] = MsgDBHighWaitEvents
 	}
 
