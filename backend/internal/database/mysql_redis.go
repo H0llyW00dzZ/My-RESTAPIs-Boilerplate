@@ -214,12 +214,14 @@ func New() Service {
 		// Initialize the Redis client
 		redisClient, err := initializeRedisClient()
 		if err != nil {
+			// This will catch connection errors such as timeouts and parsing errors from the "strconv" package.
 			log.LogFatal("Failed to initialize Redis client:", err)
 		}
 
 		// Initialize Redis storage for Fiber
 		redisStorage, err := initializeRedisStorage()
 		if err != nil {
+			// This will catch connection errors such as timeouts and parsing errors from the "strconv" package.
 			log.LogFatal("Failed to initialize Redis storage:", err)
 		}
 
