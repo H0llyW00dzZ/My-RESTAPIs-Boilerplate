@@ -269,17 +269,17 @@ func initializeMySQLDB() (*sql.DB, error) {
 
 // model represents the Bubble Tea model for the spinners.
 type model struct {
-	dotSpinner      spinner.Model
-	meterSpinner    spinner.Model
-	ellipsisSpinner spinner.Model
-	progress        float64
-	quitting        bool
-	done            bool
+	dotSpinner    spinner.Model
+	meterSpinner  spinner.Model
+	pointsSpinner spinner.Model
+	progress      float64
+	quitting      bool
+	done          bool
 }
 
 // Init initializes the model.
 func (m model) Init() tea.Cmd {
-	return tea.Batch(m.dotSpinner.Tick, m.meterSpinner.Tick, m.ellipsisSpinner.Tick)
+	return tea.Batch(m.dotSpinner.Tick, m.meterSpinner.Tick, m.pointsSpinner.Tick)
 }
 
 // Update updates the model based on the received message.
@@ -295,7 +295,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 		meterSpinner, cmd := m.meterSpinner.Update(msg)
 		cmds = append(cmds, cmd)
-		ellipsisSpinner, cmd := m.ellipsisSpinner.Update(msg)
+		pointsSpinner, cmd := m.pointsSpinner.Update(msg)
 		cmds = append(cmds, cmd)
 
 		// Update the progress value
@@ -305,11 +305,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		return model{
-			dotSpinner:      dotSpinner,
-			meterSpinner:    meterSpinner,
-			ellipsisSpinner: ellipsisSpinner,
-			progress:        m.progress,
-			quitting:        m.quitting,
+			dotSpinner:    dotSpinner,
+			meterSpinner:  meterSpinner,
+			pointsSpinner: pointsSpinner,
+			progress:      m.progress,
+			quitting:      m.quitting,
 		}, tea.Batch(cmds...)
 	case tea.QuitMsg:
 		return m, tea.Quit
@@ -322,12 +322,12 @@ func (m model) View() string {
 	// Apply the color style to the spinner frames
 	styledDotSpinner := m.dotSpinner.Style.Render(m.dotSpinner.View())
 	styledMeterSpinner := m.meterSpinner.Style.Render(m.meterSpinner.View())
-	styledEllipsisSpinner := m.ellipsisSpinner.Style.Render(m.ellipsisSpinner.View())
+	styledPointsSpinner := m.pointsSpinner.Style.Render(m.pointsSpinner.View())
 
 	// Note: This looks better now.
 	// TODO: Handle initialization failure scenarios, such as connection timeouts, since this initialization is only connecting to the database.
 	if m.done {
-		return fmt.Sprintf("\r   ✓ Database initialization completed%s   \n\n", styledEllipsisSpinner)
+		return fmt.Sprintf("\r   ✓ Database initialization completed   \n\n")
 	}
-	return fmt.Sprintf("\r\n   %s Initializing database%s   %s Progress%s", styledDotSpinner, styledEllipsisSpinner, styledMeterSpinner, styledEllipsisSpinner)
+	return fmt.Sprintf("\r\n   %s Initializing database%s   %s Progress%s", styledDotSpinner, styledPointsSpinner, styledMeterSpinner, styledPointsSpinner)
 }
