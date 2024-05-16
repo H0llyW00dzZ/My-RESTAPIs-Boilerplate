@@ -28,7 +28,7 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 
 > [!WARNING]
 > Some features might not work as expected when running this repo on certain cloud providers. For example, the `Rich Presence TUIs` feature requires a [`tty`](https://en.wikipedia.org/wiki/Tty_(Unix)).
-> The reason why some features might not work as expected after implementation is because this repo is designed to be `top-level`, and most of the `Go code` in this repo follows many `best practices` and idioms from `Effective Go`.
+> The reason why some features might not work as expected after implementation is because this repo is designed to be `top-level` and follow the `Unix philosophy`. Plus, most of the `Go code` in this repo follows many `best practices` and idioms from `Effective Go`.
 
 ## TODO Features
 
