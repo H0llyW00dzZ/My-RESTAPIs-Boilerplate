@@ -285,6 +285,7 @@ func (m model) Init() tea.Cmd {
 // Update updates the model based on the received message.
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	// TODO: Remove this "tea.KeyMsg" case because "tea.Batch" is guaranteed in advanced use cases (e.g., use with spinner.Tick)
 	case tea.KeyMsg:
 		if msg.Type == tea.KeyCtrlC {
 			return m, tea.Quit
