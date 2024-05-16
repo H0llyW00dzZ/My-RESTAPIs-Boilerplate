@@ -24,6 +24,7 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 - High Performance (Thanks to the [`Sonic JSON serializing & deserializing library`](https://github.com/bytedance/sonic))
 - Cryptography Techniques
 - High Quality Go Codes
+- Rich Presence TUIs using [`charm.sh`](https://charm.sh/)
 
 ## TODO Features
 
