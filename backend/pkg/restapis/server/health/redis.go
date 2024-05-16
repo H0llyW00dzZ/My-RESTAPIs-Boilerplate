@@ -162,6 +162,7 @@ func logRedisHealthStatus(c *fiber.Ctx, response Response) error {
 	// the integrity of the logged data.
 	if redisHealth != nil && redisHealth.Status == "up" {
 		// Log general Redis status
+		// TODO: Improve this by using charm.sh TUI components for a better and more modern experience (not the ancient experience).
 		log.LogInfof("Redis Status: %s, Stats: Version: %s, Mode: %s",
 			redisHealth.Message, redisHealth.Stats.Version, redisHealth.Stats.Mode)
 
