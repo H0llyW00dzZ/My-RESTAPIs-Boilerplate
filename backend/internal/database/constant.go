@@ -8,7 +8,6 @@ package database
 const (
 	ErrDBDown                    = "db down: %v"
 	MsgDBItsHealthy              = "It's healthy"
-	MsgDBConnected               = "Initialization to database: %s"
 	MsgDBDisconnected            = "Disconnected from database: %s"
 	MsgDBHeavyLoad               = "The database is experiencing heavy load."
 	MsgDBHighWaitEvents          = "The database has a high number of wait events, indicating potential bottlenecks."

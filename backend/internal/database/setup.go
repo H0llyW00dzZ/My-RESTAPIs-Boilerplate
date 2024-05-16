@@ -8,7 +8,6 @@ import (
 	"crypto/tls"
 	"database/sql"
 	"fmt"
-	log "h0llyw00dz-template/backend/internal/logger"
 	"runtime"
 	"strconv"
 	"time"
@@ -106,8 +105,6 @@ func InitializeMySQLDB(config MySQLConfig) (*sql.DB, error) {
 	db.SetConnMaxLifetime(0) // Connections are not closed due to being idle too long.
 	db.SetMaxIdleConns(50)   // Maximum number of connections in the idle connection pool.
 	db.SetMaxOpenConns(50)   // Maximum number of open connections to the database.
-	// Log the successful database connection
-	log.LogInfof(MsgDBConnected, dbname)
 	return db, nil
 }
 
@@ -331,7 +328,7 @@ func (m model) View() string {
 	// Note: This looks better now.
 	// TODO: Handle initialization failure scenarios, such as connection timeouts, since this initialization is only connecting to the database.
 	if m.done {
-		return fmt.Sprintf("\r\n   ✓ Database initialization completed%s   \n\n", styledEllipsisSpinner)
+		return fmt.Sprintf("\r   ✓ Database initialization completed%s   \n\n", styledEllipsisSpinner)
 	}
 	return fmt.Sprintf("\r\n   %s Initializing database%s   %s Progress%s", styledDotSpinner, styledEllipsisSpinner, styledMeterSpinner, styledEllipsisSpinner)
 }
