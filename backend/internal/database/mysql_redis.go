@@ -191,17 +191,17 @@ func New() Service {
 	meterSpinner.Spinner = spinner.Meter
 	meterSpinner.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 
-	ellipsisSpinner := spinner.New()
-	ellipsisSpinner.Spinner = spinner.Ellipsis
-	ellipsisSpinner.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("15"))
+	pointsSpinner := spinner.New()
+	pointsSpinner.Spinner = spinner.Points
+	pointsSpinner.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("15"))
 
 	// Initialize the Bubble Tea model
 	m := model{
-		dotSpinner:      dotSpinner,
-		meterSpinner:    meterSpinner,
-		ellipsisSpinner: ellipsisSpinner,
-		quitting:        false,
-		done:            false,
+		dotSpinner:    dotSpinner,
+		meterSpinner:  meterSpinner,
+		pointsSpinner: pointsSpinner,
+		quitting:      false,
+		done:          false,
 	}
 
 	// Start the Bubble Tea program
@@ -257,7 +257,7 @@ func New() Service {
 			auth: NewServiceAuth(db, redisStorage, bchash),
 		}
 
-		// Signal that the initialization is done
+		// Signal that the initialization is done to the main goroutine.
 		m.done = true
 		p.Quit()
 		close(done)
