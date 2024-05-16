@@ -26,6 +26,10 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 - High Quality Go Codes
 - Rich Presence TUIs using [`charm.sh`](https://charm.sh/)
 
+> [!WARNING]
+> Some features might not work as expected when running this repo on certain cloud providers. For example, the `Rich Presence TUIs` feature requires a [`tty`](https://en.wikipedia.org/wiki/Tty_(Unix)).
+> The reason why some features might not work as expected after implementation is because this repo is designed to be `top-level`, and most of the `Go code` in this repo follows many `best practices` and idioms from `Effective Go`.
+
 ## TODO Features
 
 Move [`here`](https://github.com/users/H0llyW00dzZ/projects/2/views/3?sliceBy%5Bvalue%5D=Todo)
