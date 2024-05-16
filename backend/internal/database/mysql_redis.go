@@ -180,9 +180,13 @@ func New() Service {
 	}
 
 	// Create new spinner models
-	// Note: For the best experience, use a terminal that supports ANSI escape sequences, such as zsh (e.g, in priv8 unix server) or bash.
-	// Also note that this won't work and will fail if this repo is running on a cloud service such as Heroku because it requires "/dev/tty" (see docs https://en.wikipedia.org/wiki/Tty_(Unix)),
+	// Note: For the best experience, use a terminal that supports ANSI escape sequences, such as zsh (e.g., in a priv8 Unix server) or bash.
+	// Also note that this won't work and will fail if this repo is running on a cloud service such as Heroku because it requires "/dev/tty" (see docs https://en.wikipedia.org/wiki/Tty_(Unix)).
 	// And I won't fix it, because the issue is related to the cloud provider, not the Go code here.
+	// Update:
+	// List of OS that support this Spinner Bubble Tea:
+	// - Windows 11 cmd (latest version) (used for development of this repo, because for better compatibility/support, it needed to be developed on Windows instead of Unix/Unix-like/Linux)
+	// - Unix/Unix-like/Linux should be supported, especially Unix systems that have TTY by default.
 	dotSpinner := spinner.New()
 	dotSpinner.Spinner = spinner.Dot
 	dotSpinner.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
@@ -211,7 +215,7 @@ func New() Service {
 	done := make(chan struct{})
 
 	// Run the Bubble Tea program and initializations in a separate goroutine
-	// Note: This is an cheap operation in terms of CPU usage, unlike other languages that do not support synchronization in this manner hahaha.
+	// Note: This is a cheap operation in terms of CPU usage, unlike other languages that do not support synchronization in this manner (hahaha).
 	go func() {
 		// Initialize the Redis client
 		redisClient, err := initializeRedisClient()
@@ -235,7 +239,7 @@ func New() Service {
 			log.LogFatal("Failed to initialize MySQL database:", err)
 		}
 
-		// Initialize the bcrypt
+		// Initialize bcrypt
 		// Note: This operation should be inexpensive as it uses a pointer,
 		// and the garbage collector will be happy handling memory efficiently. 🤪
 		bchash := bcrypt.New()
@@ -246,12 +250,12 @@ func New() Service {
 			rdb:         redisStorage, // use redisStorage for rate limiting or any other needs in middleware
 			redisClient: redisClient,
 			// Note: This method is safe, even with a large number of service instances (e.g., 1 billion) due to the singleton pattern.
-			// Also MySQL should be used as the primary database, while Redis should be used for caching.
-			// Here an example data flow is:
-			// 1. For read operations: service -> Redis (if not found in Redis) -> get from main database -> putting back in Redis -> repeat.
+			// Also, MySQL should be used as the primary database, while Redis should be used for caching.
+			// Here's an example data flow:
+			// 1. For read operations: service -> Redis (if not found in Redis) -> get from main database -> put back in Redis -> repeat.
 			// 2. For insert/update operations: service -> main database -> repeat.
-			// Then Redis will handle caching for read operations, while write operations will directly interact with the main database.
-			// Also note that these example data flows are highly stable, and the reason for this logic is because traditional SQL databases (e.g., MySQL) have limited open connections,
+			// Redis will handle caching for read operations, while write operations will directly interact with the main database.
+			// Also note that these example data flows are highly stable, and the reason for this logic is that traditional SQL databases (e.g., MySQL) have limited open connections,
 			// unlike NoSQL databases (e.g., Redis), which are capable of up to 10K connections with basically no limits.
 			// So Redis is perfect for connection pooling because the most important factor for interacting with it is the connection itself.
 			auth: NewServiceAuth(db, redisStorage, bchash),
