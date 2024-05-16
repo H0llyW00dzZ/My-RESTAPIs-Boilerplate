@@ -57,6 +57,7 @@ func logMySQLHealthStatus(c *fiber.Ctx, response Response) error {
 
 	if mysqlHealth != nil && mysqlHealth.Status == "up" {
 		// Log general MySQL status
+		// TODO: Improve this by using charm.sh TUI components for a better and more modern experience (not the ancient experience).
 		log.LogInfof("MySQL Status: %s, Stats: Open Connections: %s, In Use: %s, Idle: %s, Wait Count: %s, Duration: %s",
 			response.MySQLHealth.Message,
 			response.MySQLHealth.Stats.Open,
