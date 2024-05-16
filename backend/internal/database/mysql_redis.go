@@ -181,7 +181,7 @@ func New() Service {
 
 	// Create new spinner models
 	// Note: For the best experience, use a terminal that supports ANSI escape sequences, such as zsh (e.g, in priv8 unix server) or bash.
-	// Also note that this won't work and will fail if this repo is running on a cloud service such as Heroku because it requires "/dev/tty",
+	// Also note that this won't work and will fail if this repo is running on a cloud service such as Heroku because it requires "/dev/tty" (see docs https://en.wikipedia.org/wiki/Tty_(Unix)),
 	// And I won't fix it, because the issue is related to the cloud provider, not the Go code here.
 	dotSpinner := spinner.New()
 	dotSpinner.Spinner = spinner.Dot
