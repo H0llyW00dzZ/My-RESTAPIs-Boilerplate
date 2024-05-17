@@ -214,7 +214,7 @@ func New() Service {
 	// For example, in Heroku, this still won't work. It works with `tea.WithInput(nil)`, but it won't render anything and will just be blank.
 	p := tea.NewProgram(
 		m,
-		tea.WithOutput(os.Stdout),
+		tea.WithOutput(os.Stdout), // This is similar to a custom logger that uses "os.Stdout" from I/O Writer.
 	)
 
 	// Make a channel to signal when the initialization is done
