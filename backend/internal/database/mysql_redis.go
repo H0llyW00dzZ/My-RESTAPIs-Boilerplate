@@ -209,7 +209,13 @@ func New() Service {
 	}
 
 	// Start the Bubble Tea program
-	p := tea.NewProgram(m)
+	// Note: This may still require a TTY and there's no guarantee it will work properly.
+	// If it's related to a cloud provider issue, I won't fix it, because the issue is related to the cloud provider, not the Go code here.
+	// For example, in Heroku, this still won't work. It works with `tea.WithInput(nil)`, but it won't render anything and will just be blank.
+	p := tea.NewProgram(
+		m,
+		tea.WithOutput(os.Stdout), // This is similar to a custom logger that uses "os.Stdout" from I/O Writer.
+	)
 
 	// Make a channel to signal when the initialization is done
 	done := make(chan struct{})
