@@ -208,13 +208,18 @@ func New() Service {
 		done:          false,
 	}
 
+	// Remove the real-time timestamp because a fake-time is already used for the shake running in the TTY, which is used by goroutines for emulation.
+	timeFormatter := func(t time.Time) string {
+		return ""
+	}
+
 	// Start the Bubble Tea program
-	// Note: This may still require a TTY and there's no guarantee it will work properly.
+	// Note: This may still require a TTY, and there's no guarantee it will work properly (e.g., when running in a cloud provider that doesn't allow TTY).
 	// If it's related to a cloud provider issue, I won't fix it, because the issue is related to the cloud provider, not the Go code here.
 	// For example, in Heroku, this still won't work. It works with `tea.WithInput(nil)`, but it won't render anything and will just be blank.
 	p := tea.NewProgram(
 		m,
-		tea.WithOutput(os.Stdout), // This is similar to a custom logger that uses "os.Stdout" from I/O Writer.
+		tea.WithOutput(log.NewLogWriter(os.Stdout, timeFormatter)), // Reuse from custom logger.
 	)
 
 	// Make a channel to signal when the initialization is done
