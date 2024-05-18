@@ -26,6 +26,13 @@ type StreamService interface {
 // streamService is an implementation of the stream-based encryption StreamService interface.
 // TODO: Adopt this high level of security for the stream-based encryption/decryption service, which is suitable for integration with Bubble Tea TUIs,
 // by creating a separate repository and focusing on the client-side implementation rather than a web/server implementation.
+//
+// Reasons:
+//
+//   - Limited functionality: The current implementation may not be able to leverage advanced cryptography techniques.
+//
+//   - Cost: Implementing advanced cryptography techniques can be expensive in terms of resources usage.
+//
 // Also, will add some additional features related to cryptography in the separate repository.
 type streamService struct {
 	aesKey    []byte
