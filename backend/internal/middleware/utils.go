@@ -705,7 +705,8 @@ func NewPrometheusMiddleware(serviceName string, options ...interface{}) *fiberp
 		case string:
 			if namespace == "" {
 				namespace = opt
-			} else if subsystem == "" {
+			}
+			if subsystem == "" {
 				subsystem = opt
 			}
 		case map[string]string:
