@@ -31,7 +31,7 @@ type StreamService interface {
 //
 //   - Limited functionality: The current implementation may not be able to leverage advanced cryptography techniques.
 //
-//   - Cost: Implementing advanced cryptography techniques can be expensive in terms of resources usage.
+//   - Cost: Implementing advanced cryptography techniques can be expensive in terms of resources usage. (for example, "argon2" the cost is arround 120MB round-trip tiket)
 //
 // Also, will add some additional features related to cryptography in the separate repository.
 type streamService struct {
