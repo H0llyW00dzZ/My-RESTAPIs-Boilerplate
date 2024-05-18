@@ -33,6 +33,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/google/uuid"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 // NewCacheMiddleware creates a new cache middleware with optional custom configuration options.
@@ -688,6 +689,10 @@ func ConvertRequestMiddleware(forServer bool, contextKey ...string) fiber.Handle
 //		"custom_label2": "custom_value2",
 //	})
 //
+//	// Create a new Prometheus middleware with a custom Prometheus registry
+//	customRegistry := prometheus.NewRegistry()
+//	prometheusMiddleware := NewPrometheusMiddleware("my-service", customRegistry)
+//
 //	// Register the Prometheus middleware at a specific path
 //	prometheusMiddleware.RegisterAt(app, "/metrics")
 //
@@ -696,17 +701,19 @@ func ConvertRequestMiddleware(forServer bool, contextKey ...string) fiber.Handle
 //
 // TODO: Move this to the server package, as it would be better used with the mounted app/path.
 func NewPrometheusMiddleware(serviceName string, options ...interface{}) *fiberprometheus.FiberPrometheus {
+	var registry *prometheus.Registry
 	var namespace, subsystem string
 	var labels map[string]string
 
-	// Extract namespace, subsystem, and labels from the options.
+	// Extract namespace, subsystem, labels, and registry from the options.
 	for _, option := range options {
 		switch opt := option.(type) {
+		case *prometheus.Registry:
+			registry = opt
 		case string:
 			if namespace == "" {
 				namespace = opt
-			}
-			if subsystem == "" {
+			} else if subsystem == "" {
 				subsystem = opt
 			}
 		case map[string]string:
@@ -716,7 +723,9 @@ func NewPrometheusMiddleware(serviceName string, options ...interface{}) *fiberp
 
 	// Create a new Prometheus instance based on the provided options.
 	var prometheus *fiberprometheus.FiberPrometheus
-	if labels != nil {
+	if registry != nil {
+		prometheus = fiberprometheus.NewWithRegistry(registry, serviceName, namespace, subsystem, labels)
+	} else if labels != nil {
 		prometheus = fiberprometheus.NewWithLabels(labels, namespace, subsystem)
 	} else {
 		prometheus = fiberprometheus.NewWith(serviceName, namespace, subsystem)
