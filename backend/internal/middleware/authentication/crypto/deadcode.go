@@ -15,7 +15,7 @@ import (
 // It verifies the signature of the encrypted data before decrypting.
 // If useArgon2 is true, it uses Argon2 key derivation function to derive the decryption key.
 //
-// TODO: Improve this.
+// Depcreated: Use streaming chunk instead.
 func DecryptLargeData(src io.Reader, dst io.Writer, useArgon2 bool, secryptKey, signKey string) error {
 	salt := make([]byte, 16)
 	if _, err := io.ReadFull(src, salt); err != nil {
@@ -64,7 +64,7 @@ func DecryptLargeData(src io.Reader, dst io.Writer, useArgon2 bool, secryptKey, 
 // It generates a signature for the encrypted data and appends it to the output.
 // If useArgon2 is true, it uses Argon2 key derivation function to derive the encryption key.
 //
-// TODO: Improve this.
+// Depcreated: Use streaming chunk instead.
 func EncryptLargeData(src io.Reader, dst io.Writer, useArgon2 bool, secryptKey, signKey string) error {
 	return processLargeData(src, dst, useArgon2, secryptKey, signKey, encrypt)
 }
@@ -73,6 +73,8 @@ func EncryptLargeData(src io.Reader, dst io.Writer, useArgon2 bool, secryptKey, 
 // It reads the data from the provided io.Reader and writes the processed data to the provided io.Writer.
 // The processor function is responsible for encrypting or decrypting the data.
 // It generates a signature for the processed data and appends it to the output.
+//
+// Depcreated: Use streaming chunk instead.
 func processLargeData(src io.Reader, dst io.Writer, useArgon2 bool, secryptKey, signKey string, processor func([]byte, []byte) ([]byte, error)) error {
 	salt := make([]byte, 16)
 	if _, err := rand.Read(salt); err != nil {

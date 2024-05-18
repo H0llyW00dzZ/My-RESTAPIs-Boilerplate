@@ -258,3 +258,52 @@ func TestHybridEncryptDecryptStreamWithApiKey(t *testing.T) {
 		t.Errorf("Decrypted data does not match original plaintext. Got: %s, Want: %s", decryptedData, plaintext)
 	}
 }
+
+func TestHybridEncryptDecryptStreamLargeData(t *testing.T) {
+	// Generate random keys for AES and ChaCha20-Poly1305.
+	aesKey := make([]byte, 32)    // AES-256 requires a 32-byte key.
+	chachaKey := make([]byte, 32) // ChaCha20-Poly1305 uses a 32-byte key.
+
+	_, err := rand.Read(aesKey)
+	if err != nil {
+		t.Fatalf("Failed to generate AES key: %v", err)
+	}
+
+	_, err = rand.Read(chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to generate ChaCha20-Poly1305 key: %v", err)
+	}
+
+	// Generate a large plaintext data.
+	plaintextSize := 10 * 1024 * 1024 // 10 MB
+	plaintext := make([]byte, plaintextSize)
+	_, err = rand.Read(plaintext)
+	if err != nil {
+		t.Fatalf("Failed to generate plaintext: %v", err)
+	}
+
+	// Encrypt the data.
+	inputBuffer := bytes.NewBuffer(plaintext)
+	encryptedBuffer := new(bytes.Buffer)
+	err = stream.EncryptStream(inputBuffer, encryptedBuffer, aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to encrypt data: %v", err)
+	}
+
+	// Ensure the encrypted data buffer's read position is reset to the beginning.
+	encryptedData := encryptedBuffer.Bytes()
+	encryptedBuffer = bytes.NewBuffer(encryptedData)
+
+	// Decrypt the data.
+	decryptedBuffer := new(bytes.Buffer)
+	err = stream.DecryptStream(encryptedBuffer, decryptedBuffer, aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to decrypt data: %v", err)
+	}
+
+	// Compare the decrypted data to the original plaintext.
+	decryptedData := decryptedBuffer.Bytes()
+	if !bytes.Equal(decryptedData, plaintext) {
+		t.Errorf("Decrypted data does not match original plaintext.")
+	}
+}
