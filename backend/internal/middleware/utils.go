@@ -693,6 +693,8 @@ func ConvertRequestMiddleware(forServer bool, contextKey ...string) fiber.Handle
 //
 //	// Use the Prometheus middleware
 //	app.Use(prometheusMiddleware.Middleware)
+//
+// TODO: Move this to the server package, as it would be better used with the mounted app/path.
 func NewPrometheusMiddleware(serviceName string, options ...interface{}) *fiberprometheus.FiberPrometheus {
 	var namespace, subsystem string
 	var labels map[string]string
