@@ -260,6 +260,7 @@ func TestHybridEncryptDecryptStreamWithApiKey(t *testing.T) {
 }
 
 func TestHybridEncryptDecryptStreamLargeData(t *testing.T) {
+	// Note: Works well testing on AMD Ryzen 9 3900x 12-Core Processor (24 CPUs) RAM 32GB
 	// Generate random keys for AES and ChaCha20-Poly1305.
 	aesKey := make([]byte, 32)    // AES-256 requires a 32-byte key.
 	chachaKey := make([]byte, 32) // ChaCha20-Poly1305 uses a 32-byte key.
