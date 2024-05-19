@@ -52,7 +52,7 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 }
 
 // registerRouteConfigMiddleware applies middleware configurations to the Fiber application.
-// It sets up the necessary middleware such as recovery, logging, and custom error handling for manipulate panics.
+// It sets up the necessary middleware such as recovery, logging, and custom error handling for manipulating panics.
 func registerRouteConfigMiddleware(app *fiber.App) {
 
 	// Favicon front end setup
@@ -63,6 +63,8 @@ func registerRouteConfigMiddleware(app *fiber.App) {
 	)
 
 	// Recovery middleware setup
+	// TODO: Move this into the server package because it should be initialized as the root before other functions.
+	// This way, it can catch any panics, for example, catch any panic through the sub-package k8s/metrics.
 	recoverMiddleware := recover.New(recover.Config{
 		EnableStackTrace: true,
 		StackTraceHandler: func(c *fiber.Ctx, e interface{}) {
