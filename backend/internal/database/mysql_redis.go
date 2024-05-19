@@ -10,6 +10,7 @@ import (
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/bcrypt"
+	"math"
 	"os"
 	"strconv"
 	"sync"
@@ -453,13 +454,9 @@ func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string)
 			// Extract the number of active connections (TotalConns - IdleConns gives us the ActiveConns)
 			// Note: This fixes a potential underflow issue that may occur in certain rare cases.
 			// The problem only occurs occasionally.
-			activeConns := poolStats.TotalConns - poolStats.IdleConns
-			// TODO: Improve this. There might be another way since other uint32s don't present any issues
-			// and are accurately converted to uint64 or even float64.
-			if activeConns < 0 {
-				activeConns = 0
-			}
-			stats["redis_active_connections"] = strconv.FormatUint(uint64(activeConns), 10)
+			// Also, note that math.Max is used now because it might prevent warnings in other Go linters, such as the golangci-lint.
+			activeConns := uint64(math.Max(float64(poolStats.TotalConns-poolStats.IdleConns), 0))
+			stats["redis_active_connections"] = strconv.FormatUint(activeConns, 10)
 
 			// Get the used memory of the Redis server in bytes
 			stats["redis_max_memory"] = redisInfo["maxmemory"] // Raw max memory in bytes
