@@ -12,7 +12,6 @@ import (
 
 	log "h0llyw00dz-template/backend/internal/logger"
 
-	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
@@ -33,7 +32,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/google/uuid"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 // NewCacheMiddleware creates a new cache middleware with optional custom configuration options.
@@ -660,77 +658,4 @@ func ConvertRequestMiddleware(forServer bool, contextKey ...string) fiber.Handle
 		c.Locals(key, req)
 		return c.Next()
 	}
-}
-
-// NewPrometheusMiddleware creates a new Prometheus middleware with optional custom configuration options.
-//
-// Example usage:
-//
-//	app := fiber.New()
-//
-//	// Create a new Prometheus middleware with a service name
-//	prometheusMiddleware := NewPrometheusMiddleware("my-service")
-//
-//	// Create a new Prometheus middleware with a service name and namespace
-//	prometheusMiddleware := NewPrometheusMiddleware("my-service", "my-namespace")
-//
-//	// Create a new Prometheus middleware with a service name, namespace, and subsystem
-//	prometheusMiddleware := NewPrometheusMiddleware("my-service", "my-namespace", "my-subsystem")
-//
-//	// Create a new Prometheus middleware with a service name and custom labels
-//	prometheusMiddleware := NewPrometheusMiddleware("my-service", map[string]string{
-//		"custom_label1": "custom_value1",
-//		"custom_label2": "custom_value2",
-//	})
-//
-//	// Create a new Prometheus middleware with a service name, namespace, subsystem, and custom labels
-//	prometheusMiddleware := NewPrometheusMiddleware("my-service", "my-namespace", "my-subsystem", map[string]string{
-//		"custom_label1": "custom_value1",
-//		"custom_label2": "custom_value2",
-//	})
-//
-//	// Create a new Prometheus middleware with a custom Prometheus registry
-//	customRegistry := prometheus.NewRegistry()
-//	prometheusMiddleware := NewPrometheusMiddleware("my-service", customRegistry)
-//
-//	// Register the Prometheus middleware at a specific path
-//	prometheusMiddleware.RegisterAt(app, "/metrics")
-//
-//	// Use the Prometheus middleware
-//	app.Use(prometheusMiddleware.Middleware)
-//
-// TODO: Move this to the server package, as it would be better used with the mounted app/path.
-func NewPrometheusMiddleware(serviceName string, options ...interface{}) *fiberprometheus.FiberPrometheus {
-	var registry *prometheus.Registry
-	var namespace, subsystem string
-	var labels map[string]string
-
-	// Extract namespace, subsystem, labels, and registry from the options.
-	for _, option := range options {
-		switch opt := option.(type) {
-		case *prometheus.Registry:
-			registry = opt
-		case string:
-			if namespace == "" {
-				namespace = opt
-			} else if subsystem == "" {
-				subsystem = opt
-			}
-		case map[string]string:
-			labels = opt
-		}
-	}
-
-	// Create a new Prometheus instance based on the provided options.
-	var prometheus *fiberprometheus.FiberPrometheus
-	if registry != nil {
-		prometheus = fiberprometheus.NewWithRegistry(registry, serviceName, namespace, subsystem, labels)
-	} else if labels != nil {
-		prometheus = fiberprometheus.NewWithLabels(labels, namespace, subsystem)
-	} else {
-		prometheus = fiberprometheus.NewWith(serviceName, namespace, subsystem)
-	}
-
-	// Return the Prometheus middleware.
-	return prometheus
 }
