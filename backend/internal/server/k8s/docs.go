@@ -2,7 +2,7 @@
 //
 // License: BSD 3-Clause License
 
-// Package k8s provides functionality for integrating with Kubernetes.
+// Package k8s provides functionality for integrating with at top-level Kubernetes.
 //
 // This package contains subpackages and modules that are specific to Kubernetes-related
 // features and configurations. It aims to simplify the integration of the application
