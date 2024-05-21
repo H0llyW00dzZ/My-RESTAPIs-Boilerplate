@@ -11,6 +11,7 @@ import (
 	"hash/fnv"
 	"time"
 
+	validator "github.com/H0llyW00dzZ/FiberValidator"
 	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
@@ -762,6 +763,7 @@ func WithSwaggerCacheAge(cacheAge int) func(*swagger.Config) {
 //	*csrf.Config: Sets the Next function for the CSRF middleware.
 //	*redirect.Config: Sets the Next function for the redirect middleware.
 //	*swagger.Config: Sets the Next function for the Swagger middleware.
+//	*validator.Config: Sets the Next function for the Validator middleware.
 //
 // The Next function takes a *fiber.Ctx as a parameter and returns a boolean value.
 // If the Next function returns true, the middleware will be skipped for the current request.
@@ -790,6 +792,9 @@ func WithSwaggerCacheAge(cacheAge int) func(*swagger.Config) {
 //	// Use the WithNext option function to set the Next function for the Swagger middleware
 //	swaggerMiddleware := NewSwaggerMiddleware(WithNext(customNext))
 //
+//	// Use the WithNext option function to set the Next function for the Validator middleware
+//	validatorMiddleware := NewValidatorMiddleware(WithNext(customNext))
+//
 // Note:
 //   - If an unsupported middleware configuration is passed to WithNext, it will panic with an error message.
 //   - Additional "Next" functionality for other middlewares will be added based on future requirements.
@@ -805,6 +810,8 @@ func WithNext(next func(c *fiber.Ctx) bool) interface{} {
 		case *redirect.Config:
 			cfg.Next = next
 		case *swagger.Config:
+			cfg.Next = next
+		case *validator.Config:
 			cfg.Next = next
 		default:
 			panic(fmt.Sprintf("unsupported config type: %T", config))
@@ -917,5 +924,26 @@ func WithRules(rules map[string]string) interface{} {
 		default:
 			panic(fmt.Sprintf("unsupported config type: %T", config))
 		}
+	}
+}
+
+// WithValidatorRules is an option function for NewValidatorMiddleware that sets the validation rules.
+func WithValidatorRules(rules []validator.Restrictor) func(*validator.Config) {
+	return func(config *validator.Config) {
+		config.Rules = rules
+	}
+}
+
+// WithValidatorErrorHandler is an option function for NewValidatorMiddleware that sets the error handler function.
+func WithValidatorErrorHandler(errorHandler func(c *fiber.Ctx, err error) error) func(*validator.Config) {
+	return func(config *validator.Config) {
+		config.ErrorHandler = errorHandler
+	}
+}
+
+// WithValidatorContextKey is an option function for NewValidatorMiddleware that sets the context key for storing the validation result.
+func WithValidatorContextKey(contextKey string) func(*validator.Config) {
+	return func(config *validator.Config) {
+		config.ContextKey = contextKey
 	}
 }

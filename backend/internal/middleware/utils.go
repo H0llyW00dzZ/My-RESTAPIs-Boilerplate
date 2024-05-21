@@ -12,6 +12,7 @@ import (
 
 	log "h0llyw00dz-template/backend/internal/logger"
 
+	validator "github.com/H0llyW00dzZ/FiberValidator"
 	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
@@ -658,4 +659,26 @@ func ConvertRequestMiddleware(forServer bool, contextKey ...string) fiber.Handle
 		c.Locals(key, req)
 		return c.Next()
 	}
+}
+
+// NewValidatorMiddleware creates a new Validator middleware with the provided configuration.
+//
+// Note: This is still a work in progress and might not work as expected for MIME types other than JSON.
+// The reason for implementing it here is to avoid having to add it again.
+func NewValidatorMiddleware(options ...interface{}) fiber.Handler {
+	// Create a new Validator middleware configuration.
+	config := validator.Config{}
+
+	// Apply any additional options to the Validator configuration.
+	for _, option := range options {
+		if optFunc, ok := option.(func(*validator.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create the Validator middleware with the configured options.
+	validatorMiddleware := validator.New(config)
+
+	// Return the Validator middleware.
+	return validatorMiddleware
 }

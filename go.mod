@@ -3,6 +3,7 @@ module h0llyw00dz-template
 go 1.22.3
 
 require (
+	github.com/H0llyW00dzZ/FiberValidator v0.5.1
 	github.com/ansrivas/fiberprometheus/v2 v2.6.1
 	github.com/bytedance/sonic v1.11.6
 	github.com/charmbracelet/bubbles v0.18.0
