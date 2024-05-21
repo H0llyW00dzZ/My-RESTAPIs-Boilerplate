@@ -947,3 +947,21 @@ func WithValidatorContextKey(contextKey string) func(*validator.Config) {
 		config.ContextKey = contextKey
 	}
 }
+
+// ptr is a helper function that takes an int value and returns a pointer to it.
+// This is useful when a pointer to an int value needs to be passed, such as when setting
+// the Max value in a validator.Restrictor.
+//
+// Example usage:
+//
+//	app.Use(validator.New(validator.Config{
+//		Rules: []validator.Restrictor{
+//			validator.RestrictNumberOnly{
+//				Fields: []string{"seafood_price"},
+//				Max:    ptr(100),
+//			},
+//		},
+//	}))
+func ptr(i int) *int {
+	return &i
+}
