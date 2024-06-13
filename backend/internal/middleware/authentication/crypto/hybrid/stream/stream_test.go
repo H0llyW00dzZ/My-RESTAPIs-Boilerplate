@@ -230,7 +230,9 @@ func TestHybridEncryptDecryptStreamWithHMAC(t *testing.T) {
 		t.Fatalf("Failed to calculate HMAC digest for verification: %v", err)
 	}
 
+	t.Logf("Verified Checksum: %x", verifiedHMACDigest)
+
 	if !bytes.Equal(verifiedHMACDigest, hmacDigest) {
-		t.Errorf("HMAC verification failed. Got: %x, Want: %x", verifiedHMACDigest, hmacDigest)
+		t.Errorf("HMAC verification failed. Expected: %x, Got: %x", hmacDigest, verifiedHMACDigest)
 	}
 }
