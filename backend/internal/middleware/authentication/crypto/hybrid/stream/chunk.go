@@ -151,6 +151,8 @@ func readAndDecryptChunk(aesBlock cipher.Block, chacha cipher.AEAD, hmac hash.Ha
 //	     ID   UUID   TEXT
 //		---- ------ ------
 //		 1    Text   Text
+//
+// Also note that these TODOs won't break the cipher text because they are outside the encrypted data.
 func writeChunk(encryptedChunk, chachaNonce []byte, output io.Writer) error {
 	chunkSizeBuf := make([]byte, 2)
 	binary.BigEndian.PutUint16(chunkSizeBuf, uint16(len(encryptedChunk)))
