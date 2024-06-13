@@ -15,7 +15,7 @@ import (
 func BenchmarkHybridEncryptDecryptStream(b *testing.B) {
 	// Generate random keys for AES and ChaCha20-Poly1305.
 	aesKey := make([]byte, 32)    // AES-256 requires a 32-byte key.
-	chachaKey := make([]byte, 32) // ChaCha20-Poly1305 uses a 32-byte key.
+	chachaKey := make([]byte, 32) // XChaCha20-Poly1305 uses a 32-byte key.
 
 	_, err := rand.Read(aesKey)
 	if err != nil {
@@ -66,7 +66,7 @@ func BenchmarkHybridEncryptDecryptStream(b *testing.B) {
 func BenchmarkHybridEncryptDecryptStreamWithHMAC(b *testing.B) {
 	// Generate random keys for AES and ChaCha20-Poly1305.
 	aesKey := make([]byte, 32)    // AES-256 requires a 32-byte key.
-	chachaKey := make([]byte, 32) // ChaCha20-Poly1305 uses a 32-byte key.
+	chachaKey := make([]byte, 32) // XChaCha20-Poly1305 uses a 32-byte key.
 
 	_, err := rand.Read(aesKey)
 	if err != nil {
@@ -114,6 +114,8 @@ func BenchmarkHybridEncryptDecryptStreamWithHMAC(b *testing.B) {
 		}
 
 		// Calculate the HMAC digest.
+		//
+		// Note: This Calculate HMAC digest does not actually calculate, its a trick
 		encryptedData := encryptedBuffer.Bytes()
 		_, err = s.Digest(bytes.NewReader(encryptedData))
 		if err != nil {
