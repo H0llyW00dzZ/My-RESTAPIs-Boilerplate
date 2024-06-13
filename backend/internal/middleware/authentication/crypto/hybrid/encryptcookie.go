@@ -78,7 +78,7 @@ func encryptAESGCM(plaintext, key []byte) ([]byte, []byte, error) {
 	return ciphertext, nonce, nil
 }
 
-// encryptChaCha20Poly1305 encrypts the plaintext using ChaCha20-Poly1305 and returns the ciphertext and nonce.
+// encryptChaCha20Poly1305 encrypts the plaintext using XChaCha20-Poly1305 and returns the ciphertext and nonce.
 func encryptChaCha20Poly1305(plaintext, key []byte) ([]byte, []byte, error) {
 	aead, err := chacha20poly1305.NewX(key)
 	if err != nil {

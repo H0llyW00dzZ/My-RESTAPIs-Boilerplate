@@ -8,7 +8,7 @@ import (
 	"io"
 )
 
-// Decrypt reads from the input stream, decrypts the data using ChaCha20-Poly1305 and AES-CTR,
+// Decrypt reads from the input stream, decrypts the data using XChaCha20-Poly1305 and AES-CTR,
 // verifies the HMAC if enabled, and writes it to the output stream.
 func (s *Stream) Decrypt(input io.Reader, output io.Writer) error {
 	for {

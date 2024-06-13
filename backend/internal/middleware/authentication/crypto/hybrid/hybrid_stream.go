@@ -39,7 +39,7 @@ type streamService struct {
 }
 
 // NewStreamService creates a new instance of the stream-based encryption service.
-// It takes the AES and ChaCha20-Poly1305 keys as input.
+// It takes the AES and XChaCha20-Poly1305 keys as input.
 func NewStreamService(aesKey, chachaKey []byte) (StreamService, error) {
 	s, err := stream.New(aesKey, chachaKey)
 	if err != nil {
