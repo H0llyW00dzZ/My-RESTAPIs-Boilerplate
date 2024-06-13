@@ -9,7 +9,7 @@ import (
 )
 
 // Encrypt reads from the input stream, encrypts the data using AES-CTR and ChaCha20-Poly1305,
-// and writes it to the output stream.
+// calculates the HMAC if enabled, and writes it to the output stream.
 func (s *Stream) Encrypt(input io.Reader, output io.Writer) error {
 	chunk := make([]byte, chunkSize)
 	for {
@@ -19,7 +19,7 @@ func (s *Stream) Encrypt(input io.Reader, output io.Writer) error {
 		}
 
 		if n > 0 {
-			if err := encryptAndWriteChunk(s.aesBlock, s.chacha, chunk[:n], output); err != nil {
+			if err := encryptAndWriteChunk(s.aesBlock, s.chacha, s.hmac, chunk[:n], output); err != nil {
 				return err
 			}
 		}

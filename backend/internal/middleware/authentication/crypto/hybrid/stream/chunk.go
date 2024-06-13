@@ -7,7 +7,10 @@ package stream
 import (
 	"crypto/cipher"
 	"crypto/rand"
+	"crypto/subtle"
 	"encoding/binary"
+	"errors"
+	"hash"
 	"io"
 
 	"golang.org/x/crypto/chacha20poly1305"
@@ -69,11 +72,18 @@ func decryptChunk(aesBlock cipher.Block, chacha cipher.AEAD, chachaNonce, chacha
 	return chunk, nil
 }
 
-// encryptAndWriteChunk encrypts a chunk and writes it to the output stream.
-func encryptAndWriteChunk(aesBlock cipher.Block, chacha cipher.AEAD, chunk []byte, output io.Writer) error {
+// encryptAndWriteChunk encrypts a chunk, calculates the HMAC (if enabled), and writes it to the output stream.
+func encryptAndWriteChunk(aesBlock cipher.Block, chacha cipher.AEAD, hmac hash.Hash, chunk []byte, output io.Writer) error {
 	chachaNonce, encryptedChunk, err := encryptChunk(aesBlock, chacha, chunk)
 	if err != nil {
 		return err
+	}
+
+	if hmac != nil {
+		hmac.Reset()
+		hmac.Write(encryptedChunk)
+		hmacDigest := hmac.Sum(nil)
+		encryptedChunk = append(encryptedChunk, hmacDigest...)
 	}
 
 	if err := writeChunk(encryptedChunk, chachaNonce, output); err != nil {
@@ -83,8 +93,8 @@ func encryptAndWriteChunk(aesBlock cipher.Block, chacha cipher.AEAD, chunk []byt
 	return nil
 }
 
-// readAndDecryptChunk reads an encrypted chunk from the input stream and decrypts it.
-func readAndDecryptChunk(aesBlock cipher.Block, chacha cipher.AEAD, input io.Reader) ([]byte, error) {
+// readAndDecryptChunk reads an encrypted chunk from the input stream, verifies the HMAC (if enabled), and decrypts it.
+func readAndDecryptChunk(aesBlock cipher.Block, chacha cipher.AEAD, hmac hash.Hash, input io.Reader) ([]byte, error) {
 	chunkSize, chachaNonce, err := readChunkMetadata(input)
 	if err != nil {
 		return nil, err
@@ -93,6 +103,22 @@ func readAndDecryptChunk(aesBlock cipher.Block, chacha cipher.AEAD, input io.Rea
 	encryptedChunk := make([]byte, chunkSize)
 	if _, err := io.ReadFull(input, encryptedChunk); err != nil {
 		return nil, err
+	}
+
+	if hmac != nil {
+		hmacDigestSize := hmac.Size()
+		if len(encryptedChunk) < hmacDigestSize {
+			return nil, errors.New("invalid HMAC digest size")
+		}
+		hmacDigest := encryptedChunk[len(encryptedChunk)-hmacDigestSize:]
+		encryptedChunk = encryptedChunk[:len(encryptedChunk)-hmacDigestSize]
+
+		hmac.Reset()
+		hmac.Write(encryptedChunk)
+		expectedHMACDigest := hmac.Sum(nil)
+		if subtle.ConstantTimeCompare(hmacDigest, expectedHMACDigest) != 1 {
+			return nil, errors.New("HMAC verification failed")
+		}
 	}
 
 	chunk, err := decryptChunk(aesBlock, chacha, chachaNonce, encryptedChunk)

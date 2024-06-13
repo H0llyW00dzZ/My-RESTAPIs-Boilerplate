@@ -9,10 +9,10 @@ import (
 )
 
 // Decrypt reads from the input stream, decrypts the data using ChaCha20-Poly1305 and AES-CTR,
-// and writes it to the output stream.
+// verifies the HMAC if enabled, and writes it to the output stream.
 func (s *Stream) Decrypt(input io.Reader, output io.Writer) error {
 	for {
-		chunk, err := readAndDecryptChunk(s.aesBlock, s.chacha, input)
+		chunk, err := readAndDecryptChunk(s.aesBlock, s.chacha, s.hmac, input)
 		if err == io.EOF {
 			break
 		} else if err != nil {
