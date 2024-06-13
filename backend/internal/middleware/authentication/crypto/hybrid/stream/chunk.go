@@ -130,6 +130,27 @@ func readAndDecryptChunk(aesBlock cipher.Block, chacha cipher.AEAD, hmac hash.Ha
 }
 
 // writeChunk writes the encrypted chunk and its metadata to the output stream.
+//
+// TODO: Add an identifier to the chunk metadata. Since this is an object chunk, it is possible to include an identifier.
+// For example, when inspecting the binary data, it might look like:
+//
+//	+---------------------------------------+
+//	|                METADATA               |
+//	+-------------+-------------------------+
+//	|             |        Contestant       |
+//	| Competition +-------+--------+--------+
+//	|             |  John | Andrea | Robert |
+//	+-------------+-------+--------+--------+
+//	| Swimming    |  1:30 |   2:05 |   1:15 |
+//	+-------------+-------+--------+--------+
+//	| Running     | 15:30 |  14:10 |  15:45 |
+//	+-------------+-------+--------+--------+
+//
+// Another example:
+//
+//	     ID   UUID   TEXT
+//		---- ------ ------
+//		 1    Text   Text
 func writeChunk(encryptedChunk, chachaNonce []byte, output io.Writer) error {
 	chunkSizeBuf := make([]byte, 2)
 	binary.BigEndian.PutUint16(chunkSizeBuf, uint16(len(encryptedChunk)))
