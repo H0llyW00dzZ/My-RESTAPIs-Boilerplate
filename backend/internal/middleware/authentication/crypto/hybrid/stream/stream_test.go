@@ -238,7 +238,7 @@ func TestHybridEncryptDecryptStreamWithHMAC(t *testing.T) {
 }
 
 func TestHybridEncryptDecryptStreamWithHMACHasBeenCompromised(t *testing.T) {
-	// Generate random keys for AES and ChaCha20-Poly1305.
+	// Generate random keys for AES and XChaCha20-Poly1305.
 	aesKey := make([]byte, 32)    // AES-256 requires a 32-byte key.
 	chachaKey := make([]byte, 32) // XChaCha20-Poly1305 uses a 32-byte key.
 
@@ -301,5 +301,64 @@ func TestHybridEncryptDecryptStreamWithHMACHasBeenCompromised(t *testing.T) {
 	decryptedData := decryptedBuffer.Bytes()
 	if bytes.Equal(decryptedData, plaintext) {
 		t.Errorf("Decrypted data matches original plaintext despite unauthorized modification.")
+	}
+}
+
+// Test an additional layer of security on top of the strong (3-key) authentication.
+func TestHybridEncryptDecryptStreamWithWrongHMACKey(t *testing.T) {
+	// Generate random keys for AES and XChaCha20-Poly1305.
+	aesKey := make([]byte, 32)    // AES-256 requires a 32-byte key.
+	chachaKey := make([]byte, 32) // XChaCha20-Poly1305 uses a 32-byte key.
+
+	_, err := rand.Read(aesKey)
+	if err != nil {
+		t.Fatalf("Failed to generate AES key: %v", err)
+	}
+
+	_, err = rand.Read(chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to generate XChaCha20-Poly1305 key: %v", err)
+	}
+
+	// Create a new Stream instance.
+	s, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to create Stream instance: %v", err)
+	}
+
+	// Generate a random HMAC key.
+	hmacKey := make([]byte, 32)
+	_, err = rand.Read(hmacKey)
+	if err != nil {
+		t.Fatalf("Failed to generate HMAC key: %v", err)
+	}
+
+	// Enable HMAC authentication.
+	s.EnableHMAC(hmacKey)
+
+	// Simulate plaintext data to encrypt.
+	plaintext := []byte("Hello, World! This is a test of the hybrid encryption system with the wrong HMAC key.")
+
+	// Encrypt the data.
+	inputBuffer := bytes.NewBuffer(plaintext)
+	encryptedBuffer := new(bytes.Buffer)
+	err = s.Encrypt(inputBuffer, encryptedBuffer)
+	if err != nil {
+		t.Fatalf("Failed to encrypt data: %v", err)
+	}
+
+	// Generate a different HMAC key.
+	wrongHMACKey := make([]byte, 32)
+	_, err = rand.Read(wrongHMACKey)
+	if err != nil {
+		t.Fatalf("Failed to generate wrong HMAC key: %v", err)
+	}
+
+	// Decrypt the data using the wrong HMAC key.
+	s.EnableHMAC(wrongHMACKey)
+	decryptedBuffer := new(bytes.Buffer)
+	err = s.Decrypt(encryptedBuffer, decryptedBuffer)
+	if err == nil {
+		t.Errorf("Decryption succeeded with the wrong HMAC key.")
 	}
 }
