@@ -24,7 +24,7 @@ const (
 	chunkSize    = 1024
 )
 
-// encryptChunk encrypts a single chunk using AES-CTR and ChaCha20-Poly1305.
+// encryptChunk encrypts a single chunk using AES-CTR and XChaCha20-Poly1305.
 func encryptChunk(aesBlock cipher.Block, chacha cipher.AEAD, chunk []byte) ([]byte, []byte, error) {
 	// Generate a nonce for AES-CTR.
 	aesNonce := make([]byte, aesNonceSize)
@@ -40,21 +40,21 @@ func encryptChunk(aesBlock cipher.Block, chacha cipher.AEAD, chunk []byte) ([]by
 	// Prepend the AES nonce to the AES-CTR encrypted chunk.
 	aesEncryptedChunkWithNonce := append(aesNonce, aesEncryptedChunk...)
 
-	// Generate a nonce for ChaCha20-Poly1305.
+	// Generate a nonce for XChaCha20-Poly1305.
 	chachaNonce := make([]byte, chacha.NonceSize())
 	if _, err := rand.Read(chachaNonce); err != nil {
 		return nil, nil, err
 	}
 
-	// Encrypt the AES-CTR encrypted chunk (including the AES nonce) using ChaCha20-Poly1305.
+	// Encrypt the AES-CTR encrypted chunk (including the AES nonce) using XChaCha20-Poly1305.
 	chachaEncryptedChunk := chacha.Seal(nil, chachaNonce, aesEncryptedChunkWithNonce, nil)
 
 	return chachaNonce, chachaEncryptedChunk, nil
 }
 
-// decryptChunk decrypts a single chunk using ChaCha20-Poly1305 and AES-CTR.
+// decryptChunk decrypts a single chunk using XChaCha20-Poly1305 and AES-CTR.
 func decryptChunk(aesBlock cipher.Block, chacha cipher.AEAD, chachaNonce, chachaEncryptedChunk []byte) ([]byte, error) {
-	// Decrypt the chunk using ChaCha20-Poly1305.
+	// Decrypt the chunk using XChaCha20-Poly1305.
 	aesEncryptedChunk, err := chacha.Open(nil, chachaNonce, chachaEncryptedChunk, nil)
 	if err != nil {
 		return nil, err
@@ -147,7 +147,7 @@ func writeChunk(encryptedChunk, chachaNonce []byte, output io.Writer) error {
 	return nil
 }
 
-// readChunkMetadata reads the chunk size and ChaCha20-Poly1305 nonce from the input stream.
+// readChunkMetadata reads the chunk size and XChaCha20-Poly1305 nonce from the input stream.
 func readChunkMetadata(input io.Reader) (uint16, []byte, error) {
 	chunkSizeBuf := make([]byte, 2)
 	if _, err := io.ReadFull(input, chunkSizeBuf); err != nil {

@@ -21,7 +21,7 @@ type Stream struct {
 	hmac     hash.Hash
 }
 
-// New creates a new Stream instance with the provided AES and ChaCha20-Poly1305 keys.
+// New creates a new Stream instance with the provided AES and XChaCha20-Poly1305 keys.
 // HMAC authentication is disabled by default.
 func New(aesKey, chachaKey []byte) (*Stream, error) {
 	aesBlock, err := aes.NewCipher(aesKey)

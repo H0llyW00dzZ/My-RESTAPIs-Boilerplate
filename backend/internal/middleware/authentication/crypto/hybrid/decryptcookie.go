@@ -82,7 +82,7 @@ func decryptAESGCM(ciphertext, nonce, key []byte) ([]byte, error) {
 	return plaintext, nil
 }
 
-// decryptChaCha20Poly1305 decrypts the ciphertext using ChaCha20-Poly1305 and returns the plaintext.
+// decryptChaCha20Poly1305 decrypts the ciphertext using XChaCha20-Poly1305 and returns the plaintext.
 func decryptChaCha20Poly1305(ciphertext, nonce, key []byte) ([]byte, error) {
 	aead, err := chacha20poly1305.NewX(key)
 	if err != nil {
