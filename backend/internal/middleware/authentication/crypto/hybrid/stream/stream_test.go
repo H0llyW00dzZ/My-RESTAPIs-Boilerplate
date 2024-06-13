@@ -286,7 +286,7 @@ func TestHybridEncryptDecryptStreamWithHMACHasBeenCompromised(t *testing.T) {
 	// Simulate unauthorized modification of the encrypted data.
 	//
 	// Let's say this Data has been Compromised.
-	encryptedData[0] ^= 0xFF // Flip the first byte of the encrypted data.
+	encryptedData[1] ^= 0xFF // Flip the first byte of the encrypted data.
 
 	// Decrypt the data without calculating the HMAC digest (skipping step 2 and 3).
 	decryptedBuffer := new(bytes.Buffer)
