@@ -24,7 +24,7 @@ func BenchmarkHybridEncryptDecryptStream(b *testing.B) {
 
 	_, err = rand.Read(chachaKey)
 	if err != nil {
-		b.Fatalf("Failed to generate ChaCha20-Poly1305 key: %v", err)
+		b.Fatalf("Failed to generate XChaCha20-Poly1305 key: %v", err)
 	}
 
 	// Create a new Stream instance.
@@ -75,7 +75,7 @@ func BenchmarkHybridEncryptDecryptStreamWithHMAC(b *testing.B) {
 
 	_, err = rand.Read(chachaKey)
 	if err != nil {
-		b.Fatalf("Failed to generate ChaCha20-Poly1305 key: %v", err)
+		b.Fatalf("Failed to generate XChaCha20-Poly1305 key: %v", err)
 	}
 
 	// Create a new Stream instance.
