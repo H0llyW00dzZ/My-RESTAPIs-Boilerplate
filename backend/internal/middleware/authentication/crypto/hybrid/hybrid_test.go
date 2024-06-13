@@ -157,7 +157,10 @@ func TestStreamEncryptDecrypt(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Create an instance of the stream encryption service
-			service := hybrid.NewStreamService(aesKey, chachaKey)
+			service, err := hybrid.NewStreamService(aesKey, chachaKey)
+			if err != nil {
+				t.Fatalf("Failed to create stream encryption service: %v", err)
+			}
 
 			// Encrypt the data value
 			encryptedData, err := service.Encrypt(tc.value)
@@ -196,13 +199,19 @@ func TestHybridEncryptDecryptStream(t *testing.T) {
 		t.Fatalf("Failed to generate ChaCha20-Poly1305 key: %v", err)
 	}
 
+	// Create an instance of the stream encryption service
+	stream, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to create stream encryption service: %v", err)
+	}
+
 	// Simulate plaintext data to encrypt.
 	plaintext := []byte("Hello, World! This is a test of the hybrid encryption system.")
 
 	// Encrypt the data.
 	inputBuffer := bytes.NewBuffer(plaintext)
 	encryptedBuffer := new(bytes.Buffer)
-	err = stream.EncryptStream(inputBuffer, encryptedBuffer, aesKey, chachaKey)
+	err = stream.Encrypt(inputBuffer, encryptedBuffer)
 	if err != nil {
 		t.Fatalf("Failed to encrypt data: %v", err)
 	}
@@ -213,7 +222,7 @@ func TestHybridEncryptDecryptStream(t *testing.T) {
 
 	// Decrypt the data.
 	decryptedBuffer := new(bytes.Buffer)
-	err = stream.DecryptStream(encryptedBuffer, decryptedBuffer, aesKey, chachaKey)
+	err = stream.Decrypt(encryptedBuffer, decryptedBuffer)
 	if err != nil {
 		t.Fatalf("Failed to decrypt data: %v", err)
 	}
@@ -230,13 +239,19 @@ func TestHybridEncryptDecryptStreamWithApiKey(t *testing.T) {
 	aesKey := []byte("gopher-testing-testing-testinggg")
 	chachaKey := []byte("gopher-testing-testing-testinggg")
 
+	// Create an instance of the stream encryption service
+	service, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to create stream encryption service: %v", err)
+	}
+
 	// Simulate plaintext data to encrypt.
 	plaintext := []byte("Hello, World! This is a test of the hybrid encryption system.")
 
 	// Encrypt the data.
 	inputBuffer := bytes.NewBuffer(plaintext)
 	encryptedBuffer := new(bytes.Buffer)
-	err := stream.EncryptStream(inputBuffer, encryptedBuffer, aesKey, chachaKey)
+	err = service.Encrypt(inputBuffer, encryptedBuffer)
 	if err != nil {
 		t.Fatalf("Failed to encrypt data: %v", err)
 	}
@@ -247,7 +262,7 @@ func TestHybridEncryptDecryptStreamWithApiKey(t *testing.T) {
 
 	// Decrypt the data.
 	decryptedBuffer := new(bytes.Buffer)
-	err = stream.DecryptStream(encryptedBuffer, decryptedBuffer, aesKey, chachaKey)
+	err = service.Decrypt(encryptedBuffer, decryptedBuffer)
 	if err != nil {
 		t.Fatalf("Failed to decrypt data: %v", err)
 	}
@@ -275,6 +290,12 @@ func TestHybridEncryptDecryptStreamLargeData(t *testing.T) {
 		t.Fatalf("Failed to generate ChaCha20-Poly1305 key: %v", err)
 	}
 
+	// Create an instance of the stream encryption service
+	stream, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to create stream encryption service: %v", err)
+	}
+
 	// Generate a large plaintext data.
 	plaintextSize := 10 * 1024 * 1024 // 10 MB
 	plaintext := make([]byte, plaintextSize)
@@ -286,7 +307,7 @@ func TestHybridEncryptDecryptStreamLargeData(t *testing.T) {
 	// Encrypt the data.
 	inputBuffer := bytes.NewBuffer(plaintext)
 	encryptedBuffer := new(bytes.Buffer)
-	err = stream.EncryptStream(inputBuffer, encryptedBuffer, aesKey, chachaKey)
+	err = stream.Encrypt(inputBuffer, encryptedBuffer)
 	if err != nil {
 		t.Fatalf("Failed to encrypt data: %v", err)
 	}
@@ -297,7 +318,7 @@ func TestHybridEncryptDecryptStreamLargeData(t *testing.T) {
 
 	// Decrypt the data.
 	decryptedBuffer := new(bytes.Buffer)
-	err = stream.DecryptStream(encryptedBuffer, decryptedBuffer, aesKey, chachaKey)
+	err = stream.Decrypt(encryptedBuffer, decryptedBuffer)
 	if err != nil {
 		t.Fatalf("Failed to decrypt data: %v", err)
 	}

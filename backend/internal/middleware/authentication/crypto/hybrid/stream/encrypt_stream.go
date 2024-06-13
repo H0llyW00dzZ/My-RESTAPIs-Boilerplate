@@ -5,24 +5,12 @@
 package stream
 
 import (
-	"crypto/aes"
 	"io"
-
-	"golang.org/x/crypto/chacha20poly1305"
 )
 
-// EncryptStream reads from the input stream, encrypts the data using AES-CTR and ChaCha20-Poly1305, and writes it to the output stream.
-func EncryptStream(input io.Reader, output io.Writer, aesKey, chachaKey []byte) error {
-	aesBlock, err := aes.NewCipher(aesKey)
-	if err != nil {
-		return err
-	}
-
-	chacha, err := chacha20poly1305.NewX(chachaKey)
-	if err != nil {
-		return err
-	}
-
+// Encrypt reads from the input stream, encrypts the data using AES-CTR and ChaCha20-Poly1305,
+// and writes it to the output stream.
+func (s *Stream) Encrypt(input io.Reader, output io.Writer) error {
 	chunk := make([]byte, chunkSize)
 	for {
 		n, err := input.Read(chunk)
@@ -31,7 +19,7 @@ func EncryptStream(input io.Reader, output io.Writer, aesKey, chachaKey []byte) 
 		}
 
 		if n > 0 {
-			if err := encryptAndWriteChunk(aesBlock, chacha, chunk[:n], output); err != nil {
+			if err := encryptAndWriteChunk(s.aesBlock, s.chacha, chunk[:n], output); err != nil {
 				return err
 			}
 		}

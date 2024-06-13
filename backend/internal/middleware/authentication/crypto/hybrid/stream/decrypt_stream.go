@@ -5,26 +5,14 @@
 package stream
 
 import (
-	"crypto/aes"
 	"io"
-
-	"golang.org/x/crypto/chacha20poly1305"
 )
 
-// DecryptStream reads from the input stream, decrypts the data using ChaCha20-Poly1305 and AES-CTR, and writes it to the output stream.
-func DecryptStream(input io.Reader, output io.Writer, aesKey, chachaKey []byte) error {
-	aesBlock, err := aes.NewCipher(aesKey)
-	if err != nil {
-		return err
-	}
-
-	chacha, err := chacha20poly1305.NewX(chachaKey)
-	if err != nil {
-		return err
-	}
-
+// Decrypt reads from the input stream, decrypts the data using ChaCha20-Poly1305 and AES-CTR,
+// and writes it to the output stream.
+func (s *Stream) Decrypt(input io.Reader, output io.Writer) error {
 	for {
-		chunk, err := readAndDecryptChunk(aesBlock, chacha, input)
+		chunk, err := readAndDecryptChunk(s.aesBlock, s.chacha, input)
 		if err == io.EOF {
 			break
 		} else if err != nil {

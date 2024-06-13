@@ -14,7 +14,10 @@ import (
 )
 
 const (
-	aesNonceSize = 16 // AES-CTR nonce size (16 bytes for a 128-bit nonce)
+	// AES-CTR nonce size (16 bytes for a 128-bit nonce)
+	//
+	// TODO: Do we really need to increase this since the current size is still secure?
+	aesNonceSize = 16
 	chunkSize    = 1024
 )
 
