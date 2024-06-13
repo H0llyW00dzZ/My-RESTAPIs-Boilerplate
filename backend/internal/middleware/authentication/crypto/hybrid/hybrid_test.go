@@ -132,7 +132,7 @@ func TestStreamEncryptDecrypt(t *testing.T) {
 
 	_, err = rand.Read(chachaKey)
 	if err != nil {
-		t.Fatalf("Failed to generate ChaCha20-Poly1305 key: %v", err)
+		t.Fatalf("Failed to generate XChaCha20-Poly1305 key: %v", err)
 	}
 
 	// Test cases
@@ -196,7 +196,7 @@ func TestHybridEncryptDecryptStream(t *testing.T) {
 
 	_, err = rand.Read(chachaKey)
 	if err != nil {
-		t.Fatalf("Failed to generate ChaCha20-Poly1305 key: %v", err)
+		t.Fatalf("Failed to generate XChaCha20-Poly1305 key: %v", err)
 	}
 
 	// Create an instance of the stream encryption service
@@ -287,7 +287,7 @@ func TestHybridEncryptDecryptStreamLargeData(t *testing.T) {
 
 	_, err = rand.Read(chachaKey)
 	if err != nil {
-		t.Fatalf("Failed to generate ChaCha20-Poly1305 key: %v", err)
+		t.Fatalf("Failed to generate XChaCha20-Poly1305 key: %v", err)
 	}
 
 	// Create an instance of the stream encryption service
