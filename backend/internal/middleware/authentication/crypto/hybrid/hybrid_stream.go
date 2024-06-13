@@ -35,17 +35,20 @@ type StreamService interface {
 //
 // Also, will add some additional features related to cryptography in the separate repository.
 type streamService struct {
-	aesKey    []byte
-	chachaKey []byte
+	stream *stream.Stream
 }
 
 // NewStreamService creates a new instance of the stream-based encryption service.
 // It takes the AES and ChaCha20-Poly1305 keys as input.
-func NewStreamService(aesKey, chachaKey []byte) StreamService {
-	return &streamService{
-		aesKey:    aesKey,
-		chachaKey: chachaKey,
+func NewStreamService(aesKey, chachaKey []byte) (StreamService, error) {
+	s, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		return nil, err
 	}
+
+	return &streamService{
+		stream: s,
+	}, nil
 }
 
 // Encrypt encrypts data using a hybrid encryption scheme with streams.
@@ -54,7 +57,7 @@ func (s *streamService) Encrypt(data string) (string, error) {
 	input := bytes.NewBufferString(data)
 	encryptedOutput := &bytes.Buffer{}
 
-	err := stream.EncryptStream(input, encryptedOutput, s.aesKey, s.chachaKey)
+	err := s.stream.Encrypt(input, encryptedOutput)
 	if err != nil {
 		return "", err
 	}
@@ -74,7 +77,7 @@ func (s *streamService) Decrypt(encodedData string) (string, error) {
 	encryptedInput := bytes.NewBuffer(encryptedData)
 	decryptedOutput := &strings.Builder{}
 
-	err = stream.DecryptStream(encryptedInput, decryptedOutput, s.aesKey, s.chachaKey)
+	err = s.stream.Decrypt(encryptedInput, decryptedOutput)
 	if err != nil {
 		return "", err
 	}
