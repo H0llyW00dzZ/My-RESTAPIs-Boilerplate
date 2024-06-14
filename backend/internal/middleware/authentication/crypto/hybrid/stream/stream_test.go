@@ -362,3 +362,65 @@ func TestHybridEncryptDecryptStreamWithWrongHMACKey(t *testing.T) {
 		t.Errorf("Decryption succeeded with the wrong HMAC key.")
 	}
 }
+
+// Test without calculating or collecting the digest or checksum.
+func TestHybridEncryptDecryptStreamWithHMACWithoutDigestorChecksumCollected(t *testing.T) {
+	// Generate random keys for AES and ChaCha20-Poly1305.
+	aesKey := make([]byte, 32)    // AES-256 requires a 32-byte key.
+	chachaKey := make([]byte, 32) // XChaCha20-Poly1305 uses a 32-byte key.
+
+	_, err := rand.Read(aesKey)
+	if err != nil {
+		t.Fatalf("Failed to generate AES key: %v", err)
+	}
+
+	_, err = rand.Read(chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to generate XChaCha20-Poly1305 key: %v", err)
+	}
+
+	// Create a new Stream instance.
+	s, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to create Stream instance: %v", err)
+	}
+
+	// Generate a random HMAC key.
+	hmacKey := make([]byte, 32)
+	_, err = rand.Read(hmacKey)
+	if err != nil {
+		t.Fatalf("Failed to generate HMAC key: %v", err)
+	}
+
+	// Enable HMAC authentication.
+	s.EnableHMAC(hmacKey)
+
+	// Simulate plaintext data to encrypt.
+	plaintext := []byte("Hello, World! This is a test of the hybrid encryption system with HMAC, without collecting a digest or checksum.")
+
+	// Encrypt the data.
+	inputBuffer := bytes.NewBuffer(plaintext)
+	encryptedBuffer := new(bytes.Buffer)
+	err = s.Encrypt(inputBuffer, encryptedBuffer)
+	if err != nil {
+		t.Fatalf("Failed to encrypt data: %v", err)
+	}
+
+	// Ensure the encrypted data buffer's read position is reset to the beginning.
+	encryptedData := encryptedBuffer.Bytes()
+	encryptedBuffer = bytes.NewBuffer(encryptedData)
+
+	// Decrypt the data.
+	decryptedBuffer := new(bytes.Buffer)
+	err = s.Decrypt(encryptedBuffer, decryptedBuffer)
+	if err != nil {
+		t.Fatalf("Failed to decrypt data: %v", err)
+	}
+
+	// Compare the decrypted data to the original plaintext.
+	decryptedData := decryptedBuffer.Bytes()
+	if !bytes.Equal(decryptedData, plaintext) {
+		t.Errorf("Decrypted data does not match original plaintext. Got: %s, Want: %s", decryptedData, plaintext)
+	}
+
+}
