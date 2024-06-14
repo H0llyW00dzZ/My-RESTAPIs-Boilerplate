@@ -7,6 +7,8 @@ package stream_test
 import (
 	"bytes"
 	"crypto/rand"
+	"errors"
+	"io"
 	"testing"
 
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid/stream"
@@ -423,4 +425,146 @@ func TestHybridEncryptDecryptStreamWithHMACWithoutDigestorChecksumCollected(t *t
 		t.Errorf("Decrypted data does not match original plaintext. Got: %s, Want: %s", decryptedData, plaintext)
 	}
 
+}
+
+// errorReader is a custom reader that always returns an error.
+// It is used for testing purposes in low-level operations related to cryptography.
+type errorReader struct{}
+
+func (r *errorReader) Read(p []byte) (n int, err error) {
+	return 0, errors.New("simulated read error")
+}
+
+// errorWriter is a custom writer that always returns an error.
+// It is used for testing purposes in low-level operations related to cryptography.
+type errorWriter struct{}
+
+func (w *errorWriter) Write(p []byte) (n int, err error) {
+	return 0, errors.New("simulated write error")
+}
+
+func TestHybridEncryptDecryptStreamErrorHandling(t *testing.T) {
+	// Generate random keys for AES and ChaCha20-Poly1305.
+	aesKey := make([]byte, 32)    // AES-256 requires a 32-byte key.
+	chachaKey := make([]byte, 32) // XChaCha20-Poly1305 uses a 32-byte key.
+
+	_, err := rand.Read(aesKey)
+	if err != nil {
+		t.Fatalf("Failed to generate AES key: %v", err)
+	}
+
+	_, err = rand.Read(chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to generate XChaCha20-Poly1305 key: %v", err)
+	}
+
+	// Create a new Stream instance.
+	s, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to create Stream instance: %v", err)
+	}
+
+	// Test encryption error handling.
+	t.Run("EncryptionError", func(t *testing.T) {
+		// Create an error-producing input reader.
+		errorReader := &errorReader{}
+
+		// Attempt to encrypt data with the error-producing reader.
+		encryptedBuffer := new(bytes.Buffer)
+		err = s.Encrypt(errorReader, encryptedBuffer)
+		if err == nil {
+			t.Errorf("Expected encryption error, but got nil.")
+		}
+	})
+
+	// Test decryption error handling.
+	t.Run("DecryptionError", func(t *testing.T) {
+		// Create an error-producing input reader.
+		errorReader := &errorReader{}
+
+		// Attempt to decrypt data with the error-producing reader.
+		decryptedBuffer := new(bytes.Buffer)
+		err = s.Decrypt(errorReader, decryptedBuffer)
+		if err == nil {
+			t.Errorf("Expected decryption error, but got nil.")
+		}
+	})
+
+	// Test HMAC verification error handling.
+	t.Run("HMACVerificationError", func(t *testing.T) {
+		// Generate a random HMAC key.
+		hmacKey := make([]byte, 32)
+		_, err = rand.Read(hmacKey)
+		if err != nil {
+			t.Fatalf("Failed to generate HMAC key: %v", err)
+		}
+
+		// Enable HMAC authentication.
+		s.EnableHMAC(hmacKey)
+
+		// Simulate plaintext data to encrypt.
+		plaintext := []byte("Hello, World! This is a test of HMAC verification error handling.")
+
+		// Encrypt the data.
+		inputBuffer := bytes.NewBuffer(plaintext)
+		encryptedBuffer := new(bytes.Buffer)
+		err = s.Encrypt(inputBuffer, encryptedBuffer)
+		if err != nil {
+			t.Fatalf("Failed to encrypt data: %v", err)
+		}
+
+		// Ensure the encrypted data buffer's read position is reset to the beginning.
+		encryptedData := encryptedBuffer.Bytes()
+		encryptedBuffer = bytes.NewBuffer(encryptedData)
+
+		// Simulate unauthorized modification of the encrypted data.
+		encryptedData[len(encryptedData)-1] ^= 0xFF // Flip the last byte of the encrypted data.
+
+		// Attempt to decrypt the modified data.
+		decryptedBuffer := new(bytes.Buffer)
+		err = s.Decrypt(bytes.NewBuffer(encryptedData), decryptedBuffer)
+		if err == nil {
+			t.Errorf("Expected HMAC verification error, but got nil.")
+		}
+	})
+
+	// Test readChunkMetadata error handling.
+	t.Run("ReadChunkMetadataError", func(t *testing.T) {
+		// Create an error-producing input reader.
+		errorReader := &errorReader{}
+		decryptedBuffer := new(bytes.Buffer)
+		// Attempt to read chunk metadata with the error-producing reader.
+		err = s.Decrypt(errorReader, decryptedBuffer)
+		if err == nil {
+			t.Errorf("Expected readChunkMetadata error, but got nil.")
+		}
+	})
+
+	// Test readChunkMetadata EOF handling.
+	t.Run("ReadChunkMetadataEOF", func(t *testing.T) {
+		// Create an input reader with incomplete chunk metadata to simulate EOF.
+		incompleteMetadata := []byte{0x00} // Only one byte instead of the required chunk size and nonce
+		incompleteReader := bytes.NewReader(incompleteMetadata)
+		decryptedBuffer := new(bytes.Buffer)
+
+		// Attempt to read chunk metadata from the empty reader.
+		err = s.Decrypt(incompleteReader, decryptedBuffer)
+		if err == io.EOF {
+			t.Errorf("Expected io.EOF error, but got: %v", err)
+		}
+	})
+
+	// Test readChunkMetadata partial read handling.
+	t.Run("ReadChunkMetadataPartialRead", func(t *testing.T) {
+		// Create an input reader with incomplete chunk metadata.
+		incompleteMetadata := []byte{0x00} // Only one byte instead of the required chunk size and nonce
+		incompleteReader := bytes.NewReader(incompleteMetadata)
+		decryptedBuffer := new(bytes.Buffer)
+
+		// Attempt to read chunk metadata from the incomplete reader.
+		err = s.Decrypt(incompleteReader, decryptedBuffer)
+		if err == nil {
+			t.Errorf("Expected readChunkMetadata error for partial read, but got nil.")
+		}
+	})
 }

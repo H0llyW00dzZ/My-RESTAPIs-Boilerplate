@@ -19,7 +19,7 @@ func (s *Stream) Encrypt(input io.Reader, output io.Writer) error {
 		}
 
 		if n > 0 {
-			if err := encryptAndWriteChunk(s.aesBlock, s.chacha, s.hmac, chunk[:n], output); err != nil {
+			if err := s.encryptAndWriteChunk(chunk[:n], output); err != nil {
 				return err
 			}
 		}
