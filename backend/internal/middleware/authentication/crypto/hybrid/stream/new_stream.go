@@ -41,20 +41,22 @@ func New(aesKey, chachaKey []byte) (*Stream, error) {
 }
 
 // EnableHMAC enables HMAC authentication for the stream using the provided key.
-// The HMAC is computed using SHA-256 and follows the Encrypt-then-MAC approach
+// The HMAC is computed using SHA-256 and follows the Encrypt-then-MAC (EtM) scheme approach
 // as specified in (RFC 7366).
 //
 // When HMAC authentication is enabled, the encryption process is modified as follows:
+//
 //  1. The plaintext is encrypted using AES-CTR with a randomly generated nonce.
 //  2. The AES-CTR encrypted data is then encrypted using XChaCha20-Poly1305 with another randomly generated nonce.
-//  3. The HMAC is computed over the AES-CTR and XChaCha20-Poly1305 encrypted data.
+//  3. The HMAC is computed over the XChaCha20-Poly1305 encrypted data using the HMAC key.
 //  4. The resulting HMAC tag is appended to the ciphertext.
 //
 // The decryption process is modified as follows:
+//
 //  1. The HMAC tag is extracted from the end of the ciphertext.
-//  2. The HMAC is computed over the remaining ciphertext (excluding the HMAC tag).
+//  2. The HMAC is computed over the remaining ciphertext using the HMAC key.
 //  3. The computed HMAC is compared with the extracted HMAC tag. If they don't match, an error is returned.
-//  4. If the HMAC verification succeeds, the ciphertext (excluding the HMAC tag) is decrypted using XChaCha20-Poly1305.
+//  4. If the HMAC verification succeeds, the ciphertext is decrypted using XChaCha20-Poly1305.
 //  5. The resulting data is then decrypted using AES-CTR.
 //
 // Note: The Digest method can be used to calculate the HMAC digest of the encrypted data for future verification.
