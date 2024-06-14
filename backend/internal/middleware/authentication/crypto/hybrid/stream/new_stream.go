@@ -47,7 +47,7 @@ func New(aesKey, chachaKey []byte) (*Stream, error) {
 // When HMAC authentication is enabled, the encryption process is modified as follows:
 //  1. The plaintext is encrypted using AES-CTR with a randomly generated nonce.
 //  2. The AES-CTR encrypted data is then encrypted using XChaCha20-Poly1305 with another randomly generated nonce.
-//  3. The HMAC is computed over the XChaCha20-Poly1305 encrypted data.
+//  3. The HMAC is computed over the AES-CTR and XChaCha20-Poly1305 encrypted data.
 //  4. The resulting HMAC tag is appended to the ciphertext.
 //
 // The decryption process is modified as follows:
