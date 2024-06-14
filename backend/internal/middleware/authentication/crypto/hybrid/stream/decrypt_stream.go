@@ -12,7 +12,7 @@ import (
 // verifies the HMAC if enabled, and writes it to the output stream.
 func (s *Stream) Decrypt(input io.Reader, output io.Writer) error {
 	for {
-		chunk, err := readAndDecryptChunk(s.aesBlock, s.chacha, s.hmac, input)
+		chunk, err := s.readAndDecryptChunk(input)
 		if err == io.EOF {
 			break
 		} else if err != nil {
