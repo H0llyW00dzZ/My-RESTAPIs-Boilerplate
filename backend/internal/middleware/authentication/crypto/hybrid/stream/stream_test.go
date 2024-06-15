@@ -704,3 +704,61 @@ func TestHybridDecryptStreamEncryptedChunkSizeMismatch(t *testing.T) {
 		t.Errorf("Expected 'unexpected EOF' error, but got: %v", err)
 	}
 }
+
+func TestHybridEncryptDecryptStreamHasBeenCompromised(t *testing.T) {
+	// Generate random keys for AES and XChaCha20-Poly1305.
+	aesKey := make([]byte, 32)    // AES-256 requires a 32-byte key.
+	chachaKey := make([]byte, 32) // XChaCha20-Poly1305 uses a 32-byte key.
+
+	_, err := rand.Read(aesKey)
+	if err != nil {
+		t.Fatalf("Failed to generate AES key: %v", err)
+	}
+
+	_, err = rand.Read(chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to generate XChaCha20-Poly1305 key: %v", err)
+	}
+
+	// Create a new Stream instance.
+	s, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to create Stream instance: %v", err)
+	}
+
+	// Simulate plaintext data to encrypt.
+	plaintext := []byte("Hello, World! This is a test of the hybrid encryption system.")
+
+	// Encrypt the data.
+	inputBuffer := bytes.NewBuffer(plaintext)
+	encryptedBuffer := new(bytes.Buffer)
+	err = s.Encrypt(inputBuffer, encryptedBuffer)
+	if err != nil {
+		t.Fatalf("Failed to encrypt data: %v", err)
+	}
+
+	// Ensure the encrypted data buffer's read position is reset to the beginning.
+	encryptedData := encryptedBuffer.Bytes()
+	encryptedBuffer = bytes.NewBuffer(encryptedData)
+
+	// Simulate unauthorized modification of the encrypted data.
+	//
+	// Let's say this Data has been Compromised.
+	// Note: Without HMAC it's starting from 2
+	encryptedData[2] ^= 0xFF // Flip the second byte of the encrypted data.
+
+	// Decrypt the data.
+	decryptedBuffer := new(bytes.Buffer)
+	err = s.Decrypt(bytes.NewBuffer(encryptedData), decryptedBuffer)
+	if err == nil {
+		t.Errorf("Decryption succeeded despite unauthorized modification.")
+	} else {
+		t.Logf("Decryption failed as expected: %v", err)
+	}
+
+	// Compare the decrypted data to the original plaintext.
+	decryptedData := decryptedBuffer.Bytes()
+	if bytes.Equal(decryptedData, plaintext) {
+		t.Errorf("Decrypted data matches original plaintext despite unauthorized modification.")
+	}
+}
