@@ -199,9 +199,9 @@ func (s *Stream) readEncryptedChunk(input io.Reader, chunkSize uint16) ([]byte, 
 	if _, err := io.ReadFull(input, encryptedChunk); err != nil {
 		if err == io.ErrUnexpectedEOF {
 			if len(encryptedChunk) > 0 && s.hmac != nil {
-				return nil, errors.New("invalid HMAC digest size") // Middle Error in I/O primitives
+				return nil, errors.New("invalid HMAC digest size") // Middle Error Location in I/O primitives
 			}
-			return nil, errors.New("encrypted chunk size mismatch") // Middle Error in I/O primitives
+			return nil, errors.New("encrypted chunk size mismatch") // Middle Error Location in I/O primitives
 		}
 		return nil, err
 	}
@@ -216,7 +216,7 @@ func (s *Stream) extractHMACDigest(encryptedChunk []byte, chunkSize uint16) ([]b
 		hmacDigestSize := s.hmac.Size()
 		if len(encryptedChunk) < hmacDigestSize {
 			// TODO: This error uncovered in test since, since it performs low-level operations on I/O primitives. error handle it's different.
-			return nil, nil, errors.New("invalid HMAC digest size") // Deep/Unknown Error in I/O primitives
+			return nil, nil, errors.New("invalid HMAC digest size") // Deep/Unknown Error Location in I/O primitives
 		}
 		hmacDigest = encryptedChunk[len(encryptedChunk)-hmacDigestSize:]
 		encryptedChunk = encryptedChunk[:len(encryptedChunk)-hmacDigestSize]
@@ -224,7 +224,7 @@ func (s *Stream) extractHMACDigest(encryptedChunk []byte, chunkSize uint16) ([]b
 		// If HMAC is not enabled, check if the encrypted chunk size matches the expected size
 		if len(encryptedChunk) != int(chunkSize) {
 			// TODO: This error uncovered in test since, since it performs low-level operations on I/O primitives. error handle it's different.
-			return nil, nil, errors.New("encrypted chunk size mismatch") // Deep/Unknown Error in I/O primitives
+			return nil, nil, errors.New("encrypted chunk size mismatch") // Deep/Unknown Error Location in I/O primitives
 		}
 	}
 	return hmacDigest, encryptedChunk, nil
