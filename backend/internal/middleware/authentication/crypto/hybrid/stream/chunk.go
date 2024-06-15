@@ -106,27 +106,14 @@ func (s *Stream) readAndDecryptChunk(input io.Reader) ([]byte, error) {
 		return nil, err
 	}
 
-	encryptedChunk := make([]byte, chunkSize)
-	if _, err := io.ReadFull(input, encryptedChunk); err != nil {
+	encryptedChunk, err := s.readEncryptedChunk(input, chunkSize)
+	if err != nil {
 		return nil, err
 	}
 
-	var hmacDigest []byte
-	// Note: This Improve making it extremely difficult to tamper with the encrypted data without being detected.
-	if s.hmac != nil {
-		hmacDigestSize := s.hmac.Size()
-		if len(encryptedChunk) < hmacDigestSize {
-			// TODO: This error uncovered in test, since it performs low-level operations on I/O primitives. error handle it's different.
-			return nil, errors.New("invalid HMAC digest size")
-		}
-		hmacDigest = encryptedChunk[len(encryptedChunk)-hmacDigestSize:]
-		encryptedChunk = encryptedChunk[:len(encryptedChunk)-hmacDigestSize]
-	} else {
-		// If HMAC is not enabled, check if the encrypted chunk size matches the expected size
-		if len(encryptedChunk) != int(chunkSize) {
-			// TODO: This error uncovered in test, since it performs low-level operations on I/O primitives. error handle it's different.
-			return nil, errors.New("encrypted chunk size mismatch")
-		}
+	hmacDigest, encryptedChunk, err := s.extractHMACDigest(encryptedChunk, chunkSize)
+	if err != nil {
+		return nil, err
 	}
 
 	chunk, err := s.decryptChunk(chachaNonce, encryptedChunk)
@@ -135,11 +122,8 @@ func (s *Stream) readAndDecryptChunk(input io.Reader) ([]byte, error) {
 	}
 
 	if s.hmac != nil {
-		s.hmac.Reset()
-		s.hmac.Write(encryptedChunk)
-		expectedHMACDigest := s.hmac.Sum(nil)
-		if subtle.ConstantTimeCompare(hmacDigest, expectedHMACDigest) != 1 {
-			return nil, errors.New("HMAC verification failed")
+		if err := s.verifyHMAC(encryptedChunk, hmacDigest); err != nil {
+			return nil, err
 		}
 	}
 
@@ -207,4 +191,52 @@ func (s *Stream) readChunkMetadata(input io.Reader) (uint16, []byte, error) {
 	}
 
 	return chunkSize, chachaNonce, nil
+}
+
+// readEncryptedChunk reads the encrypted chunk from the input stream.
+func (s *Stream) readEncryptedChunk(input io.Reader, chunkSize uint16) ([]byte, error) {
+	encryptedChunk := make([]byte, chunkSize)
+	if _, err := io.ReadFull(input, encryptedChunk); err != nil {
+		if err == io.ErrUnexpectedEOF {
+			if len(encryptedChunk) > 0 && s.hmac != nil {
+				return nil, errors.New("invalid HMAC digest size") // Middle Error in I/O primitives
+			}
+			return nil, errors.New("encrypted chunk size mismatch") // Middle Error in I/O primitives
+		}
+		return nil, err
+	}
+	return encryptedChunk, nil
+}
+
+// extractHMACDigest extracts the HMAC digest from the encrypted chunk if HMAC is enabled.
+func (s *Stream) extractHMACDigest(encryptedChunk []byte, chunkSize uint16) ([]byte, []byte, error) {
+	// Note: This Improve making it extremely difficult to tamper with the encrypted data without being detected.
+	var hmacDigest []byte
+	if s.hmac != nil {
+		hmacDigestSize := s.hmac.Size()
+		if len(encryptedChunk) < hmacDigestSize {
+			// TODO: This error uncovered in test since, since it performs low-level operations on I/O primitives. error handle it's different.
+			return nil, nil, errors.New("invalid HMAC digest size") // Deep/Unknown Error in I/O primitives
+		}
+		hmacDigest = encryptedChunk[len(encryptedChunk)-hmacDigestSize:]
+		encryptedChunk = encryptedChunk[:len(encryptedChunk)-hmacDigestSize]
+	} else {
+		// If HMAC is not enabled, check if the encrypted chunk size matches the expected size
+		if len(encryptedChunk) != int(chunkSize) {
+			// TODO: This error uncovered in test since, since it performs low-level operations on I/O primitives. error handle it's different.
+			return nil, nil, errors.New("encrypted chunk size mismatch") // Deep/Unknown Error in I/O primitives
+		}
+	}
+	return hmacDigest, encryptedChunk, nil
+}
+
+// verifyHMAC verifies the HMAC of the encrypted chunk.
+func (s *Stream) verifyHMAC(encryptedChunk, hmacDigest []byte) error {
+	s.hmac.Reset()
+	s.hmac.Write(encryptedChunk)
+	expectedHMACDigest := s.hmac.Sum(nil)
+	if subtle.ConstantTimeCompare(hmacDigest, expectedHMACDigest) != 1 {
+		return errors.New("HMAC verification failed")
+	}
+	return nil
 }
