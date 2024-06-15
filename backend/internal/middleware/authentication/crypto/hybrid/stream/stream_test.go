@@ -865,3 +865,39 @@ func TestHybridEncryptDecryptStreamWithHMACDigestInvalidkey(t *testing.T) {
 		t.Logf("HMAC digest verification failed as expected %x, Got: %x", hmacDigest, calculatedHMACDigest)
 	}
 }
+
+func TestDecryptUnexpectedChunk(t *testing.T) {
+	// Generate random keys for AES and ChaCha20-Poly1305.
+	aesKey := make([]byte, 32)    // AES-256 requires a 32-byte key.
+	chachaKey := make([]byte, 32) // XChaCha20-Poly1305 uses a 32-byte key.
+
+	_, err := rand.Read(aesKey)
+	if err != nil {
+		t.Fatalf("Failed to generate AES key: %v", err)
+	}
+
+	_, err = rand.Read(chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to generate XChaCha20-Poly1305 key: %v", err)
+	}
+
+	// Create a new Stream instance.
+	s, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to create Stream instance: %v", err)
+	}
+
+	var decryptedOutput bytes.Buffer
+
+	// Test case: Decrypt encrypted data with an unexpected chunk
+	invalidEncryptedData := []byte("invalid-encrypted-data")
+	invalidEncryptedInput := bytes.NewReader(invalidEncryptedData)
+	decryptedOutput.Reset()
+
+	err = s.Decrypt(invalidEncryptedInput, &decryptedOutput)
+	if err == nil {
+		t.Error("Expected an error EOF for invalid encrypted data, but got nil")
+	}
+
+	t.Logf("Decryption failed as expected: %v", err)
+}
