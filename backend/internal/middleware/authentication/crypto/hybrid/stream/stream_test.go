@@ -510,6 +510,7 @@ func TestHybridEncryptDecryptStreamErrorHandling(t *testing.T) {
 		err = s.Encrypt(errorReader, encryptedBuffer)
 		if err == nil {
 			t.Errorf("Expected encryption error, but got nil.")
+			t.Logf("Encryption failed as expected: %v", err)
 		}
 	})
 
@@ -523,6 +524,7 @@ func TestHybridEncryptDecryptStreamErrorHandling(t *testing.T) {
 		err = s.Decrypt(errorReader, decryptedBuffer)
 		if err == nil {
 			t.Errorf("Expected decryption error, but got nil.")
+			t.Logf("Decryption failed as expected: %v", err)
 		}
 	})
 
@@ -561,6 +563,7 @@ func TestHybridEncryptDecryptStreamErrorHandling(t *testing.T) {
 		err = s.Decrypt(bytes.NewBuffer(encryptedData), decryptedBuffer)
 		if err == nil {
 			t.Errorf("Expected HMAC verification error, but got nil.")
+			t.Logf("Decryption failed as expected: %v", err)
 		}
 	})
 
@@ -573,6 +576,7 @@ func TestHybridEncryptDecryptStreamErrorHandling(t *testing.T) {
 		err = s.Decrypt(errorReader, decryptedBuffer)
 		if err == nil {
 			t.Errorf("Expected readChunkMetadata error, but got nil.")
+			t.Logf("Decryption failed as expected: %v", err)
 		}
 	})
 
@@ -587,6 +591,7 @@ func TestHybridEncryptDecryptStreamErrorHandling(t *testing.T) {
 		err = s.Decrypt(incompleteReader, decryptedBuffer)
 		if err == io.EOF {
 			t.Errorf("Expected io.EOF error, but got: %v", err)
+			t.Logf("Decryption failed as expected: %v", err)
 		}
 	})
 
@@ -601,6 +606,7 @@ func TestHybridEncryptDecryptStreamErrorHandling(t *testing.T) {
 		err = s.Decrypt(incompleteReader, decryptedBuffer)
 		if err == nil {
 			t.Errorf("Expected readChunkMetadata error for partial read, but got nil.")
+			t.Logf("Decryption failed as expected: %v", err)
 		}
 	})
 }
@@ -852,6 +858,10 @@ func TestHybridEncryptDecryptStreamWithHMACDigestInvalidkey(t *testing.T) {
 	if subtle.ConstantTimeCompare(calculatedHMACDigest, hmacDigest) == 1 {
 		t.Errorf("HMAC digest verification succeeded with the wrong HMAC key.")
 	} else {
+		// Note: This output contains the raw encrypted ciphertext when HMAC authentication is enabled.
+		// The ciphertext can be bound to an [io.Writer] output, such as a string builder, rune builder, or byte builder,
+		// and can be used for various protocols. However, using this combination of AES-CTR and XChaCha20-Poly1305 for TLS/SSL is not recommended
+		// as it may be slower compared to using pure XChaCha20-Poly1305.
 		t.Logf("HMAC digest verification failed as expected %x, Got: %x", hmacDigest, calculatedHMACDigest)
 	}
 }
