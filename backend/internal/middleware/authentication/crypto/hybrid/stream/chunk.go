@@ -21,6 +21,7 @@ const (
 	// TODO: Do we really need to increase this since the current size is still secure?
 	aesNonceSize = 16
 	chunkSize    = 1024
+	minChunkBuf  = 2
 )
 
 // encryptChunk encrypts a single chunk using AES-CTR and XChaCha20-Poly1305.
@@ -174,9 +175,9 @@ func (s *Stream) writeChunk(encryptedChunk, chachaNonce []byte, output io.Writer
 // readChunkMetadata reads the chunk size and XChaCha20-Poly1305 nonce from the input stream.
 func (s *Stream) readChunkMetadata(input io.Reader) (uint16, []byte, error) {
 	chunkSizeBuf := make([]byte, 2)
-	if _, err := io.ReadFull(input, chunkSizeBuf); err != nil {
+	if _, err := io.ReadAtLeast(input, chunkSizeBuf, minChunkBuf); err != nil {
 		if err == io.ErrUnexpectedEOF {
-			return 0, nil, errors.New("XChacha20Poly1305: Unexpected Chunk Size")
+			return 0, nil, errors.New("XChacha20Poly1305: Unexpected Chunk Buffer Size")
 		}
 		return 0, nil, err
 	}
