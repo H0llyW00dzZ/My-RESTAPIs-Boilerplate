@@ -215,7 +215,7 @@ func (s *Stream) extractHMACDigest(encryptedChunk []byte, chunkSize uint16) ([]b
 	if s.hmac != nil {
 		hmacDigestSize := s.hmac.Size()
 		if len(encryptedChunk) < hmacDigestSize {
-			// TODO: This error uncovered in test since, since it performs low-level operations on I/O primitives. error handle it's different.
+			// TODO: This error uncovered in test, since it performs low-level operations on I/O primitives. error handle it's different.
 			return nil, nil, errors.New("invalid HMAC digest size") // Deep/Unknown Error Location in I/O primitives
 		}
 		hmacDigest = encryptedChunk[len(encryptedChunk)-hmacDigestSize:]
@@ -223,7 +223,7 @@ func (s *Stream) extractHMACDigest(encryptedChunk []byte, chunkSize uint16) ([]b
 	} else {
 		// If HMAC is not enabled, check if the encrypted chunk size matches the expected size
 		if len(encryptedChunk) != int(chunkSize) {
-			// TODO: This error uncovered in test since, since it performs low-level operations on I/O primitives. error handle it's different.
+			// TODO: This error uncovered in test, since it performs low-level operations on I/O primitives. error handle it's different.
 			return nil, nil, errors.New("encrypted chunk size mismatch") // Deep/Unknown Error Location in I/O primitives
 		}
 	}
