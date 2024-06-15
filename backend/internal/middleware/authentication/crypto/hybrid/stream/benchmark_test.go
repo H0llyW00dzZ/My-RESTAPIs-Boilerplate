@@ -34,7 +34,7 @@ func BenchmarkHybridEncryptDecryptStream(b *testing.B) {
 	}
 
 	// Generate plaintext data.
-	plaintextSize := 1024 * 1024 // 1 MB
+	plaintextSize := 250 * 1024 * 1024 // 250 MB applicable for benchmark
 	plaintext := make([]byte, plaintextSize)
 	_, err = rand.Read(plaintext)
 	if err != nil {
@@ -95,7 +95,7 @@ func BenchmarkHybridEncryptDecryptStreamWithHMAC(b *testing.B) {
 	s.EnableHMAC(hmacKey)
 
 	// Generate plaintext data.
-	plaintextSize := 1024 * 1024 // 1 MB
+	plaintextSize := 250 * 1024 * 1024 // 250 MB applicable for benchmark
 	plaintext := make([]byte, plaintextSize)
 	_, err = rand.Read(plaintext)
 	if err != nil {
