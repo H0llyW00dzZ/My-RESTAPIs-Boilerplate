@@ -15,6 +15,28 @@ import (
 )
 
 // Stream represents a Hybrid stream encryption/decryption object.
+//
+// The Stream struct combines AES-CTR and XChaCha20-Poly1305 encryption algorithms
+// to provide a secure and efficient way to encrypt and decrypt data streams.
+// It also supports optional HMAC authentication for added integrity and authenticity.
+//
+// Online Tools for Cipher Analysis and Identification:
+//
+//   - Boxentriq Cipher Identifier: https://www.boxentriq.com/code-breaking/cipher-identifier
+//     This online tool helps identify the type of cipher used based on the ciphertext.
+//     It supports various classical and modern ciphers.
+//
+//   - Hex-Works: https://hex-works.com/
+//     Hex-Works provides a set of online tools for working with hexadecimal data, including encryption,
+//     decryption, and analysis. It supports AES, DES, RC4, and other ciphers.
+//
+// Note: The security of the encrypted data depends on the secure generation and management of the encryption keys.
+// Make sure to use strong, randomly generated keys and keep them confidential.
+//
+// Also note that if the results from the above tools cannot identify the cipher used, it is considered
+// a strong indication that your data and privacy are secure. If the tools fail to identify the cipher,
+// it suggests that the encryption scheme is robust and resistant to common analysis techniques,
+// providing a high level of confidentiality and security for your data.
 type Stream struct {
 	aesBlock cipher.Block
 	chacha   cipher.AEAD
