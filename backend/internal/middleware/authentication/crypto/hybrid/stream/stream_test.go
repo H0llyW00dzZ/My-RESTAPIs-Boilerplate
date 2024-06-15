@@ -127,7 +127,77 @@ func TestHybridEncryptDecryptStreamLargeData(t *testing.T) {
 	}
 
 	// Generate a large plaintext data.
-	plaintextSize := 10 * 1024 * 1024 // 10 MB
+	//
+	// Note: Don't try benchmark for large plaintext data (e.g 1GB), cause it will crash/fail decrypt due it too large for each goroutine.
+	plaintextSize := 1024 * 1024 * 1024 // 1 GB
+	plaintext := make([]byte, plaintextSize)
+	_, err = rand.Read(plaintext)
+	if err != nil {
+		t.Fatalf("Failed to generate plaintext: %v", err)
+	}
+
+	// Encrypt the data.
+	inputBuffer := bytes.NewBuffer(plaintext)
+	encryptedBuffer := new(bytes.Buffer)
+	err = s.Encrypt(inputBuffer, encryptedBuffer)
+	if err != nil {
+		t.Fatalf("Failed to encrypt data: %v", err)
+	}
+
+	// Ensure the encrypted data buffer's read position is reset to the beginning.
+	encryptedData := encryptedBuffer.Bytes()
+	encryptedBuffer = bytes.NewBuffer(encryptedData)
+
+	// Decrypt the data.
+	decryptedBuffer := new(bytes.Buffer)
+	err = s.Decrypt(encryptedBuffer, decryptedBuffer)
+	if err != nil {
+		t.Fatalf("Failed to decrypt data: %v", err)
+	}
+
+	// Compare the decrypted data to the original plaintext.
+	decryptedData := decryptedBuffer.Bytes()
+	if !bytes.Equal(decryptedData, plaintext) {
+		t.Errorf("Decrypted data does not match original plaintext.")
+	}
+}
+
+func TestHybridEncryptDecryptStreamLargeDataWithHMACEnabled(t *testing.T) {
+	// Note: Works well testing on AMD Ryzen 9 3900x 12-Core Processor (24 CPUs) RAM 32GB
+	// Generate random keys for AES and ChaCha20-Poly1305.
+	aesKey := make([]byte, 32)    // AES-256 requires a 32-byte key.
+	chachaKey := make([]byte, 32) // XChaCha20-Poly1305 uses a 32-byte key.
+
+	_, err := rand.Read(aesKey)
+	if err != nil {
+		t.Fatalf("Failed to generate AES key: %v", err)
+	}
+
+	_, err = rand.Read(chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to generate XChaCha20-Poly1305 key: %v", err)
+	}
+
+	// Create a new Stream instance.
+	s, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to create Stream instance: %v", err)
+	}
+
+	// Generate a random HMAC key.
+	hmacKey := make([]byte, 32)
+	_, err = rand.Read(hmacKey)
+	if err != nil {
+		t.Fatalf("Failed to generate HMAC key: %v", err)
+	}
+
+	// Enable HMAC authentication.
+	s.EnableHMAC(hmacKey)
+
+	// Generate a large plaintext data.
+	//
+	// Note: Don't try benchmark for large plaintext data (e.g 1GB), cause it will crash/fail decrypt due it too large for each goroutine.
+	plaintextSize := 1024 * 1024 * 1024 // 1 GB
 	plaintext := make([]byte, plaintextSize)
 	_, err = rand.Read(plaintext)
 	if err != nil {
