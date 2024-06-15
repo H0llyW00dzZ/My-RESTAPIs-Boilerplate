@@ -174,7 +174,7 @@ func (s *Stream) writeChunk(encryptedChunk, chachaNonce []byte, output io.Writer
 
 // readChunkMetadata reads the chunk size and XChaCha20-Poly1305 nonce from the input stream.
 func (s *Stream) readChunkMetadata(input io.Reader) (uint16, []byte, error) {
-	chunkSizeBuf := make([]byte, 2)
+	chunkSizeBuf := make([]byte, minChunkBuf)
 	if _, err := io.ReadAtLeast(input, chunkSizeBuf, minChunkBuf); err != nil {
 		if err == io.ErrUnexpectedEOF {
 			return 0, nil, errors.New("XChacha20Poly1305: Unexpected Chunk Buffer Size")
