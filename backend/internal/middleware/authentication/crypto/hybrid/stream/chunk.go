@@ -174,7 +174,7 @@ func (s *Stream) writeChunk(encryptedChunk, chachaNonce []byte, output io.Writer
 
 // readChunkMetadata reads the chunk size and XChaCha20-Poly1305 nonce from the input stream.
 func (s *Stream) readChunkMetadata(input io.Reader) (uint16, []byte, error) {
-	chunkSizeBuf := make([]byte, 2)
+	chunkSizeBuf := make([]byte, minChunkBuf)
 	if _, err := io.ReadAtLeast(input, chunkSizeBuf, minChunkBuf); err != nil {
 		if err == io.ErrUnexpectedEOF {
 			return 0, nil, errors.New("XChacha20Poly1305: Unexpected Chunk Buffer Size")
@@ -211,12 +211,12 @@ func (s *Stream) readEncryptedChunk(input io.Reader, chunkSize uint16) ([]byte, 
 
 // extractHMACDigest extracts the HMAC digest from the encrypted chunk if HMAC is enabled.
 func (s *Stream) extractHMACDigest(encryptedChunk []byte, chunkSize uint16) ([]byte, []byte, error) {
-	// Note: This Improve making it extremely difficult to tamper with the encrypted data without being detected.
+	// Note: This improves security by making it extremely difficult to tamper with the encrypted data without being detected.
 	var hmacDigest []byte
 	if s.hmac != nil {
 		hmacDigestSize := s.hmac.Size()
 		if len(encryptedChunk) < hmacDigestSize {
-			// TODO: This error uncovered in test, since it performs low-level operations on I/O primitives. error handle it's different.
+			// TODO: Use math to handle this error differently since it was uncovered in a test and performs low-level operations on I/O primitives.
 			return nil, nil, errors.New("invalid HMAC digest size") // Deep/Unknown Error Location in I/O primitives
 		}
 		hmacDigest = encryptedChunk[len(encryptedChunk)-hmacDigestSize:]
@@ -224,7 +224,7 @@ func (s *Stream) extractHMACDigest(encryptedChunk []byte, chunkSize uint16) ([]b
 	} else {
 		// If HMAC is not enabled, check if the encrypted chunk size matches the expected size
 		if len(encryptedChunk) != int(chunkSize) {
-			// TODO: This error uncovered in test, since it performs low-level operations on I/O primitives. error handle it's different.
+			// TODO: Use math to handle this error differently since it was uncovered in a test and performs low-level operations on I/O primitives.
 			return nil, nil, errors.New("encrypted chunk size mismatch") // Deep/Unknown Error Location in I/O primitives
 		}
 	}
