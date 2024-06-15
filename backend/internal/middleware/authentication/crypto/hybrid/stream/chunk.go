@@ -82,6 +82,9 @@ func (s *Stream) encryptAndWriteChunk(chunk []byte, output io.Writer) error {
 		return err
 	}
 
+	// Note: The design is intentionally different from the [Digest] function exposed in the public API.
+	//       The internal HMAC sum and appending process is separate from the [Digest] function
+	//       to maintain a clear distinction between the internal and external functionality.
 	if s.hmac != nil {
 		s.hmac.Reset()
 		s.hmac.Write(encryptedChunk)
@@ -109,7 +112,7 @@ func (s *Stream) readAndDecryptChunk(input io.Reader) ([]byte, error) {
 	}
 
 	var hmacDigest []byte
-	// Note This Improve making it extremely difficult to tamper with the encrypted data without being detected.
+	// Note: This Improve making it extremely difficult to tamper with the encrypted data without being detected.
 	if s.hmac != nil {
 		hmacDigestSize := s.hmac.Size()
 		if len(encryptedChunk) < hmacDigestSize {
