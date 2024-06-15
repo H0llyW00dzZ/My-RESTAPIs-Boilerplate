@@ -896,15 +896,19 @@ func TestDecryptUnexpectedChunk(t *testing.T) {
 
 	// Test case: Decrypt encrypted data with an unexpected chunk
 	invalidEncryptedData := []byte("invalid-encrypted-data")
-	invalidEncryptedInput := bytes.NewReader(invalidEncryptedData)
+	shortBufferSize := 1
 	decryptedOutput.Reset()
+	decryptedOutput.Grow(shortBufferSize)
+	invalidEncryptedInput := bytes.NewReader(invalidEncryptedData[:1])
 
 	err = s.Decrypt(invalidEncryptedInput, &decryptedOutput)
 	if err == nil {
-		t.Error("Expected an error EOF for invalid encrypted data, but got nil")
+		t.Errorf("Expected error due to buffer too short, but got nil.")
+	} else if err.Error() != "XChacha20Poly1305: Unexpected Chunk Buffer Size" {
+		t.Errorf("Expected error message 'XChacha20Poly1305: Unexpected Chunk Buffer Size', but got: %v", err)
+	} else {
+		t.Logf("Decryption failed as expected: %v", err)
 	}
-
-	t.Logf("Decryption failed as expected: %v", err)
 }
 
 func TestHybridDecryptStreamXChaCha20NonceSizeXTooShort(t *testing.T) {
