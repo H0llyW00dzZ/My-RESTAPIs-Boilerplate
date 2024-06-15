@@ -46,6 +46,10 @@ func (s *Stream) encryptChunk(chunk []byte) ([]byte, []byte, error) {
 	}
 
 	// Encrypt the AES-CTR encrypted chunk (including the AES nonce) using XChaCha20-Poly1305.
+	//
+	// TODO: Consider including the HMAC sum of the AES-CTR encrypted chunk in the "additionalData" parameter.
+	//       However, it is not strictly necessary at the moment since XChaCha20-Poly1305 is capable of handling
+	//       up to 250GB of data, basically depending on the available memory (RAM) for most use-cases.
 	chachaEncryptedChunk := s.chacha.Seal(nil, chachaNonce, aesEncryptedChunkWithNonce, nil)
 
 	return chachaNonce, chachaEncryptedChunk, nil
