@@ -8,11 +8,14 @@ import (
 	"bytes"
 	"crypto/rand"
 	"crypto/subtle"
+	"encoding/binary"
 	"errors"
 	"io"
 	"testing"
 
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid/stream"
+
+	"golang.org/x/crypto/chacha20poly1305"
 )
 
 func TestHybridEncryptDecryptStream(t *testing.T) {
@@ -670,8 +673,8 @@ func TestHybridDecryptStreamInvalidHMACDigestSize(t *testing.T) {
 	err = s.Decrypt(bytes.NewBuffer(invalidEncryptedData), decryptedBuffer)
 	if err == nil {
 		t.Errorf("Expected decryption error due to invalid HMAC digest size, but got nil.")
-	} else if err.Error() != "invalid HMAC digest size" {
-		t.Errorf("Expected error message 'invalid HMAC digest size', but got: %v", err)
+	} else if err.Error() != "XChacha20Poly1305: invalid HMAC digest size" {
+		t.Errorf("Expected error message 'XChacha20Poly1305: invalid HMAC digest size', but got: %v", err)
 	} else {
 		t.Logf("Decryption failed as expected: %v", err)
 	}
@@ -720,6 +723,8 @@ func TestHybridDecryptStreamEncryptedChunkSizeMismatch(t *testing.T) {
 	err = s.Decrypt(bytes.NewBuffer(encryptedData), decryptedBuffer)
 	if err == nil {
 		t.Errorf("Expected decryption error due to encrypted chunk size mismatch, but got nil.")
+	} else if err.Error() != "XChacha20Poly1305: encrypted chunk size mismatch" {
+		t.Errorf("Expected error message 'XChacha20Poly1305: encrypted chunk size mismatch', but got: %v", err)
 	} else {
 		t.Logf("Decryption failed as expected: %v", err)
 	}
@@ -900,4 +905,67 @@ func TestDecryptUnexpectedChunk(t *testing.T) {
 	}
 
 	t.Logf("Decryption failed as expected: %v", err)
+}
+
+func TestHybridDecryptStreamXChaCha20NonceSizeXTooShort(t *testing.T) {
+	// Generate random keys for AES and ChaCha20-Poly1305.
+	aesKey := make([]byte, 32)    // AES-256 requires a 32-byte key.
+	chachaKey := make([]byte, 32) // XChaCha20-Poly1305 uses a 32-byte key.
+
+	_, err := rand.Read(aesKey)
+	if err != nil {
+		t.Fatalf("Failed to generate AES key: %v", err)
+	}
+
+	_, err = rand.Read(chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to generate XChaCha20-Poly1305 key: %v", err)
+	}
+
+	// Create a new Stream instance.
+	s, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to create Stream instance: %v", err)
+	}
+
+	// Simulate plaintext data to encrypt.
+	plaintext := []byte("Hello, World! This is a test of a XChaCha20-Poly1305 NonceX that is too short.")
+
+	// Encrypt the data.
+	inputBuffer := bytes.NewBuffer(plaintext)
+	encryptedBuffer := new(bytes.Buffer)
+	err = s.Encrypt(inputBuffer, encryptedBuffer)
+	if err != nil {
+		t.Fatalf("Failed to encrypt data: %v", err)
+	}
+
+	// Ensure the encrypted data buffer's read position is reset to the beginning.
+	encryptedData := encryptedBuffer.Bytes()
+
+	// Extract the chunk size from the encrypted data.
+	chunkSizeBuf := encryptedData[:2]
+	chunkSize := binary.BigEndian.Uint16(chunkSizeBuf)
+
+	// Calculate the total size of the chunk (chunk size + nonce size).
+	totalChunkSize := int(chunkSize) + chacha20poly1305.NonceSizeX
+
+	// Modify the encrypted data to have a buffer size smaller than the total chunk size.
+	if len(encryptedData) >= totalChunkSize {
+		// Create a reader for a subset of the encrypted data.
+		shortBufferSize := 2 + chacha20poly1305.NonceSizeX/2 // Chunk size + half of the nonce size
+		shortBufferReader := bytes.NewReader(encryptedData[:shortBufferSize])
+
+		// Create a buffer to store the decrypted data.
+		decryptedBuffer := new(bytes.Buffer)
+
+		// Attempt to decrypt the data with the short buffer.
+		err = s.Decrypt(shortBufferReader, decryptedBuffer)
+		if err == nil {
+			t.Errorf("Expected error due to buffer too short, but got nil.")
+		} else if err.Error() != "XChacha20Poly1305: Unexpected NonceSizeX" {
+			t.Errorf("Expected error message 'XChacha20Poly1305: Unexpected NonceSizeX', but got: %v", err)
+		} else {
+			t.Logf("Decryption failed as expected: %v", err)
+		}
+	}
 }

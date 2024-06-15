@@ -175,17 +175,17 @@ func (s *Stream) writeChunk(encryptedChunk, chachaNonce []byte, output io.Writer
 func (s *Stream) readChunkMetadata(input io.Reader) (uint16, []byte, error) {
 	chunkSizeBuf := make([]byte, 2)
 	if _, err := io.ReadFull(input, chunkSizeBuf); err != nil {
-		if err == io.EOF {
-			return 0, nil, err
+		if err == io.ErrUnexpectedEOF {
+			return 0, nil, errors.New("XChacha20Poly1305: Unexpected Chunk Size")
 		}
 		return 0, nil, err
 	}
 	chunkSize := binary.BigEndian.Uint16(chunkSizeBuf)
 
 	chachaNonce := make([]byte, chacha20poly1305.NonceSizeX)
-	if _, err := io.ReadFull(input, chachaNonce); err != nil {
-		if err == io.EOF {
-			return 0, nil, err
+	if _, err := io.ReadAtLeast(input, chachaNonce, chacha20poly1305.NonceSizeX); err != nil {
+		if err == io.ErrUnexpectedEOF {
+			return 0, nil, errors.New("XChacha20Poly1305: Unexpected NonceSizeX")
 		}
 		return 0, nil, err
 	}
@@ -199,9 +199,9 @@ func (s *Stream) readEncryptedChunk(input io.Reader, chunkSize uint16) ([]byte, 
 	if _, err := io.ReadFull(input, encryptedChunk); err != nil {
 		if err == io.ErrUnexpectedEOF {
 			if len(encryptedChunk) > 0 && s.hmac != nil {
-				return nil, errors.New("invalid HMAC digest size") // Middle Error Location in I/O primitives
+				return nil, errors.New("XChacha20Poly1305: invalid HMAC digest size") // Middle Error Location in I/O primitives
 			}
-			return nil, errors.New("encrypted chunk size mismatch") // Middle Error Location in I/O primitives
+			return nil, errors.New("XChacha20Poly1305: encrypted chunk size mismatch") // Middle Error Location in I/O primitives
 		}
 		return nil, err
 	}
@@ -236,7 +236,7 @@ func (s *Stream) verifyHMAC(encryptedChunk, hmacDigest []byte) error {
 	s.hmac.Write(encryptedChunk)
 	expectedHMACDigest := s.hmac.Sum(nil)
 	if subtle.ConstantTimeCompare(hmacDigest, expectedHMACDigest) != 1 {
-		return errors.New("HMAC verification failed")
+		return errors.New("XChacha20Poly1305: HMAC verification failed")
 	}
 	return nil
 }
