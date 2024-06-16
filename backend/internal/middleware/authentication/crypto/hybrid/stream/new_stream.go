@@ -9,6 +9,7 @@ import (
 	"crypto/cipher"
 	"crypto/hmac"
 	"crypto/sha256"
+	"errors"
 	"hash"
 
 	"golang.org/x/crypto/chacha20poly1305"
@@ -41,11 +42,20 @@ type Stream struct {
 	aesBlock cipher.Block
 	chacha   cipher.AEAD
 	hmac     hash.Hash
+	cipher   func([]byte) cipher.Stream
 }
 
 // New creates a new Stream instance with the provided AES and XChaCha20-Poly1305 keys.
 // HMAC authentication is disabled by default.
 func New(aesKey, chachaKey []byte) (*Stream, error) {
+	if len(aesKey) != 16 && len(aesKey) != 24 && len(aesKey) != 32 {
+		return nil, errors.New("Hybrid Scheme: Invalid AES-CTR key size")
+	}
+
+	if len(chachaKey) != 32 {
+		return nil, errors.New("Hybrid Scheme: Invalid XChaCha20-Poly1305 key size")
+	}
+
 	aesBlock, err := aes.NewCipher(aesKey)
 	if err != nil {
 		return nil, err
@@ -59,6 +69,9 @@ func New(aesKey, chachaKey []byte) (*Stream, error) {
 	return &Stream{
 		aesBlock: aesBlock,
 		chacha:   chacha,
+		cipher: func(nonce []byte) cipher.Stream {
+			return cipher.NewCTR(aesBlock, nonce)
+		},
 	}, nil
 }
 

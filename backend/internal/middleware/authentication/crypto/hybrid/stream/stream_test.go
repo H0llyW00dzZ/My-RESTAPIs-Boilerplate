@@ -1097,3 +1097,57 @@ func TestEncryptWithoutHMACDigest(t *testing.T) {
 
 	t.Logf("Decrypted output: %s", decryptedOutput.String())
 }
+
+func TestNew_InvalidKeyLength(t *testing.T) {
+	// Test cases with invalid key lengths
+	invalidKeys := []struct {
+		name      string
+		aesKey    []byte
+		chachaKey []byte
+	}{
+		{"Invalid AES key length", make([]byte, 15), make([]byte, 32)},
+		{"Invalid ChaCha key length", make([]byte, 16), make([]byte, 31)},
+		{"Both keys invalid length", make([]byte, 15), make([]byte, 31)},
+	}
+
+	for _, tc := range invalidKeys {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := stream.New(tc.aesKey, tc.chachaKey)
+			if err == nil {
+				t.Error("Expected an error, but got nil")
+			}
+		})
+	}
+}
+
+func TestNew_ValidKeyLength(t *testing.T) {
+	// Test cases with valid key lengths
+	validKeys := []struct {
+		name      string
+		aesKey    []byte
+		chachaKey []byte
+	}{
+		{"AES-CTR-128 and XChacha20Poly1305", make([]byte, 16), make([]byte, 32)},
+		{"AES-CTR-192 and XChacha20Poly1305", make([]byte, 24), make([]byte, 32)},
+		{"AES-CTR-256 and XChacha20Poly1305", make([]byte, 32), make([]byte, 32)},
+	}
+
+	for _, tc := range validKeys {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := rand.Read(tc.aesKey)
+			if err != nil {
+				t.Fatalf("Failed to generate AES key: %v", err)
+			}
+
+			_, err = rand.Read(tc.chachaKey)
+			if err != nil {
+				t.Fatalf("Failed to generate ChaCha key: %v", err)
+			}
+
+			_, err = stream.New(tc.aesKey, tc.chachaKey)
+			if err != nil {
+				t.Errorf("Unexpected error: %v", err)
+			}
+		})
+	}
+}
