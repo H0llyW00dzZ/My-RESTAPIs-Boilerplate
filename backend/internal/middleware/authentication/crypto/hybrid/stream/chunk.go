@@ -73,7 +73,7 @@ func (s *Stream) encryptChunk(chunk []byte) ([]byte, []byte, error) {
 // decryptChunk decrypts a single chunk using XChaCha20-Poly1305 and AES-CTR.
 func (s *Stream) decryptChunk(chachaNonce, chachaEncryptedChunk []byte) ([]byte, error) {
 	// Decrypt the chunk using XChaCha20-Poly1305.
-	_, chachaEncrypted := chachaEncryptedChunk[:s.chacha.NonceSize()], chachaEncryptedChunk[s.chacha.NonceSize():]
+	chachaEncrypted := chachaEncryptedChunk[s.chacha.NonceSize():]
 	aesEncryptedChunk, err := s.chacha.Open(nil, chachaNonce, chachaEncrypted, nil)
 	if err != nil {
 		return nil, err
