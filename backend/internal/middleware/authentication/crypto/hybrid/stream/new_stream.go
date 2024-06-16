@@ -47,7 +47,10 @@ type Stream struct {
 
 const (
 	// additionalCapacityPercentage represents the percentage of additional capacity
-	// to be added to the anti-tamper capacity when it exceeds [s.chacha.NonceSize()] + [s.chacha.Overhead()].
+	// to be added to the nonce capacity when it exceeds the minimum required size.
+	// This constant is used in both the AESNonceCapacity and ChachaNonceCapacity methods
+	// to calculate the nonce capacity for AES-CTR and XChaCha20-Poly1305 respectively.
+	// The default value is set to 0.05, which means an additional 5% capacity will be added.
 	additionalCapacityPercentage = 0.05 // use 5% capacity
 )
 
