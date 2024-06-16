@@ -20,6 +20,8 @@ import (
 
 // Moved here because VSCode keeps crashing without any reason and then causes a blue screen.
 // Windows it's so bad
+//
+// Note: When testing large data for encryption/decryption, consider running the tests outside of an IDE (e.g., VSCode).
 const TempSizeData = 10 * 1024 * 1024 // 10 MB
 
 func TestHybridEncryptDecryptStream(t *testing.T) {
