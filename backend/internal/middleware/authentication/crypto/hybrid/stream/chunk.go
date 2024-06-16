@@ -5,7 +5,6 @@
 package stream
 
 import (
-	"crypto/cipher"
 	"crypto/rand"
 	"crypto/subtle"
 	"encoding/binary"
@@ -87,7 +86,7 @@ func (s *Stream) decryptChunk(chachaNonce, chachaEncryptedChunk []byte) ([]byte,
 	aesEncryptedChunk = aesEncryptedChunk[aesNonceSize:]
 
 	// Decrypt the chunk using AES-CTR.
-	aesStream := cipher.NewCTR(s.aesBlock, aesNonce)
+	aesStream := s.cipher(aesNonce)
 	chunk := make([]byte, len(aesEncryptedChunk))
 	aesStream.XORKeyStream(chunk, aesEncryptedChunk)
 
