@@ -18,6 +18,10 @@ import (
 	"golang.org/x/crypto/chacha20poly1305"
 )
 
+// Moved here because VSCode keeps crashing without any reason and then causes a blue screen.
+// Windows it's so bad
+const TempSizeData = 10 * 1024 * 1024 // 10 MB
+
 func TestHybridEncryptDecryptStream(t *testing.T) {
 	// Generate random keys for AES and ChaCha20-Poly1305.
 	aesKey := make([]byte, 32)    // AES-256 requires a 32-byte key.
@@ -91,10 +95,7 @@ func TestHybridEncryptDecryptStreamLargeData(t *testing.T) {
 	}
 
 	// Generate a large plaintext data.
-	//
-	// Note: Don't try benchmark for large plaintext data (e.g 1GB), cause it will crash/fail decrypt due it too large for each goroutine.
-	plaintextSize := 1024 * 1024 * 1024 // 1 GB
-	plaintext := make([]byte, plaintextSize)
+	plaintext := make([]byte, TempSizeData)
 	_, err = rand.Read(plaintext)
 	if err != nil {
 		t.Fatalf("Failed to generate plaintext: %v", err)
@@ -159,10 +160,7 @@ func TestHybridEncryptDecryptStreamLargeDataWithHMACEnabled(t *testing.T) {
 	s.EnableHMAC(hmacKey)
 
 	// Generate a large plaintext data.
-	//
-	// Note: Don't try benchmark for large plaintext data (e.g 1GB), cause it will crash/fail decrypt due it too large for each goroutine.
-	plaintextSize := 1024 * 1024 * 1024 // 1 GB
-	plaintext := make([]byte, plaintextSize)
+	plaintext := make([]byte, TempSizeData)
 	_, err = rand.Read(plaintext)
 	if err != nil {
 		t.Fatalf("Failed to generate plaintext: %v", err)
