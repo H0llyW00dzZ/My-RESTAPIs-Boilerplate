@@ -156,7 +156,7 @@ func (s *Stream) readAndDecryptChunk(input io.Reader) ([]byte, error) {
 //
 // Also note that these TODOs won't break the cipher text because they are outside the encrypted data.
 func (s *Stream) writeChunk(encryptedChunk, chachaNonce []byte, output io.Writer) error {
-	chunkSizeBuf := make([]byte, 2)
+	chunkSizeBuf := make([]byte, minChunkBuf)
 	binary.BigEndian.PutUint16(chunkSizeBuf, uint16(len(encryptedChunk)))
 
 	if _, err := output.Write(chunkSizeBuf); err != nil {
