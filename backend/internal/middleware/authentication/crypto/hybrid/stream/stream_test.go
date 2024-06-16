@@ -9,8 +9,10 @@ import (
 	"crypto/rand"
 	"crypto/subtle"
 	"encoding/binary"
+	"encoding/hex"
 	"errors"
 	"io"
+	"strings"
 	"testing"
 
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid/stream"
@@ -975,4 +977,123 @@ func TestHybridDecryptStreamXChaCha20NonceSizeXTooShort(t *testing.T) {
 			t.Logf("Decryption failed as expected: %v", err)
 		}
 	}
+}
+
+func TestEncryptWithHexEncoding(t *testing.T) {
+	aesKey := make([]byte, 32)
+	chachaKey := make([]byte, 32)
+
+	stream, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to create stream: %v", err)
+	}
+
+	plaintext := []byte("Hello, World! This is a test of the hybrid encryption system.")
+	input := bytes.NewReader(plaintext)
+	output := &bytes.Buffer{}
+
+	err = stream.Encrypt(input, output)
+	if err != nil {
+		t.Fatalf("Encryption failed: %v", err)
+	}
+
+	hexEncoded := hex.EncodeToString(output.Bytes())
+	t.Logf("Encrypted output (hex encoded): %s", hexEncoded)
+
+	// Decrypt the hex-encoded data
+	hexDecoded, err := hex.DecodeString(hexEncoded)
+	if err != nil {
+		t.Fatalf("Failed to decode hex: %v", err)
+	}
+
+	var decryptedOutput strings.Builder
+	err = stream.Decrypt(bytes.NewReader(hexDecoded), &decryptedOutput)
+	if err != nil {
+		t.Fatalf("Decryption failed: %v", err)
+	}
+
+	if decryptedOutput.String() != string(plaintext) {
+		t.Errorf("Decrypted output does not match plaintext")
+	}
+
+	t.Logf("Decrypted output: %s", decryptedOutput.String())
+}
+
+func TestEncryptWithHMACDigest(t *testing.T) {
+	aesKey := make([]byte, 32)
+	chachaKey := make([]byte, 32)
+	hmacKey := make([]byte, 32)
+
+	stream, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to create stream: %v", err)
+	}
+	stream.EnableHMAC(hmacKey)
+
+	plaintext := []byte("Hello, World! This is a test of the hybrid encryption system with HMAC.")
+	input := bytes.NewReader(plaintext)
+	output := &bytes.Buffer{}
+
+	err = stream.Encrypt(input, output)
+	if err != nil {
+		t.Fatalf("Encryption failed: %v", err)
+	}
+
+	hexEncoded := hex.EncodeToString(output.Bytes())
+	t.Logf("Encrypted output (hex encoded): %s", hexEncoded)
+
+	digest, err := stream.Digest(bytes.NewReader(output.Bytes()))
+	if err != nil {
+		t.Fatalf("Failed to calculate digest: %v", err)
+	}
+	t.Logf("HMAC digest: %x", digest)
+
+	var decryptedOutput strings.Builder
+	err = stream.Decrypt(bytes.NewReader(output.Bytes()), &decryptedOutput)
+	if err != nil {
+		t.Fatalf("Decryption failed: %v", err)
+	}
+
+	if decryptedOutput.String() != string(plaintext) {
+		t.Errorf("Decrypted output does not match plaintext")
+	}
+
+	t.Logf("Decrypted output: %s", decryptedOutput.String())
+}
+
+func TestEncryptWithoutHMACDigest(t *testing.T) {
+	aesKey := make([]byte, 32)
+	chachaKey := make([]byte, 32)
+	hmacKey := make([]byte, 32)
+
+	stream, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to create stream: %v", err)
+	}
+
+	stream.EnableHMAC(hmacKey)
+
+	plaintext := []byte("Hello, World! This is a test of the hybrid encryption system with HMAC.")
+	input := bytes.NewReader(plaintext)
+	output := &bytes.Buffer{}
+
+	err = stream.Encrypt(input, output)
+	if err != nil {
+		t.Fatalf("Encryption failed: %v", err)
+	}
+
+	hexEncoded := hex.EncodeToString(output.Bytes())
+	t.Logf("Encrypted output (hex encoded): %s", hexEncoded)
+
+	var decryptedOutput strings.Builder
+	err = stream.Decrypt(bytes.NewReader(output.Bytes()), &decryptedOutput)
+	if err != nil {
+		t.Fatalf("Decryption failed: %v", err)
+	}
+
+	if decryptedOutput.String() != string(plaintext) {
+		t.Errorf("Decrypted output does not match plaintext")
+	}
+
+	t.Logf("Decrypted output: %s", decryptedOutput.String())
 }
