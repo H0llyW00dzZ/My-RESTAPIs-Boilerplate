@@ -897,7 +897,7 @@ func TestDecryptUnexpectedChunk(t *testing.T) {
 	// Test case: Decrypt encrypted data with an unexpected chunk
 	//
 	// Note: The maximum chunk buffer size is 2 and can be used for the HMAC Tag as the current identifier.
-	// If set to 3 or more, it will lead to an unexpected NonceSizeX error.
+	// If set to 3 or more, it will lead to an unexpected NonceSizeX error. (see https://i.imgur.com/p8imLJp.png how it work)
 	invalidEncryptedData := []byte("invalid-encrypted-data")
 	shortBufferSize := 1
 	decryptedOutput.Reset()
