@@ -48,6 +48,10 @@ func (s *Stream) encryptChunk(chunk []byte) ([]byte, []byte, error) {
 	// cryptographic randomness will always be unique, instead of using a fixed size from s.chacha.NonceSize().
 	// This approach is suitable for XChaCha20-Poly1305.
 	antiTamper := s.ChachaNonceCapacity(len(aesEncryptedChunkWithNonce))
+	anotherChachaNonce := make([]byte, s.chacha.NonceSize(), antiTamper)
+	if _, err := rand.Read(anotherChachaNonce); err != nil {
+		return nil, nil, err
+	}
 
 	// Generate a nonce for XChaCha20-Poly1305.
 	chachaNonce := make([]byte, s.chacha.NonceSize(), antiTamper)
@@ -60,15 +64,16 @@ func (s *Stream) encryptChunk(chunk []byte) ([]byte, []byte, error) {
 	// TODO: Consider including the HMAC sum of the AES-CTR encrypted chunk in the "additionalData" parameter.
 	//       However, it is not strictly necessary at the moment since XChaCha20-Poly1305 is capable of handling
 	//       up to 250GB of data, basically depending on the available memory (RAM) for most use-cases.
-	chachaEncryptedChunk := s.chacha.Seal(chachaNonce, chachaNonce, aesEncryptedChunkWithNonce, nil)
+	chachaEncryptedChunk := s.chacha.Seal(anotherChachaNonce, chachaNonce, aesEncryptedChunkWithNonce, nil)
 
+	// The resulting ciphertext will always be unique now.
 	return chachaNonce, chachaEncryptedChunk, nil
 }
 
 // decryptChunk decrypts a single chunk using XChaCha20-Poly1305 and AES-CTR.
 func (s *Stream) decryptChunk(chachaNonce, chachaEncryptedChunk []byte) ([]byte, error) {
 	// Decrypt the chunk using XChaCha20-Poly1305.
-	chachaNonce, chachaEncrypted := chachaEncryptedChunk[:s.chacha.NonceSize()], chachaEncryptedChunk[s.chacha.NonceSize():]
+	_, chachaEncrypted := chachaEncryptedChunk[:s.chacha.NonceSize()], chachaEncryptedChunk[s.chacha.NonceSize():]
 	aesEncryptedChunk, err := s.chacha.Open(nil, chachaNonce, chachaEncrypted, nil)
 	if err != nil {
 		return nil, err
