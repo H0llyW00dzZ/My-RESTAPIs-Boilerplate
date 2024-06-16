@@ -45,6 +45,12 @@ type Stream struct {
 	cipher   func([]byte) cipher.Stream
 }
 
+const (
+	// additionalCapacityPercentage represents the percentage of additional capacity
+	// to be added to the anti-tamper capacity when it exceeds [s.chacha.NonceSize()] + [s.chacha.Overhead()].
+	additionalCapacityPercentage = 0.05 // use 5% capacity
+)
+
 // New creates a new Stream instance with the provided AES and XChaCha20-Poly1305 keys.
 // HMAC authentication is disabled by default.
 func New(aesKey, chachaKey []byte) (*Stream, error) {
@@ -99,4 +105,16 @@ func New(aesKey, chachaKey []byte) (*Stream, error) {
 // and can be used to store the HMAC sum separately for additional verification purposes.
 func (s *Stream) EnableHMAC(key []byte) {
 	s.hmac = hmac.New(sha256.New, key)
+}
+
+// AESNonceCapacity calculates the nonce capacity for AES-CTR based on the length of the encrypted data.
+// It takes the length of the encrypted data as input and returns the calculated nonce capacity.
+func (s *Stream) AESNonceCapacity(encryptedLen int) int {
+	return s.calculateAESNonceCapacity(encryptedLen)
+}
+
+// ChachaNonceCapacity calculates the nonce capacity for XChaCha20-Poly1305 based on the length of the encrypted data.
+// It takes the length of the encrypted data as input and returns the calculated nonce capacity.
+func (s *Stream) ChachaNonceCapacity(encryptedLen int) int {
+	return s.calculateChachaNonceCapacity(s.chacha.NonceSize(), encryptedLen+s.chacha.Overhead())
 }
