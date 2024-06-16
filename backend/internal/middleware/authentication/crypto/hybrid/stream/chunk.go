@@ -36,7 +36,7 @@ func (s *Stream) encryptChunk(chunk []byte) ([]byte, []byte, error) {
 	}
 
 	// Encrypt the chunk using AES-CTR.
-	aesStream := cipher.NewCTR(s.aesBlock, aesNonce)
+	aesStream := s.cipher(aesNonce)
 	aesEncryptedChunk := make([]byte, len(chunk))
 	aesStream.XORKeyStream(aesEncryptedChunk, chunk)
 
