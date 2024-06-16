@@ -40,8 +40,17 @@ func (s *Stream) encryptChunk(chunk []byte) ([]byte, []byte, error) {
 	// Prepend the AES nonce to the AES-CTR encrypted chunk.
 	aesEncryptedChunkWithNonce := append(aesNonce, aesEncryptedChunk...)
 
+	// Generate a nonce and anti-tamper for XChaCha20-Poly1305.
+	//
+	// Note: This is a technique following the example from the Go documentation
+	// (see https://pkg.go.dev/golang.org/x/crypto@v0.24.0/chacha20poly1305#example-NewX).
+	// By using a larger capacity for the nonce slice, the output of the nonce along with the
+	// cryptographic randomness will always be unique, instead of using a fixed size from s.chacha.NonceSize().
+	// This approach is suitable for XChaCha20-Poly1305.
+	antiTamper := s.chacha.NonceSize() + len(aesEncryptedChunkWithNonce) + s.chacha.Overhead()
+
 	// Generate a nonce for XChaCha20-Poly1305.
-	chachaNonce := make([]byte, s.chacha.NonceSize())
+	chachaNonce := make([]byte, s.chacha.NonceSize(), antiTamper)
 	if _, err := rand.Read(chachaNonce); err != nil {
 		return nil, nil, err
 	}
@@ -51,7 +60,7 @@ func (s *Stream) encryptChunk(chunk []byte) ([]byte, []byte, error) {
 	// TODO: Consider including the HMAC sum of the AES-CTR encrypted chunk in the "additionalData" parameter.
 	//       However, it is not strictly necessary at the moment since XChaCha20-Poly1305 is capable of handling
 	//       up to 250GB of data, basically depending on the available memory (RAM) for most use-cases.
-	chachaEncryptedChunk := s.chacha.Seal(nil, chachaNonce, aesEncryptedChunkWithNonce, nil)
+	chachaEncryptedChunk := s.chacha.Seal(chachaNonce, chachaNonce, aesEncryptedChunkWithNonce, nil)
 
 	return chachaNonce, chachaEncryptedChunk, nil
 }
@@ -59,7 +68,8 @@ func (s *Stream) encryptChunk(chunk []byte) ([]byte, []byte, error) {
 // decryptChunk decrypts a single chunk using XChaCha20-Poly1305 and AES-CTR.
 func (s *Stream) decryptChunk(chachaNonce, chachaEncryptedChunk []byte) ([]byte, error) {
 	// Decrypt the chunk using XChaCha20-Poly1305.
-	aesEncryptedChunk, err := s.chacha.Open(nil, chachaNonce, chachaEncryptedChunk, nil)
+	chachaNonce, chachaEncrypted := chachaEncryptedChunk[:s.chacha.NonceSize()], chachaEncryptedChunk[s.chacha.NonceSize():]
+	aesEncryptedChunk, err := s.chacha.Open(nil, chachaNonce, chachaEncrypted, nil)
 	if err != nil {
 		return nil, err
 	}
