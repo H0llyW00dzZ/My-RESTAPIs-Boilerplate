@@ -22,6 +22,9 @@ const (
 	aesNonceSize = 16
 	chunkSize    = 1024
 	minChunkBuf  = 2
+	// additionalCapacityPercentage represents the percentage of additional capacity
+	// to be added to the anti-tamper capacity when it exceeds [s.chacha.NonceSize()] + [s.chacha.Overhead()].
+	additionalCapacityPercentage = 0.05 // use 5% capacity
 )
 
 // encryptChunk encrypts a single chunk using AES-CTR and XChaCha20-Poly1305.
@@ -47,7 +50,12 @@ func (s *Stream) encryptChunk(chunk []byte) ([]byte, []byte, error) {
 	// By using a larger capacity for the nonce slice, the output of the nonce along with the
 	// cryptographic randomness will always be unique, instead of using a fixed size from s.chacha.NonceSize().
 	// This approach is suitable for XChaCha20-Poly1305.
-	antiTamper := s.chacha.NonceSize() + len(aesEncryptedChunkWithNonce) + s.chacha.Overhead()
+	antiTamper := len(aesEncryptedChunkWithNonce) + s.chacha.Overhead()
+	if antiTamper < s.chacha.NonceSize() {
+		antiTamper = s.chacha.NonceSize()
+	} else {
+		antiTamper += int(float64(antiTamper) * additionalCapacityPercentage)
+	}
 
 	// Generate a nonce for XChaCha20-Poly1305.
 	chachaNonce := make([]byte, s.chacha.NonceSize(), antiTamper)
