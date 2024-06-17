@@ -181,7 +181,7 @@ func (s *Stream) writeChunk(encryptedChunk, chachaNonce []byte, output io.Writer
 	// Note: This example demonstrates how to use an identifier in SSL/TLS for a private network that can be used in a private server (not locally).
 	// The focus is not solely on SSL/TLS (due boring of SSL/TLS), as this is the core of ciphertext cryptography.
 	//
-	//		identifier := []byte{0x00, 0x01337} // Example Identifier for H0LLYW00DZZ_AESCTR_XCHACHA20POLY1305_HMAC_SHA256
+	//		identifier := []byte{0x00, 0x01337} // Example CipherSuite Identifier for H0LLYW00DZZ_AESCTR_XCHACHA20POLY1305_HMAC_SHA256
 	//		if _, err := output.Write(identifier); err != nil {
 	//	    	return err
 	//		}
