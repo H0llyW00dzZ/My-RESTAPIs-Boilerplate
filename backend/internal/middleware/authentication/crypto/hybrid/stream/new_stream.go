@@ -139,7 +139,7 @@ func (s *Stream) ChachaNonceCapacity(encryptedLen int) int {
 //
 // Example usage:
 //
-//	stream, err := New(aesKey, chachaKey)
+//	stream, err := stream.New(aesKey, chachaKey)
 //	if err != nil {
 //	    // Handle error
 //	}
