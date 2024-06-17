@@ -39,10 +39,11 @@ import (
 // it suggests that the encryption scheme is robust and resistant to common analysis techniques,
 // providing a high level of confidentiality and security for your data.
 type Stream struct {
-	aesBlock cipher.Block
-	chacha   cipher.AEAD
-	hmac     hash.Hash
-	cipher   func([]byte) cipher.Stream
+	aesBlock       cipher.Block
+	chacha         cipher.AEAD
+	hmac           hash.Hash
+	cipher         func([]byte) cipher.Stream
+	customizeNonce *CustomizeCapacityNonce
 }
 
 const (
@@ -53,6 +54,13 @@ const (
 	// The default value is set to 0.05, which means an additional 5% capacity will be added.
 	additionalCapacityPercentage = 0.05 // use 5% capacity
 )
+
+// CustomizeCapacityNonce allows customizing the nonce capacity for AES-CTR and XChaCha20-Poly1305.
+// The default value for both AESNonceCapacity and ChachaNonceCapacity is 0.05 (5% additional capacity).
+type CustomizeCapacityNonce struct {
+	AESNonceCapacity    float64
+	ChachaNonceCapacity float64
+}
 
 // New creates a new Stream instance with the provided AES and XChaCha20-Poly1305 keys.
 // HMAC authentication is disabled by default.
@@ -80,6 +88,10 @@ func New(aesKey, chachaKey []byte) (*Stream, error) {
 		chacha:   chacha,
 		cipher: func(nonce []byte) cipher.Stream {
 			return cipher.NewCTR(aesBlock, nonce)
+		},
+		customizeNonce: &CustomizeCapacityNonce{
+			AESNonceCapacity:    additionalCapacityPercentage,
+			ChachaNonceCapacity: additionalCapacityPercentage,
 		},
 	}, nil
 }
@@ -120,4 +132,24 @@ func (s *Stream) AESNonceCapacity(encryptedLen int) int {
 // It takes the length of the encrypted data as input and returns the calculated nonce capacity.
 func (s *Stream) ChachaNonceCapacity(encryptedLen int) int {
 	return s.calculateChachaNonceCapacity(s.chacha.NonceSize(), encryptedLen+s.chacha.Overhead())
+}
+
+// CustomizeNonceCapacity allows customizing the nonce capacity for AES-CTR and XChaCha20-Poly1305.
+// The default value for both AESNonceCapacity and ChachaNonceCapacity is 0.05 (5% additional capacity).
+//
+// Example usage:
+//
+//	stream, err := New(aesKey, chachaKey)
+//	if err != nil {
+//	    // Handle error
+//	}
+//
+//	// Customize nonce capacity
+//	stream.CustomizeNonceCapacity(0.1, 0.08)
+//
+// In this example, the nonce capacity for AES-CTR is set to 0.1 (10% additional capacity)
+// and the nonce capacity for XChaCha20-Poly1305 is set to 0.08 (8% additional capacity).
+func (s *Stream) CustomizeNonceCapacity(aesCapacity, chachaCapacity float64) {
+	s.customizeNonce.AESNonceCapacity = aesCapacity
+	s.customizeNonce.ChachaNonceCapacity = chachaCapacity
 }
