@@ -101,6 +101,11 @@ func (s *Stream) encryptAndWriteChunk(chunk []byte, output io.Writer) error {
 	// Note: The design is intentionally different from the [Digest] function exposed in the public API.
 	//       The internal HMAC sum and appending process is separate from the [Digest] function
 	//       to maintain a clear distinction between the internal and external functionality.
+	//
+	//       Also note that when HMAC authentication is enabled, the HMAC is bound to the encrypted chunk.
+	//       Tampering with the HMAC (e.g., modifying it and then decrypting without HMAC authentication) will cause the decryption process to fail.
+	//       The integrity verification will fail during decryption if the HMAC digest has been tampered with.
+	//       It is crucial to maintain the integrity of the HMAC and not attempt any modifications.
 	if s.hmac != nil {
 		s.hmac.Reset()
 		s.hmac.Write(encryptedChunk)
