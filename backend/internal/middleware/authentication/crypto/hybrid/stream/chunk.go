@@ -104,7 +104,7 @@ func (s *Stream) encryptAndWriteChunk(chunk []byte, output io.Writer) error {
 	//
 	//       Also note that when HMAC authentication is enabled, the HMAC is bound to the encrypted chunk.
 	//       Tampering with the HMAC (e.g., modifying it and then decrypting without HMAC authentication) will cause the decryption process to fail.
-	//       The integrity verification will fail during decryption if the HMAC digest has been tampered with.
+	//       The integrity verification will fail during decryption if the internal HMAC sum has been tampered with.
 	//       It is crucial to maintain the integrity of the HMAC and not attempt any modifications.
 	if s.hmac != nil {
 		s.hmac.Reset()
