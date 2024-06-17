@@ -178,6 +178,13 @@ func (s *Stream) readAndDecryptChunk(input io.Reader) ([]byte, error) {
 func (s *Stream) writeChunk(encryptedChunk, chachaNonce []byte, output io.Writer) error {
 	chunkSizeBuf := make([]byte, minChunkBuf)
 	binary.BigEndian.PutUint16(chunkSizeBuf, uint16(len(encryptedChunk)))
+	// Note: This example demonstrates how to use an identifier in SSL/TLS for a private network that can be used in a private server (not locally).
+	// The focus is not solely on SSL/TLS (due boring of SSL/TLS), as this is the core of ciphertext cryptography.
+	//
+	//		identifier := []byte{0x00, 0x01337} // Example Identifier for H0LLYW00DZZ_AESCTR_XCHACHA20POLY1305_HMAC_SHA256
+	//		if _, err := output.Write(identifier); err != nil {
+	//	    	return err
+	//		}
 
 	if _, err := output.Write(chunkSizeBuf); err != nil {
 		return err
@@ -194,6 +201,23 @@ func (s *Stream) writeChunk(encryptedChunk, chachaNonce []byte, output io.Writer
 
 // readChunkMetadata reads the chunk size and XChaCha20-Poly1305 nonce from the input stream.
 func (s *Stream) readChunkMetadata(input io.Reader) (uint16, []byte, error) {
+	// Note: This example demonstrates how to use an identifier in SSL/TLS for a private network that can be used in a private server (not locally).
+	// The focus is not solely on SSL/TLS (due boring of SSL/TLS), as this is the core of ciphertext cryptography.
+	//
+	//		identifierBuf := make([]byte, 2)
+	//		if _, err := io.ReadAtLeast(input, identifierBuf, 2); err != nil {
+	//	    	return 0, nil, err
+	//		}
+	//		identifier := binary.BigEndian.Uint16(identifierBuf)
+	//		// Parse the identifier and set the corresponding algorithms and parameters
+	//		switch identifier {
+	//		case 0x01337:
+	//	    	// H0LLYW00DZZ_AESCTR_XCHACHA20POLY1305_HMAC_SHA256
+	//	    	// Set the corresponding algorithms and parameters
+	//		default:
+	//	    	return 0, nil, errors.New("Unknown identifier")
+	//		}
+
 	chunkSizeBuf := make([]byte, minChunkBuf)
 	if _, err := io.ReadAtLeast(input, chunkSizeBuf, minChunkBuf); err != nil {
 		if err == io.ErrUnexpectedEOF {
