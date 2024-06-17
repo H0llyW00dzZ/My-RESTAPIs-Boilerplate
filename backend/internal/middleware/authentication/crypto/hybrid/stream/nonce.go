@@ -14,7 +14,7 @@ func (s *Stream) calculateAESNonceCapacity(overhead int) int {
 	if capacity < s.aesBlock.BlockSize() {
 		capacity = s.aesBlock.BlockSize()
 	} else {
-		capacity += int(float64(capacity) * additionalCapacityPercentage)
+		capacity += int(float64(capacity) * s.customizeNonce.AESNonceCapacity)
 	}
 	return capacity
 }
@@ -29,7 +29,7 @@ func (s *Stream) calculateChachaNonceCapacity(nonceSize, overhead int) int {
 	if capacity < nonceSize {
 		capacity = nonceSize
 	} else {
-		capacity += int(float64(capacity) * additionalCapacityPercentage)
+		capacity += int(float64(capacity) * s.customizeNonce.ChachaNonceCapacity)
 	}
 	return capacity
 }

@@ -1151,3 +1151,45 @@ func TestNew_ValidKeyLength(t *testing.T) {
 		})
 	}
 }
+
+func TestEncryptWithCustomizeNonceCapacity(t *testing.T) {
+	aesKey := make([]byte, 32)
+	chachaKey := make([]byte, 32)
+
+	stream, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to create stream: %v", err)
+	}
+
+	stream.CustomizeNonceCapacity(0.50, 0.50)
+
+	plaintext := []byte("Hello, World! This is a test of the hybrid encryption system With Customize Nonce Capacity.")
+	input := bytes.NewReader(plaintext)
+	output := &bytes.Buffer{}
+
+	err = stream.Encrypt(input, output)
+	if err != nil {
+		t.Fatalf("Encryption failed: %v", err)
+	}
+
+	hexEncoded := hex.EncodeToString(output.Bytes())
+	t.Logf("Encrypted output (hex encoded): %s", hexEncoded)
+
+	// Decrypt the hex-encoded data
+	hexDecoded, err := hex.DecodeString(hexEncoded)
+	if err != nil {
+		t.Fatalf("Failed to decode hex: %v", err)
+	}
+
+	var decryptedOutput strings.Builder
+	err = stream.Decrypt(bytes.NewReader(hexDecoded), &decryptedOutput)
+	if err != nil {
+		t.Fatalf("Decryption failed: %v", err)
+	}
+
+	if decryptedOutput.String() != string(plaintext) {
+		t.Errorf("Decrypted output does not match plaintext")
+	}
+
+	t.Logf("Decrypted output: %s", decryptedOutput.String())
+}
