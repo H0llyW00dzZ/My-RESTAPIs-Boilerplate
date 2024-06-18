@@ -82,6 +82,8 @@ func (config *RedisClientConfig) InitializeRedisClient() *redis.Client {
 		Password: config.Password,
 		DB:       config.Database,
 		// Note: TLSConfig is optional, but it is recommended for better security, so it's advisable to use it.
+		// Also note that for non-Kubernetes environments, it is recommended to use TLS. For certificates, packages from https://pkg.go.dev/golang.org/x/crypto@v0.24.0/acme or Caddy can be used.
+		// Personally, I don't use this because I am running on Kubernetes with another secure connection method (e.g., bound pods/node ports).
 		TLSConfig: &tls.Config{
 			MinVersion: tls.VersionTLS12,
 		},
@@ -120,6 +122,8 @@ func (config *FiberRedisClientConfig) InitializeRedisStorage() fiber.Storage {
 		Database: config.Database,
 		Reset:    config.Reset,
 		// Note: TLSConfig is optional, but it is recommended for better security, so it's advisable to use it.
+		// Also note that for non-Kubernetes environments, it is recommended to use TLS. For certificates, packages from https://pkg.go.dev/golang.org/x/crypto@v0.24.0/acme or Caddy can be used.
+		// Personally, I don't use this because I am running on Kubernetes with another secure connection method (e.g., bound pods/node ports).
 		TLSConfig: &tls.Config{
 			MinVersion: tls.VersionTLS12,
 		},
