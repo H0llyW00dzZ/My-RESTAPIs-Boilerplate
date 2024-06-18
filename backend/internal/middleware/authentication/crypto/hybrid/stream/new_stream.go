@@ -69,6 +69,156 @@ type CustomizeCapacityNonce struct {
 
 // New creates a new Stream instance with the provided AES and XChaCha20-Poly1305 keys.
 // HMAC authentication is disabled by default.
+//
+// Example usage with RSA:
+//
+// Note: Example usage with RSA Currently unimplemented (due boring of SSL/TLS) for the identifier, will implement later; however,
+// it must be used privately because it differs from most SSL/TLS implementations used on the internet
+//
+//	import (
+//		"crypto/rand"
+//		"crypto/rsa"
+//		"crypto/sha256"
+//		"crypto/x509"
+//		"encoding/pem"
+//		"os"
+//	)
+//
+//	// Generate AES key using crypto/rand
+//	aesKey := make([]byte, 32)
+//	if _, err := rand.Read(aesKey); err != nil {
+//		panic(err)
+//	}
+//
+//	// Generate XChaCha20-Poly1305 key using crypto/rand
+//	chachaKey := make([]byte, 32)
+//	if _, err := rand.Read(chachaKey); err != nil {
+//		panic(err)
+//	}
+//
+//	// Create a new Stream instance
+//	stream, err := stream.New(aesKey, chachaKey)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	// Generate RSA key pair
+//	rsaKey, err := rsa.GenerateKey(rand.Reader, 2048)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	// Encode RSA private key to PEM format
+//	rsaPrivateKeyPEM := pem.EncodeToMemory(&pem.Block{
+//		Type:  "RSA PRIVATE KEY",
+//		Bytes: x509.MarshalPKCS1PrivateKey(rsaKey),
+//	})
+//
+//	// Save RSA private key to file
+//	if err := os.WriteFile("private.pem", rsaPrivateKeyPEM, 0600); err != nil {
+//		panic(err)
+//	}
+//
+//	// Encode RSA public key to PEM format
+//	rsaPublicKeyPEM := pem.EncodeToMemory(&pem.Block{
+//		Type:  "RSA PUBLIC KEY",
+//		Bytes: x509.MarshalPKCS1PublicKey(&rsaKey.PublicKey),
+//	})
+//
+//	// Save RSA public key to file
+//	if err := os.WriteFile("public.pem", rsaPublicKeyPEM, 0644); err != nil {
+//		panic(err)
+//	}
+//
+//	// Use the Stream instance for encryption
+//	plaintext := []byte("Hello, World!")
+//	encryptedStream := &bytes.Buffer{}
+//	if err := stream.Encrypt(bytes.NewReader(plaintext), encryptedStream); err != nil {
+//		panic(err)
+//	}
+//
+//	// Encrypt the AES key and XChaCha20-Poly1305 key using RSA
+//	encryptedKeys := make([]byte, 64)
+//	encryptedAESKey, err := rsa.EncryptOAEP(sha256.New(), rand.Reader, &rsaKey.PublicKey, aesKey, nil)
+//	if err != nil {
+//		panic(err)
+//	}
+//	encryptedChaChaKey, err := rsa.EncryptOAEP(sha256.New(), rand.Reader, &rsaKey.PublicKey, chachaKey, nil)
+//	if err != nil {
+//		panic(err)
+//	}
+//	copy(encryptedKeys[:32], encryptedAESKey)
+//	copy(encryptedKeys[32:], encryptedChaChaKey)
+//
+//	// Save the encrypted keys to a file
+//	if err := os.WriteFile("encrypted_keys.bin", encryptedKeys, 0600); err != nil {
+//		panic(err)
+//	}
+//
+//	// ... (Decryption process using the RSA private key and the encrypted keys)
+//
+// Example usage without RSA:
+//
+//	import (
+//		"crypto/rand"
+//		"encoding/hex"
+//		"log"
+//		"strings"
+//	)
+//
+//	// Generate AES key using crypto/rand
+//	aesKey := make([]byte, 32)
+//	if _, err := rand.Read(aesKey); err != nil {
+//		panic(err)
+//	}
+//
+//	// Generate XChaCha20-Poly1305 key using crypto/rand
+//	chachaKey := make([]byte, 32)
+//	if _, err := rand.Read(chachaKey); err != nil {
+//		panic(err)
+//	}
+//
+//	// Create a new Stream instance
+//	stream, err := stream.New(aesKey, chachaKey)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	// Use the Stream instance for encryption
+//	plaintext := []byte("Hello, World!")
+//	encryptedStream := &bytes.Buffer{}
+//	if err := stream.Encrypt(bytes.NewReader(plaintext), encryptedStream); err != nil {
+//		panic(err)
+//	}
+//
+//	// Encode the encrypted data as hex
+//	encryptedHex := hex.EncodeToString(encryptedStream.Bytes())
+//	log.Printf("Encrypted data (hex): %s", encryptedHex)
+//
+//
+//	// Decryption process
+//	// Decode the encrypted data from hex
+//	encryptedBytes, err := hex.DecodeString(encryptedHex)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//
+//	// Create a new Stream instance for decryption
+//	decryptStream, err := stream.New(aesKey, chachaKey)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	// Use the Stream instance for decryption
+//	decryptedBuilder := &strings.Builder{}
+//	if err := decryptStream.Decrypt(bytes.NewReader(encryptedBytes), decryptedBuilder); err != nil {
+//		panic(err)
+//	}
+//
+//	log.Printf("Decrypted data: %s", decryptedBuilder.String())
+//
+// Note: Make sure to securely store and manage the generated keys.
 func New(aesKey, chachaKey []byte) (*Stream, error) {
 	if len(aesKey) != 16 && len(aesKey) != 24 && len(aesKey) != 32 {
 		return nil, errors.New("Hybrid Scheme: Invalid AES-CTR key size")
