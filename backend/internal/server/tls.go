@@ -21,6 +21,10 @@ type streamConn struct {
 }
 
 // Read reads encrypted data from the TLS connection, decrypts it using the Stream, and returns the decrypted data.
+//
+// Note: Exercise caution when calling this method in relation to section 10.10.3 of the TLS Encrypted Client Hello (ECH) draft
+// (see https://www.ietf.org/archive/id/draft-ietf-tls-esni-18.html#section-10.10.3).
+// The reason for implementing this is that it is legal for the server owner to do so. However, it requires careful consideration to use correctly.
 func (c *streamConn) Read() ([]byte, error) {
 	var buffer bytes.Buffer
 	err := c.Stream.Decrypt(c.Conn, &buffer)
