@@ -70,7 +70,7 @@ type CustomizeCapacityNonce struct {
 // New creates a new Stream instance with the provided AES and XChaCha20-Poly1305 keys.
 // HMAC authentication is disabled by default.
 //
-// Example usage with RSA:
+// Example usage with RSA (TLS 1.2, personally not recommended):
 //
 // Note: Example usage with RSA Currently unimplemented (due boring of SSL/TLS) for the identifier, will implement later; however,
 // it must be used privately because it differs from most SSL/TLS implementations used on the internet
@@ -157,7 +157,7 @@ type CustomizeCapacityNonce struct {
 //
 //	// ... (Decryption process using the RSA private key and the encrypted keys)
 //
-// Example usage without RSA:
+// Example usage without RSA (TLS 1.3, It's ok can be used; however, currently unimplemented for the identifier):
 //
 //	import (
 //		"crypto/rand"
