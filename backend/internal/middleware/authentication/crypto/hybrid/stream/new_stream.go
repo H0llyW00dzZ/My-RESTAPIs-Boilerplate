@@ -72,7 +72,8 @@ type CustomizeCapacityNonce struct {
 //
 // Example usage with RSA:
 //
-// Note: Example usage with RSA Currently unimplemented (due boring of SSL/TLS), will implement later; however, it must be used privately because it differs from most SSL/TLS implementations used on the internet
+// Note: Example usage with RSA Currently unimplemented (due boring of SSL/TLS) for the identifier, will implement later; however,
+// it must be used privately because it differs from most SSL/TLS implementations used on the internet
 //
 //	import (
 //		"crypto/rand"
