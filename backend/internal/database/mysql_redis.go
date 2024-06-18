@@ -2,6 +2,9 @@
 //
 // License: BSD 3-Clause License, MIT License
 
+// Note: The database package here is not covered by tests and won't have tests implemented for it,
+// as it is not worth testing the database that requires authentication. (literally stupid testing that requires authentication unlike mock)
+
 package database
 
 import (
@@ -151,6 +154,8 @@ type service struct {
 	mu          sync.Mutex // a mutex to guard connection restarts or any that needed
 	auth        ServiceAuth
 	bcrypt      *bcrypt.Hash
+	initRedis   *RedisClientConfig
+	initMysql   *MySQLConfig
 }
 
 // dbConfig holds the environment variables for the database connection.
@@ -715,12 +720,6 @@ func (s *service) RestartRedisConnection() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// Parse the Redis configuration from environment variables.
-	redisConfig, err := parseRedisConfig()
-	if err != nil {
-		return err
-	}
-
 	// Close the existing Redis client connection.
 	if err := s.redisClient.Close(); err != nil {
 		log.LogErrorf("Error closing Redis client: %v", err)
@@ -728,7 +727,7 @@ func (s *service) RestartRedisConnection() error {
 	}
 
 	// Reinitialize the Redis client.
-	s.redisClient = InitializeRedisClient(redisConfig)
+	s.redisClient = s.initRedis.InitializeRedisClient()
 
 	// Log the reconnection
 	log.LogInfo("Redis connection has been restarted.")
@@ -749,13 +748,7 @@ func (s *service) RestartMySQLConnection() error {
 
 	// Reinitialize the MySQL database connection.
 	var err error
-	s.db, err = InitializeMySQLDB(MySQLConfig{
-		Username: username,
-		Password: password,
-		Host:     host,
-		Port:     port,
-		Database: dbname,
-	})
+	s.db, err = s.initMysql.InitializeMySQLDB()
 	if err != nil {
 		log.LogErrorf("Error reinitializing MySQL database connection: %v", err)
 		return err
