@@ -2,6 +2,9 @@
 //
 // License: BSD 3-Clause License
 
+// Note: The database package here is not covered by tests and won't have tests implemented for it,
+// as it is not worth testing the database that requires authentication. (literally stupid testing that requires authentication unlike mock)
+
 package database
 
 import (
