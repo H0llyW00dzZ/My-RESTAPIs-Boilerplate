@@ -25,6 +25,9 @@ type streamConn struct {
 // Note: Exercise caution when calling this method in relation to section 10.10.3 of the TLS Encrypted Client Hello (ECH) draft
 // (see https://www.ietf.org/archive/id/draft-ietf-tls-esni-18.html#section-10.10.3).
 // The reason for implementing this is that it is legal for the server owner to do so. However, it requires careful consideration to use correctly.
+//
+// TIP: To mitigate this risk from section [10.10.3], servers can implement rate limiting or other security measures to control the number of decryption operations they perform within a given time frame.
+// By monitoring and limiting the rate of decryption requests, servers can reduce the impact of potential DoS attacks while still fulfilling their role in the ECH protocol.
 func (c *streamConn) Read() ([]byte, error) {
 	var buffer bytes.Buffer
 	err := c.Stream.Decrypt(c.Conn, &buffer)
