@@ -61,7 +61,7 @@ const (
 // Note: Customizing the nonce capacity for AES-CTR and XChaCha20-Poly1305 won't increase the bit size of the nonce.
 // It just enhances the ciphertext to make it always unique. The default is set to 5%, which provides a balance between
 // security and performance. If the capacity is set to a high value (e.g., 100%), it can lead to performance issues
-// when encrypting or decrypting large amounts of data (e.g., 100GB data then it need 200GB).
+// when encrypting or decrypting large amounts of data/packets (e.g., 100GB data/packets then it need 200GB).
 type CustomizeCapacityNonce struct {
 	AESNonceCapacity    float64
 	ChachaNonceCapacity float64
