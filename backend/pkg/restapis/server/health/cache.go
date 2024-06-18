@@ -67,7 +67,7 @@ func storeValidFiltersInCache(storage fiber.Storage, ipAddress string) error {
 }
 
 // retrieveFromCache attempts to retrieve data from cache based on the provided key.
-func retrieveFromCache(storage fiber.Storage, key string, data interface{}) bool {
+func retrieveFromCache(storage fiber.Storage, key string, data any) bool {
 	cacheData, err := storage.Get(key)
 	if err != nil {
 		if err == fiber.ErrNotFound {
@@ -97,7 +97,7 @@ func retrieveFromCache(storage fiber.Storage, key string, data interface{}) bool
 }
 
 // storeInCache stores the provided data in cache with the specified key and expiration.
-func storeInCache(storage fiber.Storage, key string, data interface{}, expiration time.Duration) {
+func storeInCache(storage fiber.Storage, key string, data any, expiration time.Duration) {
 	cacheData, err := sonic.Marshal(data)
 	if err != nil {
 		log.LogErrorf("Failed to marshal cache data for key: %s, error: %v", key, err)

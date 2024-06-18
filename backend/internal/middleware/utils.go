@@ -53,7 +53,7 @@ import (
 //	         - WithStoreResponseHeaders(storeResponseHeaders bool): Enables or disables storing additional response headers.
 //	         - WithMaxBytes(maxBytes uint): Sets the maximum number of bytes of response bodies to store in cache.
 //	         - WithMethods(methods []string): Specifies the HTTP methods to cache.
-//	         The options are passed as interface{} and are type-asserted within the function.
+//	         The options are passed as any and are type-asserted within the function.
 //
 // Returns:
 //
@@ -75,7 +75,7 @@ import (
 //	    WithMaxBytes(1024 * 1024),
 //	    WithMethods([]string{fiber.MethodGet, fiber.MethodPost}),
 //	)
-func NewCacheMiddleware(options ...interface{}) fiber.Handler {
+func NewCacheMiddleware(options ...any) fiber.Handler {
 	// Create a new cache middleware configuration.
 	config := cache.Config{}
 
@@ -120,7 +120,7 @@ func NewCacheMiddleware(options ...interface{}) fiber.Handler {
 //	         - WithExpiration(expiration time.Duration): Sets the expiration time for the rate limit.
 //	         - WithLimitReached(handler fiber.Handler): Sets a custom handler to execute when the rate limit is reached.
 //	         - WithStorage(storage fiber.Storage): Sets the storage backend for the rate limiter middleware.
-//	         The options are passed as interface{} and are type-asserted within the function.
+//	         The options are passed as any and are type-asserted within the function.
 //
 // Returns:
 //
@@ -145,7 +145,7 @@ func NewCacheMiddleware(options ...interface{}) fiber.Handler {
 //
 //	// Create a rate limiter middleware with multiple custom options
 //	rateLimiter := NewRateLimiter(WithMax(100), WithExpiration(time.Minute), WithLimitReached(customLimitReachedHandler), WithStorage(customStorage))
-func NewRateLimiter(options ...interface{}) fiber.Handler {
+func NewRateLimiter(options ...any) fiber.Handler {
 	// Create a new rate limiter middleware configuration.
 	config := limiter.Config{}
 
@@ -176,7 +176,7 @@ func NewRateLimiter(options ...interface{}) fiber.Handler {
 //	WithMaxAge(3600),
 //
 // )
-func NewCORSMiddleware(options ...interface{}) fiber.Handler {
+func NewCORSMiddleware(options ...any) fiber.Handler {
 	// Note: In the Fiber framework v3, this CORS middleware configuration provides better security and low overhead.
 	// For example, it allows blocking internal IPs by setting `AllowPrivateNetwork` to false (read more: https://docs.gofiber.io/api/middleware/cors).
 	// Create a new CORS middleware configuration with default values
@@ -198,7 +198,7 @@ func NewCORSMiddleware(options ...interface{}) fiber.Handler {
 
 // NewETagMiddleware creates a new ETag middleware with the default and optional custom configuration options.
 // It generates strong ETags for response caching and validation.
-func NewETagMiddleware(options ...interface{}) fiber.Handler {
+func NewETagMiddleware(options ...any) fiber.Handler {
 	// Create a new ETag middleware configuration.
 	config := etag.Config{}
 
@@ -218,7 +218,7 @@ func NewETagMiddleware(options ...interface{}) fiber.Handler {
 
 // NewFaviconMiddleware creates a new favicon middleware to serve a favicon file.
 // It takes the file path of the favicon and the URL path where the favicon will be served.
-func NewFaviconMiddleware(options ...interface{}) fiber.Handler {
+func NewFaviconMiddleware(options ...any) fiber.Handler {
 	// Create a new favicon middleware configuration with default values
 	config := favicon.Config{}
 
@@ -340,7 +340,7 @@ func CustomCacheSkipper(prefixes ...string) func(*fiber.Ctx) bool {
 //
 // TODO: Implement a custom "Next" function that can skip authorization for admin/security roles,
 // as they utilize another highly secure authentication mechanism with zero vulnerabilities and exploits 💀.
-func NewKeyAuthMiddleware(options ...interface{}) fiber.Handler {
+func NewKeyAuthMiddleware(options ...any) fiber.Handler {
 	// Create a new key authentication middleware configuration.
 	config := keyauth.Config{}
 
@@ -371,7 +371,7 @@ func NewKeyAuthMiddleware(options ...interface{}) fiber.Handler {
 //
 // TODO: Enhance this to integrate it with a perfect hybrid cryptosystem 🛡️🔐
 // when the Fiber encrypted cookie supports multiple keys (as currently, it only supports one key)
-func NewEncryptedCookieMiddleware(options ...interface{}) fiber.Handler {
+func NewEncryptedCookieMiddleware(options ...any) fiber.Handler {
 	// Create a new encrypted cookie middleware configuration.
 	config := encryptcookie.Config{}
 
@@ -400,7 +400,7 @@ func NewEncryptedCookieMiddleware(options ...interface{}) fiber.Handler {
 //	  }),
 //	  WithRedirectStatusCode(fiber.StatusMovedPermanently),
 //	)
-func NewRedirectMiddleware(options ...interface{}) fiber.Handler {
+func NewRedirectMiddleware(options ...any) fiber.Handler {
 	// Create a new redirect configuration with default values
 	config := redirect.Config{}
 
@@ -424,7 +424,7 @@ func NewRedirectMiddleware(options ...interface{}) fiber.Handler {
 // it is recommended to use a database that can handle high connections,
 // for example, Redis is recommended because it can handle 10K++ connections,
 // which is perfect for pooling without bottlenecks, and it's essentially unlimited connection.
-func NewSessionMiddleware(options ...interface{}) fiber.Handler {
+func NewSessionMiddleware(options ...any) fiber.Handler {
 	// Create a new session middleware configuration.
 	config := session.Config{}
 
@@ -475,7 +475,7 @@ func NewSessionMiddleware(options ...interface{}) fiber.Handler {
 }
 
 // NewCSRFMiddleware creates a new CSRF middleware with optional custom configuration options.
-func NewCSRFMiddleware(options ...interface{}) fiber.Handler {
+func NewCSRFMiddleware(options ...any) fiber.Handler {
 	// Create a new CSRF middleware configuration.
 	config := csrf.Config{}
 
@@ -512,7 +512,7 @@ func NewCSRFMiddleware(options ...interface{}) fiber.Handler {
 //	)
 //
 // Note: This suitable for frontend.
-func NewHelmetMiddleware(options ...interface{}) fiber.Handler {
+func NewHelmetMiddleware(options ...any) fiber.Handler {
 	// Create a new Helmet middleware configuration with default values
 	config := helmet.Config{}
 
@@ -534,7 +534,7 @@ func NewHelmetMiddleware(options ...interface{}) fiber.Handler {
 //
 // TODO: Consider customizing this middleware to support alternative authentication methods like OAuth, cryptocurrency-based authentication,
 // or Single Sign-On (SSO) by modifying the username/password logic to handle session tokens or other authentication mechanisms (NOTE: NO JWT and their base standards).
-func NewBasicAuthMiddleware(options ...interface{}) fiber.Handler {
+func NewBasicAuthMiddleware(options ...any) fiber.Handler {
 	// Create a new basic authentication middleware configuration.
 	config := basicauth.Config{}
 
@@ -553,7 +553,7 @@ func NewBasicAuthMiddleware(options ...interface{}) fiber.Handler {
 }
 
 // NewSwaggerMiddleware creates a new Swagger middleware with optional custom configuration options.
-func NewSwaggerMiddleware(options ...interface{}) fiber.Handler {
+func NewSwaggerMiddleware(options ...any) fiber.Handler {
 	// Create a new Swagger middleware configuration.
 	config := swagger.Config{}
 
@@ -574,7 +574,7 @@ func NewSwaggerMiddleware(options ...interface{}) fiber.Handler {
 // NewIdempotencyMiddleware creates a new idempotency middleware with optional custom configuration options.
 //
 // Ref: https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-02
-func NewIdempotencyMiddleware(options ...interface{}) fiber.Handler {
+func NewIdempotencyMiddleware(options ...any) fiber.Handler {
 	// Create a new idempotency middleware configuration.
 	config := idempotency.Config{}
 
@@ -593,7 +593,7 @@ func NewIdempotencyMiddleware(options ...interface{}) fiber.Handler {
 }
 
 // NewRewriteMiddleware creates a new Rewrite middleware with optional custom configuration options.
-func NewRewriteMiddleware(options ...interface{}) fiber.Handler {
+func NewRewriteMiddleware(options ...any) fiber.Handler {
 	// Create a new Rewrite middleware configuration
 	config := rewrite.Config{}
 
@@ -665,7 +665,7 @@ func ConvertRequestMiddleware(forServer bool, contextKey ...string) fiber.Handle
 //
 // Note: This is still a work in progress and might not work as expected for MIME types other than JSON.
 // The reason for implementing it here is to avoid having to add it again.
-func NewValidatorMiddleware(options ...interface{}) fiber.Handler {
+func NewValidatorMiddleware(options ...any) fiber.Handler {
 	// Create a new Validator middleware configuration.
 	config := validator.Config{}
 

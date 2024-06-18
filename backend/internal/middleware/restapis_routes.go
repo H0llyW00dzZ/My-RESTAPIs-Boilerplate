@@ -89,7 +89,7 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 	}
 
 	// Note: This method is also called a "higher-order function",
-	// similar to another configuration where "...interface{}" is used.
+	// similar to another configuration where "...any" is used.
 	// This is one of the reasons why I like Go. For example, when I'm lazy to implement something from scratch,
 	// I can just use a package that is already stable then build on top of it using higher-order functions.
 	redirectMiddleware := NewRedirectMiddleware(

@@ -73,11 +73,11 @@ func getValidFilters() []string {
 func createHealthResponse(health map[string]string, filter string) Response {
 	// Note: By structuring the code this way, it is easily maintainable for customization, etc.
 	// Define a map of filter-specific response creation functions
-	responseCreators := map[string]func(map[string]string) interface{}{
-		"mysql": func(h map[string]string) interface{} {
+	responseCreators := map[string]func(map[string]string) any{
+		"mysql": func(h map[string]string) any {
 			return createMySQLHealthResponse(h)
 		},
-		"redis": func(h map[string]string) interface{} {
+		"redis": func(h map[string]string) any {
 			return createRedisHealthResponse(h)
 		},
 	}
@@ -99,7 +99,7 @@ func createHealthResponse(health map[string]string, filter string) Response {
 }
 
 // applyHealthResponse applies the health response to the Response struct based on the type of response.
-func applyHealthResponse(response *Response, healthResponse interface{}) {
+func applyHealthResponse(response *Response, healthResponse any) {
 	switch r := healthResponse.(type) {
 	case *MySQLHealth:
 		response.MySQLHealth = r

@@ -88,52 +88,52 @@ func (w *LogWriter) Write(p []byte) (n int, err error) {
 }
 
 // Panic logs panic messages.
-func (l *Logger) Panic(v ...interface{}) {
+func (l *Logger) Panic(v ...any) {
 	l.crashLogger.Print(v...)
 }
 
 // Panicf logs formatted panic messages.
-func (l *Logger) Panicf(format string, v ...interface{}) {
+func (l *Logger) Panicf(format string, v ...any) {
 	l.crashLogger.Printf(format, v...)
 }
 
 // Fatal logs fatal messages and exits the program with status code 1.
-func (l *Logger) Fatal(v ...interface{}) {
+func (l *Logger) Fatal(v ...any) {
 	l.fatalLogger.Fatalln(v...)
 }
 
 // Fatalf logs formatted fatal messages and exits the program with status code 1.
-func (l *Logger) Fatalf(format string, v ...interface{}) {
+func (l *Logger) Fatalf(format string, v ...any) {
 	l.fatalLogger.Fatalf(format, v...)
 }
 
 // Info logs informational messages.
-func (l *Logger) Info(v ...interface{}) {
+func (l *Logger) Info(v ...any) {
 	l.infoLogger.Println(v...)
 }
 
 // Infof logs formatted informational messages.
-func (l *Logger) Infof(format string, v ...interface{}) {
+func (l *Logger) Infof(format string, v ...any) {
 	l.infoLogger.Printf(format, v...)
 }
 
 // Visitor logs messages related to WebSocket visitors.
-func (l *Logger) Visitor(v ...interface{}) {
+func (l *Logger) Visitor(v ...any) {
 	l.visitorLogger.Println(v...)
 }
 
 // Visitorf logs formatted messages related to WebSocket visitors.
-func (l *Logger) Visitorf(format string, v ...interface{}) {
+func (l *Logger) Visitorf(format string, v ...any) {
 	l.visitorLogger.Printf(format, v...)
 }
 
 // Error logs error messages.
-func (l *Logger) Error(v ...interface{}) {
+func (l *Logger) Error(v ...any) {
 	l.errorLogger.Println(v...)
 }
 
 // Errorf logs formatted error messages.
-func (l *Logger) Errorf(format string, v ...interface{}) {
+func (l *Logger) Errorf(format string, v ...any) {
 	l.errorLogger.Printf(format, v...)
 }
 
@@ -152,52 +152,52 @@ func InitializeLogger(appName, timeFormat string) {
 }
 
 // LogCrash is a convenience function to log crash messages using the custom logger.
-func LogCrash(v ...interface{}) {
+func LogCrash(v ...any) {
 	customLogger.Panic(v...)
 }
 
 // LogCrashf is a convenience function to log formatted crash messages using the custom logger.
-func LogCrashf(format string, v ...interface{}) {
+func LogCrashf(format string, v ...any) {
 	customLogger.Panicf(format, v...)
 }
 
 // LogFatal is a convenience function to log fatal messages using the custom logger.
-func LogFatal(v ...interface{}) {
+func LogFatal(v ...any) {
 	customLogger.Fatal(v...)
 }
 
 // LogFatalf is a convenience function to log formatted fatal messages using the custom logger.
-func LogFatalf(format string, v ...interface{}) {
+func LogFatalf(format string, v ...any) {
 	customLogger.Fatalf(format, v...)
 }
 
 // LogInfo is a convenience function to log informational messages using the custom logger.
-func LogInfo(v ...interface{}) {
+func LogInfo(v ...any) {
 	customLogger.Info(v...)
 }
 
 // LogInfof is a convenience function to log formatted informational messages using the custom logger.
-func LogInfof(format string, v ...interface{}) {
+func LogInfof(format string, v ...any) {
 	customLogger.Infof(format, v...)
 }
 
 // LogVisitor is a convenience function to log visitor messages using the custom logger.
-func LogVisitor(v ...interface{}) {
+func LogVisitor(v ...any) {
 	customLogger.Visitor(v...)
 }
 
 // LogVisitorf is a convenience function to log formatted visitor messages using the custom logger.
-func LogVisitorf(format string, v ...interface{}) {
+func LogVisitorf(format string, v ...any) {
 	customLogger.Visitorf(format, v...)
 }
 
 // LogError is a convenience function to log error messages using the custom logger.
-func LogError(v ...interface{}) {
+func LogError(v ...any) {
 	customLogger.Error(v...)
 }
 
 // LogErrorf is a convenience function to log formatted error messages using the custom logger.
-func LogErrorf(format string, v ...interface{}) {
+func LogErrorf(format string, v ...any) {
 	customLogger.Errorf(format, v...)
 }
 

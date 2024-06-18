@@ -102,8 +102,8 @@ func ratelimiterMsg(customMessage string) func(*fiber.Ctx) error {
 // Note:
 //   - If an unsupported middleware configuration is passed to WithKeyGenerator, it will panic with an error message.
 //   - Additional key generator support for other middlewares will be added based on future requirements.
-func WithKeyGenerator(keyGenerator func(*fiber.Ctx) string) interface{} {
-	return func(config interface{}) {
+func WithKeyGenerator(keyGenerator func(*fiber.Ctx) string) any {
+	return func(config any) {
 		// Note: This a better switch-statement, it doesn't matter if there is so many switch (e.g, 1 billion switch case)
 		switch cfg := config.(type) {
 		case *cache.Config:
@@ -462,8 +462,8 @@ func CleanupExpiredSessions(store *session.Store, interval time.Duration) {
 // Note:
 //   - If an unsupported middleware configuration is passed to WithStorage, it will panic with an error message.
 //   - Additional storage support for other middlewares will be implemented in the future as needed.
-func WithStorage(storage fiber.Storage) interface{} {
-	return func(config interface{}) {
+func WithStorage(storage fiber.Storage) any {
+	return func(config any) {
 		switch cfg := config.(type) {
 		case *cache.Config:
 			cfg.Storage = storage
@@ -566,7 +566,7 @@ func WithCSRFSessionKey(sessionKey string) func(*csrf.Config) {
 }
 
 // WithCSRFContextKey is an option function for NewCSRFMiddleware that sets the context key for storing the CSRF token.
-func WithCSRFContextKey(contextKey interface{}) func(*csrf.Config) {
+func WithCSRFContextKey(contextKey any) func(*csrf.Config) {
 	return func(config *csrf.Config) {
 		config.ContextKey = contextKey
 	}
@@ -594,7 +594,7 @@ func WithCSRFExtractor(extractor func(*fiber.Ctx) (string, error)) func(*csrf.Co
 }
 
 // WithCSRFHandlerContextKey is an option function for NewCSRFMiddleware that sets the context key for storing the CSRF handler.
-func WithCSRFHandlerContextKey(handlerContextKey interface{}) func(*csrf.Config) {
+func WithCSRFHandlerContextKey(handlerContextKey any) func(*csrf.Config) {
 	return func(config *csrf.Config) {
 		config.HandlerContextKey = handlerContextKey
 	}
@@ -798,8 +798,8 @@ func WithSwaggerCacheAge(cacheAge int) func(*swagger.Config) {
 // Note:
 //   - If an unsupported middleware configuration is passed to WithNext, it will panic with an error message.
 //   - Additional "Next" functionality for other middlewares will be added based on future requirements.
-func WithNext(next func(c *fiber.Ctx) bool) interface{} {
-	return func(config interface{}) {
+func WithNext(next func(c *fiber.Ctx) bool) any {
+	return func(config any) {
 		switch cfg := config.(type) {
 		case *cache.Config:
 			cfg.Next = next
@@ -913,9 +913,9 @@ func WithIdempotencyLock(lock idempotency.Locker) func(*idempotency.Config) {
 //
 // Note:
 //   - If an unsupported middleware configuration is passed to WithRules, it will panic with an error message.
-func WithRules(rules map[string]string) interface{} {
+func WithRules(rules map[string]string) any {
 	// Note: now, this reusable, get good get golang.
-	return func(config interface{}) {
+	return func(config any) {
 		switch cfg := config.(type) {
 		case *rewrite.Config:
 			cfg.Rules = rules

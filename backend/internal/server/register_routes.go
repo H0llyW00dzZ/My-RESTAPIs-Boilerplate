@@ -18,7 +18,7 @@ import "h0llyw00dz-template/backend/internal/server/k8s/metrics"
 //    path: The path where the Prometheus metrics will be exposed.
 //    serviceName: The name of the service for labeling the metrics.
 //    options: Optional parameters for configuring the Prometheus middleware.
-func (s *FiberServer) RegisterRoutesPrometheus(path string, serviceName string, options ...interface{}) {
+func (s *FiberServer) RegisterRoutesPrometheus(path string, serviceName string, options ...any) {
 	prometheus := metrics.NewPrometheusMiddleware(serviceName, options...)
 	prometheus.RegisterAt(s.app, path)
 	s.app.Use(prometheus.Middleware)
