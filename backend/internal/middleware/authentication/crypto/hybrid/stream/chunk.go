@@ -221,7 +221,7 @@ func (s *Stream) readChunkMetadata(input io.Reader) (uint16, []byte, error) {
 	chunkSizeBuf := make([]byte, minChunkBuf)
 	if _, err := io.ReadAtLeast(input, chunkSizeBuf, minChunkBuf); err != nil {
 		if err == io.ErrUnexpectedEOF {
-			return 0, nil, errors.New("XChacha20Poly1305: Unexpected Chunk Buffer Size")
+			return 0, nil, errors.New("XChaCha20-Poly1305: Unexpected Chunk Buffer Size")
 		}
 		return 0, nil, err
 	}
@@ -230,7 +230,7 @@ func (s *Stream) readChunkMetadata(input io.Reader) (uint16, []byte, error) {
 	chachaNonce := make([]byte, chacha20poly1305.NonceSizeX)
 	if _, err := io.ReadAtLeast(input, chachaNonce, chacha20poly1305.NonceSizeX); err != nil {
 		if err == io.ErrUnexpectedEOF {
-			return 0, nil, errors.New("XChacha20Poly1305: Unexpected NonceSizeX")
+			return 0, nil, errors.New("XChaCha20-Poly1305: Unexpected NonceSizeX")
 		}
 		return 0, nil, err
 	}
@@ -244,9 +244,9 @@ func (s *Stream) readEncryptedChunk(input io.Reader, chunkSize uint16) ([]byte, 
 	if _, err := io.ReadFull(input, encryptedChunk); err != nil {
 		if err == io.ErrUnexpectedEOF {
 			if len(encryptedChunk) > 0 && s.hmac != nil {
-				return nil, errors.New("XChacha20Poly1305: invalid HMAC digest size") // Middle Error Location in I/O primitives
+				return nil, errors.New("XChaCha20-Poly1305: invalid HMAC digest size") // Middle Error Location in I/O primitives
 			}
-			return nil, errors.New("XChacha20Poly1305: encrypted chunk size mismatch") // Middle Error Location in I/O primitives
+			return nil, errors.New("XChaCha20-Poly1305: encrypted chunk size mismatch") // Middle Error Location in I/O primitives
 		}
 		return nil, err
 	}
@@ -281,7 +281,7 @@ func (s *Stream) verifyHMAC(encryptedChunk, hmacDigest []byte) error {
 	s.hmac.Write(encryptedChunk)
 	expectedHMACDigest := s.hmac.Sum(nil)
 	if subtle.ConstantTimeCompare(hmacDigest, expectedHMACDigest) != 1 {
-		return errors.New("XChacha20Poly1305: HMAC verification failed")
+		return errors.New("XChaCha20-Poly1305: HMAC verification failed")
 	}
 	return nil
 }

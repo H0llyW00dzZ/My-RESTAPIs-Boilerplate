@@ -675,8 +675,8 @@ func TestHybridDecryptStreamInvalidHMACDigestSize(t *testing.T) {
 	err = s.Decrypt(bytes.NewBuffer(invalidEncryptedData), decryptedBuffer)
 	if err == nil {
 		t.Errorf("Expected decryption error due to invalid HMAC digest size, but got nil.")
-	} else if err.Error() != "XChacha20Poly1305: invalid HMAC digest size" {
-		t.Errorf("Expected error message 'XChacha20Poly1305: invalid HMAC digest size', but got: %v", err)
+	} else if err.Error() != "XChaCha20-Poly1305: invalid HMAC digest size" {
+		t.Errorf("Expected error message 'XChaCha20-Poly1305: invalid HMAC digest size', but got: %v", err)
 	} else {
 		t.Logf("Decryption failed as expected: %v", err)
 	}
@@ -725,8 +725,8 @@ func TestHybridDecryptStreamEncryptedChunkSizeMismatch(t *testing.T) {
 	err = s.Decrypt(bytes.NewBuffer(encryptedData), decryptedBuffer)
 	if err == nil {
 		t.Errorf("Expected decryption error due to encrypted chunk size mismatch, but got nil.")
-	} else if err.Error() != "XChacha20Poly1305: encrypted chunk size mismatch" {
-		t.Errorf("Expected error message 'XChacha20Poly1305: encrypted chunk size mismatch', but got: %v", err)
+	} else if err.Error() != "XChaCha20-Poly1305: encrypted chunk size mismatch" {
+		t.Errorf("Expected error message 'XChaCha20-Poly1305: encrypted chunk size mismatch', but got: %v", err)
 	} else {
 		t.Logf("Decryption failed as expected: %v", err)
 	}
@@ -909,8 +909,8 @@ func TestDecryptUnexpectedChunk(t *testing.T) {
 	err = s.Decrypt(invalidEncryptedInput, &decryptedOutput)
 	if err == nil {
 		t.Errorf("Expected error due to buffer too short, but got nil.")
-	} else if err.Error() != "XChacha20Poly1305: Unexpected Chunk Buffer Size" {
-		t.Errorf("Expected error message 'XChacha20Poly1305: Unexpected Chunk Buffer Size', but got: %v", err)
+	} else if err.Error() != "XChaCha20-Poly1305: Unexpected Chunk Buffer Size" {
+		t.Errorf("Expected error message 'XChaCha20-Poly1305: Unexpected Chunk Buffer Size', but got: %v", err)
 	} else {
 		t.Logf("Decryption failed as expected: %v", err)
 	}
@@ -971,8 +971,8 @@ func TestHybridDecryptStreamXChaCha20NonceSizeXTooShort(t *testing.T) {
 		err = s.Decrypt(shortBufferReader, decryptedBuffer)
 		if err == nil {
 			t.Errorf("Expected error due to buffer too short, but got nil.")
-		} else if err.Error() != "XChacha20Poly1305: Unexpected NonceSizeX" {
-			t.Errorf("Expected error message 'XChacha20Poly1305: Unexpected NonceSizeX', but got: %v", err)
+		} else if err.Error() != "XChaCha20-Poly1305: Unexpected NonceSizeX" {
+			t.Errorf("Expected error message 'XChaCha20-Poly1305: Unexpected NonceSizeX', but got: %v", err)
 		} else {
 			t.Logf("Decryption failed as expected: %v", err)
 		}
@@ -1127,9 +1127,9 @@ func TestNew_ValidKeyLength(t *testing.T) {
 		aesKey    []byte
 		chachaKey []byte
 	}{
-		{"AES-CTR-128 and XChacha20Poly1305", make([]byte, 16), make([]byte, 32)},
-		{"AES-CTR-192 and XChacha20Poly1305", make([]byte, 24), make([]byte, 32)},
-		{"AES-CTR-256 and XChacha20Poly1305", make([]byte, 32), make([]byte, 32)},
+		{"AES-CTR-128 and XChaCha20-Poly1305", make([]byte, 16), make([]byte, 32)},
+		{"AES-CTR-192 and XChaCha20-Poly1305", make([]byte, 24), make([]byte, 32)},
+		{"AES-CTR-256 and XChaCha20-Poly1305", make([]byte, 32), make([]byte, 32)},
 	}
 
 	for _, tc := range validKeys {
