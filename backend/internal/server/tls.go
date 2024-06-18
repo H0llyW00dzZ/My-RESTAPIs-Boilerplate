@@ -14,6 +14,8 @@ import (
 //
 // Note: Currently unused, and marked as TODO, will complete implementing this later
 type streamConn struct {
+	// Note: This is already connected because [stream.Stream] is the core of cryptographic operations.
+	// It can be used to write/read over the network, for example, to store encrypted data in a database.
 	*tls.Conn
 	*stream.Stream
 }
