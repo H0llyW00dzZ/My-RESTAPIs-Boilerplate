@@ -14,7 +14,7 @@ import (
 //
 //	length to specify the length of the random byte slice (default is 50)
 //	prefix to specify a custom prefix for the API key (default is "sk-")
-func GenerateAPIKey(options ...interface{}) string {
+func GenerateAPIKey(options ...any) string {
 	// Set the default length to 50 and default prefix to "sk-"
 	apiKeyLength := 50
 	prefix := "sk-"

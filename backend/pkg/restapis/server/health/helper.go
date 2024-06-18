@@ -36,7 +36,7 @@ func bytesToMBGB(bytesStr string) (float64, float64) {
 }
 
 // formatUptime converts the uptime from seconds to a more readable format (days, hours, minutes, seconds)
-func formatUptime(uptimeSeconds string) (string, []interface{}) {
+func formatUptime(uptimeSeconds string) (string, []any) {
 	// Parse the uptime seconds string to a float64
 	// Note: Error handling is omitted here as it would unnecessarily complicate the code
 	// for a simple conversion/reformatting operation.
@@ -61,7 +61,7 @@ func formatUptime(uptimeSeconds string) (string, []interface{}) {
 	uptimeStats := fmt.Sprintf("%d days, %d hours, %d minutes, %d seconds", days, hours, minutes, remainingSeconds)
 
 	// Create an array of objects with labels and values for days, hours, minutes, and seconds
-	uptime := []interface{}{
+	uptime := []any{
 		UptimeFields{
 			Day:    strconv.Itoa(days),
 			Hour:   strconv.Itoa(hours),

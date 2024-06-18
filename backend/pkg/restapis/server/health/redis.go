@@ -47,12 +47,12 @@ type MemoryStats struct {
 
 // RedisStats groups the statistics related to Redis.
 type RedisStats struct {
-	Version          string        `json:"version,omitempty"`
-	Mode             string        `json:"mode,omitempty"`
-	ConnectedClients string        `json:"connected_clients,omitempty"`
-	Memory           MemoryStats   `json:"memory,omitempty"`
-	Uptime           []interface{} `json:"uptime,omitempty"`
-	Pooling          PoolingStats  `json:"pooling,omitempty"`
+	Version          string       `json:"version,omitempty"`
+	Mode             string       `json:"mode,omitempty"`
+	ConnectedClients string       `json:"connected_clients,omitempty"`
+	Memory           MemoryStats  `json:"memory,omitempty"`
+	Uptime           []any        `json:"uptime,omitempty"`
+	Pooling          PoolingStats `json:"pooling,omitempty"`
 }
 
 // UptimeFields represents the uptime fields in a structured format.

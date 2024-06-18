@@ -40,7 +40,7 @@ type Service interface {
 	Close() error
 
 	// Exec executes a SQL query with the provided arguments and returns the result.
-	Exec(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
+	Exec(ctx context.Context, query string, args ...any) (sql.Result, error)
 
 	// ExecWithoutRow executes a query that doesn't return any rows, such as
 	// CREATE, ALTER, DROP, INSERT, UPDATE, or DELETE statements.
@@ -55,7 +55,7 @@ type Service interface {
 	//	if err != nil {
 	//	    // Handle the error
 	//	}
-	ExecWithoutRow(ctx context.Context, query string, args ...interface{}) error
+	ExecWithoutRow(ctx context.Context, query string, args ...any) error
 
 	// EnsureTransactionClosure is a deferred function to handle transaction rollback or commit.
 	// It can be used in goroutines along with an interval, such as in a scheduler.
@@ -100,7 +100,7 @@ type Service interface {
 	BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error)
 
 	// QueryRow executes a query that is expected to return at most one row and scans that row into the provided destination.
-	QueryRow(ctx context.Context, query string, args ...interface{}) *sql.Row
+	QueryRow(ctx context.Context, query string, args ...any) *sql.Row
 
 	// FiberStorage returns the [fiber.Storage] interface for storage middleware.
 	FiberStorage() fiber.Storage
@@ -540,7 +540,7 @@ func (s *service) evaluateRedisStats(redisInfo, stats map[string]string) map[str
 }
 
 // Exec executes a SQL query with the provided arguments.
-func (s *service) Exec(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
+func (s *service) Exec(ctx context.Context, query string, args ...any) (sql.Result, error) {
 	return s.db.ExecContext(ctx, query, args...)
 }
 
@@ -548,7 +548,7 @@ func (s *service) Exec(ctx context.Context, query string, args ...interface{}) (
 //
 // Note: This method is different from "Exec". Unlike "Exec", it doesn't return "sql.Result".
 // This method is better suited for initializing database schemas or running migrations before the app starts.
-func (s *service) ExecWithoutRow(ctx context.Context, query string, args ...interface{}) error {
+func (s *service) ExecWithoutRow(ctx context.Context, query string, args ...any) error {
 	_, err := s.db.ExecContext(ctx, query, args...)
 	if err != nil {
 		log.LogErrorf("Error executing query: %v", err)
@@ -594,7 +594,7 @@ func (s *service) BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, er
 }
 
 // QueryRow executes a query that is expected to return at most one row.
-func (s *service) QueryRow(ctx context.Context, query string, args ...interface{}) *sql.Row {
+func (s *service) QueryRow(ctx context.Context, query string, args ...any) *sql.Row {
 	return s.db.QueryRowContext(ctx, query, args...)
 }
 

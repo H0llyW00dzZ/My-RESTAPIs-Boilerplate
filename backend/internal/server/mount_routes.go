@@ -32,7 +32,7 @@ import (
 // Returns:
 //
 //	A Fiber handler function that mounts the Prometheus middleware.
-func MountPrometheusMiddlewareHandler(path, serviceName string, options ...interface{}) fiber.Handler {
+func MountPrometheusMiddlewareHandler(path, serviceName string, options ...any) fiber.Handler {
 	prometheus := metrics.NewPrometheusMiddleware(serviceName, options...)
 	return func(c *fiber.Ctx) error {
 		prometheus.RegisterAt(c.App(), path)

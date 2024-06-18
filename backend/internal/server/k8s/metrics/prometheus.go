@@ -10,7 +10,7 @@ import (
 )
 
 // NewPrometheusMiddleware creates a new Prometheus middleware with optional custom configuration options.
-func NewPrometheusMiddleware(serviceName string, options ...interface{}) *fiberprometheus.FiberPrometheus {
+func NewPrometheusMiddleware(serviceName string, options ...any) *fiberprometheus.FiberPrometheus {
 	var registry *prometheus.Registry
 	var namespace, subsystem string
 	var labels map[string]string

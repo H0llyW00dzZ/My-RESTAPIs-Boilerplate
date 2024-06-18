@@ -67,7 +67,7 @@ func registerRouteConfigMiddleware(app *fiber.App) {
 	// This way, it can catch any panics, for example, catch any panic through the sub-package k8s/metrics.
 	recoverMiddleware := recover.New(recover.Config{
 		EnableStackTrace: true,
-		StackTraceHandler: func(c *fiber.Ctx, e interface{}) {
+		StackTraceHandler: func(c *fiber.Ctx, e any) {
 			// Log the panic and stack trace
 			log.LogUserActivity(c, "attempted to panic occurred")
 			log.LogCrashf(MsgPanicOccurred, e)

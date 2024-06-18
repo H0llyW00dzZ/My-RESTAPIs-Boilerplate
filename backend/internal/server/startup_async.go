@@ -24,8 +24,8 @@ type Server interface {
 	Start(addr, monitorPath string)
 	Shutdown(ctx context.Context) error
 	CleanupDB() error
-	Mount(prefix string, app interface{})
-	MountPath(path string, handler interface{})
+	Mount(prefix string, app any)
+	MountPath(path string, handler any)
 }
 
 // FiberServer implements the Server interface for a Fiber application.
@@ -84,7 +84,7 @@ func (s *FiberServer) CleanupDB() error {
 }
 
 // Mount mounts a Fiber application or a group of routes onto the main application.
-func (s *FiberServer) Mount(prefix string, app interface{}) {
+func (s *FiberServer) Mount(prefix string, app any) {
 	// Note: It seems possible to integrate it with gRPC (protoc) for internal services,
 	// but it's not really needed at the moment.
 	switch v := app.(type) {
@@ -99,7 +99,7 @@ func (s *FiberServer) Mount(prefix string, app interface{}) {
 }
 
 // MountPath mounts a Fiber handler or a group of routes onto the main application at a specific path.
-func (s *FiberServer) MountPath(path string, handler interface{}) {
+func (s *FiberServer) MountPath(path string, handler any) {
 	// Note: It seems possible to integrate it with gRPC (protoc) for internal services,
 	// but it's not really needed at the moment.
 	switch v := handler.(type) {
