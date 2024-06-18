@@ -44,6 +44,9 @@ type Stream struct {
 	hmac           hash.Hash
 	cipher         func([]byte) cipher.Stream
 	customizeNonce *CustomizeCapacityNonce
+	// TODO: Implement TLS 1.3 support, since this stream object is designed as the core of cryptographic operations.
+	// Any cipher, including custom ciphers, is always welcome. ¯\_(ツ)_/¯
+	tlschacha cipher.AEAD
 }
 
 const (
