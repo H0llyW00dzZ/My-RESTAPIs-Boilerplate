@@ -87,6 +87,9 @@ type streamListener struct {
 }
 
 // NewStreamConn creates a new streamConn instance by wrapping a TLS connection and a Stream.
+//
+// Note: This is suitable due to TLS 1.3's improved handling of protocols (e.g., keys, handshake) compared to TLS 1.2, which is more complex and less efficient.
+// However, this is not yet finished as Go 1.23 has not been released.
 func NewStreamConn(tlsConn *tls.Conn, stream *stream.Stream) net.Conn {
 	return &streamConn{
 		Conn:   tlsConn,
