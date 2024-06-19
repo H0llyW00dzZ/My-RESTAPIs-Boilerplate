@@ -121,11 +121,11 @@ func logUserActivity(c *fiber.Ctx, filter string) {
 }
 
 // logHealthStatus logs the health status based on the filter.
-func logHealthStatus(c *fiber.Ctx, response Response, filter string) error {
+func (r *Response) logHealthStatus(c *fiber.Ctx, response Response, filter string) error {
 	// Define a map of filter-specific logging functions
 	loggers := map[string]func(*fiber.Ctx, Response) error{
-		"mysql": logMySQLHealthStatus,
-		"redis": logRedisHealthStatus,
+		"mysql": r.MySQLHealth.logMySQLHealthStatus,
+		"redis": r.RedisHealth.logRedisHealthStatus,
 	}
 
 	// Check if the filter is empty or exists in the loggers map
