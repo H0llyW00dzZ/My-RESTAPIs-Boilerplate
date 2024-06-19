@@ -72,12 +72,10 @@ type RedisHealth struct {
 }
 
 // createRedisHealthResponse creates a RedisHealth struct from the provided health statistics.
-func createRedisHealthResponse(health map[string]string) *RedisHealth {
-	redisHealth := &RedisHealth{
-		Status:  health["redis_status"],
-		Message: health["redis_message"],
-		Error:   health["redis_error"],
-	}
+func (r *RedisHealth) createRedisHealthResponse(health map[string]string) *RedisHealth {
+	r.Status = health["redis_status"]
+	r.Message = health["redis_message"]
+	r.Error = health["redis_error"]
 
 	// Only populate the Stats field if Redis is up and running
 	if health["redis_status"] == "up" {
@@ -122,7 +120,7 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 			ObservedTotal: observedTotal,
 		}
 
-		redisHealth.Stats = &RedisStats{
+		r.Stats = &RedisStats{
 			Version:          health["redis_version"],
 			Mode:             health["redis_mode"],
 			ConnectedClients: health["redis_connected_clients"],
@@ -149,11 +147,11 @@ func createRedisHealthResponse(health map[string]string) *RedisHealth {
 		}
 	}
 
-	return redisHealth
+	return r
 }
 
 // logRedisHealthStatus logs the Redis health status and sends an error response if Redis is down.
-func logRedisHealthStatus(c *fiber.Ctx, response Response) error {
+func (r *RedisHealth) logRedisHealthStatus(c *fiber.Ctx, response Response) error {
 	// Extract redisHealth from the response
 	redisHealth := response.RedisHealth
 

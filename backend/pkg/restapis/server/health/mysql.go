@@ -29,16 +29,14 @@ type MySQLHealth struct {
 }
 
 // createMySQLHealthResponse creates a MySQLHealth struct from the provided health statistics.
-func createMySQLHealthResponse(health map[string]string) *MySQLHealth {
-	mysqlHealth := &MySQLHealth{
-		Status:  health["mysql_status"],
-		Message: health["mysql_message"],
-		Error:   health["mysql_error"],
-	}
+func (m *MySQLHealth) createMySQLHealthResponse(health map[string]string) *MySQLHealth {
+	m.Status = health["mysql_status"]
+	m.Message = health["mysql_message"]
+	m.Error = health["mysql_error"]
 
 	// Only populate the Stats field if MySQL is up and running
 	if health["mysql_status"] == "up" {
-		mysqlHealth.Stats = &ConnectionStats{
+		m.Stats = &ConnectionStats{
 			Open:      health["mysql_open_connections"],
 			InUse:     health["mysql_in_use"],
 			Idle:      health["mysql_idle"],
@@ -47,11 +45,11 @@ func createMySQLHealthResponse(health map[string]string) *MySQLHealth {
 		}
 	}
 
-	return mysqlHealth
+	return m
 }
 
 // logMySQLHealthStatus logs the MySQL health status and sends an error response if MySQL is down.
-func logMySQLHealthStatus(c *fiber.Ctx, response Response) error {
+func (m *MySQLHealth) logMySQLHealthStatus(c *fiber.Ctx, response Response) error {
 	// Extract mysqlHealth from the response
 	mysqlHealth := response.MySQLHealth
 

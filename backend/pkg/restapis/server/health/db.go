@@ -27,6 +27,7 @@ func DBHandler(db database.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Note: It is important to call this when using encrypted cookies.
 		// If this is not called in some handlers, it can lead to high vulnerability where cookies are not being encrypted.
+		// Additionally, use encryption from Boring TLS 1.3 when it's available, which is a better approach.
 		c.SendString("value=" + c.Cookies("GhoperCookie"))
 		// Get the IP address from the request context
 		ipAddress := c.IP()
@@ -50,16 +51,16 @@ func DBHandler(db database.Service) fiber.Handler {
 		health := db.Health(filter)
 
 		// Create the response struct using the createHealthResponse function
-		response := createHealthResponse(health, filter)
+		r := createHealthResponse(health, filter)
 
 		// Log the health status based on the filter
-		logHealthStatus(c, response, filter)
+		r.logHealthStatus(c, r, filter)
 
 		// Return the structured health statistics as JSON
 		// Note: The "c.JSON" method uses the sonic package (related to main configuration) for JSON encoding and decoding,
 		// which is one of the reasons why the Fiber framework is considered the best framework in 2024.
 		// "You don't need to repeat yourself for JSON encoding/decoding (e.g., using the standard library or other JSON encoder/decoder)."
-		return c.JSON(response)
+		return c.JSON(r)
 	}
 }
 
@@ -75,35 +76,35 @@ func createHealthResponse(health map[string]string, filter string) Response {
 	// Define a map of filter-specific response creation functions
 	responseCreators := map[string]func(map[string]string) any{
 		"mysql": func(h map[string]string) any {
-			return createMySQLHealthResponse(h)
+			return (&MySQLHealth{}).createMySQLHealthResponse(h)
 		},
 		"redis": func(h map[string]string) any {
-			return createRedisHealthResponse(h)
+			return (&RedisHealth{}).createRedisHealthResponse(h)
 		},
 	}
 
-	response := Response{}
+	r := Response{}
 
 	// Check if the filter is empty or exists in the responseCreators map
 	if filter == "" {
 		// If the filter is empty, create responses for all available filters
 		for _, creator := range responseCreators {
-			applyHealthResponse(&response, creator(health))
+			r.applyHealthResponse(creator(health))
 		}
 	} else if creator, ok := responseCreators[filter]; ok {
 		// If the filter exists in the responseCreators map, create the corresponding response
-		applyHealthResponse(&response, creator(health))
+		r.applyHealthResponse(creator(health))
 	}
 
-	return response
+	return r
 }
 
 // applyHealthResponse applies the health response to the Response struct based on the type of response.
-func applyHealthResponse(response *Response, healthResponse any) {
-	switch r := healthResponse.(type) {
+func (r *Response) applyHealthResponse(healthResponse any) {
+	switch resp := healthResponse.(type) {
 	case *MySQLHealth:
-		response.MySQLHealth = r
+		r.MySQLHealth = resp
 	case *RedisHealth:
-		response.RedisHealth = r
+		r.RedisHealth = resp
 	}
 }
