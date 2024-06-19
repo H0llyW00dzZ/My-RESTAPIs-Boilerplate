@@ -251,6 +251,10 @@ func New(aesKey, chachaKey []byte) (*Stream, error) {
 			AESNonceCapacity:    additionalCapacityPercentage,
 			ChachaNonceCapacity: additionalCapacityPercentage,
 		},
+		// Not available right now. When available, enabling this will replace AES-CTR and XChaCha20-Poly1305.
+		// Due to TLS 1.3, ChaCha will be bound to the TLS protocol, which is already sufficient for backend/frontend usage.
+		// It will be used over the network for writing/reading data, storing it in a database, digital signatures, email, and other potential needs.
+		tlschacha: nil,
 	}, nil
 }
 
