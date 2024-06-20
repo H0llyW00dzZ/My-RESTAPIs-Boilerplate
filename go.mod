@@ -5,7 +5,7 @@ go 1.22.4
 require (
 	github.com/H0llyW00dzZ/FiberValidator v0.5.2
 	github.com/ansrivas/fiberprometheus/v2 v2.6.1
-	github.com/bytedance/sonic v1.11.8
+	github.com/bytedance/sonic v1.11.9
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.26.4
 	github.com/charmbracelet/lipgloss v0.11.0
