@@ -674,7 +674,7 @@ func TestStreamServerExplicitHTTPSUnixPacket(t *testing.T) {
 		"HTTP/1.1 200 OK",
 		"Content-Type: text/plain; charset=utf-8",
 	}
-	expectedBody := "Hello, World!"
+	expectedBody := "Hello, Unix! (via TLS)" // forgot
 
 	respLines := strings.Split(decryptedResp.String(), "\r\n")
 	for _, header := range expectedHeaders {
