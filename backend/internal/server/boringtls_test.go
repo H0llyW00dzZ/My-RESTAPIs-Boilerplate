@@ -554,3 +554,145 @@ func TestStreamServerStupidMiddleman(t *testing.T) {
 	default:
 	}
 }
+
+func TestStreamServerExplicitHTTPSUnixPacket(t *testing.T) {
+	// Generate AES key and ChaCha20 key
+	aesKey := make([]byte, 32)
+	chachaKey := make([]byte, 32)
+	_, err := rand.Read(aesKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = rand.Read(chachaKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new Stream instance
+	// Note: This test kinda slow (tested on windows) due 2 cipher text, if pure ChaCha20-Poly1305 might faster
+	s, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new Fiber app
+	app := fiber.New()
+
+	// Define a test route
+	app.Get("/test", func(c *fiber.Ctx) error {
+		log.Println("Server: Received request")
+		if c.Protocol() == "https" {
+			return c.SendString("Hello, Unix! (via TLS)")
+		}
+		return c.SendString("Hello, Unix!")
+	})
+
+	// Create a Unix domain socket path
+	socketPath := "/tmp/test.sock"
+
+	// Create a listener using Unix domain socket
+	listener, err := net.Listen("unixpacket", socketPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer listener.Close()
+
+	// Wrap the listener with streamListener
+	streamListener := server.NewStreamListener(listener, nil, s)
+
+	// Create a channel to receive the server error
+	errChan := make(chan error)
+
+	// Start the server
+	go func() {
+		log.Println("Server: Starting server")
+		errChan <- app.Listener(streamListener)
+	}()
+
+	// Wait for the server to start
+	time.Sleep(time.Second)
+
+	// Create a Unix domain socket connection to the server
+	log.Println("Client: Establishing Unix domain socket connection")
+	conn, err := net.Dial("unixpacket", socketPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+
+	// Create a new Stream instance for the client
+	clientStream, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send an encrypted request to the server
+	log.Println("[Packet Netw0rkz] Client: Sending encrypted request")
+	req := "GET /test HTTP/1.1\r\nHost: localhost\r\n\r\n"
+	encryptedReq := &bytes.Buffer{}
+	err = clientStream.Encrypt(bytes.NewReader([]byte(req)), encryptedReq)
+	if err != nil {
+		t.Fatal(err)
+	}
+	encryptedReqHex := hex.EncodeToString(encryptedReq.Bytes())
+	log.Printf("[Packet Netw0rkz] Client: Encrypted request (hex): %s", encryptedReqHex)
+	_, err = conn.Write(encryptedReq.Bytes())
+	if err != nil {
+		t.Fatal(err)
+	}
+	log.Println("[Packet Netw0rkz] Client: Encrypted request sent")
+
+	// Read the encrypted response from the server
+	log.Println("[Packet Netw0rkz] Server: Reading encrypted response")
+	var encryptedResp []byte
+	buffer := make([]byte, 1024)
+	for {
+		n, err := conn.Read(buffer)
+		if err != nil {
+			t.Fatal(err)
+		}
+		encryptedResp = append(encryptedResp, buffer[:n]...)
+		if n < len(buffer) {
+			break
+		}
+	}
+	encryptedRespHex := hex.EncodeToString(encryptedResp)
+	log.Printf("[Packet Netw0rkz] Server: Encrypted response (hex): %s", encryptedRespHex)
+	log.Println("[Packet Netw0rkz] Server: Encrypted response received")
+
+	// Decrypt the response
+	log.Println("[Packet Netw0rkz] Server: Decrypting response")
+	decryptedResp := &bytes.Buffer{}
+	err = clientStream.Decrypt(bytes.NewReader(encryptedResp), decryptedResp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	log.Println("[Packet Netw0rkz] Server: Response decrypted")
+
+	// Check the decrypted response
+	expectedHeaders := []string{
+		"HTTP/1.1 200 OK",
+		"Content-Type: text/plain; charset=utf-8",
+	}
+	expectedBody := "Hello, World!"
+
+	respLines := strings.Split(decryptedResp.String(), "\r\n")
+	for _, header := range expectedHeaders {
+		if !contains(respLines, header) {
+			t.Errorf("missing expected header: %q", header)
+		}
+	}
+
+	if !contains(respLines, expectedBody) {
+		t.Errorf("missing expected body: %q", expectedBody)
+	}
+
+	log.Printf("[Packet Netw0rkz] Boring TLS: Decrypted response: %s", decryptedResp.String())
+
+	// Check if the server returned an error
+	select {
+	case err := <-errChan:
+		t.Fatal(err)
+	default:
+	}
+}
