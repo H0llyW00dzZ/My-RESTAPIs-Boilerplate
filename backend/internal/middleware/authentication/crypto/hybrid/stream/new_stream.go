@@ -262,6 +262,16 @@ func New(aesKey, chachaKey []byte) (*Stream, error) {
 // The HMAC is computed using SHA-256 and follows the Encrypt-then-MAC (EtM) scheme approach
 // as specified in (RFC 7366).
 //
+// Note: Enabling HMAC authentication is not supported for TLS, especially for TLS 1.3, as it is already considered secure.
+// TLS 1.3 provides robust security features, including improved key exchange, perfect forward secrecy, and authenticated encryption.
+// Adding an additional HMAC layer on top of TLS 1.3 is unnecessary and may introduce compatibility issues with existing TLS implementations.
+//
+// If you require additional authentication or integrity checks, it is recommended to use the built-in features of TLS 1.3,
+// such as the use of secure cipher suites and proper certificate validation.
+//
+// For non-TLS scenarios where you need to ensure the integrity and authenticity of encrypted data, you can enable HMAC authentication
+// using this method. However, keep in mind that it adds computational overhead and may not be suitable for all use cases.
+//
 // When HMAC authentication is enabled, the encryption process is modified as follows:
 //
 //  1. The plaintext is encrypted using AES-CTR with a randomly generated nonce.
