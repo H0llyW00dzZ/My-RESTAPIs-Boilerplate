@@ -262,7 +262,7 @@ func New() Service {
 		bchash, err := bcrypt.New()
 
 		if err != nil {
-			// This will not be a connection error, but a DSN parse error or
+			// This will not be a connection error, but a Cost error or
 			// another initialization error.
 			log.LogFatal("Failed to initialize bcrypt:", err)
 		}
