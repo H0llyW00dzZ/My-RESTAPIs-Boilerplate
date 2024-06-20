@@ -289,7 +289,7 @@ func TestStreamServerExplicitHTTPS(t *testing.T) {
 
 	// Send an encrypted request to the server
 	log.Println("[Packet Netw0rkz] Client: Sending encrypted request")
-	req := "GET /test HTTP/1.1\r\nHost: localhost:8080\r\n\r\n"
+	req := "GET /test HTTP/1.1\r\nHost: localhost:8081\r\n\r\n"
 	encryptedReq := &bytes.Buffer{}
 	err = clientStream.Encrypt(bytes.NewReader([]byte(req)), encryptedReq)
 	if err != nil {
@@ -438,6 +438,114 @@ func TestStreamClientWrongProtocol(t *testing.T) {
 		t.Fatal("Expected TLS handshake to fail due to wrong protocol version")
 	}
 	log.Printf("Client: TLS handshake failed as expected: %v", err)
+
+	// Check if the server returned an error
+	select {
+	case err := <-errChan:
+		t.Fatal(err)
+	default:
+	}
+}
+
+func TestStreamServerStupidMiddleman(t *testing.T) {
+	// Generate AES key and ChaCha20 key
+	aesKey := make([]byte, 32)
+	chachaKey := make([]byte, 32)
+	_, err := rand.Read(aesKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = rand.Read(chachaKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new Stream instance
+	s, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new Fiber app
+	app := fiber.New(
+		fiber.Config{},
+	)
+
+	// Define a test route
+	app.Get("/test", func(c *fiber.Ctx) error {
+		log.Println("Server: Received request")
+		return c.SendString("Hello, World!")
+	})
+
+	// Load the self-signed certificate and key
+	cert, err := tls.LoadX509KeyPair("boring-cert.pem", "boring-key.pem")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a TLS configuration for the server
+	tlsServerConfig := tlsConfig(cert)
+
+	// Create a listener
+	listener, err := net.Listen("tcp", ":8083")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Wrap the listener with streamListener
+	streamListener := server.NewStreamListener(listener, tlsServerConfig, s)
+
+	// Create a channel to receive the server error
+	errChan := make(chan error)
+
+	// Start the server
+	go func() {
+		log.Println("Server: Starting server")
+		errChan <- app.Listener(streamListener)
+	}()
+
+	// Wait for the server to start
+	time.Sleep(time.Second)
+
+	// Create a TLS client configuration
+	tlsClientConfig := clientTLSConfig()
+
+	// Create a TLS connection to the server
+	log.Println("Client: Establishing TLS connection")
+	conn, err := tls.Dial("tcp", "localhost:8083", tlsClientConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+
+	// Send a plain request to the server
+	log.Println("[Packet Netw0rkz] Client: Sending plain request")
+	req := "GET /test HTTP/1.1\r\nHost: localhost:8083\r\n\r\n"
+	_, err = conn.Write([]byte(req))
+	if err != nil {
+		t.Fatal(err)
+	}
+	log.Println("[Packet Netw0rkz] Client: Plain request sent")
+
+	// Simulate a stupid middleman intercepting the plain request
+	log.Println("[Packet Netw0rkz] Middleman: Intercepted plain request")
+	log.Printf("[Packet Netw0rkz] Middleman: Plain request: %s", req)
+
+	// Read the response from the server
+	log.Println("[Packet Netw0rkz] Server: Reading response")
+	var resp []byte
+	buffer := make([]byte, 1024)
+	n, err := conn.Read(buffer)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp = append(resp, buffer[:n]...)
+	log.Printf("[Packet Netw0rkz] Server: Encrypted response: %x", resp)
+	log.Println("[Packet Netw0rkz] Server: Encrypted response received")
+
+	// Simulate a stupid middleman intercepting the encrypted response
+	log.Println("[Packet Netw0rkz] Middleman: Intercepted encrypted response")
+	log.Printf("[Packet Netw0rkz] Middleman: Encrypted response: %x", resp)
 
 	// Check if the server returned an error
 	select {
