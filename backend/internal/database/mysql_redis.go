@@ -259,7 +259,13 @@ func New() Service {
 		// Initialize bcrypt
 		// Note: This operation should be inexpensive as it uses a pointer,
 		// and the garbage collector will be happy handling memory efficiently. 🤪
-		bchash := bcrypt.New()
+		bchash, err := bcrypt.New()
+
+		if err != nil {
+			// This will not be a connection error, but a DSN parse error or
+			// another initialization error.
+			log.LogFatal("Failed to initialize bcrypt:", err)
+		}
 
 		// Create the service instance
 		dbInstance = &service{
