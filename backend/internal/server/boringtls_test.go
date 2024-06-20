@@ -8,8 +8,10 @@ import (
 	"bytes"
 	"crypto/rand"
 	"crypto/tls"
+	"encoding/hex"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid/stream"
 	"h0llyw00dz-template/backend/internal/server"
+	"log"
 	"net"
 	"strings"
 	"testing"
@@ -44,6 +46,7 @@ func TestStreamServer(t *testing.T) {
 
 	// Define a test route
 	app.Get("/test", func(c *fiber.Ctx) error {
+		log.Println("Server: Received request")
 		return c.SendString("Hello, World!")
 	})
 
@@ -81,6 +84,7 @@ func TestStreamServer(t *testing.T) {
 
 	// Start the server
 	go func() {
+		log.Println("Server: Starting server")
 		errChan <- app.Listener(streamListener)
 	}()
 
@@ -102,6 +106,7 @@ func TestStreamServer(t *testing.T) {
 	}
 
 	// Create a TLS connection to the server
+	log.Println("Client: Establishing TLS connection")
 	conn, err := tls.Dial("tcp", "localhost:8080", clientTLSConfig)
 	if err != nil {
 		t.Fatal(err)
@@ -115,18 +120,23 @@ func TestStreamServer(t *testing.T) {
 	}
 
 	// Send an encrypted request to the server
+	log.Println("[Packet Netw0rkz] Client: Sending encrypted request")
 	req := "GET /test HTTP/1.1\r\nHost: localhost:8080\r\n\r\n"
 	encryptedReq := &bytes.Buffer{}
 	err = clientStream.Encrypt(bytes.NewReader([]byte(req)), encryptedReq)
 	if err != nil {
 		t.Fatal(err)
 	}
+	encryptedReqHex := hex.EncodeToString(encryptedReq.Bytes())
+	log.Printf("[Packet Netw0rkz] Client: Encrypted request (hex): %s", encryptedReqHex)
 	_, err = conn.Write(encryptedReq.Bytes())
 	if err != nil {
 		t.Fatal(err)
 	}
+	log.Println("[Packet Netw0rkz] Client: Encrypted request sent")
 
 	// Read the encrypted response from the server
+	log.Println("[Packet Netw0rkz] Server: Reading encrypted response")
 	var encryptedResp []byte
 	buffer := make([]byte, 1024)
 	for {
@@ -139,13 +149,18 @@ func TestStreamServer(t *testing.T) {
 			break
 		}
 	}
+	encryptedRespHex := hex.EncodeToString(encryptedResp)
+	log.Printf("[Packet Netw0rkz] Server: Encrypted response (hex): %s", encryptedRespHex)
+	log.Println("[Packet Netw0rkz] Server: Encrypted response received")
 
 	// Decrypt the response
+	log.Println("[Packet Netw0rkz] Server: Decrypting response")
 	decryptedResp := &bytes.Buffer{}
 	err = clientStream.Decrypt(bytes.NewReader(encryptedResp), decryptedResp)
 	if err != nil {
 		t.Fatal(err)
 	}
+	log.Println("[Packet Netw0rkz] Server: Response decrypted")
 
 	// Check the decrypted response
 	expectedHeaders := []string{
