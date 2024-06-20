@@ -23,11 +23,7 @@ import (
 
 func tlsConfig(cert tls.Certificate) *tls.Config {
 	return &tls.Config{
-		MinVersion:               tls.VersionTLS13,
-		PreferServerCipherSuites: true,
-		CipherSuites: []uint16{
-			tls.TLS_CHACHA20_POLY1305_SHA256,
-		},
+		MinVersion: tls.VersionTLS13,
 		CurvePreferences: []tls.CurveID{
 			tls.X25519,
 			tls.CurveP256,
@@ -39,9 +35,6 @@ func tlsConfig(cert tls.Certificate) *tls.Config {
 func clientTLSConfig() *tls.Config {
 	return &tls.Config{
 		MinVersion: tls.VersionTLS13,
-		CipherSuites: []uint16{
-			tls.TLS_CHACHA20_POLY1305_SHA256,
-		},
 		CurvePreferences: []tls.CurveID{
 			tls.X25519,
 			tls.CurveP256,
