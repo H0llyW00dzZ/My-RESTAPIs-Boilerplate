@@ -36,6 +36,7 @@ func TestStreamServer(t *testing.T) {
 	}
 
 	// Create a new Stream instance
+	// Note: This test kinda slow (tested on windows) due 2 cipher text, if pure ChaCha20-Poly1305 might faster
 	s, err := stream.New(aesKey, chachaKey)
 	if err != nil {
 		t.Fatal(err)
