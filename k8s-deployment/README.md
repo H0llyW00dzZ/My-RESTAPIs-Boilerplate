@@ -14,7 +14,7 @@ Before deploying the application, ensure that you have the following:
 
 To deploy the REST API boilerplate application using the provided K8s deployment files, follow these steps:
 
-1. Update the `redisinsight-deployment.yaml` file with your desired configuration, such as the number of replicas, resource limits, and environment variables.
+1. Update the `redis-insight.yaml` file with your desired configuration, such as the number of replicas, resource limits, and environment variables.
 
 2. Create the necessary secrets for the deployment:
 
