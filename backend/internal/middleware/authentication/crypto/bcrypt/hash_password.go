@@ -8,8 +8,8 @@ import "golang.org/x/crypto/bcrypt"
 
 // hashPassword takes a plaintext password and returns the bcrypt hash of the password.
 func (b *Hash) hashPassword(password string) (string, error) {
-	// Generate a salt with a default cost of 10
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	// Generate a salt with a cost from struct
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), b.cost)
 	if err != nil {
 		return "", err
 	}
