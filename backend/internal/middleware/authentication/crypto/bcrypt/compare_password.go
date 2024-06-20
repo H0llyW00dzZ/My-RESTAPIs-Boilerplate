@@ -10,7 +10,7 @@ import (
 
 // ComparePassword compares a plaintext password with the stored bcrypt hash.
 // It returns true if the password matches the hash, false otherwise.
-func ComparePassword(password, hash string) bool {
+func (b *Hash) comparePassword(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
