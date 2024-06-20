@@ -13,6 +13,7 @@ import (
 	"h0llyw00dz-template/backend/internal/server"
 	"log"
 	"net"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -556,6 +557,10 @@ func TestStreamServerStupidMiddleman(t *testing.T) {
 }
 
 func TestStreamServerExplicitHTTPSUnixPacket(t *testing.T) {
+	if runtime.GOOS != "linux" && runtime.GOOS != "darwin" {
+		t.Skip("Skipping test on non-Unix systems")
+	}
+
 	// Generate AES key and ChaCha20 key
 	aesKey := make([]byte, 32)
 	chachaKey := make([]byte, 32)
@@ -694,5 +699,307 @@ func TestStreamServerExplicitHTTPSUnixPacket(t *testing.T) {
 	case err := <-errChan:
 		t.Fatal(err)
 	default:
+	}
+}
+
+func TestStreamConnDeadlines(t *testing.T) {
+	// Generate AES key and ChaCha20 key
+	aesKey := make([]byte, 32)
+	chachaKey := make([]byte, 32)
+	_, err := rand.Read(aesKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = rand.Read(chachaKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new Stream instance
+	s, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Load the self-signed certificate and key
+	cert, err := tls.LoadX509KeyPair("boring-cert.pem", "boring-key.pem")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a TLS configuration for the server
+	tlsServerConfig := tlsConfig(cert)
+
+	// Create a listener
+	listener, err := net.Listen("tcp", ":8084")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer listener.Close()
+
+	// Create a channel to receive the server error
+	errChan := make(chan error)
+
+	// Start the server
+	go func() {
+		conn, err := listener.Accept()
+		if err != nil {
+			errChan <- err
+			return
+		}
+		defer conn.Close()
+
+		// Establish a TLS connection
+		tlsConn := tls.Server(conn, tlsServerConfig)
+		defer tlsConn.Close()
+
+		// Create a new streamConn instance
+		streamConn := server.NewStreamConn(tlsConn, s)
+
+		// Set the read deadline to 1 second from now
+		readDeadline := time.Now().Add(time.Second)
+		if err := streamConn.SetReadDeadline(readDeadline); err != nil {
+			errChan <- err
+			return
+		}
+
+		// Read from the connection
+		buffer := make([]byte, 1024)
+		_, err = streamConn.Read(buffer)
+		if err != nil {
+			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+				errChan <- nil // Read timeout occurred as expected
+			} else {
+				errChan <- err
+			}
+			return
+		}
+
+		// Set the write deadline to 1 second from now
+		writeDeadline := time.Now().Add(time.Second)
+		if err := streamConn.SetWriteDeadline(writeDeadline); err != nil {
+			errChan <- err
+			return
+		}
+
+		// Write to the connection
+		_, err = streamConn.Write([]byte("Hello, World!"))
+		if err != nil {
+			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+				errChan <- nil // Write timeout occurred as expected
+			} else {
+				errChan <- err
+			}
+			return
+		}
+
+		errChan <- nil
+	}()
+
+	// Create a TLS client configuration
+	tlsClientConfig := clientTLSConfig()
+
+	// Create a TLS connection to the server
+	conn, err := tls.Dial("tcp", "localhost:8084", tlsClientConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+
+	// Set the overall deadline to 2 seconds from now
+	deadline := time.Now().Add(2 * time.Second)
+	if err := conn.SetDeadline(deadline); err != nil {
+		t.Fatal(err)
+	}
+
+	// Send an encrypted request to the server
+	log.Println("[Packet Netw0rkz] Client: Sending encrypted request")
+	req := "GET /test HTTP/1.1\r\nHost: localhost:8084\r\n\r\n"
+	encryptedReq := &bytes.Buffer{}
+	err = s.Encrypt(bytes.NewReader([]byte(req)), encryptedReq)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = conn.Write(encryptedReq.Bytes())
+	if err != nil {
+		t.Fatal(err)
+	}
+	log.Println("[Packet Netw0rkz] Client: Encrypted request sent")
+
+	// Wait for the read deadline to expire
+	time.Sleep(2 * time.Second)
+
+	// Read the encrypted response from the server
+	log.Println("[Packet Netw0rkz] Server: Reading encrypted response")
+
+	buffer := make([]byte, 1024)
+	_, err = conn.Read(buffer)
+	if err == nil {
+		t.Fatal("Expected read timeout error")
+	}
+	if netErr, ok := err.(net.Error); !ok || !netErr.Timeout() {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+	log.Println("[Packet Netw0rkz] Server: Read timeout occurred as expected")
+
+	// Wait for the server to finish
+	err = <-errChan
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Set the write deadline to the past
+	pastDeadline := time.Now().Add(-time.Second)
+	if err := conn.SetWriteDeadline(pastDeadline); err != nil {
+		t.Fatal(err)
+	}
+
+	// Attempt to write to the connection
+	_, err = conn.Write([]byte("Another message"))
+	if err == nil {
+		t.Fatal("Expected write timeout error")
+	}
+	if netErr, ok := err.(net.Error); !ok || !netErr.Timeout() {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+	log.Println("[Packet Netw0rkz] Client: Write timeout occurred as expected")
+}
+
+func TestStreamConnSetDeadline(t *testing.T) {
+	// Generate AES key and ChaCha20 key
+	aesKey := make([]byte, 32)
+	chachaKey := make([]byte, 32)
+	_, err := rand.Read(aesKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = rand.Read(chachaKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new Stream instance
+	s, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a listener
+	listener, err := net.Listen("tcp", ":8085")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer listener.Close()
+
+	// Create a channel to receive the server error
+	errChan := make(chan error)
+
+	// Load the self-signed certificate and key
+	cert, err := tls.LoadX509KeyPair("boring-cert.pem", "boring-key.pem")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a TLS configuration for the server
+	tlsServerConfig := tlsConfig(cert)
+
+	// Start the server
+	go func() {
+		conn, err := listener.Accept()
+		if err != nil {
+			errChan <- err
+			return
+		}
+		defer conn.Close()
+
+		// Establish a TLS connection
+		tlsConn := tls.Server(conn, tlsServerConfig)
+		defer tlsConn.Close()
+
+		// Create a new streamConn instance
+		streamConn := server.NewStreamConn(tlsConn, s)
+
+		// Set the overall deadline to 2 seconds from now
+		deadline := time.Now().Add(2 * time.Second)
+		if err := streamConn.SetDeadline(deadline); err != nil {
+			errChan <- err
+			return
+		}
+
+		// Read from the connection
+		buffer := make([]byte, 1024)
+		_, err = streamConn.Read(buffer)
+		if err != nil {
+			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+				errChan <- nil // Overall deadline occurred as expected
+			} else {
+				errChan <- err
+			}
+			return
+		}
+
+		// Write to the connection
+		_, err = streamConn.Write([]byte("Hello, World!"))
+		if err != nil {
+			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+				errChan <- nil // Overall deadline occurred as expected
+			} else {
+				errChan <- err
+			}
+			return
+		}
+
+		errChan <- nil
+	}()
+
+	// Create a TLS client configuration
+	tlsClientConfig := clientTLSConfig()
+
+	// Create a TLS connection to the server
+	conn, err := tls.Dial("tcp", "localhost:8085", tlsClientConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+
+	// Set the overall deadline to 1 second from now
+	deadline := time.Now().Add(time.Second)
+	if err := conn.SetDeadline(deadline); err != nil {
+		t.Fatal(err)
+	}
+
+	// Send an encrypted request to the server
+	log.Println("[Packet Netw0rkz] Client: Sending encrypted request")
+	req := "GET /test HTTP/1.1\r\nHost: localhost:8085\r\n\r\n"
+	encryptedReq := &bytes.Buffer{}
+	err = s.Encrypt(bytes.NewReader([]byte(req)), encryptedReq)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = conn.Write(encryptedReq.Bytes())
+	if err != nil {
+		t.Fatal(err)
+	}
+	log.Println("[Packet Netw0rkz] Client: Encrypted request sent")
+
+	// Wait for the overall deadline to expire
+	time.Sleep(2 * time.Second)
+
+	// Read the encrypted response from the server
+	log.Println("[Packet Netw0rkz] Server: Reading encrypted response")
+	buffer := make([]byte, 1024)
+	_, err = conn.Read(buffer)
+	if err == nil {
+		t.Fatal("Expected overall deadline error")
+	}
+	if netErr, ok := err.(net.Error); !ok || !netErr.Timeout() {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+	log.Println("[Packet Netw0rkz] Server: Overall deadline occurred as expected")
+
+	// Wait for the server to finish
+	err = <-errChan
+	if err != nil {
+		t.Fatal(err)
 	}
 }
