@@ -13,6 +13,8 @@ import (
 )
 
 // streamConn is a wrapper struct that combines a TLS 1.3 connection and a Hybrid Scheme (Stream) for encrypted communication.
+// It is designed on top of the TLS connection, providing enhanced security for the communication channel,
+// unlike most TLS implementations in the world (e.g, not allowed to use another ciphertext).
 //
 // Note: Currently unused and marked as TODO. Implementation will be completed later (see https://tip.golang.org/doc/go1.23).
 type streamConn struct {
