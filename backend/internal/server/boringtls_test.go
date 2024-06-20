@@ -250,7 +250,7 @@ func TestStreamServerExplicitHTTPS(t *testing.T) {
 	tlsServerConfig := tlsConfig(cert)
 
 	// Create a listener
-	listener, err := net.Listen("tcp", ":8080")
+	listener, err := net.Listen("tcp", ":8081")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -275,7 +275,7 @@ func TestStreamServerExplicitHTTPS(t *testing.T) {
 
 	// Create a TLS connection to the server
 	log.Println("Client: Establishing TLS connection")
-	conn, err := tls.Dial("tcp", "localhost:8080", tlsClientConfig)
+	conn, err := tls.Dial("tcp", "localhost:8081", tlsClientConfig)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -349,6 +349,95 @@ func TestStreamServerExplicitHTTPS(t *testing.T) {
 	}
 
 	log.Printf("[Packet Netw0rkz] Boring TLS: Decrypted response: %s", decryptedResp.String())
+
+	// Check if the server returned an error
+	select {
+	case err := <-errChan:
+		t.Fatal(err)
+	default:
+	}
+}
+
+func TestStreamClientWrongProtocol(t *testing.T) {
+	// Generate AES key and ChaCha20 key
+	aesKey := make([]byte, 32)
+	chachaKey := make([]byte, 32)
+	_, err := rand.Read(aesKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = rand.Read(chachaKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new Stream instance
+	s, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new Fiber app
+	app := fiber.New()
+
+	// Define a test route
+	app.Get("/test", func(c *fiber.Ctx) error {
+		log.Println("Server: Received request")
+		return c.SendString("Hello, World!")
+	})
+
+	// Load the self-signed certificate and key
+	cert, err := tls.LoadX509KeyPair("boring-cert.pem", "boring-key.pem")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a TLS configuration for the server
+	tlsServerConfig := tlsConfig(cert)
+
+	// Create a listener
+	listener, err := net.Listen("tcp", ":8082")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Wrap the listener with streamListener
+	streamListener := server.NewStreamListener(listener, tlsServerConfig, s)
+
+	// Create a channel to receive the server error
+	errChan := make(chan error)
+
+	// Start the server
+	go func() {
+		log.Println("Server: Starting server")
+		errChan <- app.Listener(streamListener)
+	}()
+
+	// Wait for the server to start
+	time.Sleep(time.Second)
+
+	// Create a TLS client configuration with TLS 1.2
+	tlsClientConfig := &tls.Config{
+		MinVersion: tls.VersionTLS12,
+		MaxVersion: tls.VersionTLS12,
+		CipherSuites: []uint16{
+			tls.TLS_CHACHA20_POLY1305_SHA256,
+		},
+		CurvePreferences: []tls.CurveID{
+			tls.X25519,
+			tls.CurveP256,
+		},
+		InsecureSkipVerify: true,
+		ServerName:         "localhost",
+	}
+
+	// Create a TLS connection to the server
+	log.Println("Client: Establishing TLS connection")
+	_, err = tls.Dial("tcp", "localhost:8082", tlsClientConfig)
+	if err == nil {
+		t.Fatal("Expected TLS handshake to fail due to wrong protocol version")
+	}
+	log.Printf("Client: TLS handshake failed as expected: %v", err)
 
 	// Check if the server returned an error
 	select {
