@@ -33,12 +33,17 @@ type streamConn struct {
 // TIP: To mitigate this risk from section [10.10.3], servers can implement rate limiting or other security measures to control the number of decryption operations they perform within a given time frame.
 // By monitoring and limiting the rate of decryption requests, servers can reduce the impact of potential DoS attacks while still fulfilling their role in the ECH protocol.
 func (c *streamConn) Read(b []byte) (int, error) {
-	var buffer bytes.Buffer
-	err := c.Stream.Decrypt(c.Conn, &buffer)
+	n, err := c.Conn.Read(b)
 	if err != nil {
 		return 0, err
 	}
-	return buffer.Read(b)
+	var decryptedBuf bytes.Buffer
+	err = c.Stream.Decrypt(bytes.NewReader(b[:n]), &decryptedBuf)
+	if err != nil {
+		return 0, err
+	}
+	copy(b, decryptedBuf.Bytes())
+	return decryptedBuf.Len(), nil
 }
 
 // Write encrypts the provided data using the Stream and writes it to the TLS connection.
@@ -112,4 +117,13 @@ func (l *streamListener) Accept() (net.Conn, error) {
 
 	tlsConn := tls.Server(conn, l.tlsConfig)
 	return NewStreamConn(tlsConn, l.stream), nil
+}
+
+// NewStreamListener creates a new streamListener instance.
+func NewStreamListener(listener net.Listener, tlsConfig *tls.Config, stream *stream.Stream) net.Listener {
+	return &streamListener{
+		Listener:  listener,
+		tlsConfig: tlsConfig,
+		stream:    stream,
+	}
 }
