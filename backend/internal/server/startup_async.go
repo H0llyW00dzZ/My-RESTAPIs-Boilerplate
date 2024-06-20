@@ -51,8 +51,9 @@ func NewFiberServer(app *fiber.App, appName, monitorPath string) *FiberServer {
 
 // Start runs the Fiber server in a separate goroutine to listen for incoming requests.
 func (s *FiberServer) Start(addr, monitorPath string) {
-	// TODO: Change Listen to ListenTLS to use TLS 1.3 protocols.
-	// For the certificate, if used at the Enterprise/Government level, it should be issued to the organization named "Boring TLS" hahaha.
+	// TODO: Implement environment mode. For example, when the environment is set to "dev" or "local", it will switch to "Listen".
+	// Otherwise, it will force a change from Listen to ListenTLS to use TLS 1.3 protocols.
+	// For the certificate, if used at the enterprise or government level, it should be issued to the organization named "Boring TLS" hahaha.
 	go func() {
 		log.LogInfof(MsgServerStart, addr)
 		if err := s.app.Listen(addr); err != nil {
