@@ -30,3 +30,5 @@ main
 
 # H0llyW00dzZ boring TLS 1.3 cert
 boring-boring-boring.txt
+boring-cert.pem
+boring-key.pem
