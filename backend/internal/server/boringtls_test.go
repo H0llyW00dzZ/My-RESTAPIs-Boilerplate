@@ -25,8 +25,13 @@ func tlsConfig(cert tls.Certificate) *tls.Config {
 	return &tls.Config{
 		MinVersion: tls.VersionTLS13,
 		CurvePreferences: []tls.CurveID{
+			// Note: These are classical elliptic curves for TLS 1.3 key exchange.
+			// For experimental purposes related to post-quantum hybrid design, refer to:
+			// https://datatracker.ietf.org/doc/html/draft-ietf-tls-hybrid-design-10
 			tls.X25519,
 			tls.CurveP256,
+			tls.CurveP384,
+			tls.CurveP521,
 		},
 		Certificates: []tls.Certificate{cert},
 	}
@@ -36,8 +41,13 @@ func clientTLSConfig() *tls.Config {
 	return &tls.Config{
 		MinVersion: tls.VersionTLS13,
 		CurvePreferences: []tls.CurveID{
+			// Note: These are classical elliptic curves for TLS 1.3 key exchange.
+			// For experimental purposes related to post-quantum hybrid design, refer to:
+			// https://datatracker.ietf.org/doc/html/draft-ietf-tls-hybrid-design-10
 			tls.X25519,
 			tls.CurveP256,
+			tls.CurveP384,
+			tls.CurveP521,
 		},
 		InsecureSkipVerify: true,
 		ServerName:         "localhost",
