@@ -9,9 +9,9 @@ import (
 	"crypto/rand"
 	"crypto/tls"
 	"encoding/hex"
+	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid/stream"
 	"h0llyw00dz-template/backend/internal/server"
-	"log"
 	"net"
 	"runtime"
 	"strings"
@@ -47,6 +47,7 @@ func clientTLSConfig() *tls.Config {
 // Note: This is just a test that demonstrates a working example of using TLS 1.3 along with an additional encryption layer.
 // It is still unfinished. If finished, it would require writing a lot of functions when using a custom cipher for the cipher suite (might be copied from std/dependency injection).
 func TestStreamServer(t *testing.T) {
+	log.InitializeLogger("Boring TLS 1.3 Testing", "")
 	// Generate AES key and ChaCha20 key
 	aesKey := make([]byte, 32)
 	chachaKey := make([]byte, 32)
@@ -71,7 +72,7 @@ func TestStreamServer(t *testing.T) {
 
 	// Define a test route
 	app.Get("/test", func(c *fiber.Ctx) error {
-		log.Println("Server: Received request")
+		log.LogInfo("Server: Received request")
 		return c.SendString("Hello, World!")
 	})
 
@@ -98,7 +99,7 @@ func TestStreamServer(t *testing.T) {
 
 	// Start the server
 	go func() {
-		log.Println("Server: Starting server")
+		log.LogInfo("Server: Starting server")
 		errChan <- app.Listener(streamListener)
 	}()
 
@@ -109,7 +110,7 @@ func TestStreamServer(t *testing.T) {
 	tlsClientConfig := clientTLSConfig()
 
 	// Create a TLS connection to the server
-	log.Println("Client: Establishing TLS connection")
+	log.LogInfo("Client: Establishing TLS connection")
 	conn, err := tls.Dial("tcp", "localhost:8080", tlsClientConfig)
 	if err != nil {
 		t.Fatal(err)
@@ -123,7 +124,7 @@ func TestStreamServer(t *testing.T) {
 	}
 
 	// Send an encrypted request to the server
-	log.Println("[Packet Netw0rkz] Client: Sending encrypted request")
+	log.LogInfo("[Packet Netw0rkz] Client: Sending encrypted request")
 	req := "GET /test HTTP/1.1\r\nHost: localhost:8080\r\n\r\n"
 	encryptedReq := &bytes.Buffer{}
 	err = clientStream.Encrypt(bytes.NewReader([]byte(req)), encryptedReq)
@@ -131,15 +132,15 @@ func TestStreamServer(t *testing.T) {
 		t.Fatal(err)
 	}
 	encryptedReqHex := hex.EncodeToString(encryptedReq.Bytes())
-	log.Printf("[Packet Netw0rkz] Client: Encrypted request (hex): %s", encryptedReqHex)
+	log.LogInfof("[Packet Netw0rkz] Client: Encrypted request (hex): %s", encryptedReqHex)
 	_, err = conn.Write(encryptedReq.Bytes())
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Println("[Packet Netw0rkz] Client: Encrypted request sent")
+	log.LogInfo("[Packet Netw0rkz] Client: Encrypted request sent")
 
 	// Read the encrypted response from the server
-	log.Println("[Packet Netw0rkz] Server: Reading encrypted response")
+	log.LogInfo("[Packet Netw0rkz] Server: Reading encrypted response")
 	var encryptedResp []byte
 	buffer := make([]byte, 1024)
 	for {
@@ -153,17 +154,17 @@ func TestStreamServer(t *testing.T) {
 		}
 	}
 	encryptedRespHex := hex.EncodeToString(encryptedResp)
-	log.Printf("[Packet Netw0rkz] Server: Encrypted response (hex): %s", encryptedRespHex)
-	log.Println("[Packet Netw0rkz] Server: Encrypted response received")
+	log.LogInfof("[Packet Netw0rkz] Server: Encrypted response (hex): %s", encryptedRespHex)
+	log.LogInfo("[Packet Netw0rkz] Server: Encrypted response received")
 
 	// Decrypt the response
-	log.Println("[Packet Netw0rkz] Server: Decrypting response")
+	log.LogInfo("[Packet Netw0rkz] Server: Decrypting response")
 	decryptedResp := &bytes.Buffer{}
 	err = clientStream.Decrypt(bytes.NewReader(encryptedResp), decryptedResp)
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Println("[Packet Netw0rkz] Server: Response decrypted")
+	log.LogInfo("[Packet Netw0rkz] Server: Response decrypted")
 
 	// Check the decrypted response
 	expectedHeaders := []string{
@@ -227,7 +228,7 @@ func TestStreamServerExplicitHTTPS(t *testing.T) {
 
 	// Define a test route
 	app.Get("/test", func(c *fiber.Ctx) error {
-		log.Println("Server: Received request")
+		log.LogInfo("Server: Received request")
 		if c.Protocol() == "https" {
 			return c.SendString("Hello, World! (via TLS)")
 		}
@@ -257,7 +258,7 @@ func TestStreamServerExplicitHTTPS(t *testing.T) {
 
 	// Start the server
 	go func() {
-		log.Println("Server: Starting server")
+		log.LogInfo("Server: Starting server")
 		errChan <- app.Listener(streamListener)
 	}()
 
@@ -268,7 +269,7 @@ func TestStreamServerExplicitHTTPS(t *testing.T) {
 	tlsClientConfig := clientTLSConfig()
 
 	// Create a TLS connection to the server
-	log.Println("Client: Establishing TLS connection")
+	log.LogInfo("Client: Establishing TLS connection")
 	conn, err := tls.Dial("tcp", "localhost:8081", tlsClientConfig)
 	if err != nil {
 		t.Fatal(err)
@@ -282,7 +283,7 @@ func TestStreamServerExplicitHTTPS(t *testing.T) {
 	}
 
 	// Send an encrypted request to the server
-	log.Println("[Packet Netw0rkz] Client: Sending encrypted request")
+	log.LogInfo("[Packet Netw0rkz] Client: Sending encrypted request")
 	req := "GET /test HTTP/1.1\r\nHost: localhost:8081\r\n\r\n"
 	encryptedReq := &bytes.Buffer{}
 	err = clientStream.Encrypt(bytes.NewReader([]byte(req)), encryptedReq)
@@ -290,15 +291,15 @@ func TestStreamServerExplicitHTTPS(t *testing.T) {
 		t.Fatal(err)
 	}
 	encryptedReqHex := hex.EncodeToString(encryptedReq.Bytes())
-	log.Printf("[Packet Netw0rkz] Client: Encrypted request (hex): %s", encryptedReqHex)
+	log.LogInfof("[Packet Netw0rkz] Client: Encrypted request (hex): %s", encryptedReqHex)
 	_, err = conn.Write(encryptedReq.Bytes())
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Println("[Packet Netw0rkz] Client: Encrypted request sent")
+	log.LogInfo("[Packet Netw0rkz] Client: Encrypted request sent")
 
 	// Read the encrypted response from the server
-	log.Println("[Packet Netw0rkz] Server: Reading encrypted response")
+	log.LogInfo("[Packet Netw0rkz] Server: Reading encrypted response")
 	var encryptedResp []byte
 	buffer := make([]byte, 1024)
 	for {
@@ -312,17 +313,17 @@ func TestStreamServerExplicitHTTPS(t *testing.T) {
 		}
 	}
 	encryptedRespHex := hex.EncodeToString(encryptedResp)
-	log.Printf("[Packet Netw0rkz] Server: Encrypted response (hex): %s", encryptedRespHex)
-	log.Println("[Packet Netw0rkz] Server: Encrypted response received")
+	log.LogInfof("[Packet Netw0rkz] Server: Encrypted response (hex): %s", encryptedRespHex)
+	log.LogInfo("[Packet Netw0rkz] Server: Encrypted response received")
 
 	// Decrypt the response
-	log.Println("[Packet Netw0rkz] Server: Decrypting response")
+	log.LogInfo("[Packet Netw0rkz] Server: Decrypting response")
 	decryptedResp := &bytes.Buffer{}
 	err = clientStream.Decrypt(bytes.NewReader(encryptedResp), decryptedResp)
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Println("[Packet Netw0rkz] Server: Response decrypted")
+	log.LogInfo("[Packet Netw0rkz] Server: Response decrypted")
 
 	// Check the decrypted response
 	expectedHeaders := []string{
@@ -342,7 +343,7 @@ func TestStreamServerExplicitHTTPS(t *testing.T) {
 		t.Errorf("missing expected body: %q", expectedBody)
 	}
 
-	log.Printf("[Packet Netw0rkz] Boring TLS: Decrypted response: %s", decryptedResp.String())
+	log.LogInfof("[Packet Netw0rkz] Boring TLS: Decrypted response: %s", decryptedResp.String())
 
 	// Check if the server returned an error
 	select {
@@ -376,7 +377,7 @@ func TestStreamClientWrongProtocol(t *testing.T) {
 
 	// Define a test route
 	app.Get("/test", func(c *fiber.Ctx) error {
-		log.Println("Server: Received request")
+		log.LogInfo("Server: Received request")
 		return c.SendString("Hello, World!")
 	})
 
@@ -403,7 +404,7 @@ func TestStreamClientWrongProtocol(t *testing.T) {
 
 	// Start the server
 	go func() {
-		log.Println("Server: Starting server")
+		log.LogInfo("Server: Starting server")
 		errChan <- app.Listener(streamListener)
 	}()
 
@@ -426,12 +427,12 @@ func TestStreamClientWrongProtocol(t *testing.T) {
 	}
 
 	// Create a TLS connection to the server
-	log.Println("Client: Establishing TLS connection")
+	log.LogInfo("Client: Establishing TLS connection")
 	_, err = tls.Dial("tcp", "localhost:8082", tlsClientConfig)
 	if err == nil {
 		t.Fatal("Expected TLS handshake to fail due to wrong protocol version")
 	}
-	log.Printf("Client: TLS handshake failed as expected: %v", err)
+	log.LogInfof("Client: TLS handshake failed as expected: %v", err)
 
 	// Check if the server returned an error
 	select {
@@ -467,7 +468,7 @@ func TestStreamServerStupidMiddleman(t *testing.T) {
 
 	// Define a test route
 	app.Get("/test", func(c *fiber.Ctx) error {
-		log.Println("Server: Received request")
+		log.LogInfo("Server: Received request")
 		return c.SendString("Hello, World!")
 	})
 
@@ -494,7 +495,7 @@ func TestStreamServerStupidMiddleman(t *testing.T) {
 
 	// Start the server
 	go func() {
-		log.Println("Server: Starting server")
+		log.LogInfo("Server: Starting server")
 		errChan <- app.Listener(streamListener)
 	}()
 
@@ -505,7 +506,7 @@ func TestStreamServerStupidMiddleman(t *testing.T) {
 	tlsClientConfig := clientTLSConfig()
 
 	// Create a TLS connection to the server
-	log.Println("Client: Establishing TLS connection")
+	log.LogInfo("Client: Establishing TLS connection")
 	conn, err := tls.Dial("tcp", "localhost:8083", tlsClientConfig)
 	if err != nil {
 		t.Fatal(err)
@@ -513,20 +514,20 @@ func TestStreamServerStupidMiddleman(t *testing.T) {
 	defer conn.Close()
 
 	// Send a plain request to the server
-	log.Println("[Packet Netw0rkz] Client: Sending plain request")
+	log.LogInfo("[Packet Netw0rkz] Client: Sending plain request")
 	req := "GET /test HTTP/1.1\r\nHost: localhost:8083\r\n\r\n"
 	_, err = conn.Write([]byte(req))
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Println("[Packet Netw0rkz] Client: Plain request sent")
+	log.LogInfo("[Packet Netw0rkz] Client: Plain request sent")
 
 	// Simulate a stupid middleman intercepting the plain request
-	log.Println("[Packet Netw0rkz] Middleman: Intercepted plain request")
-	log.Printf("[Packet Netw0rkz] Middleman: Plain request: %s", req)
+	log.LogInfo("[Packet Netw0rkz] Middleman: Intercepted plain request")
+	log.LogInfof("[Packet Netw0rkz] Middleman: Plain request: %s", req)
 
 	// Read the response from the server
-	log.Println("[Packet Netw0rkz] Server: Reading response")
+	log.LogInfo("[Packet Netw0rkz] Server: Reading response")
 	var resp []byte
 	buffer := make([]byte, 1024)
 	n, err := conn.Read(buffer)
@@ -534,12 +535,12 @@ func TestStreamServerStupidMiddleman(t *testing.T) {
 		t.Fatal(err)
 	}
 	resp = append(resp, buffer[:n]...)
-	log.Printf("[Packet Netw0rkz] Server: Encrypted response: %x", resp)
-	log.Println("[Packet Netw0rkz] Server: Encrypted response received")
+	log.LogInfof("[Packet Netw0rkz] Server: Encrypted response: %x", resp)
+	log.LogInfo("[Packet Netw0rkz] Server: Encrypted response received")
 
 	// Simulate a stupid middleman intercepting the encrypted response
-	log.Println("[Packet Netw0rkz] Middleman: Intercepted encrypted response")
-	log.Printf("[Packet Netw0rkz] Middleman: Encrypted response: %x", resp)
+	log.LogInfo("[Packet Netw0rkz] Middleman: Intercepted encrypted response")
+	log.LogInfof("[Packet Netw0rkz] Middleman: Encrypted response: %x", resp)
 
 	// Check if the server returned an error
 	select {
@@ -578,7 +579,7 @@ func TestStreamServerExplicitHTTPSUnixPacket(t *testing.T) {
 
 	// Define a test route
 	app.Get("/test", func(c *fiber.Ctx) error {
-		log.Println("Server: Received request")
+		log.LogInfo("Server: Received request")
 		if c.Protocol() == "https" {
 			return c.SendString("Hello, Unix! (via TLS)")
 		}
@@ -603,7 +604,7 @@ func TestStreamServerExplicitHTTPSUnixPacket(t *testing.T) {
 
 	// Start the server
 	go func() {
-		log.Println("Server: Starting server")
+		log.LogInfo("Server: Starting server")
 		errChan <- app.Listener(streamListener)
 	}()
 
@@ -611,7 +612,7 @@ func TestStreamServerExplicitHTTPSUnixPacket(t *testing.T) {
 	time.Sleep(time.Second)
 
 	// Create a Unix domain socket connection to the server
-	log.Println("Client: Establishing Unix domain socket connection")
+	log.LogInfo("Client: Establishing Unix domain socket connection")
 	conn, err := net.Dial("unixpacket", socketPath)
 	if err != nil {
 		t.Fatal(err)
@@ -625,7 +626,7 @@ func TestStreamServerExplicitHTTPSUnixPacket(t *testing.T) {
 	}
 
 	// Send an encrypted request to the server
-	log.Println("[Packet Netw0rkz] Client: Sending encrypted request")
+	log.LogInfo("[Packet Netw0rkz] Client: Sending encrypted request")
 	req := "GET /test HTTP/1.1\r\nHost: localhost\r\n\r\n"
 	encryptedReq := &bytes.Buffer{}
 	err = clientStream.Encrypt(bytes.NewReader([]byte(req)), encryptedReq)
@@ -633,15 +634,15 @@ func TestStreamServerExplicitHTTPSUnixPacket(t *testing.T) {
 		t.Fatal(err)
 	}
 	encryptedReqHex := hex.EncodeToString(encryptedReq.Bytes())
-	log.Printf("[Packet Netw0rkz] Client: Encrypted request (hex): %s", encryptedReqHex)
+	log.LogInfof("[Packet Netw0rkz] Client: Encrypted request (hex): %s", encryptedReqHex)
 	_, err = conn.Write(encryptedReq.Bytes())
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Println("[Packet Netw0rkz] Client: Encrypted request sent")
+	log.LogInfo("[Packet Netw0rkz] Client: Encrypted request sent")
 
 	// Read the encrypted response from the server
-	log.Println("[Packet Netw0rkz] Server: Reading encrypted response")
+	log.LogInfo("[Packet Netw0rkz] Server: Reading encrypted response")
 	var encryptedResp []byte
 	buffer := make([]byte, 1024)
 	for {
@@ -655,17 +656,17 @@ func TestStreamServerExplicitHTTPSUnixPacket(t *testing.T) {
 		}
 	}
 	encryptedRespHex := hex.EncodeToString(encryptedResp)
-	log.Printf("[Packet Netw0rkz] Server: Encrypted response (hex): %s", encryptedRespHex)
-	log.Println("[Packet Netw0rkz] Server: Encrypted response received")
+	log.LogInfof("[Packet Netw0rkz] Server: Encrypted response (hex): %s", encryptedRespHex)
+	log.LogInfo("[Packet Netw0rkz] Server: Encrypted response received")
 
 	// Decrypt the response
-	log.Println("[Packet Netw0rkz] Server: Decrypting response")
+	log.LogInfo("[Packet Netw0rkz] Server: Decrypting response")
 	decryptedResp := &bytes.Buffer{}
 	err = clientStream.Decrypt(bytes.NewReader(encryptedResp), decryptedResp)
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Println("[Packet Netw0rkz] Server: Response decrypted")
+	log.LogInfo("[Packet Netw0rkz] Server: Response decrypted")
 
 	// Check the decrypted response
 	expectedHeaders := []string{
@@ -685,7 +686,7 @@ func TestStreamServerExplicitHTTPSUnixPacket(t *testing.T) {
 		t.Errorf("missing expected body: %q", expectedBody)
 	}
 
-	log.Printf("[Packet Netw0rkz] Boring TLS: Decrypted response: %s", decryptedResp.String())
+	log.LogInfof("[Packet Netw0rkz] Boring TLS: Decrypted response: %s", decryptedResp.String())
 
 	// Check if the server returned an error
 	select {
@@ -806,7 +807,7 @@ func TestStreamConnDeadlines(t *testing.T) {
 	}
 
 	// Send an encrypted request to the server
-	log.Println("[Packet Netw0rkz] Client: Sending encrypted request")
+	log.LogInfo("[Packet Netw0rkz] Client: Sending encrypted request")
 	req := "GET /test HTTP/1.1\r\nHost: localhost:8084\r\n\r\n"
 	encryptedReq := &bytes.Buffer{}
 	err = s.Encrypt(bytes.NewReader([]byte(req)), encryptedReq)
@@ -817,13 +818,13 @@ func TestStreamConnDeadlines(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Println("[Packet Netw0rkz] Client: Encrypted request sent")
+	log.LogInfo("[Packet Netw0rkz] Client: Encrypted request sent")
 
 	// Wait for the read deadline to expire
 	time.Sleep(2 * time.Second)
 
 	// Read the encrypted response from the server
-	log.Println("[Packet Netw0rkz] Server: Reading encrypted response")
+	log.LogInfo("[Packet Netw0rkz] Server: Reading encrypted response")
 
 	buffer := make([]byte, 1024)
 	_, err = conn.Read(buffer)
@@ -833,7 +834,7 @@ func TestStreamConnDeadlines(t *testing.T) {
 	if netErr, ok := err.(net.Error); !ok || !netErr.Timeout() {
 		t.Fatalf("Unexpected error: %v", err)
 	}
-	log.Println("[Packet Netw0rkz] Server: Read timeout occurred as expected")
+	log.LogInfo("[Packet Netw0rkz] Server: Read timeout occurred as expected")
 
 	// Wait for the server to finish
 	err = <-errChan
@@ -855,7 +856,7 @@ func TestStreamConnDeadlines(t *testing.T) {
 	if netErr, ok := err.(net.Error); !ok || !netErr.Timeout() {
 		t.Fatalf("Unexpected error: %v", err)
 	}
-	log.Println("[Packet Netw0rkz] Client: Write timeout occurred as expected")
+	log.LogInfo("[Packet Netw0rkz] Client: Write timeout occurred as expected")
 }
 
 func TestStreamConnSetDeadline(t *testing.T) {
@@ -962,7 +963,7 @@ func TestStreamConnSetDeadline(t *testing.T) {
 	}
 
 	// Send an encrypted request to the server
-	log.Println("[Packet Netw0rkz] Client: Sending encrypted request")
+	log.LogInfo("[Packet Netw0rkz] Client: Sending encrypted request")
 	req := "GET /test HTTP/1.1\r\nHost: localhost:8085\r\n\r\n"
 	encryptedReq := &bytes.Buffer{}
 	err = s.Encrypt(bytes.NewReader([]byte(req)), encryptedReq)
@@ -973,13 +974,13 @@ func TestStreamConnSetDeadline(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Println("[Packet Netw0rkz] Client: Encrypted request sent")
+	log.LogInfo("[Packet Netw0rkz] Client: Encrypted request sent")
 
 	// Wait for the overall deadline to expire
 	time.Sleep(2 * time.Second)
 
 	// Read the encrypted response from the server
-	log.Println("[Packet Netw0rkz] Server: Reading encrypted response")
+	log.LogInfo("[Packet Netw0rkz] Server: Reading encrypted response")
 	buffer := make([]byte, 1024)
 	_, err = conn.Read(buffer)
 	if err == nil {
@@ -988,7 +989,7 @@ func TestStreamConnSetDeadline(t *testing.T) {
 	if netErr, ok := err.(net.Error); !ok || !netErr.Timeout() {
 		t.Fatalf("Unexpected error: %v", err)
 	}
-	log.Println("[Packet Netw0rkz] Server: Overall deadline occurred as expected")
+	log.LogInfo("[Packet Netw0rkz] Server: Overall deadline occurred as expected")
 
 	// Wait for the server to finish
 	err = <-errChan
