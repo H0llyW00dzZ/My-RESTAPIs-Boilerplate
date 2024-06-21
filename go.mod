@@ -7,7 +7,7 @@ require (
 	github.com/ansrivas/fiberprometheus/v2 v2.6.1
 	github.com/bytedance/sonic v1.11.9
 	github.com/charmbracelet/bubbles v0.18.0
-	github.com/charmbracelet/bubbletea v0.26.4
+	github.com/charmbracelet/bubbletea v0.26.5
 	github.com/charmbracelet/lipgloss v0.11.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gofiber/contrib/swagger v1.1.2
