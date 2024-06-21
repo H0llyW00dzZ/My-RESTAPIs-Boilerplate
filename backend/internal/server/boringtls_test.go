@@ -1173,6 +1173,10 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 	// Define a test route
 	app.Get("/test", func(c *fiber.Ctx) error {
 		if c.Secure() {
+			// Note: This works well for automatic encryption/decryption during transport transparently.
+			// However, do not try this on front-end apps such as browsers,
+			// as it may not be compatible due to the specific cipher used and protocols. If it's still a Go application, it is compatible and works well (e.g., keys, handshake).
+			// Even with TLS 1.3, not all browsers will work if used for HTTPS front-end, even on Firefox (in Firefox, it works; however, it only encrypts and is unable to decrypt), due to the cipher.
 			log.LogInfo("Server: Received request")
 			return c.JSON(fiber.Map{
 				"message": "Hello, World! (via TLS)",
