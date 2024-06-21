@@ -12,7 +12,9 @@ import (
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid/stream"
 	"h0llyw00dz-template/backend/internal/server"
+	"io"
 	"net"
+	"net/http"
 	"runtime"
 	"strings"
 	"testing"
@@ -1142,5 +1144,104 @@ func TestStreamServerWithoutAdditionalEncrypt(t *testing.T) {
 	case err := <-errChan:
 		t.Fatal(err)
 	default:
+	}
+}
+
+// Note: The speed is not bad; however, this is not fully implemented.
+func TestStreamServerWithCustomTransport(t *testing.T) {
+	// Generate AES key and ChaCha20 key
+	aesKey := make([]byte, 32)
+	chachaKey := make([]byte, 32)
+	_, err := rand.Read(aesKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = rand.Read(chachaKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new Stream instance
+	s, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new Fiber app
+	app := fiber.New()
+
+	// Define a test route
+	app.Get("/test", func(c *fiber.Ctx) error {
+		if c.Secure() {
+			log.LogInfo("Server: Received request")
+			return c.JSON(fiber.Map{
+				"message": "Hello, World! (via TLS)",
+			})
+		}
+		return c.SendString("Hello, World!")
+	})
+
+	// Load the self-signed certificate and key
+	cert, err := tls.LoadX509KeyPair("boring-cert.pem", "boring-key.pem")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a TLS configuration for the server
+	tlsServerConfig := tlsConfig(cert)
+
+	// Create a regular TCP listener
+	ln, err := net.Listen("tcp", ":8087")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer ln.Close()
+
+	// Wrap the TCP listener with the streamListener
+	streamLn := server.NewStreamListener(ln, tlsServerConfig, s)
+
+	// Start the server with the streamListener
+	go app.Listener(streamLn)
+
+	// Create a custom transport with the Boring TLS 1.3 protocol
+	transport := &http.Transport{
+		DialTLS: func(network, addr string) (net.Conn, error) {
+			conn, err := tls.Dial(network, addr, &tls.Config{
+				MinVersion:         tls.VersionTLS13,
+				InsecureSkipVerify: true,
+				ServerName:         "localhost",
+			})
+			if err != nil {
+				return nil, err
+			}
+			return server.NewStreamConn(conn, s), nil
+		},
+	}
+
+	// Create a client with the custom transport
+	client := &http.Client{
+		Transport: transport,
+	}
+
+	// Make a request to the server
+	resp, err := client.Get("https://" + ln.Addr().String() + "/test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	// Check the response
+	expectedBody := `{"message":"Hello, World! (via TLS)"}`
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("Expected status code %d, but got %d", http.StatusOK, resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if string(body) != expectedBody {
+		t.Errorf("Expected response body to be '%s', but got '%s'", expectedBody, string(body))
 	}
 }
