@@ -22,6 +22,7 @@ import (
 )
 
 func tlsConfig(cert tls.Certificate) *tls.Config {
+	log.InitializeLogger("Boring TLS 1.3 Testing", "")
 	return &tls.Config{
 		MinVersion: tls.VersionTLS13,
 		CurvePreferences: []tls.CurveID{
@@ -38,6 +39,7 @@ func tlsConfig(cert tls.Certificate) *tls.Config {
 }
 
 func clientTLSConfig() *tls.Config {
+	log.InitializeLogger("Boring TLS 1.3 Testing", "")
 	return &tls.Config{
 		MinVersion: tls.VersionTLS13,
 		CurvePreferences: []tls.CurveID{
@@ -57,7 +59,6 @@ func clientTLSConfig() *tls.Config {
 // Note: This is just a test that demonstrates a working example of using TLS 1.3 along with an additional encryption layer.
 // It is still unfinished. If finished, it would require writing a lot of functions when using a custom cipher for the cipher suite (might be copied from std/dependency injection).
 func TestStreamServer(t *testing.T) {
-	log.InitializeLogger("Boring TLS 1.3 Testing", "")
 	// Generate AES key and ChaCha20 key
 	aesKey := make([]byte, 32)
 	chachaKey := make([]byte, 32)
