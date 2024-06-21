@@ -1210,6 +1210,12 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 				MinVersion:         tls.VersionTLS13,
 				InsecureSkipVerify: true,
 				ServerName:         "localhost",
+				CurvePreferences: []tls.CurveID{
+					// Note: These are classical elliptic curves for TLS 1.3 key exchange.
+					// For experimental purposes related to post-quantum hybrid design, refer to:
+					// https://datatracker.ietf.org/doc/html/draft-ietf-tls-hybrid-design-10
+					tls.X25519, // better performance for TLS 1.3
+				},
 			})
 			if err != nil {
 				return nil, err
