@@ -33,6 +33,12 @@ type streamConn struct {
 // TIP: To mitigate this risk from section [10.10.3], servers can implement rate limiting or other security measures to control the number of decryption operations they perform within a given time frame.
 // By monitoring and limiting the rate of decryption requests, servers can reduce the impact of potential DoS attacks while still fulfilling their role in the ECH protocol.
 func (c *streamConn) Read(b []byte) (int, error) {
+	// Note: This should be correct for TLS 1.3, and it's safe for Go due to the following reasons:
+	//
+	// - The Stream instance itself is designed to be thread-safe and can be safely shared across multiple goroutines.
+	//   It does not maintain any mutable state that could cause race conditions or interference between goroutines.
+	//
+	// - Additionally, don't use QUIC connections as they are not safe for multiple goroutines.
 	n, err := c.Conn.Read(b)
 	if err != nil {
 		return 0, err
@@ -47,6 +53,8 @@ func (c *streamConn) Read(b []byte) (int, error) {
 }
 
 // Write encrypts the provided data using the Stream and writes it to the TLS connection.
+//
+// TODO: Improve this function to support storing encrypted data/values from the client into a database (e.g sensitive data), which is a safer approach for storing encrypted data.
 func (c *streamConn) Write(b []byte) (int, error) {
 	var buffer bytes.Buffer
 	err := c.Stream.Encrypt(bytes.NewReader(b), &buffer)
