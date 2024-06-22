@@ -20,4 +20,5 @@
 // - Communication between microservices in a distributed system
 // - Encryption of data stored in databases or files
 // - Secure transmission of data between different components of a Go application
+// - VPN (Virtual Private Network)
 package stream
