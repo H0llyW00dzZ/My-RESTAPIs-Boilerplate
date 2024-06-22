@@ -51,8 +51,11 @@ func NewFiberServer(app *fiber.App, appName, monitorPath string) *FiberServer {
 
 // Start runs the Fiber server in a separate goroutine to listen for incoming requests.
 func (s *FiberServer) Start(addr, monitorPath string) {
-	// TODO: Implement environment mode. For example, when the environment is set to "dev" or "local", it will switch to "Listen".
-	// Otherwise, it will force a change from Listen to NewStreamListener (automatically and transparently encrypting and decrypting, similar to Certificate Transparency my Boring TLS Certificate) to use TLS 1.3 protocols.
+	// TODO: Implement environment mode. For example, when the environment is set to "dev" or "local",
+	// it will switch to "Listen (Non HTTPS)". Otherwise, it will force a change from Listen to ListenTLS
+	// for public access that can be accessed by a browser. For the Go application itself (only accessed by the Go application, which is pretty useful for authentication), it will switch
+	// to a combination of Listener and StreamListener (automatically and transparently encrypting and decrypting,
+	// similar to Certificate Transparency my Boring TLS Certificate) to use TLS 1.3 protocols.
 	// For the certificate, if used at the enterprise or government level, it should be issued to the organization named "Boring TLS" hahaha.
 	go func() {
 		log.LogInfof(MsgServerStart, addr)
