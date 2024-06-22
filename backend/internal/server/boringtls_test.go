@@ -9,6 +9,7 @@ import (
 	"crypto/rand"
 	"crypto/tls"
 	"encoding/hex"
+	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid/stream"
 	"h0llyw00dz-template/backend/internal/server"
@@ -1162,6 +1163,10 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 	}
 
 	// Create a new Stream instance
+	// Note: When this is bound into a TLS connection by modifying from copies the standard library,
+	// for example, adding the stream encrypter/decrypter along with stream.New for the cipher suites,
+	// it can create a high-level secure TLS connection without relying on quantum-resistant algorithm approaches,
+	// because the most important about crytographic it's ciphertext and TLS/DTLS for transmitting.
 	s, err := stream.New(aesKey, chachaKey)
 	if err != nil {
 		t.Fatal(err)
@@ -1178,6 +1183,7 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 			// as it may not be compatible due to the specific cipher used and protocols. If it's still a Go application, it is compatible and works well (e.g., keys, handshake).
 			// Even with TLS 1.3, not all browsers will work if used for HTTPS front-end, even on Firefox (in Firefox, it works; however, it only encrypts and is unable to decrypt), due to the cipher.
 			log.LogInfo("Server: Received request")
+			log.LogInfo("Server: Encrypting response")
 			return c.JSON(fiber.Map{
 				"message": "Hello, World! (via TLS)",
 			})
@@ -1207,60 +1213,72 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 	// Start the server with the streamListener
 	go app.Listener(streamLn)
 
-	// Create a custom transport with the Boring TLS 1.3 protocol
+	// Define different curve preferences for each transport
+	curvePreferences := [][]tls.CurveID{
+		{tls.CurveP384, tls.CurveP521, tls.X25519, tls.CurveP256},
+		{tls.CurveP521, tls.X25519, tls.CurveP256, tls.CurveP384},
+		{tls.X25519, tls.CurveP384, tls.CurveP521, tls.CurveP256},
+	}
+
+	// Create multiple custom transports with different curve preferences for Boring TLS 1.3 protocol
 	// Note: This is suitable for Go applications; however, do not try it in a browser as it may not be compatible due to the specific cipher used and protocols.
 	// If it's still a Go application, it is compatible and works well (e.g., keys, handshake).
-	transport := &http.Transport{
-		DialTLS: func(network, addr string) (net.Conn, error) {
-			conn, err := tls.Dial(network, addr, &tls.Config{
-				MinVersion:         tls.VersionTLS13,
-				InsecureSkipVerify: true,
-				ServerName:         "localhost",
-				CurvePreferences: []tls.CurveID{
-					// Note: These are classical elliptic curves for TLS 1.3 key exchange.
-					// For experimental purposes related to post-quantum hybrid design, refer to:
-					// https://datatracker.ietf.org/doc/html/draft-ietf-tls-hybrid-design-10
-					tls.X25519, // better performance for TLS 1.3
-					tls.CurveP256,
-					tls.CurveP384,
-					tls.CurveP521,
-				},
-			})
-			if err != nil {
-				return nil, err
-			}
-			return server.NewStreamConn(conn, s), nil
-		},
+	transports := make([]*http.Transport, len(curvePreferences))
+	for i, curves := range curvePreferences {
+		transports[i] = &http.Transport{
+			DialTLS: func(network, addr string) (net.Conn, error) {
+				conn, err := tls.Dial(network, addr, &tls.Config{
+					MinVersion:         tls.VersionTLS13,
+					InsecureSkipVerify: true,
+					ServerName:         "localhost",
+					CurvePreferences:   curves,
+				})
+				if err != nil {
+					return nil, err
+				}
+				log.LogInfo(fmt.Sprintf("Client %d: Established TLS connection", i+1))
+				return server.NewStreamConn(conn, s), nil
+			},
+		}
 	}
 
-	// Create a client with the custom transport
-	client := &http.Client{
-		Transport: transport,
+	// Create multiple clients with different transports
+	clients := make([]*http.Client, len(transports))
+	for i, transport := range transports {
+		clients[i] = &http.Client{
+			Transport: transport,
+		}
 	}
 
-	// Make a request to the server
-	resp, err := client.Get("https://" + ln.Addr().String() + "/test")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer resp.Body.Close()
+	// Make requests to the server using each client
+	for i, client := range clients {
+		log.LogInfo(fmt.Sprintf("Client %d: Sending request", i+1))
+		resp, err := client.Get("https://" + ln.Addr().String() + "/test")
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer resp.Body.Close()
 
-	// Check the response
-	// When the client reaches this point, the response is automatically decrypted transparently,
-	// just like when the server reaches "c.Secure" during the transport. So The packet is encrypted during transmission.
-	expectedBody := `{"message":"Hello, World! (via TLS)"}`
-	if resp.StatusCode != http.StatusOK {
-		t.Errorf("Expected status code %d, but got %d", http.StatusOK, resp.StatusCode)
-	}
+		// Check the response
+		// When the client reaches this point, the response is automatically decrypted transparently,
+		// just like when the server reaches "c.Secure" during the transport. So The packet is encrypted during transmission.
+		expectedBody := `{"message":"Hello, World! (via TLS)"}`
+		if resp.StatusCode != http.StatusOK {
+			t.Errorf("Expected status code %d, but got %d", http.StatusOK, resp.StatusCode)
+		}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		t.Fatal(err)
-	}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	if string(body) != expectedBody {
-		// If the response doesn't match the expected response when the server sends "{"message":"Hello, World! (via TLS)"}",
-		// then the client is unable to decrypt it even transparently (similar to when testing in Firefox, where the browser is unable to decrypt the response for the client).
-		t.Errorf("Expected response body to be '%s', but got '%s'", expectedBody, string(body))
+		log.LogInfo(fmt.Sprintf("Client %d: Received response", i+1))
+		log.LogInfo(fmt.Sprintf("Client %d: Decrypting response", i+1))
+
+		if string(body) != expectedBody {
+			// If the response doesn't match the expected response when the server sends "{"message":"Hello, World! (via TLS)"}",
+			// then the client is unable to decrypt it even transparently (similar to when testing in Firefox, where the browser is unable to decrypt the response for the client).
+			t.Errorf("Expected response body to be '%s', but got '%s'", expectedBody, string(body))
+		}
 	}
 }
