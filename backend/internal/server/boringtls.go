@@ -7,9 +7,12 @@ package server
 import (
 	"bytes"
 	"crypto/tls"
+	"errors"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid/stream"
 	"net"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 // streamConn is a wrapper struct that combines a TLS 1.3 connection and a Hybrid Scheme (Stream) for encrypted communication.
@@ -128,6 +131,30 @@ func (l *streamListener) Accept() (net.Conn, error) {
 		return nil, err
 	}
 
+	// Peek into the connection to check if it's a browser request
+	buf := make([]byte, 1024)
+	n, err := conn.Read(buf)
+	if err != nil {
+		conn.Close()
+		return nil, err
+	}
+
+	// Check if the request is from a browser
+	if isBrowserRequest(buf[:n]) {
+		// Send a response indicating that the browser is unsupported
+		response := "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\n\r\nUnsupported browser. Please use a compatible client.\r\n"
+		_, err = conn.Write([]byte(response))
+		if err != nil {
+			conn.Close()
+			return nil, err
+		}
+		conn.Close()
+		return nil, errors.New("Boring TLS: unsupported browser")
+	}
+
+	// Reset the connection back to its original state
+	conn = &rewoundConn{Conn: conn, buf: buf[:n]}
+
 	tlsConn := tls.Server(conn, l.tlsConfig)
 	return NewStreamConn(tlsConn, l.stream), nil
 }
@@ -139,4 +166,45 @@ func NewStreamListener(listener net.Listener, tlsConfig *tls.Config, stream *str
 		tlsConfig: tlsConfig,
 		stream:    stream,
 	}
+}
+
+// rewoundConn is a net.Conn that allows reading from a buffer before reading from the underlying connection.
+type rewoundConn struct {
+	net.Conn
+	buf       []byte
+	bufCursor int
+}
+
+func (c *rewoundConn) Read(b []byte) (int, error) {
+	if c.bufCursor < len(c.buf) {
+		n := copy(b, c.buf[c.bufCursor:])
+		c.bufCursor += n
+		return n, nil
+	}
+	return c.Conn.Read(b)
+}
+
+// isBrowserRequest checks if the given data represents a browser request.
+func isBrowserRequest(data []byte) bool {
+	// Check if the data starts with a valid HTTP method
+	// Note: This is a raw packet, so it's different because it includes a space after the method.
+	methods := [][]byte{
+		[]byte(fiber.MethodGet + " "),
+		[]byte(fiber.MethodHead + " "),
+		[]byte(fiber.MethodPost + " "),
+		[]byte(fiber.MethodPut + " "),
+		[]byte(fiber.MethodDelete + " "),
+		[]byte(fiber.MethodConnect + " "),
+		[]byte(fiber.MethodOptions + " "),
+		[]byte(fiber.MethodTrace + " "),
+		[]byte(fiber.MethodPatch + " "),
+	}
+
+	for _, method := range methods {
+		if bytes.HasPrefix(data, method) {
+			return true
+		}
+	}
+
+	return false
 }

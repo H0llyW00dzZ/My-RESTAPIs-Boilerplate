@@ -1282,3 +1282,97 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 		}
 	}
 }
+
+func TestUnsupportedBrowserRequest(t *testing.T) {
+	// Generate AES key and ChaCha20 key
+	aesKey := make([]byte, 32)
+	chachaKey := make([]byte, 32)
+	_, err := rand.Read(aesKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = rand.Read(chachaKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new Stream instance
+	s, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new Fiber app
+	app := fiber.New()
+
+	// Load the self-signed certificate and key
+	cert, err := tls.LoadX509KeyPair("boring-cert.pem", "boring-key.pem")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a TLS configuration for the server
+	tlsServerConfig := tlsConfig(cert)
+
+	// Create a listener
+	listener, err := net.Listen("tcp", ":8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Wrap the listener with streamListener
+	streamListener := server.NewStreamListener(listener, tlsServerConfig, s)
+
+	// Create a channel to receive the server error
+	errChan := make(chan error)
+
+	// Start the server
+	go func() {
+		log.LogInfo("Server: Starting server")
+		errChan <- app.Listener(streamListener)
+	}()
+
+	// Wait for the server to start
+	time.Sleep(time.Second)
+
+	// Create a TCP connection to the server
+	conn, err := net.Dial("tcp", "localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+
+	// Send an HTTP request simulating a browser
+	req := "GET / HTTP/1.1\r\nHost: localhost:8080\r\nUser-Agent: GopherBrowser/5.0\r\n\r\n"
+	_, err = conn.Write([]byte(req))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Read the response from the server
+	var resp []byte
+	buffer := make([]byte, 1024)
+	for {
+		n, err := conn.Read(buffer)
+		if err != nil {
+			if err != io.EOF {
+				t.Fatal(err)
+			}
+			break
+		}
+		resp = append(resp, buffer[:n]...)
+	}
+
+	// Check the response
+	expectedResponse := "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\n\r\nUnsupported browser. Please use a compatible client.\r\n"
+	if string(resp) != expectedResponse {
+		t.Errorf("Unexpected response. Expected:\n%s\nGot:\n%s", expectedResponse, string(resp))
+	}
+
+	// Check if the server returned an error
+	select {
+	case err := <-errChan:
+		t.Fatal(err)
+	default:
+	}
+}
