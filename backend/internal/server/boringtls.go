@@ -175,6 +175,22 @@ type rewoundConn struct {
 	bufCursor int
 }
 
+// Read reads data from the connection.
+//
+// It first checks if there is any buffered data available from the previous peek operation.
+// If buffered data is available, it copies the data from the buffer to the provided byte slice
+// and advances the buffer cursor accordingly. If the buffered data is exhausted, it proceeds
+// to read from the underlying connection.
+//
+// Details:
+//
+//   - If there is buffered data available (c.bufCursor < len(c.buf)), the method copies the data
+//     from the buffer starting at the current cursor position (c.buf[c.bufCursor:]) to the provided
+//     byte slice 'b'. It then advances the buffer cursor by the number of bytes copied.
+//
+//   - If the buffered data is exhausted (c.bufCursor >= len(c.buf)), the method proceeds to read
+//     from the underlying connection using c.Conn.Read(b). This allows seamless reading of data
+//     from the connection once the buffered data has been consumed.
 func (c *rewoundConn) Read(b []byte) (int, error) {
 	if c.bufCursor < len(c.buf) {
 		n := copy(b, c.buf[c.bufCursor:])
