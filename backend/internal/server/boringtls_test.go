@@ -6,6 +6,7 @@ package server_test
 
 import (
 	"bytes"
+	"context"
 	"crypto/rand"
 	"crypto/tls"
 	"encoding/hex"
@@ -1228,18 +1229,27 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 	transports := make([]*http.Transport, len(curvePreferences))
 	for i, curves := range curvePreferences {
 		transports[i] = &http.Transport{
-			DialTLS: func(network, addr string) (net.Conn, error) {
-				conn, err := tls.Dial(network, addr, &tls.Config{
+			DialTLSContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+				dialer := &net.Dialer{}
+				conn, err := dialer.DialContext(context.Background(), network, addr)
+				if err != nil {
+					return nil, err
+				}
+
+				tlsConn := tls.Client(conn, &tls.Config{
 					MinVersion:         tls.VersionTLS13,
 					InsecureSkipVerify: true,
 					ServerName:         "localhost",
 					CurvePreferences:   curves,
 				})
-				if err != nil {
+
+				if err := tlsConn.HandshakeContext(context.Background()); err != nil {
+					conn.Close()
 					return nil, err
 				}
+
 				log.LogInfo(fmt.Sprintf("Client %d: Established TLS connection", i+1))
-				return server.NewStreamConn(conn, s), nil
+				return server.NewStreamConn(tlsConn, s), nil
 			},
 		}
 	}
