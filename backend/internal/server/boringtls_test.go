@@ -1208,6 +1208,8 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 	go app.Listener(streamLn)
 
 	// Create a custom transport with the Boring TLS 1.3 protocol
+	// Note: This is suitable for Go applications; however, do not try it in a browser as it may not be compatible due to the specific cipher used and protocols.
+	// If it's still a Go application, it is compatible and works well (e.g., keys, handshake).
 	transport := &http.Transport{
 		DialTLS: func(network, addr string) (net.Conn, error) {
 			conn, err := tls.Dial(network, addr, &tls.Config{
@@ -1219,6 +1221,9 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 					// For experimental purposes related to post-quantum hybrid design, refer to:
 					// https://datatracker.ietf.org/doc/html/draft-ietf-tls-hybrid-design-10
 					tls.X25519, // better performance for TLS 1.3
+					tls.CurveP256,
+					tls.CurveP384,
+					tls.CurveP521,
 				},
 			})
 			if err != nil {
@@ -1241,6 +1246,8 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 	defer resp.Body.Close()
 
 	// Check the response
+	// When the client reaches this point, the response is automatically decrypted transparently,
+	// just like when the server reaches "c.Secure" during the transport. So The packet is encrypted during transmission.
 	expectedBody := `{"message":"Hello, World! (via TLS)"}`
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("Expected status code %d, but got %d", http.StatusOK, resp.StatusCode)
