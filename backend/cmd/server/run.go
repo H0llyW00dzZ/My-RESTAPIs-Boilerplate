@@ -112,7 +112,13 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 	server := handler.NewFiberServer(app, appName, monitorPath)
 
 	// Start the server with graceful shutdown and monitor
-	handler.StartServer(server, addr, monitorPath, shutdownTimeout)
+	//
+	// TODO: Implement environment mode. For example, when the environment is set to "dev" or "local",
+	// it will switch to "Listen (Non HTTPS)". Otherwise, it will force a change from Listen to ListenTLS
+	// for public access that can be accessed by a browser. For the Go application itself (only accessed by the Go application, which is pretty useful for authentication), it will switch
+	// to a combination of Listener and StreamListener (automatically and transparently encrypting and decrypting,
+	// similar to Certificate Transparency my Boring TLS Certificate) to use TLS 1.3 protocols.
+	handler.StartServer(server, addr, monitorPath, "", "", shutdownTimeout, nil, nil)
 }
 
 // getEnv reads an environment variable and returns its value.
