@@ -1259,6 +1259,8 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 	}
 
 	if string(body) != expectedBody {
+		// If the response doesn't match the expected response when the server sends "{"message":"Hello, World! (via TLS)"}",
+		// then the client is unable to decrypt it even transparently (similar to when testing in Firefox, where the browser is unable to decrypt the response for the client).
 		t.Errorf("Expected response body to be '%s', but got '%s'", expectedBody, string(body))
 	}
 }
