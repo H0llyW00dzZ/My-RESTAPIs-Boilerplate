@@ -54,6 +54,7 @@ func NewFiberServer(app *fiber.App, appName, monitorPath string) *FiberServer {
 // Start runs the Fiber server in a separate goroutine to listen for incoming requests.
 func (s *FiberServer) Start(addr, monitorPath, certFile, keyFile string, tlsConfig *tls.Config, streamListener net.Listener) {
 	go func() {
+		// TODO: Improve the Listener by creating another Fiber app when tlsConfig and streamListener are configured. This way, it can connect to other Fiber apps (Sharing is caring).
 		if tlsConfig != nil && streamListener != nil {
 			if err := s.app.Listener(streamListener); err != nil {
 				log.LogErrorf(ErrorHTTPListenAndServe, err)
