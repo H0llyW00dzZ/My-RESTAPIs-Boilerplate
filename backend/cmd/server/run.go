@@ -118,6 +118,8 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 	// for public access that can be accessed by a browser. For the Go application itself (only accessed by the Go application, which is pretty useful for authentication), it will switch
 	// to a combination of Listener and StreamListener (automatically and transparently encrypting and decrypting,
 	// similar to Certificate Transparency my Boring TLS Certificate) to use TLS 1.3 protocols.
+	//
+	// Note: When running in Kubernetes, this is an easy configuration with cert-manager.io for environment mode (as currently implemented). It just uses a secret.
 	handler.StartServer(server, addr, monitorPath, "", "", shutdownTimeout, nil, nil)
 }
 
