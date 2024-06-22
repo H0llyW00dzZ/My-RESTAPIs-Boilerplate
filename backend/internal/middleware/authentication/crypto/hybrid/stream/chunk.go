@@ -261,7 +261,8 @@ func (s *Stream) extractHMACDigest(encryptedChunk []byte, chunkSize uint16) ([]b
 		hmacDigestSize := s.hmac.Size()
 		if len(encryptedChunk) < hmacDigestSize {
 			// TODO: Use math to handle this error differently since it was uncovered in a test and performs low-level operations on I/O primitives.
-			return nil, nil, errors.New("Hybrid Scheme: invalid HMAC digest size") // Deep/Unknown Error Location in I/O primitives
+			// Note: This uncovered probably in TLS, but it's not possible for TLS to encounter this as TLS already uses HMAC.
+			return nil, nil, errors.New("Hybrid Scheme: invalid HMAC digest size") // Deep/Unknown Error Location in I/O primitives, probably in TLS
 		}
 		hmacDigest = encryptedChunk[len(encryptedChunk)-hmacDigestSize:]
 		encryptedChunk = encryptedChunk[:len(encryptedChunk)-hmacDigestSize]
@@ -269,7 +270,8 @@ func (s *Stream) extractHMACDigest(encryptedChunk []byte, chunkSize uint16) ([]b
 		// If HMAC is not enabled, check if the encrypted chunk size matches the expected size
 		if len(encryptedChunk) != int(chunkSize) {
 			// TODO: Use math to handle this error differently since it was uncovered in a test and performs low-level operations on I/O primitives.
-			return nil, nil, errors.New("Hybrid Scheme: encrypted chunk size mismatch") // Deep/Unknown Error Location in I/O primitives
+			// Note: This uncovered probably in TLS, but it's not possible for TLS to encounter this as TLS already uses HMAC.
+			return nil, nil, errors.New("Hybrid Scheme: encrypted chunk size mismatch") // Deep/Unknown Error Location in I/O primitives, probably in TLS
 		}
 	}
 	return hmacDigest, encryptedChunk, nil
