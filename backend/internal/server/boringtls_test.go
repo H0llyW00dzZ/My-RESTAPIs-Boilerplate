@@ -1397,6 +1397,7 @@ func TestUnsupportedBrowserRequest(t *testing.T) {
 	default:
 	}
 }
+
 func TestPipeStreamConn(t *testing.T) {
 	// Generate test keys
 	aesKey := make([]byte, 32)
@@ -1442,7 +1443,7 @@ func TestPipeStreamConn(t *testing.T) {
 	}()
 
 	// Read the decrypted data from the client streamConn
-	decryptedData := make([]byte, 1024)
+	decryptedData := make([]byte, chunkingConf)
 	n, err := clientStreamConn.Read(decryptedData)
 	if err != nil {
 		t.Fatalf("Failed to read decrypted data from client streamConn: %v", err)
@@ -1503,7 +1504,7 @@ func TestPipeStreamOutside(t *testing.T) {
 	}()
 
 	// Read the encrypted data from the client connection
-	encryptedData := make([]byte, 1024)
+	encryptedData := make([]byte, chunkingConf)
 	n, err := tlsClientConn.Read(encryptedData)
 	if err != nil {
 		t.Fatalf("Failed to read encrypted data from client connection: %v", err)
