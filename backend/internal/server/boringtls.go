@@ -6,21 +6,11 @@ package server
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"crypto/tls"
-	"crypto/x509"
-	"encoding/base64"
 	"errors"
-	"fmt"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid/stream"
-	"io"
 	"net"
-	"net/http"
 	"time"
-
-	"github.com/bytedance/sonic"
-
-	"github.com/gofiber/fiber/v2"
 )
 
 // streamConn is a wrapper struct that combines a TLS 1.3 connection and a Hybrid Scheme (Stream) for encrypted communication.
@@ -209,120 +199,4 @@ func (c *rewoundConn) Read(b []byte) (int, error) {
 		return n, nil
 	}
 	return c.Conn.Read(b)
-}
-
-// isBrowserRequest checks if the given data represents a browser request.
-func isBrowserRequest(data []byte) bool {
-	// Check if the data starts with a valid HTTP method
-	// Note: This is a raw packet, so it's different because it includes a space after the method.
-	methods := [][]byte{
-		[]byte(fiber.MethodGet + " "),
-		[]byte(fiber.MethodHead + " "),
-		[]byte(fiber.MethodPost + " "),
-		[]byte(fiber.MethodPut + " "),
-		[]byte(fiber.MethodDelete + " "),
-		[]byte(fiber.MethodConnect + " "),
-		[]byte(fiber.MethodOptions + " "),
-		[]byte(fiber.MethodTrace + " "),
-		[]byte(fiber.MethodPatch + " "),
-	}
-
-	for _, method := range methods {
-		if bytes.HasPrefix(data, method) {
-			return true
-		}
-	}
-
-	return false
-}
-
-// CTLog represents a Certificate Transparency log.
-// It contains the URL of the log server.
-type CTLog struct {
-	URL string
-}
-
-// SubmitToCTLog submits the given certificate to the specified Certificate Transparency log.
-//
-// Note: Currently unused and marked as TODO.
-func SubmitToCTLog(cert *x509.Certificate, ctLog CTLog) error {
-	// Encode the certificate in DER format
-	certDER, err := x509.CreateCertificate(nil, cert, cert, nil, nil)
-	if err != nil {
-		return fmt.Errorf("failed to encode certificate: %v", err)
-	}
-
-	// Calculate the SHA-256 hash of the certificate
-	hash := sha256.Sum256(certDER)
-
-	// Create the JSON payload for submitting the certificate to the CT log
-	payload := struct {
-		Chain []string `json:"chain"`
-	}{
-		Chain: []string{base64.StdEncoding.EncodeToString(certDER)},
-	}
-
-	// Marshal the JSON payload
-	jsonPayload, err := sonic.Marshal(payload)
-	if err != nil {
-		return fmt.Errorf("failed to marshal JSON payload: %v", err)
-	}
-
-	// Create the HTTP request to submit the certificate to the CT log
-	req, err := http.NewRequest("POST", ctLog.URL+"/ct/v1/add-chain", bytes.NewBuffer(jsonPayload))
-	if err != nil {
-		return fmt.Errorf("failed to create HTTP request: %v", err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	// Send the HTTP request
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to submit certificate to CT log: %v", err)
-	}
-	defer resp.Body.Close()
-
-	// Parse the response body
-	var response struct {
-		SCTVersion uint8  `json:"sct_version"`
-		ID         string `json:"id"`
-		Timestamp  uint64 `json:"timestamp"`
-		Extensions string `json:"extensions"`
-		Signature  string `json:"signature"`
-	}
-
-	responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("failed to read response body: %v", err)
-	}
-
-	if err := sonic.Unmarshal(responseBody, &response); err != nil {
-		return fmt.Errorf("failed to parse response: %v", err)
-	}
-
-	// Verify the signed certificate timestamp (SCT)
-	if response.SCTVersion != 0 {
-		return fmt.Errorf("unsupported SCT version: %d", response.SCTVersion)
-	}
-
-	// Decode the base64-encoded signature
-	signature, err := base64.StdEncoding.DecodeString(response.Signature)
-	if err != nil {
-		return fmt.Errorf("failed to decode signature: %v", err)
-	}
-
-	// Verify the timestamp
-	if response.Timestamp < uint64(time.Now().Add(-24*time.Hour).Unix()) ||
-		response.Timestamp > uint64(time.Now().Add(24*time.Hour).Unix()) {
-		return fmt.Errorf("invalid timestamp: %d", response.Timestamp)
-	}
-
-	// Verify the signature
-	data := append(hash[:], []byte(fmt.Sprintf("%d", response.Timestamp))...)
-	if err := cert.CheckSignature(x509.SHA256WithRSA, data, signature); err != nil {
-		return fmt.Errorf("failed to verify signature: %v", err)
-	}
-
-	return nil
 }

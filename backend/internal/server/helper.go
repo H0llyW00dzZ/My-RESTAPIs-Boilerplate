@@ -5,8 +5,11 @@
 package server
 
 import (
+	"bytes"
 	"fmt"
 	"h0llyw00dz-template/backend/internal/database"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 // InitializeTables creates all the necessary tables in the database.
@@ -77,4 +80,29 @@ func createTables(db database.Service, tables ...func(database.Service) error) e
 		}
 	}
 	return nil
+}
+
+// isBrowserRequest checks if the given data represents a browser request.
+func isBrowserRequest(data []byte) bool {
+	// Check if the data starts with a valid HTTP method
+	// Note: This is a raw packet, so it's different because it includes a space after the method.
+	methods := [][]byte{
+		[]byte(fiber.MethodGet + " "),
+		[]byte(fiber.MethodHead + " "),
+		[]byte(fiber.MethodPost + " "),
+		[]byte(fiber.MethodPut + " "),
+		[]byte(fiber.MethodDelete + " "),
+		[]byte(fiber.MethodConnect + " "),
+		[]byte(fiber.MethodOptions + " "),
+		[]byte(fiber.MethodTrace + " "),
+		[]byte(fiber.MethodPatch + " "),
+	}
+
+	for _, method := range methods {
+		if bytes.HasPrefix(data, method) {
+			return true
+		}
+	}
+
+	return false
 }
