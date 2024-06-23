@@ -142,6 +142,9 @@ func (l *streamListener) Accept() (net.Conn, error) {
 	// Check if the request is from a browser
 	if isBrowserRequest(buf[:n]) {
 		// Send a response indicating that the browser is unsupported
+		//
+		// Note: This is a hardcoded raw response, which may not be suitable depending on the client request (e.g., when the client sends JSON, the response must be in JSON format).
+		// Since this packet is communicated through your network/modem router, it's possible but not worthwhile due to the complexity involved.
 		response := "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\n\r\nUnsupported browser. Please use a compatible client.\r\n"
 		_, err = conn.Write([]byte(response))
 		if err != nil {
