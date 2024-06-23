@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"runtime"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -1185,8 +1186,8 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 			// However, do not try this on front-end apps such as browsers,
 			// as it may not be compatible due to the specific cipher used and protocols. If it's still a Go application, it is compatible and works well (e.g., keys, handshake).
 			// Even with TLS 1.3, not all browsers will work if used for HTTPS front-end, even on Firefox (in Firefox, it works; however, it only encrypts and is unable to decrypt), due to the cipher.
-			log.LogInfo("Server: Received request")
-			log.LogInfo("Server: Encrypting response")
+			log.LogInfof("Server: Received request %s", c.Body()) // Decrypted transparently...
+			log.LogInfo("Server: Encrypting response")            // Encrypting transparently...
 			return c.JSON(fiber.Map{
 				"message": "Hello, World! (via TLS)",
 			})
@@ -1265,7 +1266,15 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 	// Make requests to the server using each client
 	for i, client := range clients {
 		log.LogInfo(fmt.Sprintf("Client %d: Sending request", i+1))
-		resp, err := client.Get("https://" + ln.Addr().String() + "/test")
+
+		// Create a request with a body
+		requestBody := []byte(fmt.Sprintf("Request body from client %d", i+1)) // Encrypting transparently...
+		req, err := http.NewRequest("GET", "https://"+ln.Addr().String()+"/test", bytes.NewBuffer(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		resp, err := client.Do(req)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -1285,7 +1294,7 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 		}
 
 		log.LogInfo(fmt.Sprintf("Client %d: Received response", i+1))
-		log.LogInfo(fmt.Sprintf("Client %d: Decrypting response", i+1))
+		log.LogInfo(fmt.Sprintf("Client %d: Decrypting response", i+1)) // Decrypted transparently...
 
 		if string(body) != expectedBody {
 			// If the response doesn't match the expected response when the server sends "{"message":"Hello, World! (via TLS)"}",
@@ -1387,4 +1396,123 @@ func TestUnsupportedBrowserRequest(t *testing.T) {
 		t.Fatal(err)
 	default:
 	}
+}
+func TestPipeStreamConn(t *testing.T) {
+	// Generate test keys
+	aesKey := make([]byte, 32)
+	chachaKey := make([]byte, 32)
+
+	// Create a Stream instance
+	s, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to create Stream: %v", err)
+	}
+
+	// Create a test TLS connection
+	clientConn, serverConn := net.Pipe()
+	tlsClientConn := tls.Client(clientConn, clientTLSConfig())
+
+	// Load the self-signed certificate and key
+	cert, err := tls.LoadX509KeyPair("boring-cert.pem", "boring-key.pem")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tlsServerConn := tls.Server(serverConn, tlsConfig(cert))
+
+	// Create a streamConn instance for the client
+	clientStreamConn := server.NewStreamConn(tlsClientConn, s)
+
+	// Create a streamConn instance for the server
+	serverStreamConn := server.NewStreamConn(tlsServerConn, s)
+
+	// Test data
+	testData := []byte("Hello, World!")
+
+	// Write test data to the server streamConn
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, err := serverStreamConn.Write(testData)
+		if err != nil {
+			t.Errorf("Failed to write data to server streamConn: %v", err)
+		}
+		serverStreamConn.Close()
+	}()
+
+	// Read the decrypted data from the client streamConn
+	decryptedData := make([]byte, 1024)
+	n, err := clientStreamConn.Read(decryptedData)
+	if err != nil {
+		t.Fatalf("Failed to read decrypted data from client streamConn: %v", err)
+	}
+	decryptedData = decryptedData[:n]
+
+	// Log the decrypted data
+	log.LogInfof("Decrypted data: %s", decryptedData)
+
+	// Compare the decrypted data with the original test data
+	if !bytes.Equal(decryptedData, testData) {
+		t.Errorf("Decrypted data does not match the original data")
+	}
+
+	// Wait for the goroutine to finish
+	wg.Wait()
+}
+
+func TestPipeStreamOutside(t *testing.T) {
+	// Generate test keys
+	aesKey := make([]byte, 32)
+	chachaKey := make([]byte, 32)
+
+	// Create a Stream instance
+	s, err := stream.New(aesKey, chachaKey)
+	if err != nil {
+		t.Fatalf("Failed to create Stream: %v", err)
+	}
+
+	// Create a test TLS connection
+	clientConn, serverConn := net.Pipe()
+	tlsClientConn := tls.Client(clientConn, clientTLSConfig())
+
+	// Load the self-signed certificate and key
+	cert, err := tls.LoadX509KeyPair("boring-cert.pem", "boring-key.pem")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tlsServerConn := tls.Server(serverConn, tlsConfig(cert))
+
+	// Create a streamConn instance for the server
+	serverStreamConn := server.NewStreamConn(tlsServerConn, s)
+
+	// Test data
+	testData := []byte("Hello, World!")
+
+	// Write test data to the server streamConn
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, err := serverStreamConn.Write(testData)
+		if err != nil {
+			t.Errorf("Failed to write data to server streamConn: %v", err)
+		}
+		serverStreamConn.Close()
+	}()
+
+	// Read the encrypted data from the client connection
+	encryptedData := make([]byte, 1024)
+	n, err := tlsClientConn.Read(encryptedData)
+	if err != nil {
+		t.Fatalf("Failed to read encrypted data from client connection: %v", err)
+	}
+	encryptedData = encryptedData[:n]
+
+	// Log the encrypted data
+	log.LogInfof("Encrypted data: %x", encryptedData)
+
+	// Wait for the goroutine to finish
+	wg.Wait()
 }
