@@ -19,8 +19,14 @@ const (
 	//
 	// TODO: Do we really need to increase this since the current size is still secure?
 	aesNonceSize = 16
-	chunkSize    = 1024
 	minChunkBuf  = 2
+)
+
+const (
+	// ChunkSize is the size of each chunk to be encrypted and decrypted.
+	// This value should be large enough to improve performance but small enough to
+	// avoid excessive memory consumption.
+	ChunkSize = 1024
 )
 
 // encryptChunk encrypts a single chunk using AES-CTR and XChaCha20-Poly1305.

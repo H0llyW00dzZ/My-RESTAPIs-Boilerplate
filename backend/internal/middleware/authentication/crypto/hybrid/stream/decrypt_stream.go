@@ -12,7 +12,8 @@ import (
 // verifies the HMAC if enabled, and writes it to the output stream.
 //
 // Note: This function requires a builder for the output, such as a string builder, rune builder, or byte builder,
-// since it performs low-level operations on I/O primitives.
+// since it performs low-level operations on I/O primitives. It is designed as the core of cryptographic operations and is compatible with
+// the standard library.
 func (s *Stream) Decrypt(input io.Reader, output io.Writer) error {
 	for {
 		chunk, err := s.readAndDecryptChunk(input)

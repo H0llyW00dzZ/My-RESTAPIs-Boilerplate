@@ -12,9 +12,10 @@ import (
 // calculates the HMAC if enabled, and writes it to the output stream.
 //
 // Note: This function requires a builder for the output, such as a string builder, rune builder, or byte builder,
-// since it performs low-level operations on I/O primitives.
+// since it performs low-level operations on I/O primitives. It is designed as the core of cryptographic operations and is compatible with
+// the standard library.
 func (s *Stream) Encrypt(input io.Reader, output io.Writer) error {
-	chunk := make([]byte, chunkSize)
+	chunk := make([]byte, ChunkSize)
 	for {
 		n, err := input.Read(chunk)
 		if err != nil && err != io.EOF {

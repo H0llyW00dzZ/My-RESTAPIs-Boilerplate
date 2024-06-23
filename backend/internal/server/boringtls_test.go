@@ -27,8 +27,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-const chunkingConf = 1024
-
 func tlsConfig(cert tls.Certificate) *tls.Config {
 	log.InitializeLogger("Boring TLS 1.3 Testing", "")
 	return &tls.Config{
@@ -161,7 +159,7 @@ func TestStreamServer(t *testing.T) {
 	// Read the encrypted response from the server
 	log.LogInfo("[Packet Netw0rkz] Server: Reading encrypted response")
 	var encryptedResp []byte
-	buffer := make([]byte, chunkingConf)
+	buffer := make([]byte, stream.ChunkSize)
 	for {
 		n, err := conn.Read(buffer)
 		if err != nil {
@@ -320,7 +318,7 @@ func TestStreamServerExplicitHTTPS(t *testing.T) {
 	// Read the encrypted response from the server
 	log.LogInfo("[Packet Netw0rkz] Server: Reading encrypted response")
 	var encryptedResp []byte
-	buffer := make([]byte, chunkingConf)
+	buffer := make([]byte, stream.ChunkSize)
 	for {
 		n, err := conn.Read(buffer)
 		if err != nil {
@@ -548,7 +546,7 @@ func TestStreamServerStupidMiddleman(t *testing.T) {
 	// Read the response from the server
 	log.LogInfo("[Packet Netw0rkz] Server: Reading response")
 	var resp []byte
-	buffer := make([]byte, chunkingConf)
+	buffer := make([]byte, stream.ChunkSize)
 	n, err := conn.Read(buffer)
 	if err != nil {
 		t.Fatal(err)
@@ -663,7 +661,7 @@ func TestStreamServerExplicitHTTPSUnixPacket(t *testing.T) {
 	// Read the encrypted response from the server
 	log.LogInfo("[Packet Netw0rkz] Server: Reading encrypted response")
 	var encryptedResp []byte
-	buffer := make([]byte, chunkingConf)
+	buffer := make([]byte, stream.ChunkSize)
 	for {
 		n, err := conn.Read(buffer)
 		if err != nil {
@@ -777,7 +775,7 @@ func TestStreamConnDeadlines(t *testing.T) {
 		}
 
 		// Read from the connection
-		buffer := make([]byte, chunkingConf)
+		buffer := make([]byte, stream.ChunkSize)
 		_, err = streamConn.Read(buffer)
 		if err != nil {
 			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
@@ -845,7 +843,7 @@ func TestStreamConnDeadlines(t *testing.T) {
 	// Read the encrypted response from the server
 	log.LogInfo("[Packet Netw0rkz] Server: Reading encrypted response")
 
-	buffer := make([]byte, chunkingConf)
+	buffer := make([]byte, stream.ChunkSize)
 	_, err = conn.Read(buffer)
 	if err == nil {
 		t.Fatal("Expected read timeout error")
@@ -940,7 +938,7 @@ func TestStreamConnSetDeadline(t *testing.T) {
 		}
 
 		// Read from the connection
-		buffer := make([]byte, chunkingConf)
+		buffer := make([]byte, stream.ChunkSize)
 		_, err = streamConn.Read(buffer)
 		if err != nil {
 			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
@@ -1000,7 +998,7 @@ func TestStreamConnSetDeadline(t *testing.T) {
 
 	// Read the encrypted response from the server
 	log.LogInfo("[Packet Netw0rkz] Server: Reading encrypted response")
-	buffer := make([]byte, chunkingConf)
+	buffer := make([]byte, stream.ChunkSize)
 	_, err = conn.Read(buffer)
 	if err == nil {
 		t.Fatal("Expected overall deadline error")
@@ -1110,7 +1108,7 @@ func TestStreamServerWithoutAdditionalEncrypt(t *testing.T) {
 	// Read the response from the server (it will be automatically decrypted)
 	log.LogInfo("[Packet Netw0rkz] Server: Reading response")
 	var response []byte
-	buffer := make([]byte, chunkingConf)
+	buffer := make([]byte, stream.ChunkSize)
 	n, err := streamConn.Read(buffer)
 	if err != nil {
 		t.Fatal(err)
@@ -1372,7 +1370,7 @@ func TestUnsupportedBrowserRequest(t *testing.T) {
 
 	// Read the response from the server
 	var resp []byte
-	buffer := make([]byte, chunkingConf)
+	buffer := make([]byte, stream.ChunkSize)
 	for {
 		n, err := conn.Read(buffer)
 		if err != nil {
@@ -1443,7 +1441,7 @@ func TestPipeStreamConn(t *testing.T) {
 	}()
 
 	// Read the decrypted data from the client streamConn
-	decryptedData := make([]byte, chunkingConf)
+	decryptedData := make([]byte, stream.ChunkSize)
 	n, err := clientStreamConn.Read(decryptedData)
 	if err != nil {
 		t.Fatalf("Failed to read decrypted data from client streamConn: %v", err)
@@ -1504,7 +1502,7 @@ func TestPipeStreamOutside(t *testing.T) {
 	}()
 
 	// Read the encrypted data from the client connection
-	encryptedData := make([]byte, chunkingConf)
+	encryptedData := make([]byte, stream.ChunkSize)
 	n, err := tlsClientConn.Read(encryptedData)
 	if err != nil {
 		t.Fatalf("Failed to read encrypted data from client connection: %v", err)

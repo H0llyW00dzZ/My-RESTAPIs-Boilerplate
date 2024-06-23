@@ -130,7 +130,7 @@ func (l *streamListener) Accept() (net.Conn, error) {
 	}
 
 	// Peek into the connection to check if it's a browser request
-	buf := make([]byte, 1024)
+	buf := make([]byte, stream.ChunkSize)
 	n, err := conn.Read(buf)
 	if err != nil {
 		conn.Close()
