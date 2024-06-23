@@ -1225,6 +1225,24 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 	// Create multiple custom transports with different curve preferences for Boring TLS 1.3 protocol
 	// Note: This is suitable for Go applications; however, do not try it in a browser as it may not be compatible due to the specific cipher used and protocols.
 	// If it's still a Go application, it is compatible and works well (e.g., keys, handshake).
+	//
+	// The Capture how they communication:
+	//
+	// 41	13.879787	127.0.0.1	127.0.0.1	TLSv1.3	336	Client Hello (SNI=localhost)
+	// 43	13.881593	127.0.0.1	127.0.0.1	TLSv1.3	811	Server Hello, Change Cipher Spec, Application Data, Application Data, Application Data, Application Data
+	// 45	13.882339	127.0.0.1	127.0.0.1	TLSv1.3	108	Change Cipher Spec, Application Data
+	// 47	13.882651	127.0.0.1	127.0.0.1	TLSv1.3	288	Application Data
+	// 49	13.883195	127.0.0.1	127.0.0.1	TLSv1.3	293	Application Data
+	// 54	13.891774	127.0.0.1	127.0.0.1	TLSv1.3	372	Client Hello (SNI=localhost)
+	// 56	13.894169	127.0.0.1	127.0.0.1	TLSv1.3	845	Server Hello, Change Cipher Spec, Application Data, Application Data, Application Data, Application Data
+	// 58	13.896112	127.0.0.1	127.0.0.1	TLSv1.3	108	Change Cipher Spec, Application Data
+	// 60	13.896444	127.0.0.1	127.0.0.1	TLSv1.3	288	Application Data
+	// 62	13.896780	127.0.0.1	127.0.0.1	TLSv1.3	293	Application Data
+	// 67	13.898244	127.0.0.1	127.0.0.1	TLSv1.3	271	Client Hello (SNI=localhost)
+	// 69	13.898533	127.0.0.1	127.0.0.1	TLSv1.3	745	Server Hello, Change Cipher Spec, Application Data, Application Data, Application Data, Application Data
+	// 71	13.898760	127.0.0.1	127.0.0.1	TLSv1.3	108	Change Cipher Spec, Application Data
+	// 73	13.898937	127.0.0.1	127.0.0.1	TLSv1.3	288	Application Data
+	// 75	13.899197	127.0.0.1	127.0.0.1	TLSv1.3	293	Application Data
 	transports := make([]*http.Transport, len(curvePreferences))
 	for i, curves := range curvePreferences {
 		transports[i] = &http.Transport{
