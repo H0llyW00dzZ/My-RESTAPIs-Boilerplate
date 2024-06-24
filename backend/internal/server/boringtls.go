@@ -44,7 +44,7 @@ func (c *streamConn) Read(b []byte) (int, error) {
 	// - The Stream instance itself is designed to be thread-safe and can be safely shared across multiple goroutines.
 	//   It does not maintain any mutable state that could cause race conditions or interference between goroutines.
 	//
-	// - Additionally, don't use QUIC connections as they are not safe for multiple goroutines.
+	// - Additionally, don't use QUIC connections (UDP) as they are not safe for multiple goroutines and might not suitable for ciphertext chacha (due it's udp).
 	n, err := c.Conn.Read(b)
 	if err != nil {
 		return 0, err
