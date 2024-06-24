@@ -119,10 +119,7 @@ func NewStreamConn(tlsConn *tls.Conn, stream *stream.Stream) net.Conn {
 	}
 }
 
-// Accept waits for and returns the next connection to the listener, wrapped in a streamConn
-//
-// Note: For clients that can be used for private communication, such as real-time chat or other features,
-// the implementation must be done outside of this server due to the nature of the streamListener.
+// Accept waits for and returns the next connection to the listener, wrapped in a streamConn.
 func (l *streamListener) Accept() (net.Conn, error) {
 	conn, err := l.Listener.Accept()
 	if err != nil {
@@ -161,6 +158,9 @@ func (l *streamListener) Accept() (net.Conn, error) {
 }
 
 // NewStreamListener creates a new streamListener instance.
+//
+// Note: This for Server-Side, For clients that can be used for private communication, such as real-time chat or other features (e.g, authentication),
+// the implementation must be done outside of this server due to the nature of the streamListener.
 func NewStreamListener(listener net.Listener, tlsConfig *tls.Config, stream *stream.Stream) net.Listener {
 	return &streamListener{
 		Listener:  listener,
