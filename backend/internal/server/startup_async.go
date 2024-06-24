@@ -56,14 +56,19 @@ func (s *FiberServer) Start(addr, monitorPath, certFile, keyFile string, tlsConf
 	go func() {
 		// TODO: Improve the Listener by creating another Fiber app when tlsConfig and streamListener are configured. This way, it can connect to other Fiber apps (Sharing is caring).
 		if tlsConfig != nil && streamListener != nil {
+			// Note: This branch handles Boring TLS 1.3 scenarios where the TLS configuration is provided in "run.go".
+			// However, Boring TLS 1.3 is currently unavailable.
 			if err := s.app.Listener(streamListener); err != nil {
 				log.LogErrorf(ErrorHTTPListenAndServe, err)
 			}
 		} else if tlsConfig != nil {
+			// Note: This branch handles standard TLS 1.3 scenarios where the TLS configuration is provided in "run.go".
 			if err := s.app.ListenTLS(addr, certFile, keyFile); err != nil {
 				log.LogErrorf(ErrorHTTPListenAndServe, err)
 			}
 		} else {
+			// Note: This branch handles TLS 1.2 scenarios or TLS 1.3 when run as a receiver forwarder (e.g. from nginx)
+			// due to its non-secure nature and requirement to be in internal/development mode.
 			if err := s.app.Listen(addr); err != nil {
 				log.LogErrorf(ErrorHTTPListenAndServe, err)
 			}
