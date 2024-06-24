@@ -23,7 +23,7 @@ type streamConn struct {
 	// It can be used to write/read over the network, for example, to store encrypted data in a database.
 	// Also note that this wrapper is safe, instead of using an unsafe pointer (e.g., https://pkg.go.dev/unsafe). When it binds * into *tls.Conn and *stream.Stream,
 	// it already binds everything for the client and server. It doesn't need to be modified as it is already stable.
-	// Even if modified, it only copies the standard library and adds the stream encrypter/decrypter along with stream.New for the cipher suites.
+	// Even if modified, it only copies the standard library and adds the stream encrypter/decrypter along with stream.New for the cipher suites that used for key sharing.
 	// This design allows the use of another cipher (due to TLS 1.3 being already secure) for experimental purposes (e.g., implementing another cipher) because it is written in Go, which is safe for cryptography.
 	// However, for modifications made by copying, it only works for Go applications.
 	*tls.Conn
