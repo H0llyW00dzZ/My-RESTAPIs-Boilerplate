@@ -25,6 +25,10 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 - Cryptography Techniques
 - High Quality Go Codes
 - Rich Presence TUIs using [`charm.sh`](https://charm.sh/)
+- Boring TLS 1.3 Protocol (WIP)
+
+> [!NOTE]  
+> `Boring TLS 1.3 Protocol` This project utilizes the industry-standard TLS 1.3 protocol, known for its exceptional security and reliability. We call it `Boring TLS` because its robust security makes it almost boring.
 
 > [!WARNING]
 > Some features might not work as expected when running this repo on certain cloud providers. For example, the `Rich Presence TUIs` feature requires a [`tty`](https://en.wikipedia.org/wiki/Tty_(Unix)).
