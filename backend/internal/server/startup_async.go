@@ -63,6 +63,8 @@ func (s *FiberServer) Start(addr, monitorPath, certFile, keyFile string, tlsConf
 			}
 		} else if tlsConfig != nil {
 			// Note: This branch handles standard TLS 1.3 scenarios where the TLS configuration is provided in "run.go".
+			// However, the default Fiber configuration uses TLS 1.2 in "ListenTLSWithCertificate" Which is consider outdated & Unsafe now.
+			// Therefore, even if TLS 1.3 is configured in "run.go", the provided configuration will override the Fiber default configuration and use TLS 1.3.
 			if err := s.app.ListenTLS(addr, certFile, keyFile); err != nil {
 				log.LogErrorf(ErrorHTTPListenAndServe, err)
 			}
