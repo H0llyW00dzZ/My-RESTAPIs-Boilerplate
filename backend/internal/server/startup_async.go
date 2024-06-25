@@ -71,8 +71,6 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 				log.LogFatal(err)
 			}
 			tlsListener := tls.NewListener(ln, tlsConfig)
-			// Note: In test mode, "SetTLSHandler" should be not included (see TestStandardTLS13ProtocolWithCustomTransport).
-			// This is because it is difficult to capture as it is bound to the generic address 0.0.0.0.
 			s.app.SetTLSHandler(tlsHandler)
 			if err := s.app.Listener(tlsListener); err != nil {
 				log.LogFatalf(ErrorHTTPListenAndServe, err)
