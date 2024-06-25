@@ -174,6 +174,10 @@ func getEnv(key, defaultValue string) string {
 // Note: This design is well-written and idiomatic, unlike designs that spliting functions (e.g., those related to TLS like "ListenTLS" "ListenMutualTLS" or whatever it is).
 func TLSConfig(cert tls.Certificate, clientCertPool *x509.CertPool) *tls.Config {
 	tlsHandler := &fiber.TLSHandler{}
+	// Note: Go's standard TLS 1.3 implementation does not allow direct configuration of cipher suites.
+	// This means that while one can specify cipher suites in Go code, the implementation will prioritize the use of
+	// AES-based ciphers like aes_128_gcm_sha256 or aes_256_gcm_sha256 (both bad common cipher, not even allowed to use ChaCha20 especially XChaCha20 which more secure),
+	// which may be slower than ChaCha20 which is faster on some platforms.
 	tlsConfig := &tls.Config{
 		MaxVersion: tls.VersionTLS13, // Explicit
 		MinVersion: tls.VersionTLS13,
