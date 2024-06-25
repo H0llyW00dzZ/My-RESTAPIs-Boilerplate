@@ -64,12 +64,12 @@ func (s *FiberServer) Start(addr, monitorPath, certFile, keyFile string, tlsConf
 		} else if tlsConfig != nil {
 			// Note: This branch handles standard TLS 1.3 scenarios where the TLS configuration is provided in "run.go".
 			// However, the default Fiber configuration uses TLS 1.2 in "ListenTLSWithCertificate" Which is consider outdated & Unsafe now.
-			// Therefore, even if TLS 1.3 is configured in "run.go", the provided configuration will override the Fiber default configuration and use TLS 1.3.
+			// Therefore, even if TLS 1.3 is configured in "run.go", the provided configuration will override/replace the Fiber default configuration and use TLS 1.3.
 			if err := s.app.ListenTLS(addr, certFile, keyFile); err != nil {
 				log.LogErrorf(ErrorHTTPListenAndServe, err)
 			}
 		} else {
-			// Note: This branch handles TLS 1.2 scenarios or TLS 1.3 when run as a receiver forwarder (e.g. from nginx)
+			// Note: This branch handles TLS 1.2 scenarios or TLS 1.3 when run as a receiver forwarder (e.g. from nginx (Non Kubernetes), Ingress from nginx if it's running on Kubernetes)
 			// due to its non-secure nature and requirement to be in internal/development mode.
 			if err := s.app.Listen(addr); err != nil {
 				log.LogErrorf(ErrorHTTPListenAndServe, err)
