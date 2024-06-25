@@ -5,6 +5,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"os"
 	"time"
@@ -133,4 +134,23 @@ func getEnv(key, defaultValue string) string {
 		return defaultValue
 	}
 	return value
+}
+
+// TLSConfig creates and configures a TLS configuration for the server.
+// It sets the minimum TLS version to TLS 1.3 and defines preferred curve preferences.
+// It also uses the GetClientInfo function from the fiber.TLSHandler to get client information.
+//
+// Note: this will override/replace the Fiber default configuration that use TLS 1.2 and use this configuration.
+func TLSConfig() *tls.Config {
+	tlsHandler := &fiber.TLSHandler{}
+	return &tls.Config{
+		MinVersion: tls.VersionTLS13,
+		CurvePreferences: []tls.CurveID{
+			tls.X25519,
+			tls.CurveP256,
+			tls.CurveP384,
+			tls.CurveP521,
+		},
+		GetCertificate: tlsHandler.GetClientInfo,
+	}
 }
