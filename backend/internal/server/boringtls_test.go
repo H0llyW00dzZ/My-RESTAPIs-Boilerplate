@@ -1247,6 +1247,13 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 	// 75	13.899197	127.0.0.1	127.0.0.1	TLSv1.3	293	Application Data
 	//
 	// Note: "Application Data, Application Data, Application Data, Application Data" It's Truncated and Encrypted
+	// Also note that the Truncated Application Data, it's depends of TLS 1.3 Implementation
+	// For example TLS 1.3 brave implementation :
+	//
+	// 193	3.773853	127.0.0.1	127.0.0.1	TLSv1.3	628	Client Hello (SNI=safebrowsing.brave.com)
+	// 195	4.005218	127.0.0.1	127.0.0.1	TLSv1.3	274	Server Hello, Change Cipher Spec, Application Data, Application Data
+	//
+	// "Application Data, Application Data" not Truncated and Encrypted (Include Client Hello it's encrypted) only in go still not encrypted yet.
 	transports := make([]*http.Transport, len(curvePreferences))
 	for i, curves := range curvePreferences {
 		transports[i] = &http.Transport{
