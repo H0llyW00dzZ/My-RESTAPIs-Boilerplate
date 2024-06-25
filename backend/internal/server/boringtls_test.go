@@ -1569,15 +1569,17 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 	tlsServerConfig := tlsConfig(cert)
 
 	// Create a regular TCP listener
-	ln, err := net.Listen(app.Config().Network, ":8088")
+	ln, err := net.Listen("tcp", ":8088")
 	if err != nil {
 		t.Fatal(err)
 	}
 	tlsListener := tls.NewListener(ln, tlsServerConfig)
 	defer ln.Close()
 
-	// Start the server with the streamListener
+	tlsHandler := &fiber.TLSHandler{}
+	// Start the server with the Custom Listener
 	go func() {
+		app.SetTLSHandler(tlsHandler)
 		if err := app.Listener(tlsListener); err != nil {
 			log.LogFatal(err)
 		}
@@ -1593,27 +1595,11 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 	transports := make([]*http.Transport, len(curvePreferences))
 	for i, curves := range curvePreferences {
 		transports[i] = &http.Transport{
-			DialTLSContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-				dialer := &net.Dialer{}
-				conn, err := dialer.DialContext(context.Background(), network, addr)
-				if err != nil {
-					return nil, err
-				}
-
-				tlsConn := tls.Client(conn, &tls.Config{
-					MinVersion:         tls.VersionTLS13,
-					InsecureSkipVerify: true,
-					ServerName:         "localhost",
-					CurvePreferences:   curves,
-				})
-
-				if err := tlsConn.HandshakeContext(context.Background()); err != nil {
-					conn.Close()
-					return nil, err
-				}
-
-				log.LogInfof("Client %d: Established TLS connection", i+1)
-				return tlsConn, nil // Return the TLS connection
+			TLSClientConfig: &tls.Config{
+				MinVersion:         tls.VersionTLS13,
+				InsecureSkipVerify: true,
+				ServerName:         "localhost",
+				CurvePreferences:   curves,
 			},
 		}
 	}
@@ -1632,7 +1618,7 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 
 		// Create a request with a body
 		requestBody := []byte(fmt.Sprintf("Request body from client %d", i+1)) // Encrypting transparently...
-		req, err := http.NewRequest("GET", "https://"+ln.Addr().String()+"/test", bytes.NewBuffer(requestBody))
+		req, err := http.NewRequest("GET", "https://localhost:8088/test", bytes.NewBuffer(requestBody))
 		if err != nil {
 			t.Fatal(err)
 		}
