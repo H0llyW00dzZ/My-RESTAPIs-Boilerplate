@@ -6,6 +6,7 @@ package main
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"os"
 	"time"
@@ -121,7 +122,7 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 	// similar to Certificate Transparency my Boring TLS Certificate) to use TLS 1.3 protocols.
 	//
 	// Note: When running in Kubernetes, this is an easy configuration with cert-manager.io for environment mode (as currently implemented). It just uses a secret.
-	handler.StartServer(server, addr, monitorPath, "", "", shutdownTimeout, nil, nil)
+	handler.StartServer(server, addr, monitorPath, shutdownTimeout, nil, nil)
 }
 
 // getEnv reads an environment variable and returns its value.
@@ -138,18 +139,42 @@ func getEnv(key, defaultValue string) string {
 
 // TLSConfig creates and configures a TLS configuration for the server.
 // It sets the minimum TLS version to TLS 1.3 and defines preferred curve preferences.
-// It also uses the GetClientInfo function from the fiber.TLSHandler to get client information.
+// It also uses the [fiber.GetClientInfo] function from the [fiber.TLSHandler] to get client information.
 //
 // Example Usage in startupserver:
 //
-//	gopherTLSConfig := TLSConfig()
-//	 // Note: myCert, mySecretKey load from environment, if it's running on Kubernetes it would be easy for secret and secure
-//	handler.StartServer(server, addr, monitorPath, myCert, mySecretKey, shutdownTimeout, gopherTLSConfig, nil)
+//	 // Note: myCert, myCertKey load from environment, if it's running on Kubernetes it would be easy for secret and secure
+//	gopherCert, err := tls.LoadX509KeyPair(myCert, myCertKey)
+//	if err != nil {
+//		// handle error
+//	}
+//	gopherTLSConfig := TLSConfig(gopherCert, nil) // clientCert nil
+//	handler.StartServer(server, addr, monitorPath, shutdownTimeout, gopherTLSConfig, nil) // Boring TLS 1.3 nil due it's my own protocol and currently unavailable.
 //
-// Note: this will override/replace the Fiber default configuration that use TLS 1.2 Which is consider outdated & Unsafe now and use this configuration.
-func TLSConfig() *tls.Config {
+// Example ListenMutualTLS Usage in startupserver:
+//
+//	 // Note: myCert, myCertKey, clientCertFile load from environment, if it's running on Kubernetes it would be easy for secret and secure
+//	gopherCertPool, err := tls.LoadX509KeyPair(myCert, myCertKey)
+//	if err != nil {
+//		// handle error
+//	}
+//
+//	// Load client CA certificate (optional)
+//	var clientCertPool *x509.CertPool
+//	clientCertBytes, err := os.ReadFile(clientCertFile)
+//
+//	if err == nil {
+//	    clientCertPool = x509.NewCertPool()
+//	    clientCertPool.AppendCertsFromPEM(clientCertBytes)
+//	}
+//
+//	gopherTLSConfig := TLSConfig(gopherCertPool, clientCertPool)
+//	handler.StartServer(server, addr, monitorPath, shutdownTimeout, gopherTLSConfig, nil) // Boring TLS 1.3 nil due it's my own protocol and currently unavailable.
+//
+// Note: This design is well-written and idiomatic, unlike designs that spliting functions (e.g., those related to TLS like "ListenTLS" "ListenMutualTLS" or whatever it is).
+func TLSConfig(cert tls.Certificate, clientCertPool *x509.CertPool) *tls.Config {
 	tlsHandler := &fiber.TLSHandler{}
-	return &tls.Config{
+	tlsConfig := &tls.Config{
 		MinVersion: tls.VersionTLS13,
 		CurvePreferences: []tls.CurveID{
 			tls.X25519,
@@ -157,6 +182,15 @@ func TLSConfig() *tls.Config {
 			tls.CurveP384,
 			tls.CurveP521,
 		},
+		Certificates:   []tls.Certificate{cert},
 		GetCertificate: tlsHandler.GetClientInfo,
 	}
+
+	// Only enable client auth if clientCertPool is not nil
+	if clientCertPool != nil {
+		tlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
+		tlsConfig.ClientCAs = clientCertPool
+	}
+
+	return tlsConfig
 }
