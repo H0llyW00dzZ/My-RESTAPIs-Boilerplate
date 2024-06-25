@@ -185,9 +185,11 @@ func TLSConfig(cert tls.Certificate, clientCertPool *x509.CertPool) *tls.Config 
 		},
 		Certificates:   []tls.Certificate{cert},
 		GetCertificate: tlsHandler.GetClientInfo,
+		// TODO: Handle "VerifyPeerCertificate" for Certificate Transparency.
 	}
 
 	// Only enable client auth if clientCertPool is not nil
+	// TODO: Handle "GetClientCertificate" that might need.
 	if clientCertPool != nil {
 		tlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
 		tlsConfig.ClientCAs = clientCertPool
