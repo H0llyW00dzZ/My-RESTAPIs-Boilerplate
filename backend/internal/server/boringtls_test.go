@@ -1537,3 +1537,130 @@ func TestPipeStreamOutside(t *testing.T) {
 	// Wait for the goroutine to finish
 	wg.Wait()
 }
+
+func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
+	// Create a new Fiber app
+	app := fiber.New(fiber.Config{
+		Prefork: false, // Disable prefork to avoid issues with TLS1.3 and concurrent connections
+	})
+
+	// Add middleware for logging error recovery
+	log.InitializeLogger("TLS 1.3 Testing", "")
+
+	// Define a test route
+	app.Get("/test", func(c *fiber.Ctx) error {
+		if c.Secure() {
+			log.LogInfof("Server: Received request %s", c.Body()) // Decrypted transparently...
+			log.LogInfof("Server: Encrypting response")           // Encrypting transparently...
+			return c.JSON(fiber.Map{
+				"message": "Hello, World! (via TLS)",
+			})
+		}
+		return c.SendString("Hello, World!")
+	})
+
+	// Load the self-signed certificate and key
+	cert, err := tls.LoadX509KeyPair("boring-cert.pem", "boring-key.pem")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a TLS configuration for the server
+	tlsServerConfig := tlsConfig(cert)
+
+	// Create a regular TCP listener
+	ln, err := net.Listen(app.Config().Network, ":8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	tlsListener := tls.NewListener(ln, tlsServerConfig)
+	defer ln.Close()
+
+	// Start the server with the streamListener
+	go func() {
+		if err := app.Listener(tlsListener); err != nil {
+			log.LogFatal(err)
+		}
+	}()
+
+	// Define different curve preferences for each transport
+	curvePreferences := [][]tls.CurveID{
+		{tls.CurveP384, tls.CurveP521, tls.X25519, tls.CurveP256},
+		{tls.CurveP521, tls.X25519, tls.CurveP256, tls.CurveP384},
+		{tls.X25519, tls.CurveP384, tls.CurveP521, tls.CurveP256},
+	}
+
+	transports := make([]*http.Transport, len(curvePreferences))
+	for i, curves := range curvePreferences {
+		transports[i] = &http.Transport{
+			DialTLSContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+				dialer := &net.Dialer{}
+				conn, err := dialer.DialContext(context.Background(), network, addr)
+				if err != nil {
+					return nil, err
+				}
+
+				tlsConn := tls.Client(conn, &tls.Config{
+					MinVersion:         tls.VersionTLS13,
+					InsecureSkipVerify: true,
+					ServerName:         "localhost",
+					CurvePreferences:   curves,
+				})
+
+				if err := tlsConn.HandshakeContext(context.Background()); err != nil {
+					conn.Close()
+					return nil, err
+				}
+
+				log.LogInfof("Client %d: Established TLS connection", i+1)
+				return tlsConn, nil // Return the TLS connection
+			},
+		}
+	}
+
+	// Create multiple clients with different transports
+	clients := make([]*http.Client, len(transports))
+	for i, transport := range transports {
+		clients[i] = &http.Client{
+			Transport: transport,
+		}
+	}
+
+	// Make requests to the server using each client
+	for i, client := range clients {
+		log.LogInfof("Client %d: Sending request", i+1)
+
+		// Create a request with a body
+		requestBody := []byte(fmt.Sprintf("Request body from client %d", i+1)) // Encrypting transparently...
+		req, err := http.NewRequest("GET", "https://"+ln.Addr().String()+"/test", bytes.NewBuffer(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		resp, err := client.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer resp.Body.Close()
+
+		// Check the response
+		// When the client reaches this point, the response is automatically decrypted transparently,
+		// just like when the server reaches "c.Secure" during the transport. So The packet is encrypted during transmission.
+		expectedBody := `{"message":"Hello, World! (via TLS)"}`
+		if resp.StatusCode != http.StatusOK {
+			t.Errorf("Expected status code %d, but got %d", http.StatusOK, resp.StatusCode)
+		}
+
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		log.LogInfof("Client %d: Received response", i+1)
+		log.LogInfof("Client %d: Decrypting response", i+1) // Decrypted transparently...
+
+		if string(body) != expectedBody {
+			t.Errorf("Expected response body to be '%s', but got '%s'", expectedBody, string(body))
+		}
+	}
+}

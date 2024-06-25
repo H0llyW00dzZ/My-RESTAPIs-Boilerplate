@@ -23,7 +23,7 @@ import (
 
 // Server defines the interface for a server that can be started, shut down, and clean up its database.
 type Server interface {
-	Start(addr, monitorPath, certFile, keyFile string, tlsConfig *tls.Config, streamListener net.Listener)
+	Start(addr, monitorPath string, tlsConfig *tls.Config, streamListener net.Listener)
 	Shutdown(ctx context.Context) error
 	CleanupDB() error
 	Mount(prefix string, app any)
@@ -52,27 +52,36 @@ func NewFiberServer(app *fiber.App, appName, monitorPath string) *FiberServer {
 }
 
 // Start runs the Fiber server in a separate goroutine to listen for incoming requests.
-func (s *FiberServer) Start(addr, monitorPath, certFile, keyFile string, tlsConfig *tls.Config, streamListener net.Listener) {
+func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, streamListener net.Listener) {
+	tlsHandler := &fiber.TLSHandler{}
 	go func() {
 		// TODO: Improve the Listener by creating another Fiber app when tlsConfig and streamListener are configured. This way, it can connect to other Fiber apps (Sharing is caring).
 		if tlsConfig != nil && streamListener != nil {
 			// Note: This branch handles Boring TLS 1.3 scenarios where the TLS configuration is provided in "run.go".
 			// However, Boring TLS 1.3 is currently unavailable.
 			if err := s.app.Listener(streamListener); err != nil {
-				log.LogErrorf(ErrorHTTPListenAndServe, err)
+				log.LogFatalf(ErrorHTTPListenAndServe, err)
 			}
 		} else if tlsConfig != nil {
 			// Note: This branch handles standard TLS 1.3 scenarios where the TLS configuration is provided in "run.go".
-			// However, the default Fiber configuration uses TLS 1.2 in "ListenTLSWithCertificate" Which is consider outdated & Unsafe now.
-			// Therefore, even if TLS 1.3 is configured in "run.go", the provided configuration will override/replace the Fiber default configuration and use TLS 1.3.
-			if err := s.app.ListenTLS(addr, certFile, keyFile); err != nil {
-				log.LogErrorf(ErrorHTTPListenAndServe, err)
+			// It Force TLS 1.3, due Fiber wrong implementation, about ListenTLS related in "ListenTLSWithCertificate"
+			// it should be "if tlsConfig != nil" then load default instead of using "config := &tls.Config".
+			ln, err := net.Listen(s.app.Config().Network, addr)
+			if err != nil {
+				log.LogFatal(err)
+			}
+			tlsListener := tls.NewListener(ln, tlsConfig)
+			// Note: In test mode, "SetTLSHandler" should be not included (see TestStandardTLS13ProtocolWithCustomTransport).
+			// This is because it is difficult to capture as it is bound to the generic address 0.0.0.0.
+			s.app.SetTLSHandler(tlsHandler)
+			if err := s.app.Listener(tlsListener); err != nil {
+				log.LogFatalf(ErrorHTTPListenAndServe, err)
 			}
 		} else {
 			// Note: This branch handles TLS 1.2 scenarios or TLS 1.3 when run as a receiver forwarder (e.g. from nginx (Non Kubernetes), Ingress from nginx if it's running on Kubernetes)
 			// due to its non-secure nature and requirement to be in internal/development mode.
 			if err := s.app.Listen(addr); err != nil {
-				log.LogErrorf(ErrorHTTPListenAndServe, err)
+				log.LogFatalf(ErrorHTTPListenAndServe, err)
 			}
 		}
 	}()
@@ -134,14 +143,14 @@ func (s *FiberServer) MountPath(path string, handler any) {
 
 // StartServer initializes and starts the server, then waits for a shutdown signal.
 // It manages the lifecycle of the server, including graceful shutdown.
-func StartServer(server Server, addr, monitorPath, certFile, keyFile string, shutdownTimeout time.Duration, tlsConfig *tls.Config, streamListener net.Listener) {
-	startServerAsync(server, addr, monitorPath, certFile, keyFile, tlsConfig, streamListener)
+func StartServer(server Server, addr, monitorPath string, shutdownTimeout time.Duration, tlsConfig *tls.Config, streamListener net.Listener) {
+	startServerAsync(server, addr, monitorPath, tlsConfig, streamListener)
 	waitForShutdownSignal(shutdownTimeout, server)
 }
 
 // startServerAsync initiates the server's start process in a non-blocking manner.
-func startServerAsync(server Server, addr, monitorPath, certFile, keyFile string, tlsConfig *tls.Config, streamListener net.Listener) {
-	server.Start(addr, monitorPath, certFile, keyFile, tlsConfig, streamListener)
+func startServerAsync(server Server, addr, monitorPath string, tlsConfig *tls.Config, streamListener net.Listener) {
+	server.Start(addr, monitorPath, tlsConfig, streamListener)
 }
 
 // waitForShutdownSignal listens for OS interrupt or SIGTERM signals to gracefully shut down the server.
