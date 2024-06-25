@@ -175,6 +175,7 @@ func getEnv(key, defaultValue string) string {
 func TLSConfig(cert tls.Certificate, clientCertPool *x509.CertPool) *tls.Config {
 	tlsHandler := &fiber.TLSHandler{}
 	tlsConfig := &tls.Config{
+		MaxVersion: tls.VersionTLS13, // Explicit
 		MinVersion: tls.VersionTLS13,
 		CurvePreferences: []tls.CurveID{
 			tls.X25519,
