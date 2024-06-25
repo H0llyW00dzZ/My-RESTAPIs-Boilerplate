@@ -1569,7 +1569,7 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 	tlsServerConfig := tlsConfig(cert)
 
 	// Create a regular TCP listener
-	ln, err := net.Listen("tcp", ":8088")
+	ln, err := net.Listen(app.Config().Network, ":8088")
 	if err != nil {
 		t.Fatal(err)
 	}
