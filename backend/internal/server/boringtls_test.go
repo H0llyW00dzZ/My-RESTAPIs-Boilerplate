@@ -29,6 +29,7 @@ import (
 
 func tlsConfig(cert tls.Certificate) *tls.Config {
 	log.InitializeLogger("Boring TLS 1.3 Testing", "")
+	tlsHandler := &fiber.TLSHandler{}
 	return &tls.Config{
 		MinVersion: tls.VersionTLS13,
 		CurvePreferences: []tls.CurveID{
@@ -40,7 +41,8 @@ func tlsConfig(cert tls.Certificate) *tls.Config {
 			tls.CurveP384,
 			tls.CurveP521,
 		},
-		Certificates: []tls.Certificate{cert},
+		Certificates:   []tls.Certificate{cert},
+		GetCertificate: tlsHandler.GetClientInfo,
 	}
 }
 
@@ -1243,6 +1245,8 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 	// 71	13.898760	127.0.0.1	127.0.0.1	TLSv1.3	108	Change Cipher Spec, Application Data
 	// 73	13.898937	127.0.0.1	127.0.0.1	TLSv1.3	288	Application Data
 	// 75	13.899197	127.0.0.1	127.0.0.1	TLSv1.3	293	Application Data
+	//
+	// Note: "Application Data, Application Data, Application Data, Application Data" It's Truncated and Encrypted
 	transports := make([]*http.Transport, len(curvePreferences))
 	for i, curves := range curvePreferences {
 		transports[i] = &http.Transport{
