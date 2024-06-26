@@ -184,6 +184,7 @@ func (s *FiberServer) makeHTTPRequest(req *http.Request) (*http.Response, error)
 	}
 
 	// Create an HTTP client with the custom TLS configuration
+	// TODO: HTTP/2 ?
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: tlsConfig,
