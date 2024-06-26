@@ -1600,6 +1600,8 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 		{tls.X25519, tls.CurveP384, tls.CurveP521, tls.CurveP256},
 	}
 
+	// Note: This test case yields the same results as Boring TLS 1.3 Protocol. However, the cipher suite prioritizes "TLS_AES_128_GCM_SHA256" (bad common cipherText)
+	// and does not allow or support the use of "TLS_CHACHA20_POLY1305_SHA256", which could potentially improve performance due to its truncated nature.
 	transports := make([]*http.Transport, len(curvePreferences))
 	for i, curves := range curvePreferences {
 		transports[i] = &http.Transport{
