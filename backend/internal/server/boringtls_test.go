@@ -43,6 +43,7 @@ func tlsConfig(cert tls.Certificate) *tls.Config {
 		},
 		Certificates:   []tls.Certificate{cert},
 		GetCertificate: tlsHandler.GetClientInfo,
+		Rand:           server.RandTLS(),
 	}
 }
 
@@ -1576,7 +1577,7 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 	tlsServerConfig := tlsConfig(cert)
 
 	// Create a regular TCP listener
-	ln, err := net.Listen(app.Config().Network, ":8088")
+	ln, err := net.Listen(app.Config().Network, ":443")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1625,7 +1626,7 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 
 		// Create a request with a body
 		requestBody := []byte(fmt.Sprintf("Request body from client %d", i+1)) // Encrypting transparently...
-		req, err := http.NewRequest("GET", "https://localhost:8088/test", bytes.NewBuffer(requestBody))
+		req, err := http.NewRequest("GET", "https://localhost:443/test", bytes.NewBuffer(requestBody))
 		if err != nil {
 			t.Fatal(err)
 		}
