@@ -7,9 +7,11 @@ package server
 import (
 	"bytes"
 	"crypto/rand"
+	"crypto/tls"
 	"fmt"
 	"h0llyw00dz-template/backend/internal/database"
 	"io"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -160,4 +162,40 @@ func (r *fixedReader) Read(p []byte) (n int, err error) {
 
 	// Note: If [rand.Read] fails to generate random bytes, it will be handled by the standard library [crypto/tls] package internally, and you don't need to know about it.
 	return rand.Read(p[:r.size])
+}
+
+// makeHTTPRequest is a helper function that makes an HTTP request using TLS 1.3.
+//
+// Note: This uses the standard library because it is only used for activation and certification, similar to them.
+func (s *FiberServer) makeHTTPRequest(req *http.Request) (*http.Response, error) {
+	// Create a custom TLS configuration with TLS 1.3 enabled
+	//
+	// Note: The cipher/preferred cipher in Go's standard TLS 1.3 implementation does not allow direct configuration of cipher suites. See the note about TLSConfig in "run.go".
+	// That's why it is kept like this, as it doesn't work when set to ChaCha.
+	tlsConfig := &tls.Config{
+		MinVersion: tls.VersionTLS13,
+		MaxVersion: tls.VersionTLS13,
+		CurvePreferences: []tls.CurveID{
+			tls.X25519,
+			tls.CurveP256,
+			tls.CurveP384,
+			tls.CurveP521,
+		},
+	}
+
+	// Create an HTTP client with the custom TLS configuration
+	// TODO: HTTP/2 ?
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: tlsConfig,
+		},
+	}
+
+	// Send the HTTP request using the client
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }

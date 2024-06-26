@@ -21,6 +21,15 @@ type CTLog struct {
 	URL string
 }
 
+// SCTResponse represents the response from the CT log server.
+type SCTResponse struct {
+	SCTVersion uint8  `json:"sct_version"`
+	ID         string `json:"id"`
+	Timestamp  uint64 `json:"timestamp"`
+	Extensions string `json:"extensions"`
+	Signature  string `json:"signature"`
+}
+
 // SubmitToCTLog submits the given certificate to the specified Certificate Transparency log.
 //
 // Note: Currently unused and marked as TODO.
@@ -55,22 +64,15 @@ func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, ctLog CTLog) error {
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	// Send the HTTP request
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	// Send the HTTP request using the helper function
+	resp, err := s.makeHTTPRequest(req)
 	if err != nil {
 		return fmt.Errorf("failed to submit certificate to CT log: %v", err)
 	}
 	defer resp.Body.Close()
 
 	// Parse the response body
-	var response struct {
-		SCTVersion uint8  `json:"sct_version"`
-		ID         string `json:"id"`
-		Timestamp  uint64 `json:"timestamp"`
-		Extensions string `json:"extensions"`
-		Signature  string `json:"signature"`
-	}
+	var response SCTResponse
 
 	responseBody, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -83,6 +85,15 @@ func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, ctLog CTLog) error {
 	}
 
 	// Verify the signed certificate timestamp (SCT)
+	if err := verifySCT(response, hash, cert); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// verifySCT verifies the signed certificate timestamp (SCT).
+func verifySCT(response SCTResponse, hash [32]byte, cert *x509.Certificate) error {
 	if response.SCTVersion != 0 {
 		return fmt.Errorf("unsupported SCT version: %d", response.SCTVersion)
 	}
@@ -94,8 +105,7 @@ func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, ctLog CTLog) error {
 	}
 
 	// Verify the timestamp
-	if response.Timestamp < uint64(time.Now().Add(-24*time.Hour).Unix()) ||
-		response.Timestamp > uint64(time.Now().Add(24*time.Hour).Unix()) {
+	if !verifyTimestamp(response.Timestamp) {
 		return fmt.Errorf("invalid timestamp: %d", response.Timestamp)
 	}
 
@@ -106,4 +116,10 @@ func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, ctLog CTLog) error {
 	}
 
 	return nil
+}
+
+// verifyTimestamp checks if the given timestamp is within a valid range.
+func verifyTimestamp(timestamp uint64) bool {
+	now := time.Now().Unix()
+	return timestamp >= uint64(now-24*60*60) && timestamp <= uint64(now+24*60*60)
 }
