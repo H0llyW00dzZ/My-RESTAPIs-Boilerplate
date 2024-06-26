@@ -176,7 +176,7 @@ func TLSConfig(cert tls.Certificate, clientCertPool *x509.CertPool) *tls.Config 
 	tlsHandler := &fiber.TLSHandler{}
 	// Note: Go's standard TLS 1.3 implementation does not allow direct configuration of cipher suites.
 	// This means that while one can specify cipher suites in Go code, the implementation will prioritize the use of
-	// AES-based ciphers like aes_128_gcm_sha256 or aes_256_gcm_sha256 (both bad common cipher, not even allowed to use ChaCha20 especially XChaCha20 which more secure),
+	// AES-based ciphers like TLS_AES_128_GCM_SHA256 or TLS_AES_256_GCM_SHA384 (both bad common cipher, not even allowed to use ChaCha20 especially XChaCha20 which more secure),
 	// which may be slower than ChaCha20 which is faster on some platforms.
 	tlsConfig := &tls.Config{
 		MaxVersion: tls.VersionTLS13, // Explicit
