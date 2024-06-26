@@ -189,6 +189,9 @@ func TLSConfig(cert tls.Certificate, clientCertPool *x509.CertPool) *tls.Config 
 		},
 		Certificates:   []tls.Certificate{cert},
 		GetCertificate: tlsHandler.GetClientInfo,
+		// Note: This safe for multiple goroutines each time it is called, ensuring that each goroutine gets its own independent reader
+		// The fixedReader itself does not maintain any mutable state, making it safe for concurrent use.
+		Rand: handler.RandTLS(),
 		// TODO: Handle "VerifyPeerCertificate" for Certificate Transparency.
 	}
 
