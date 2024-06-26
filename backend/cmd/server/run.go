@@ -178,6 +178,36 @@ func TLSConfig(cert tls.Certificate, clientCertPool *x509.CertPool) *tls.Config 
 	// This means that while one can specify cipher suites in Go code, the implementation will prioritize the use of
 	// AES-based ciphers like TLS_AES_128_GCM_SHA256 or TLS_AES_256_GCM_SHA384 (both bad common cipher, not even allowed to use ChaCha20 especially XChaCha20 which more secure),
 	// which may be slower than ChaCha20 which is faster on some platforms.
+	//
+	// However, the actual cipher suite used in a TLS connection is determined by the client's preferences and capabilities.
+	// When the client's preference is set to prioritize ChaCha20-based cipher suites like TLS_CHACHA20_POLY1305_SHA256,
+	// and the server supports it, they will negotiate and agree to use that cipher suite for the encrypted communication.
+	//
+	// Example (Tested on Firefox, which allows customization of cipher suites for TLS 1.3):
+	//
+	//  TLSv1.3 Record Layer: Handshake Protocol: Client Hello (SNI=localhost)
+	//  Cipher Suites (9 suites)
+	//  Cipher Suite: TLS_CHACHA20_POLY1305_SHA256 (0x1303)
+	//  Cipher Suite: TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256 (0xcca9)
+	//  Cipher Suite: TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256 (0xcca8)
+	//  Cipher Suite: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 (0xc02b)
+	//  Cipher Suite: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (0xc02f)
+	//  Cipher Suite: TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 (0xc02c)
+	//  Cipher Suite: TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (0xc030)
+	//  Cipher Suite: TLS_RSA_WITH_AES_128_GCM_SHA256 (0x009c)
+	//  Cipher Suite: TLS_RSA_WITH_AES_256_GCM_SHA384 (0x009d)
+	//
+	// TLSv1.3 Record Layer: Handshake Protocol: Server Hello
+	// Cipher Suite: TLS_CHACHA20_POLY1305_SHA256 (0x1303)
+	// TLSv1.3 Record Layer: Change Cipher Spec Protocol: Change Cipher Spec
+	//
+	// In this example, the client (Firefox) sends a Client Hello message with its supported cipher suites, prioritizing
+	// TLS_CHACHA20_POLY1305_SHA256. The server responds with a Server Hello message, agreeing to use
+	// TLS_CHACHA20_POLY1305_SHA256 based on the client's preferences.
+	//
+	// ChaCha20 is known for its excellent performance, particularly on mobile devices and low-end processors.
+	// By using ChaCha20, clients can potentially achieve better encryption and decryption speeds compared to
+	// using AES-based ciphers, resulting in improved overall performance.
 	tlsConfig := &tls.Config{
 		MaxVersion: tls.VersionTLS13, // Explicit
 		MinVersion: tls.VersionTLS13,
