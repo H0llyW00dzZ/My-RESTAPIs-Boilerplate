@@ -89,6 +89,12 @@ func (config *RedisClientConfig) InitializeRedisClient() *redis.Client {
 			// However Go's standard TLS 1.3 implementation is broken because it keeps forcing the use of the AES-GCM cipher suite.
 			MaxVersion: tls.VersionTLS13,
 			MinVersion: tls.VersionTLS13,
+			CurvePreferences: []tls.CurveID{
+				tls.X25519,
+				tls.CurveP256,
+				tls.CurveP384,
+				tls.CurveP521,
+			},
 		},
 		PoolTimeout:           config.PoolTimeout,           // PoolTimeout should already be a time.Duration
 		PoolSize:              config.PoolSize,              // adding back this for default.
@@ -132,6 +138,12 @@ func (config *FiberRedisClientConfig) InitializeRedisStorage() fiber.Storage {
 			// However Go's standard TLS 1.3 implementation is broken because it keeps forcing the use of the AES-GCM cipher suite.
 			MaxVersion: tls.VersionTLS13,
 			MinVersion: tls.VersionTLS13,
+			CurvePreferences: []tls.CurveID{
+				tls.X25519,
+				tls.CurveP256,
+				tls.CurveP384,
+				tls.CurveP521,
+			},
 		},
 		PoolSize: config.PoolSize, // Adjust the pool size as necessary.
 	})
