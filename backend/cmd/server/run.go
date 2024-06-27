@@ -210,8 +210,15 @@ func TLSConfig(cert tls.Certificate, clientCertPool *x509.CertPool) *tls.Config 
 	// By using ChaCha20, clients can potentially achieve better encryption and decryption speeds compared to
 	// using AES-based ciphers, resulting in improved overall performance.
 	tlsConfig := &tls.Config{
+		// Note: This Explicitly setting the maximum and minimum TLS versions can improve the negotiation process.
 		MaxVersion: tls.VersionTLS13, // Explicit
 		MinVersion: tls.VersionTLS13,
+		// Note: CurvePreferences works well when set, for example, with "tls.X25519" as the first preference.
+		// However, when setting CipherSuites for TLS 1.3 or PreferServerCipherSuites (which is not actually deprecated),
+		// it won't work properly if CipherSuites or PreferServerCipherSuites are specified because Go's standard TLS 1.3 implementation
+		// does not allow direct configuration of cipher suites, even for the client side (e.g., http client in Go).
+		// It's better to keep it like this, as it will depend on the client's preferences. For example,
+		// when TLS_CHACHA20_POLY1305_SHA256 is set as the top/first preference, the server will choose "TLS_CHACHA20_POLY1305_SHA256" based on the client's preference.
 		CurvePreferences: []tls.CurveID{
 			tls.X25519,
 			tls.CurveP256,
