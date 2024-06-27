@@ -127,7 +127,10 @@ func isBrowserRequest(data []byte) bool {
 //		// ...
 //	}
 //
-// Note: This Helper function is safe for use by multiple goroutines that call it simultaneously.
+// Note: This helper function is safe for use by multiple goroutines that call it simultaneously.
+// Also note that the fixed reader of 32 random bytes is a well-known entropy size for nonces and RSA blinding. When captured in Wireshark,
+// it is always unique. Plus, it is suitable for use by multiple goroutines because it provides an independent reader for each goroutine,
+// and the size cannot be changed or increased.
 func RandTLS() io.Reader {
 	return &fixedReader{
 		size: 32,
