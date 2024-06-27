@@ -206,6 +206,7 @@ func TLSConfig(cert tls.Certificate, clientCertPool *x509.CertPool) *tls.Config 
 	// TLS_CHACHA20_POLY1305_SHA256. The server responds with a Server Hello message, agreeing to use
 	// TLS_CHACHA20_POLY1305_SHA256 based on the client's preferences.
 	//
+	// Acknowledgment:
 	// ChaCha20 is known for its excellent performance, particularly on mobile devices and low-end processors.
 	// By using ChaCha20, clients can potentially achieve better encryption and decryption speeds compared to
 	// using AES-based ciphers, resulting in improved overall performance.
