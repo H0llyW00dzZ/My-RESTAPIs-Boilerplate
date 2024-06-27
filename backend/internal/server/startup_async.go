@@ -72,15 +72,9 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 			}
 			tlsListener := tls.NewListener(ln, tlsConfig)
 			s.app.SetTLSHandler(tlsHandler)
-
-			// Wrap the Fiber app's Listener method to handle the RecordHeaderError
-			if err := s.app.Listener(WrappedListener{tlsListener}); err != nil {
-				if recordHeaderErr, ok := err.(tls.RecordHeaderError); ok {
-					// TODO: Integrate with Prometheus, for monitoring.
-					log.LogErrorf("TLS record header error: %v", recordHeaderErr)
-				} else {
-					log.LogFatalf(ErrorHTTPListenAndServe, err)
-				}
+			// Pass the TLS listener directly to the Fiber app
+			if err := s.app.Listener(tlsListener); err != nil {
+				log.LogFatalf(ErrorHTTPListenAndServe, err)
 			}
 		} else {
 			// Note: This branch handles TLS 1.2 scenarios or TLS 1.3 when run as a receiver forwarder (e.g. from nginx (Non Kubernetes), Ingress from nginx if it's running on Kubernetes)
