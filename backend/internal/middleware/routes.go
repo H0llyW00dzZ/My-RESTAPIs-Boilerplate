@@ -85,7 +85,7 @@ func registerRouteConfigMiddleware(app *fiber.App) {
 // Note: This is useful for large Go applications, especially when running in Kubernetes,
 // as it eliminates the need for multiple containers. It also supports integration with the Kubernetes ecosystem,
 // such as pointing to CNAME/NS or manually (if not using Kubernetes).
-// Also note that For TLS certificates, a wildcard certificate is required.
+// Also note that For TLS certificates, a wildcard/advanced certificate is required.
 func DomainRouter(hosts map[string]*Host) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		host := hosts[c.Hostname()]
