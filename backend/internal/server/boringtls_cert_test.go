@@ -158,7 +158,7 @@ func TestSubmitToCTLog(t *testing.T) {
 				}
 
 				sctResponse := server.SCTResponse{
-					SCTVersion: 0,
+					SCTVersion: server.CTVersion1,
 					ID:         "test-ct-log",
 					Timestamp:  timestamp,
 					Extensions: "",
@@ -228,7 +228,7 @@ func TestSubmitToCTLog(t *testing.T) {
 			DoFunc: func(req *http.Request) (*http.Response, error) {
 				// Prepare the mock response with an invalid SCT response
 				invalidSCTResponse := server.SCTResponse{
-					SCTVersion: 1, // Unsupported SCT version
+					SCTVersion: server.CTVersion2 + 1, // Unsupported SCT version
 				}
 				responseBody, _ := sonic.Marshal(invalidSCTResponse)
 				mockResponse := &http.Response{
@@ -251,7 +251,8 @@ func TestSubmitToCTLog(t *testing.T) {
 		if err == nil {
 			t.Error("Expected an error, but got nil")
 		}
-		if err != nil && err.Error() != "unsupported SCT version: 1" {
+		expectedErrorMessage := fmt.Sprintf("unsupported SCT version: %d", server.CTVersion2+1)
+		if err != nil && err.Error() != expectedErrorMessage {
 			t.Errorf("Unexpected error message: %v", err)
 		}
 	})
@@ -285,7 +286,7 @@ func TestSubmitToCTLog(t *testing.T) {
 				}
 
 				sctResponse := server.SCTResponse{
-					SCTVersion: 0,
+					SCTVersion: server.CTVersion1,
 					ID:         "test-ct-log",
 					Timestamp:  timestamp,
 					Extensions: "",
@@ -340,7 +341,7 @@ func TestSubmitToCTLog(t *testing.T) {
 			}
 
 			sctResponse := server.SCTResponse{
-				SCTVersion: 0,
+				SCTVersion: server.CTVersion1,
 				ID:         "test-ct-log",
 				Timestamp:  timestamp,
 				Extensions: "",
