@@ -130,7 +130,12 @@ func TestSubmitToCTLog(t *testing.T) {
 	}
 
 	// Create a test Fiber server
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		JSONEncoder:  sonic.Marshal,
+		JSONDecoder:  sonic.Unmarshal,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 5 * time.Second,
+	})
 	fiberServer := &server.FiberServer{
 		App: app,
 	}
@@ -364,7 +369,12 @@ func TestSubmitToCTLog(t *testing.T) {
 		}
 
 		// Create a test Fiber server
-		app := fiber.New()
+		app := fiber.New(fiber.Config{
+			JSONEncoder:  sonic.Marshal,
+			JSONDecoder:  sonic.Unmarshal,
+			ReadTimeout:  5 * time.Second,
+			WriteTimeout: 5 * time.Second,
+		})
 		fiberServer := &server.FiberServer{
 			App: app,
 		}
