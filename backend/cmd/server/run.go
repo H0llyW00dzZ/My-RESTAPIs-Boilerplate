@@ -34,27 +34,41 @@ func main() {
 // It provides default values for the application name, port, monitoring path, time format, and timeouts
 // to ensure the application has sensible defaults if environment variables are not set.
 //
-// The following environment variables are used:
+// Application Configuration:
 //
 //   - APP_NAME: The name of the application (default: "Gopher").
-//
 //   - PORT: The port number on which the server will listen (default: "8080").
-//
 //   - MONITOR_PATH: The path for the server monitoring endpoint (default: "/monitor").
-//
 //   - TIME_FORMAT: The format for logging timestamps (default: "unix").
-//
 //     Available options:
-//
 //   - "unix": Unix timestamp format (e.g., [1713355079]).
-//
 //   - "default": Default timestamp format (e.g., 2024/04/17 15:04:05).
 //
+// Timeout Configuration:
+//
 //   - READ_TIMEOUT: The maximum duration for reading the entire request, including the body (default: "5s").
-//
 //   - WRITE_TIMEOUT: The maximum duration before timing out writes of the response (default: "5s").
-//
 //   - SHUTDOWN_TIMEOUT: The maximum duration to wait for active connections to finish during server shutdown (default: "5s").
+//
+// MySQL Database Configuration:
+//
+//   - DB_HOST: The hostname or IP address of the MySQL database server (required).
+//   - DB_PORT: The port number on which the MySQL database server is listening (required).
+//   - DB_DATABASE: The name of the MySQL database to connect to (required).
+//   - DB_USERNAME: The username for authenticating with the MySQL database (required).
+//   - DB_PASSWORD: The password for authenticating with the MySQL database (required).
+//
+// Redis Database Configuration:
+//
+//   - RDB_ADDRESS: The address of the Redis server (required).
+//   - RDB_PORT: The port number on which the Redis server is listening (required).
+//   - RDB_PASSWORD: The password for authenticating with the Redis server (required).
+//   - RDB_DATABASE: The Redis database number to use (required).
+//   - RDB_POOL_TIMEOUT: The maximum amount of time to wait for a connection from the Redis connection pool (required).
+//   - REDIS_MAXCONN_IDLE_TIME: The maximum amount of time a Redis connection can remain idle in the connection pool (required).
+//   - REDIS_MAXCONN_LIFE_TIME: The maximum lifetime of a Redis connection in the connection pool (required).
+//
+// Note: Regarding TLS certificates, there are no environment variables defined. It is necessary to write custom code to handle TLS certificates to avoid conflicts.
 func getEnvVariables() (appName, port, monitorPath, timeFormat string, readTimeout, writeTimeout, shutdownTimeout time.Duration) {
 	// Get the APP_NAME, PORT, and MONITOR_PATH from environment variables or use default values.
 	appName = getEnv("APP_NAME", "Gopher")
