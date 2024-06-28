@@ -26,9 +26,13 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 - High Quality Go Codes
 - Rich Presence TUIs using [`charm.sh`](https://charm.sh/)
 - Boring TLS 1.3 Protocol (WIP)
+- Certificate Transparency (CT) Log
 
 > [!NOTE]  
 > `Boring TLS 1.3 Protocol` This project utilizes the industry-standard TLS 1.3 protocol, known for its exceptional security and reliability. We call it `Boring TLS` because its robust security makes it almost boring.
+
+> [!NOTE]
+> `Certificate Transparency (CT) Log` This project includes built-in support for submitting certificates to Certificate Transparency logs. It supports certificates with both RSA and ECDSA keys. By submitting certificates to CT logs, it enhances the security and transparency of the TLS ecosystem, allowing domain owners to monitor and detect fraudulent certificates or other bad certificates. The CT log functionality is implemented using the `SubmitToCTLog` function, which takes the certificate, private key, and CT log details as input. It encodes the certificate, calculates the hash, creates a JSON payload, sends an HTTP request to the CT log server, and verifies the signed certificate timestamp (SCT) received in the response. The `VerifySCT` method is responsible for verifying the SCT based on the public key type (RSA or ECDSA) and ensures the integrity of the timestamp. With this feature, it is easy to integrate certificate transparency into the TLS setup and contribute to a more secure web.
 
 > [!WARNING]
 > Some features might not work as expected when running this repo on certain cloud providers. For example, the `Rich Presence TUIs` feature requires a [`tty`](https://en.wikipedia.org/wiki/Tty_(Unix)).
