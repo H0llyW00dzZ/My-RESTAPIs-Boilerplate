@@ -141,7 +141,7 @@ func TestSubmitToCTLog(t *testing.T) {
 	}
 
 	// Test case 1: Successful submission to CT log with ECDSA key
-	t.Run("SuccessfulSubmissionECDSA", func(t *testing.T) {
+	t.Run("SuccessfulSubmissionECDSACTVersion1", func(t *testing.T) {
 		// Create a mock HTTP client
 		mockHTTPClient := &MockHTTPClient{
 			DoFunc: func(req *http.Request) (*http.Response, error) {
@@ -263,7 +263,7 @@ func TestSubmitToCTLog(t *testing.T) {
 	})
 
 	// Test case 4: Successful submission to CT log with RSA key
-	t.Run("SuccessfulSubmissionRSA", func(t *testing.T) {
+	t.Run("SuccessfulSubmissionRSACTVersion1", func(t *testing.T) {
 		// Generate a self-signed certificate with a valid RSA private key
 		cert, privateKey, err := generateSelfSignedCertRSA()
 		if err != nil {
@@ -382,7 +382,7 @@ func TestSubmitToCTLog(t *testing.T) {
 	})
 
 	// Test case 6: Successful submission to CT log with CTVersion2
-	t.Run("SuccessfulSubmissionCTVersion2", func(t *testing.T) {
+	t.Run("SuccessfulSubmissionECDSACTVersion2", func(t *testing.T) {
 		// Generate a self-signed certificate with a valid ECDSA private key
 		cert, privateKey, err := generateSelfSignedCertECDSA()
 		if err != nil {
