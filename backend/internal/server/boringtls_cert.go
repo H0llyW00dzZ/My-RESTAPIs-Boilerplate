@@ -13,6 +13,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 // CTLog represents a Certificate Transparency log.
@@ -29,6 +31,23 @@ type SCTResponse struct {
 	Extensions string `json:"extensions"`
 	Signature  string `json:"signature"`
 }
+
+const (
+	// CTPath is the path for submitting certificates to the CT log server.
+	// It represents the API endpoint for adding a certificate chain to the log.
+	// The path is typically in the format "/ct/v1/add-chain".
+	CTPath = "/ct/v1/add-chain"
+
+	// ContentTypeJSON represents the content type for JSON data.
+	// It is used in the HTTP request header to specify that the request body contains JSON data.
+	// The value is set to "application/json" using the [fiber.MIMEApplicationJSON] constant from the Fiber framework.
+	ContentTypeJSON = fiber.MIMEApplicationJSON
+
+	// ContentType represents the key for the Content-Type header in an HTTP request or response.
+	// It is used to specify the media type of the resource being sent or received.
+	// The value is set to "Content-Type" using the [fiber.HeaderContentType] constant from the Fiber framework.
+	ContentType = fiber.HeaderContentType
+)
 
 // SubmitToCTLog submits the given certificate to the specified Certificate Transparency log.
 //
@@ -58,11 +77,11 @@ func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, ctLog CTLog) error {
 	}
 
 	// Create the HTTP request to submit the certificate to the CT log
-	req, err := http.NewRequest("POST", ctLog.URL+"/ct/v1/add-chain", bytes.NewBuffer(jsonPayload))
+	req, err := http.NewRequest(http.MethodPost, ctLog.URL+CTPath, bytes.NewBuffer(jsonPayload))
 	if err != nil {
 		return fmt.Errorf("failed to create HTTP request: %v", err)
 	}
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set(ContentType, ContentTypeJSON)
 
 	// Send the HTTP request using the helper function
 	resp, err := s.makeHTTPRequest(req)
