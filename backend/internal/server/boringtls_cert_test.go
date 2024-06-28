@@ -31,6 +31,13 @@ import (
 	"h0llyw00dz-template/backend/internal/server"
 )
 
+const (
+	AheadTime24Hours = 24 * time.Hour
+	AheadTime7Days   = 7 * 24 * time.Hour
+	AheadTime30Days  = 30 * 24 * time.Hour
+	Expired          = -time.Hour * 24
+)
+
 // MockHTTPClient is a mock implementation of the HTTP client.
 type MockHTTPClient struct {
 	DoFunc func(req *http.Request) (*http.Response, error)
@@ -61,7 +68,7 @@ func generateSelfSignedCertECDSA() (*x509.Certificate, *ecdsa.PrivateKey, error)
 			CommonName: "example.com",
 		},
 		NotBefore: time.Now(),
-		NotAfter:  time.Now().Add(24 * time.Hour),
+		NotAfter:  time.Now().Add(AheadTime24Hours),
 
 		KeyUsage:              x509.KeyUsageDigitalSignature,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
@@ -98,7 +105,7 @@ func generateSelfSignedCertRSA() (*x509.Certificate, *rsa.PrivateKey, error) {
 			CommonName: "example.com",
 		},
 		NotBefore: time.Now(),
-		NotAfter:  time.Now().Add(24 * time.Hour),
+		NotAfter:  time.Now().Add(AheadTime7Days),
 
 		KeyUsage:              x509.KeyUsageDigitalSignature,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
@@ -133,7 +140,42 @@ func generateSelfSignedCertEd25519() (*x509.Certificate, ed25519.PrivateKey, err
 			CommonName: "example.com",
 		},
 		NotBefore: time.Now(),
-		NotAfter:  time.Now().Add(24 * time.Hour),
+		NotAfter:  time.Now().Add(AheadTime30Days),
+
+		KeyUsage:              x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+	}
+
+	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, publicKey, privateKey)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	cert, err := x509.ParseCertificate(derBytes)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return cert, privateKey, nil
+}
+
+func generateSelfSignedCertEd25519WithExpired() (*x509.Certificate, ed25519.PrivateKey, error) {
+	privateKey := ed25519.NewKeyFromSeed(make([]byte, ed25519.SeedSize))
+	publicKey := privateKey.Public().(ed25519.PublicKey)
+
+	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	template := x509.Certificate{
+		SerialNumber: serialNumber,
+		Subject: pkix.Name{
+			CommonName: "example.com",
+		},
+		NotBefore: time.Now().Add(Expired),      // Set NotBefore to 24 hours ago
+		NotAfter:  time.Now().Add(-time.Minute), // Set NotAfter to 1 minute ago
 
 		KeyUsage:              x509.KeyUsageDigitalSignature,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
@@ -440,7 +482,7 @@ func TestSubmitToCTLog(t *testing.T) {
 			DoFunc: func(req *http.Request) (*http.Response, error) {
 				// Prepare the mock response with a valid SCT response for CTVersion2
 				timestamp := uint64(time.Now().Unix())
-				transItem := struct {
+				transMissionItem := struct {
 					SCTVersion   uint8
 					Timestamp    uint64
 					Extensions   []byte
@@ -451,9 +493,9 @@ func TestSubmitToCTLog(t *testing.T) {
 					Extensions:   []byte(""),
 					STHExtension: []byte(""),
 				}
-				transItemBytes, _ := sonic.Marshal(transItem)
+				transMissionItemBytes, _ := sonic.Marshal(transMissionItem)
 
-				signature, err := ecdsa.SignASN1(rand.Reader, privateKey, transItemBytes)
+				signature, err := ecdsa.SignASN1(rand.Reader, privateKey, transMissionItemBytes)
 				if err != nil {
 					t.Fatalf("Failed to generate signature: %v", err)
 				}
@@ -505,7 +547,7 @@ func TestSubmitToCTLog(t *testing.T) {
 			DoFunc: func(req *http.Request) (*http.Response, error) {
 				// Prepare the mock response with a valid SCT response for CTVersion2
 				timestamp := uint64(time.Now().Unix())
-				transItem := struct {
+				transMissionItem := struct {
 					SCTVersion   uint8
 					Timestamp    uint64
 					Extensions   []byte
@@ -516,11 +558,11 @@ func TestSubmitToCTLog(t *testing.T) {
 					Extensions:   []byte(""),
 					STHExtension: []byte(""),
 				}
-				transItemBytes, _ := sonic.Marshal(transItem)
+				transMissionItemBytes, _ := sonic.Marshal(transMissionItem)
 
 				// Hash the data before signing
 				hasher := sha256.New()
-				hasher.Write(transItemBytes)
+				hasher.Write(transMissionItemBytes)
 				hashedData := hasher.Sum(nil)
 
 				signature, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA256, hashedData)
@@ -901,7 +943,7 @@ func TestSubmitToCTLog(t *testing.T) {
 			DoFunc: func(req *http.Request) (*http.Response, error) {
 				// Prepare the mock response with a valid SCT response for CTVersion2
 				timestamp := uint64(time.Now().Unix())
-				transItem := struct {
+				transMissionItem := struct {
 					SCTVersion   uint8
 					Timestamp    uint64
 					Extensions   []byte
@@ -912,9 +954,9 @@ func TestSubmitToCTLog(t *testing.T) {
 					Extensions:   []byte(""),
 					STHExtension: []byte(""),
 				}
-				transItemBytes, _ := sonic.Marshal(transItem)
+				transMissionItemBytes, _ := sonic.Marshal(transMissionItem)
 
-				signature := ed25519.Sign(privateKey, transItemBytes)
+				signature := ed25519.Sign(privateKey, transMissionItemBytes)
 
 				sctResponse := server.SCTResponse{
 					SCTVersion:   server.CTVersion2,
@@ -1007,6 +1049,71 @@ func TestSubmitToCTLog(t *testing.T) {
 			t.Error("Expected an error, but got nil")
 		}
 		expectedErrorMessage := "failed to verify Ed25519 signature"
+		if err != nil && err.Error() != expectedErrorMessage {
+			t.Errorf("Unexpected error message: %v", err)
+		}
+	})
+
+	// Test case 15: failed verify Ed25519 signature due to expired certificate
+	t.Run("FailedVerifyEd25519SignatureExpired", func(t *testing.T) {
+		// Generate a self-signed certificate with a valid Ed25519 private key
+		cert, privateKey, err := generateSelfSignedCertEd25519WithExpired()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		var timestamp uint64
+
+		// Create a mock HTTP client
+		mockHTTPClient := &MockHTTPClient{
+			DoFunc: func(req *http.Request) (*http.Response, error) {
+				// Prepare the mock response with a valid SCT response for CTVersion2
+				timestamp = uint64(time.Now().Unix())
+				transMissionMissionItem := struct {
+					SCTVersion   uint8
+					Timestamp    uint64
+					Extensions   []byte
+					STHExtension []byte
+				}{
+					SCTVersion:   server.CTVersion2,
+					Timestamp:    timestamp,
+					Extensions:   []byte(""),
+					STHExtension: []byte(""),
+				}
+				transMissionMissionItemBytes, _ := sonic.Marshal(transMissionMissionItem)
+
+				signature := ed25519.Sign(privateKey, transMissionMissionItemBytes)
+
+				sctResponse := server.SCTResponse{
+					SCTVersion:   server.CTVersion2,
+					ID:           "test-ct-log",
+					Timestamp:    timestamp,
+					Extensions:   "",
+					STHExtension: "",
+					Signature:    base64.StdEncoding.EncodeToString(signature),
+				}
+				responseBody, _ := sonic.Marshal(sctResponse)
+				mockResponse := &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(bytes.NewBuffer(responseBody)),
+				}
+				return mockResponse, nil
+			},
+		}
+
+		// Replace the MakeHTTPRequestFunc with the mock implementation
+		httpRequestMaker.MakeHTTPRequestFunc = func(req *http.Request) (*http.Response, error) {
+			return mockHTTPClient.Do(req)
+		}
+
+		// Call the SubmitToCTLog method with the HTTPRequestMaker and the mock private key
+		err = fiberServer.SubmitToCTLog(cert, privateKey, ctLog, httpRequestMaker)
+
+		// Assert the expectations
+		if err == nil {
+			t.Error("Expected an error, but got nil")
+		}
+		expectedErrorMessage := fmt.Sprintf("invalid timestamp: %d", timestamp)
 		if err != nil && err.Error() != expectedErrorMessage {
 			t.Errorf("Unexpected error message: %v", err)
 		}
