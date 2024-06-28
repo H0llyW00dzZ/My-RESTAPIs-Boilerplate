@@ -140,8 +140,8 @@ func TestSubmitToCTLog(t *testing.T) {
 		MakeHTTPRequestFunc: fiberServer.MakeHTTPRequest,
 	}
 
-	// Test case 1: Successful submission to CT log
-	t.Run("SuccessfulSubmission", func(t *testing.T) {
+	// Test case 1: Successful submission to CT log with ECDSA key
+	t.Run("SuccessfulSubmissionECDSA", func(t *testing.T) {
 		// Create a mock HTTP client
 		mockHTTPClient := &MockHTTPClient{
 			DoFunc: func(req *http.Request) (*http.Response, error) {
