@@ -192,14 +192,17 @@ func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, privateKey crypto.Pr
 	if err := s.App.Config().JSONDecoder(responseBody, &response); err != nil {
 		return fmt.Errorf("failed to parse response: %v", err)
 	}
-
+	jsonConfig := json{
+		Marshal: s.App.Config().JSONEncoder,
+	}
 	// Verify the signed certificate timestamp (SCT)
 	sctVerifier := &SCTVerifier{
 		Response: response,
 		Hash:     hash,
 		Cert:     cert,
+		json:     jsonConfig,
 	}
-	if err := sctVerifier.VerifySCT(s.App.Config().JSONEncoder); err != nil {
+	if err := sctVerifier.VerifySCT(); err != nil {
 		return err
 	}
 
@@ -211,10 +214,19 @@ type SCTVerifier struct {
 	Response SCTResponse
 	Hash     [32]byte
 	Cert     *x509.Certificate
+	json
+}
+
+// json is a struct that holds the JSON encoding/decoding configuration.
+// It provides a way to customize the JSON encoding/decoding behavior by specifying
+// a custom Marshal/Unmarshal function.
+type json struct {
+	Marshal   func(v any) ([]byte, error)
+	Unmarshal func(data []byte, v any) error
 }
 
 // VerifySCT verifies the signed certificate timestamp (SCT).
-func (v *SCTVerifier) VerifySCT(jsonEncoder func(v any) ([]byte, error)) error {
+func (v *SCTVerifier) VerifySCT() error {
 	// Note: This is a method Go idiom that uses the constant iota sequence.
 	// It is particularly useful in cryptographic operations (e.g., implementing custom ciphers, custom protocols, or any cryptography-related tasks).
 	if v.Response.SCTVersion < CTVersion1 || v.Response.SCTVersion > LatestCTVersion {
@@ -256,7 +268,7 @@ func (v *SCTVerifier) VerifySCT(jsonEncoder func(v any) ([]byte, error)) error {
 		}
 
 		// Encode the TransItem structure using Fiber's JSON encoding configuration
-		transItemBytes, err := jsonEncoder(transItem)
+		transItemBytes, err := v.json.Marshal(transItem)
 		if err != nil {
 			return fmt.Errorf("failed to encode TransItem: %v", err)
 		}
