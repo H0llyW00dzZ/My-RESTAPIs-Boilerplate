@@ -239,6 +239,8 @@ func (v *SCTVerifier) VerifySCT(jsonEncoder func(v any) ([]byte, error)) error {
 	switch v.Response.SCTVersion {
 	case CTVersion1:
 		data = append(hash[:], []byte(fmt.Sprintf("%d", v.Response.Timestamp))...)
+		// Note: When there is another version (e.g., Version 3), this Version 2 logic should be extracted
+		// into a separate function to keep the code simple and maintainable.
 	case CTVersion2:
 		// Construct the TransItem structure for signature verification
 		transItem := struct {
