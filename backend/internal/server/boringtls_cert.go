@@ -232,6 +232,7 @@ func (v *SCTVerifier) VerifySCT() error {
 	}
 
 	// Calculate the hash of the certificate in DER format
+	// TODO: Do we really need to improve this to make it more flexible (e.g., if the certificate does not use SHA-256)?
 	hash := sha256.Sum256(v.Cert.Raw)
 
 	// Verify the signature based on the public key type
@@ -242,7 +243,8 @@ func (v *SCTVerifier) VerifySCT() error {
 			return fmt.Errorf("failed to verify ECDSA signature")
 		}
 	case *rsa.PublicKey:
-		// Hash the data before verifying the RSA signature
+		// Hash the data before verifying the RSA
+		// TODO: Do we really need to improve this to make it more flexible (e.g., if the certificate does not use SHA-256)?
 		hasher := sha256.New()
 		hasher.Write(data)
 		hashedData := hasher.Sum(nil)
