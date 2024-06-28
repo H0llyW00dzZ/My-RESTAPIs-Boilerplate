@@ -84,6 +84,9 @@ func (config *RedisClientConfig) InitializeRedisClient() *redis.Client {
 		// Note: TLSConfig is optional, but it is recommended for better security, so it's advisable to use it.
 		// Also note that for non-Kubernetes environments, it is recommended to use TLS. For certificates, packages from https://pkg.go.dev/golang.org/x/crypto@v0.24.0/acme or Caddy can be used.
 		// Personally, I don't use this because I am running on Kubernetes with another secure connection method (e.g., bound pods/node ports).
+		// For Mutual TLS or whatever it is, see: https://redis.io/docs/latest/operate/rc/security/database-security/tls-ssl/. However,
+		// the requirement for Mutual TLS or whatever it is depends on how the cloud provider sets it up.
+		// For example, in some cloud providers, Mutual TLS or whatever it is may not be needed, and only the following settings are required.
 		TLSConfig: &tls.Config{
 			// Explicitly set the maximum and minimum TLS versions to 1.3 this server anyways.
 			// However Go's standard TLS 1.3 implementation is broken because it keeps forcing the use of the AES-GCM cipher suite.
@@ -133,6 +136,9 @@ func (config *FiberRedisClientConfig) InitializeRedisStorage() fiber.Storage {
 		// Note: TLSConfig is optional, but it is recommended for better security, so it's advisable to use it.
 		// Also note that for non-Kubernetes environments, it is recommended to use TLS. For certificates, packages from https://pkg.go.dev/golang.org/x/crypto@v0.24.0/acme or Caddy can be used.
 		// Personally, I don't use this because I am running on Kubernetes with another secure connection method (e.g., bound pods/node ports).
+		// For Mutual TLS or whatever it is, see: https://redis.io/docs/latest/operate/rc/security/database-security/tls-ssl/. However,
+		// the requirement for Mutual TLS or whatever it is depends on how the cloud provider sets it up.
+		// For example, in some cloud providers, Mutual TLS or whatever it is may not be needed, and only the following settings are required.
 		TLSConfig: &tls.Config{
 			// Explicitly set the maximum and minimum TLS versions to 1.3 this server anyways.
 			// However Go's standard TLS 1.3 implementation is broken because it keeps forcing the use of the AES-GCM cipher suite.
