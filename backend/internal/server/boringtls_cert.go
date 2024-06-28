@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"crypto"
 	"crypto/ecdsa"
-	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
 	"crypto/x509"
@@ -139,7 +138,10 @@ const (
 // Note: Currently unused because it's boring to submit Certificate Transparency logs, unlike implementing a Cryptographic Protocol.
 func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, privateKey crypto.PrivateKey, ctLog CTLog, httpRequestMaker *HTTPRequestMaker) error {
 	// Encode the certificate in DER format
-	certDER, err := x509.CreateCertificate(rand.Reader, cert, cert, publicKey(privateKey), privateKey)
+	// Note: The [RandTLS()] function provides sufficient randomness for the purposes of [x509.CreateCertificate],
+	// including generating serial numbers and signing certificates with any type of key,
+	// instead of multiple calls to [io.Reader], following DRY (Don't Repeat Yourself).
+	certDER, err := x509.CreateCertificate(RandTLS(), cert, cert, publicKey(privateKey), privateKey)
 	if err != nil {
 		return fmt.Errorf("failed to encode certificate: %v", err)
 	}
