@@ -274,7 +274,19 @@ func (v *SCTVerifier) VerifySCT() error {
 // VerifyTimestamp checks if the timestamp in the SCT response is within a valid range.
 func (v *SCTVerifier) VerifyTimestamp() bool {
 	now := time.Now().Unix()
-	return v.Response.Timestamp >= uint64(now-24*60*60) && v.Response.Timestamp <= uint64(now+24*60*60)
+	sctTime := int64(v.Response.Timestamp)
+
+	// Check if the SCT timestamp is within ±24 hours from the current time
+	if sctTime < now-24*60*60 || sctTime > now+24*60*60 {
+		return false
+	}
+
+	// Check if the SCT timestamp is within the validity period of the certificate
+	if sctTime < v.Cert.NotBefore.Unix() || sctTime > v.Cert.NotAfter.Unix() {
+		return false
+	}
+
+	return true
 }
 
 // publicKey returns the public key associated with the given private key.
