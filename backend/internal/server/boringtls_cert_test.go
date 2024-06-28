@@ -1054,7 +1054,7 @@ func TestSubmitToCTLog(t *testing.T) {
 		}
 	})
 
-	// Test case 15: failed verify Ed25519 signature due to expired certificate
+	// Test case 16: failed verify Ed25519 signature due to expired certificate
 	t.Run("FailedVerifyEd25519SignatureExpired", func(t *testing.T) {
 		// Generate a self-signed certificate with a valid Ed25519 private key
 		cert, privateKey, err := generateSelfSignedCertEd25519WithExpired()
