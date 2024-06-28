@@ -228,7 +228,12 @@ func TestSubmitToCTLog(t *testing.T) {
 			DoFunc: func(req *http.Request) (*http.Response, error) {
 				// Prepare the mock response with an invalid SCT response
 				invalidSCTResponse := server.SCTResponse{
-					SCTVersion: server.CTVersion2 + 1, // Unsupported SCT version
+					SCTVersion:   server.CTVersion2 + 1, // Unsupported SCT version
+					ID:           "test-ct-log",
+					Timestamp:    uint64(time.Now().Unix()),
+					Extensions:   "",
+					STHExtension: "",
+					Signature:    base64.StdEncoding.EncodeToString([]byte("invalid-signature")),
 				}
 				responseBody, _ := sonic.Marshal(invalidSCTResponse)
 				mockResponse := &http.Response{
@@ -375,4 +380,140 @@ func TestSubmitToCTLog(t *testing.T) {
 		// Verification & Certificate Transparency submitted successfully
 		t.Log("Hello Crypto: Certificate submitted to CT log successfully")
 	})
+
+	// Test case 6: Successful submission to CT log with CTVersion2
+	t.Run("SuccessfulSubmissionCTVersion2", func(t *testing.T) {
+		// Generate a self-signed certificate with a valid ECDSA private key
+		cert, privateKey, err := generateSelfSignedCertECDSA()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Create a mock HTTP client
+		mockHTTPClient := &MockHTTPClient{
+			DoFunc: func(req *http.Request) (*http.Response, error) {
+				// Prepare the mock response with a valid SCT response for CTVersion2
+				timestamp := uint64(time.Now().Unix())
+				transItem := struct {
+					SCTVersion   uint8
+					Timestamp    uint64
+					Extensions   []byte
+					STHExtension []byte
+				}{
+					SCTVersion:   server.CTVersion2,
+					Timestamp:    timestamp,
+					Extensions:   []byte(""),
+					STHExtension: []byte(""),
+				}
+				transItemBytes, _ := sonic.Marshal(transItem)
+
+				signature, err := ecdsa.SignASN1(rand.Reader, privateKey, transItemBytes)
+				if err != nil {
+					t.Fatalf("Failed to generate signature: %v", err)
+				}
+
+				sctResponse := server.SCTResponse{
+					SCTVersion:   server.CTVersion2,
+					ID:           "test-ct-log",
+					Timestamp:    timestamp,
+					Extensions:   "",
+					STHExtension: "",
+					Signature:    base64.StdEncoding.EncodeToString(signature),
+				}
+				responseBody, _ := sonic.Marshal(sctResponse)
+				mockResponse := &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(bytes.NewBuffer(responseBody)),
+				}
+				return mockResponse, nil
+			},
+		}
+
+		// Replace the MakeHTTPRequestFunc with the mock implementation
+		httpRequestMaker.MakeHTTPRequestFunc = func(req *http.Request) (*http.Response, error) {
+			return mockHTTPClient.Do(req)
+		}
+
+		// Call the SubmitToCTLog method with the HTTPRequestMaker and private key
+		err = fiberServer.SubmitToCTLog(cert, privateKey, ctLog, httpRequestMaker)
+
+		// Assert the expectations
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+
+		// Verification & Certificate Transparency submitted successfully
+		t.Log("Hello Crypto: Certificate submitted to CT log successfully")
+	})
+
+	// Test case 7: Successful submission to CT log with RSA key and CTVersion2
+	t.Run("SuccessfulSubmissionRSACTVersion2", func(t *testing.T) {
+		// Generate a self-signed certificate with a valid RSA private key
+		cert, privateKey, err := generateSelfSignedCertRSA()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Create a mock HTTP client
+		mockHTTPClient := &MockHTTPClient{
+			DoFunc: func(req *http.Request) (*http.Response, error) {
+				// Prepare the mock response with a valid SCT response for CTVersion2
+				timestamp := uint64(time.Now().Unix())
+				transItem := struct {
+					SCTVersion   uint8
+					Timestamp    uint64
+					Extensions   []byte
+					STHExtension []byte
+				}{
+					SCTVersion:   server.CTVersion2,
+					Timestamp:    timestamp,
+					Extensions:   []byte(""),
+					STHExtension: []byte(""),
+				}
+				transItemBytes, _ := sonic.Marshal(transItem)
+
+				// Hash the data before signing
+				hasher := sha256.New()
+				hasher.Write(transItemBytes)
+				hashedData := hasher.Sum(nil)
+
+				signature, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA256, hashedData)
+				if err != nil {
+					t.Fatalf("Failed to generate signature: %v", err)
+				}
+
+				sctResponse := server.SCTResponse{
+					SCTVersion:   server.CTVersion2,
+					ID:           "test-ct-log",
+					Timestamp:    timestamp,
+					Extensions:   "",
+					STHExtension: "",
+					Signature:    base64.StdEncoding.EncodeToString(signature),
+				}
+				responseBody, _ := sonic.Marshal(sctResponse)
+				mockResponse := &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(bytes.NewBuffer(responseBody)),
+				}
+				return mockResponse, nil
+			},
+		}
+
+		// Replace the MakeHTTPRequestFunc with the mock implementation
+		httpRequestMaker.MakeHTTPRequestFunc = func(req *http.Request) (*http.Response, error) {
+			return mockHTTPClient.Do(req)
+		}
+
+		// Call the SubmitToCTLog method with the HTTPRequestMaker and RSA private key
+		err = fiberServer.SubmitToCTLog(cert, privateKey, ctLog, httpRequestMaker)
+
+		// Assert the expectations
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+
+		// Verification & Certificate Transparency submitted successfully
+		t.Log("Hello Crypto: Certificate submitted to CT log successfully")
+	})
+
 }
