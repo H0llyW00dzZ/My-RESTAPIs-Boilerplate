@@ -92,6 +92,7 @@ func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, ctLog CTLog) error {
 	}
 
 	// Calculate the SHA-256 hash of the certificate
+	// TODO: Do we really need to improve this to make it more flexible (e.g., if the certificate does not use SHA-256)?
 	hash := sha256.Sum256(certDER)
 
 	// Create the JSON payload for submitting the certificate to the CT log
