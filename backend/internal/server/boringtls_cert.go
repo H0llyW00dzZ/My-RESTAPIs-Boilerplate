@@ -153,8 +153,13 @@ func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, privateKey crypto.Pr
 	}
 	req.Header.Set(ContentType, ContentTypeJSON)
 
-	// Send the HTTP request using the helper function
-	resp, err := httpRequestMaker.MakeHTTPRequest(req)
+	// Send the HTTP request using the helper function or MakeHTTPRequest directly
+	var resp *http.Response
+	if httpRequestMaker != nil {
+		resp, err = httpRequestMaker.MakeHTTPRequest(req)
+	} else {
+		resp, err = s.MakeHTTPRequest(req)
+	}
 	if err != nil {
 		return fmt.Errorf("failed to submit certificate to CT log: %v", err)
 	}
