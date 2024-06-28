@@ -214,6 +214,8 @@ type SCTVerifier struct {
 
 // VerifySCT verifies the signed certificate timestamp (SCT).
 func (v *SCTVerifier) VerifySCT() error {
+	// Note: This is a method Go idiom that uses the constant iota sequence.
+	// It is particularly useful in cryptographic operations (e.g., implementing custom ciphers, custom protocols, or any cryptography-related tasks).
 	if v.Response.SCTVersion < CTVersion1 || v.Response.SCTVersion > LatestCTVersion {
 		return fmt.Errorf("unsupported SCT version: %d", v.Response.SCTVersion)
 	}
