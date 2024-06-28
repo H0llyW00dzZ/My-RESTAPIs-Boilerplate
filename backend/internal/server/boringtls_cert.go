@@ -53,6 +53,20 @@ const (
 	ContentType = fiber.HeaderContentType
 )
 
+const (
+	// CTVersion1 represents version 1 of the Certificate Transparency (CT) protocol.
+	// It is defined using an iota constant, allowing for easy extensibility and readability.
+	CTVersion1 uint8 = iota + 1
+
+	// CTVersion2 represents version 2 of the Certificate Transparency (CT) protocol.
+	// It is automatically assigned the next value in the iota sequence.
+	CTVersion2
+
+	// LatestCTVersion represents the latest version of the Certificate Transparency (CT) protocol.
+	// It should be updated whenever a new version is added.
+	LatestCTVersion = CTVersion2
+)
+
 // SubmitToCTLog submits the given certificate to the specified Certificate Transparency log.
 //
 // The function takes the following parameters:
@@ -200,7 +214,7 @@ type SCTVerifier struct {
 
 // VerifySCT verifies the signed certificate timestamp (SCT).
 func (v *SCTVerifier) VerifySCT() error {
-	if v.Response.SCTVersion != 0 {
+	if v.Response.SCTVersion < CTVersion1 || v.Response.SCTVersion > LatestCTVersion {
 		return fmt.Errorf("unsupported SCT version: %d", v.Response.SCTVersion)
 	}
 
