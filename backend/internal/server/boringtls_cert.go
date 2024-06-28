@@ -13,6 +13,7 @@ import (
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -281,7 +282,7 @@ func (v *SCTVerifier) VerifySCT() error {
 	switch publicKey := v.Cert.PublicKey.(type) {
 	case *ecdsa.PublicKey:
 		if !ecdsa.VerifyASN1(publicKey, data, signature) {
-			return fmt.Errorf("failed to verify ECDSA signature")
+			return errors.New("failed to verify ECDSA signature")
 		}
 	case *rsa.PublicKey:
 		// Hash the data before verifying the RSA signature
