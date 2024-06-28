@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"crypto"
 	"crypto/ecdsa"
+	"crypto/ed25519"
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/rsa"
@@ -105,6 +106,41 @@ func generateSelfSignedCertRSA() (*x509.Certificate, *rsa.PrivateKey, error) {
 	}
 
 	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	cert, err := x509.ParseCertificate(derBytes)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return cert, privateKey, nil
+}
+
+func generateSelfSignedCertEd25519() (*x509.Certificate, ed25519.PrivateKey, error) {
+	privateKey := ed25519.NewKeyFromSeed(make([]byte, ed25519.SeedSize))
+	publicKey := privateKey.Public().(ed25519.PublicKey)
+
+	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	template := x509.Certificate{
+		SerialNumber: serialNumber,
+		Subject: pkix.Name{
+			CommonName: "example.com",
+		},
+		NotBefore: time.Now(),
+		NotAfter:  time.Now().Add(24 * time.Hour),
+
+		KeyUsage:              x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+	}
+
+	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, publicKey, privateKey)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -794,6 +830,183 @@ func TestSubmitToCTLog(t *testing.T) {
 			t.Error("Expected an error, but got nil")
 		}
 		expectedErrorMessage := "invalid timestamp: 9999"
+		if err != nil && err.Error() != expectedErrorMessage {
+			t.Errorf("Unexpected error message: %v", err)
+		}
+	})
+
+	// Test case 13: Successful submission to CT log with Ed25519 key
+	t.Run("SuccessfulSubmissionEd25519CTVersion1", func(t *testing.T) {
+		// Generate a self-signed certificate with a valid Ed25519 private key
+		cert, privateKey, err := generateSelfSignedCertEd25519()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Create a mock HTTP client
+		mockHTTPClient := &MockHTTPClient{
+			DoFunc: func(req *http.Request) (*http.Response, error) {
+				// Calculate the SHA-256 hash of the certificate
+				hash := sha256.Sum256(cert.Raw)
+
+				// Prepare the mock response with a valid SCT response
+				timestamp := uint64(time.Now().Unix())
+				data := append(hash[:], []byte(fmt.Sprintf("%d", timestamp))...)
+
+				signature := ed25519.Sign(privateKey, data)
+
+				sctResponse := server.SCTResponse{
+					SCTVersion: server.CTVersion1,
+					ID:         "test-ct-log",
+					Timestamp:  timestamp,
+					Extensions: "",
+					Signature:  base64.StdEncoding.EncodeToString(signature),
+				}
+				responseBody, _ := sonic.Marshal(sctResponse)
+				mockResponse := &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(bytes.NewBuffer(responseBody)),
+				}
+				return mockResponse, nil
+			},
+		}
+
+		// Replace the MakeHTTPRequestFunc with the mock implementation
+		httpRequestMaker.MakeHTTPRequestFunc = func(req *http.Request) (*http.Response, error) {
+			return mockHTTPClient.Do(req)
+		}
+
+		// Call the SubmitToCTLog method with the HTTPRequestMaker and Ed25519 private key
+		err = fiberServer.SubmitToCTLog(cert, privateKey, ctLog, httpRequestMaker)
+
+		// Assert the expectations
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+
+		// Verification & Certificate Transparency submitted successfully
+		t.Log("Hello Crypto: Certificate submitted to CT log successfully")
+	})
+
+	// Test case 14: Successful submission to CT log with Ed25519 key and CTVersion2
+	t.Run("SuccessfulSubmissionEd25519CTVersion2", func(t *testing.T) {
+		// Generate a self-signed certificate with a valid Ed25519 private key
+		cert, privateKey, err := generateSelfSignedCertEd25519()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Create a mock HTTP client
+		mockHTTPClient := &MockHTTPClient{
+			DoFunc: func(req *http.Request) (*http.Response, error) {
+				// Prepare the mock response with a valid SCT response for CTVersion2
+				timestamp := uint64(time.Now().Unix())
+				transItem := struct {
+					SCTVersion   uint8
+					Timestamp    uint64
+					Extensions   []byte
+					STHExtension []byte
+				}{
+					SCTVersion:   server.CTVersion2,
+					Timestamp:    timestamp,
+					Extensions:   []byte(""),
+					STHExtension: []byte(""),
+				}
+				transItemBytes, _ := sonic.Marshal(transItem)
+
+				signature := ed25519.Sign(privateKey, transItemBytes)
+
+				sctResponse := server.SCTResponse{
+					SCTVersion:   server.CTVersion2,
+					ID:           "test-ct-log",
+					Timestamp:    timestamp,
+					Extensions:   "",
+					STHExtension: "",
+					Signature:    base64.StdEncoding.EncodeToString(signature),
+				}
+				responseBody, _ := sonic.Marshal(sctResponse)
+				mockResponse := &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(bytes.NewBuffer(responseBody)),
+				}
+				return mockResponse, nil
+			},
+		}
+
+		// Replace the MakeHTTPRequestFunc with the mock implementation
+		httpRequestMaker.MakeHTTPRequestFunc = func(req *http.Request) (*http.Response, error) {
+			return mockHTTPClient.Do(req)
+		}
+
+		// Call the SubmitToCTLog method with the HTTPRequestMaker and Ed25519 private key
+		err = fiberServer.SubmitToCTLog(cert, privateKey, ctLog, httpRequestMaker)
+
+		// Assert the expectations
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+
+		// Verification & Certificate Transparency submitted successfully
+		t.Log("Hello Crypto: Certificate submitted to CT log successfully")
+	})
+
+	// Test case 15: failed verify Ed25519 signature
+	t.Run("FailedVerifyEd25519Signature", func(t *testing.T) {
+		// Generate a self-signed certificate with a valid Ed25519 private key
+		cert, privateKey, err := generateSelfSignedCertEd25519()
+		if err != nil {
+			t.Fatal(err)
+		}
+		// Generate a valid ECDSA private key
+		privateKeyx, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+		if err != nil {
+			t.Fatalf("Failed to generate ECDSA private key: %v", err)
+		}
+
+		// Create a mock HTTP client
+		mockHTTPClient := &MockHTTPClient{
+			DoFunc: func(req *http.Request) (*http.Response, error) {
+				// Prepare the mock response with a valid SCT response
+				// Calculate the SHA-256 hash of the certificate
+				hash := sha256.Sum256(cert.Raw)
+
+				// Prepare the mock response with a valid SCT response
+				timestamp := uint64(time.Now().Unix())
+				data := append(hash[:], []byte(fmt.Sprintf("%d", timestamp))...)
+
+				signature, err := ecdsa.SignASN1(rand.Reader, privateKeyx, data)
+				if err != nil {
+					t.Fatalf("Failed to generate signature: %v", err)
+				}
+				sctResponse := server.SCTResponse{
+					SCTVersion: server.CTVersion1,
+					ID:         "test-ct-log",
+					Timestamp:  timestamp,
+					Extensions: "",
+					Signature:  base64.StdEncoding.EncodeToString(signature),
+				}
+				responseBody, _ := sonic.Marshal(sctResponse)
+				mockResponse := &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(bytes.NewBuffer(responseBody)),
+				}
+				return mockResponse, nil
+			},
+		}
+
+		// Replace the MakeHTTPRequestFunc with the mock implementation
+		httpRequestMaker.MakeHTTPRequestFunc = func(req *http.Request) (*http.Response, error) {
+			return mockHTTPClient.Do(req)
+		}
+
+		// Call the SubmitToCTLog method with the HTTPRequestMaker and the mock private key
+		err = fiberServer.SubmitToCTLog(cert, privateKey, ctLog, httpRequestMaker)
+
+		// Assert the expectations
+		if err == nil {
+			t.Error("Expected an error, but got nil")
+		}
+		expectedErrorMessage := "failed to verify Ed25519 signature"
 		if err != nil && err.Error() != expectedErrorMessage {
 			t.Errorf("Unexpected error message: %v", err)
 		}

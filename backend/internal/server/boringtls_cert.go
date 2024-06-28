@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"crypto"
 	"crypto/ecdsa"
+	"crypto/ed25519"
 	"crypto/rsa"
 	"crypto/sha256"
 	"crypto/x509"
@@ -283,6 +284,8 @@ func publicKey(priv crypto.PrivateKey) crypto.PublicKey {
 		return &k.PublicKey
 	case *ecdsa.PrivateKey:
 		return &k.PublicKey
+	case ed25519.PrivateKey:
+		return k.Public().(ed25519.PublicKey)
 	default:
 		return nil
 	}
@@ -320,6 +323,10 @@ func (v *SCTVerifier) verifySignature(data, signature []byte) error {
 	case *rsa.PublicKey:
 		if err := v.verifyRSASignature(publicKey, data, signature); err != nil {
 			return err
+		}
+	case ed25519.PublicKey:
+		if !ed25519.Verify(publicKey, data, signature) {
+			return errors.New("failed to verify Ed25519 signature")
 		}
 	default:
 		return fmt.Errorf("unsupported public key type: %T", v.Cert.PublicKey)
