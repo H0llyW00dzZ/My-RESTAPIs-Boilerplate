@@ -120,7 +120,7 @@ const (
 //	}
 //	fmt.Println("Certificate submitted to CT log successfully")
 //
-// Note: Currently unused.
+// Note: Currently unused because it's boring to submit Certificate Transparency logs, unlike implementing a Cryptographic Protocol.
 func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, privateKey crypto.PrivateKey, ctLog CTLog, httpRequestMaker *HTTPRequestMaker) error {
 	// Encode the certificate in DER format
 	certDER, err := x509.CreateCertificate(rand.Reader, cert, cert, publicKey(privateKey), privateKey)
