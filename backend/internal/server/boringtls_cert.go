@@ -148,7 +148,7 @@ func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, privateKey crypto.Pr
 
 	// Calculate the SHA-256 hash of the certificate
 	// TODO: Do we really need to improve this to make it more flexible (e.g., if the certificate does not use SHA-256)?
-	hash := sha256.Sum256(certDER)
+	h := sha256.Sum256(certDER)
 
 	// Create the JSON payload for submitting the certificate to the CT log
 	payload := struct {
@@ -201,7 +201,7 @@ func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, privateKey crypto.Pr
 	// Verify the signed certificate timestamp (SCT)
 	sctVerifier := &SCTVerifier{
 		Response: response,
-		Hash:     hash,
+		Hash:     h,
 		Cert:     cert,
 		json:     jsonConfig,
 	}
@@ -250,54 +250,21 @@ func (v *SCTVerifier) VerifySCT() error {
 	// Calculate the hash of the certificate in DER format
 	// TODO: Do we really need to improve this to make it more flexible (e.g., if the certificate does not use SHA-256)?
 	var data []byte
-	hash := sha256.Sum256(v.Cert.Raw)
+	h := sha256.Sum256(v.Cert.Raw)
 	switch v.Response.SCTVersion {
 	case CTVersion1:
-		data = append(hash[:], []byte(fmt.Sprintf("%d", v.Response.Timestamp))...)
-		// Note: When there is another version (e.g., Version 3), this Version 2 logic should be extracted
-		// into a separate function to keep the code simple and maintainable.
+		data = append(h[:], []byte(fmt.Sprintf("%d", v.Response.Timestamp))...)
 	case CTVersion2:
-		// Construct the TransItem structure for signature verification
-		transItem := struct {
-			SCTVersion   uint8
-			Timestamp    uint64
-			Extensions   []byte
-			STHExtension []byte
-		}{
-			SCTVersion:   v.Response.SCTVersion,
-			Timestamp:    v.Response.Timestamp,
-			Extensions:   []byte(v.Response.Extensions),
-			STHExtension: []byte(v.Response.STHExtension),
-		}
-
-		// Encode the TransItem structure using Fiber's JSON encoding configuration
-		transItemBytes, err := v.json.Marshal(transItem)
+		data, err = v.constructTransmissionItemV2()
 		if err != nil {
-			return fmt.Errorf("failed to encode TransItem: %v", err)
+			return err
 		}
-		data = transItemBytes
 	default:
 		return fmt.Errorf("unsupported SCT version: %d", v.Response.SCTVersion)
 	}
 
-	// Verify the signature based on the public key type
-	switch publicKey := v.Cert.PublicKey.(type) {
-	case *ecdsa.PublicKey:
-		if !ecdsa.VerifyASN1(publicKey, data, signature) {
-			return errors.New("failed to verify ECDSA signature")
-		}
-	case *rsa.PublicKey:
-		// Hash the data before verifying the RSA signature
-		// TODO: Do we really need to improve this to make it more flexible (e.g., if the certificate does not use SHA-256)?
-		hasher := sha256.New()
-		hasher.Write(data)
-		hashedData := hasher.Sum(nil)
-
-		if err := rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hashedData, signature); err != nil {
-			return fmt.Errorf("failed to verify RSA signature: %v", err)
-		}
-	default:
-		return fmt.Errorf("unsupported public key type: %T", v.Cert.PublicKey)
+	if err := v.verifySignature(data, signature); err != nil {
+		return err
 	}
 
 	return nil
@@ -319,4 +286,57 @@ func publicKey(priv crypto.PrivateKey) crypto.PublicKey {
 	default:
 		return nil
 	}
+}
+
+// constructTransmissionItemV2 constructs the transmission Item structure for SCT version 2.
+func (v *SCTVerifier) constructTransmissionItemV2() ([]byte, error) {
+	transMissionItem := struct {
+		SCTVersion   uint8
+		Timestamp    uint64
+		Extensions   []byte
+		STHExtension []byte
+	}{
+		SCTVersion:   v.Response.SCTVersion,
+		Timestamp:    v.Response.Timestamp,
+		Extensions:   []byte(v.Response.Extensions),
+		STHExtension: []byte(v.Response.STHExtension),
+	}
+
+	transmissionItemBytes, err := v.json.Marshal(transMissionItem)
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode TransMissionItem: %v", err)
+	}
+
+	return transmissionItemBytes, nil
+}
+
+// verifySignature verifies the signature based on the public key type.
+func (v *SCTVerifier) verifySignature(data, signature []byte) error {
+	switch publicKey := v.Cert.PublicKey.(type) {
+	case *ecdsa.PublicKey:
+		if !ecdsa.VerifyASN1(publicKey, data, signature) {
+			return errors.New("failed to verify ECDSA signature")
+		}
+	case *rsa.PublicKey:
+		if err := v.verifyRSASignature(publicKey, data, signature); err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("unsupported public key type: %T", v.Cert.PublicKey)
+	}
+
+	return nil
+}
+
+// verifyRSASignature verifies the RSA signature.
+func (v *SCTVerifier) verifyRSASignature(publicKey *rsa.PublicKey, data, signature []byte) error {
+	h := sha256.New()
+	h.Write(data)
+	hashedData := h.Sum(nil)
+
+	if err := rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hashedData, signature); err != nil {
+		return fmt.Errorf("failed to verify RSA signature: %v", err)
+	}
+
+	return nil
 }
