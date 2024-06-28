@@ -51,6 +51,38 @@ const (
 
 // SubmitToCTLog submits the given certificate to the specified Certificate Transparency log.
 //
+// Example Usage:
+//
+//	// Load the certificate from a PEM-encoded file
+//	certPEM, err := os.ReadFile("path/to/certificate.pem")
+//	if err != nil {
+//		log.Fatalf("failed to read certificate file: %v", err)
+//	}
+//
+//	// Decode the PEM-encoded certificate
+//	block, _ := pem.Decode(certPEM)
+//	if block == nil || block.Type != "CERTIFICATE" {
+//		log.Fatal("failed to decode PEM-encoded certificate")
+//	}
+//
+//	// Parse the X.509 certificate
+//	cert, err := x509.ParseCertificate(block.Bytes)
+//	if err != nil {
+//		log.Fatalf("failed to parse certificate: %v", err)
+//	}
+//
+//	// Define the CT log server URL
+//	ctLog := server.CTLog{
+//		URL: "https://ct.example.com",
+//	}
+//
+//	// Submit the certificate to the CT log
+//	err = server.SubmitToCTLog(cert, ctLog)
+//	if err != nil {
+//		log.Fatalf("failed to submit certificate to CT log: %v", err)
+//	}
+//	 fmt.Println("Certificate submitted to CT log successfully")
+//
 // Note: Currently unused and marked as TODO.
 func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, ctLog CTLog) error {
 	// Encode the certificate in DER format
@@ -104,41 +136,53 @@ func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, ctLog CTLog) error {
 	}
 
 	// Verify the signed certificate timestamp (SCT)
-	if err := verifySCT(response, hash, cert); err != nil {
+	sctVerifier := &SCTVerifier{
+		Response: response,
+		Hash:     hash,
+		Cert:     cert,
+	}
+	if err := sctVerifier.VerifySCT(); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// verifySCT verifies the signed certificate timestamp (SCT).
-func verifySCT(response SCTResponse, hash [32]byte, cert *x509.Certificate) error {
-	if response.SCTVersion != 0 {
-		return fmt.Errorf("unsupported SCT version: %d", response.SCTVersion)
+// SCTVerifier represents a verifier for signed certificate timestamps (SCTs).
+type SCTVerifier struct {
+	Response SCTResponse
+	Hash     [32]byte
+	Cert     *x509.Certificate
+}
+
+// VerifySCT verifies the signed certificate timestamp (SCT).
+func (v *SCTVerifier) VerifySCT() error {
+	if v.Response.SCTVersion != 0 {
+		return fmt.Errorf("unsupported SCT version: %d", v.Response.SCTVersion)
 	}
 
 	// Decode the base64-encoded signature
-	signature, err := base64.StdEncoding.DecodeString(response.Signature)
+	signature, err := base64.StdEncoding.DecodeString(v.Response.Signature)
 	if err != nil {
 		return fmt.Errorf("failed to decode signature: %v", err)
 	}
 
 	// Verify the timestamp
-	if !verifyTimestamp(response.Timestamp) {
-		return fmt.Errorf("invalid timestamp: %d", response.Timestamp)
+	if !v.VerifyTimestamp() {
+		return fmt.Errorf("invalid timestamp: %d", v.Response.Timestamp)
 	}
 
 	// Verify the signature
-	data := append(hash[:], []byte(fmt.Sprintf("%d", response.Timestamp))...)
-	if err := cert.CheckSignature(x509.SHA256WithRSA, data, signature); err != nil {
+	data := append(v.Hash[:], []byte(fmt.Sprintf("%d", v.Response.Timestamp))...)
+	if err := v.Cert.CheckSignature(v.Cert.SignatureAlgorithm, data, signature); err != nil {
 		return fmt.Errorf("failed to verify signature: %v", err)
 	}
 
 	return nil
 }
 
-// verifyTimestamp checks if the given timestamp is within a valid range.
-func verifyTimestamp(timestamp uint64) bool {
+// VerifyTimestamp checks if the timestamp in the SCT response is within a valid range.
+func (v *SCTVerifier) VerifyTimestamp() bool {
 	now := time.Now().Unix()
-	return timestamp >= uint64(now-24*60*60) && timestamp <= uint64(now+24*60*60)
+	return v.Response.Timestamp >= uint64(now-24*60*60) && v.Response.Timestamp <= uint64(now+24*60*60)
 }
