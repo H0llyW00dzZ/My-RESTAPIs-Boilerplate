@@ -141,7 +141,7 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 
 // getEnv reads an environment variable and returns its value.
 // If the environment variable is not set, it returns a specified default value.
-// This function encapsulates the standard library's os.LookupEnv to provide defaults,
+// This function encapsulates the standard library's [os.LookupEnv] to provide defaults,
 // following the common Go idiom of "make the zero value useful".
 func getEnv(key, defaultValue string) string {
 	value, exists := os.LookupEnv(key)
