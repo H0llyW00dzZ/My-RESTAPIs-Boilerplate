@@ -20,6 +20,6 @@ import "h0llyw00dz-template/backend/internal/server/k8s/metrics"
 //    options: Optional parameters for configuring the Prometheus middleware.
 func (s *FiberServer) RegisterRoutesPrometheus(path string, serviceName string, options ...any) {
 	prometheus := metrics.NewPrometheusMiddleware(serviceName, options...)
-	prometheus.RegisterAt(s.app, path)
-	s.app.Use(prometheus.Middleware)
+	prometheus.RegisterAt(s.App, path)
+	s.App.Use(prometheus.Middleware)
 }

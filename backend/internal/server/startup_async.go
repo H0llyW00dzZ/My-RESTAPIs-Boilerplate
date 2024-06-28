@@ -6,7 +6,9 @@ package server
 
 import (
 	"context"
+	"crypto"
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"net"
 	"os"
@@ -28,11 +30,12 @@ type Server interface {
 	CleanupDB() error
 	Mount(prefix string, app any)
 	MountPath(path string, handler any)
+	SubmitToCTLog(cert *x509.Certificate, privateKey crypto.PrivateKey, ctLog CTLog, httpRequestMaker *HTTPRequestMaker) error
 }
 
 // FiberServer implements the Server interface for a Fiber application.
 type FiberServer struct {
-	app *fiber.App
+	App *fiber.App
 	db  database.Service
 }
 
@@ -44,7 +47,7 @@ func NewFiberServer(app *fiber.App, appName, monitorPath string) *FiberServer {
 	// as it would create multiple database connections, leading to potential resource exhaustion.
 	db := database.New()
 	s := &FiberServer{
-		app: app,
+		App: app,
 		db:  db,
 	}
 	middleware.RegisterRoutes(app, appName, monitorPath, db)
@@ -59,27 +62,27 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 		if tlsConfig != nil && streamListener != nil {
 			// Note: This branch handles Boring TLS 1.3 scenarios where the TLS configuration is provided in "run.go".
 			// However, Boring TLS 1.3 is currently unavailable.
-			if err := s.app.Listener(streamListener); err != nil {
+			if err := s.App.Listener(streamListener); err != nil {
 				log.LogFatalf(ErrorHTTPListenAndServe, err)
 			}
 		} else if tlsConfig != nil {
 			// Note: This branch handles standard TLS 1.3 scenarios where the TLS configuration is provided in "run.go".
 			// It Force TLS 1.3, due Fiber wrong implementation, about ListenTLS related in "ListenTLSWithCertificate"
 			// it should be "if tlsConfig == nil" then load default instead of using "config := &tls.Config".
-			ln, err := net.Listen(s.app.Config().Network, addr)
+			ln, err := net.Listen(s.App.Config().Network, addr)
 			if err != nil {
 				log.LogFatal(err)
 			}
 			tlsListener := tls.NewListener(ln, tlsConfig)
-			s.app.SetTLSHandler(tlsHandler)
+			s.App.SetTLSHandler(tlsHandler)
 			// Pass the TLS listener directly to the Fiber app
-			if err := s.app.Listener(tlsListener); err != nil {
+			if err := s.App.Listener(tlsListener); err != nil {
 				log.LogFatalf(ErrorHTTPListenAndServe, err)
 			}
 		} else {
 			// Note: This branch handles TLS 1.2 scenarios or TLS 1.3 when run as a receiver forwarder (e.g. from nginx (Non Kubernetes), Ingress from nginx if it's running on Kubernetes)
 			// due to its non-secure nature and requirement to be in internal/development mode.
-			if err := s.app.Listen(addr); err != nil {
+			if err := s.App.Listen(addr); err != nil {
 				log.LogFatalf(ErrorHTTPListenAndServe, err)
 			}
 		}
@@ -88,7 +91,7 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 
 // Shutdown gracefully stops the Fiber server using the provided context.
 func (s *FiberServer) Shutdown(ctx context.Context) error {
-	return s.app.ShutdownWithContext(ctx)
+	return s.App.ShutdownWithContext(ctx)
 }
 
 // CleanupDB closes the database connection and Redis client, then logs the outcome.
@@ -116,9 +119,9 @@ func (s *FiberServer) Mount(prefix string, app any) {
 	// but it's not really needed at the moment.
 	switch v := app.(type) {
 	case *fiber.App:
-		s.app.Mount(prefix, v)
+		s.App.Mount(prefix, v)
 	case func(router fiber.Router):
-		group := s.app.Group(prefix)
+		group := s.App.Group(prefix)
 		v(group)
 	default:
 		panic(fmt.Errorf("unknown type for mounting: %T", v))
@@ -131,9 +134,9 @@ func (s *FiberServer) MountPath(path string, handler any) {
 	// but it's not really needed at the moment.
 	switch v := handler.(type) {
 	case fiber.Handler:
-		s.app.Get(path, v)
+		s.App.Get(path, v)
 	case func(router fiber.Router):
-		group := s.app.Group(path)
+		group := s.App.Group(path)
 		v(group)
 	default:
 		panic(fmt.Errorf("unknown type for mounting path: %T", v))

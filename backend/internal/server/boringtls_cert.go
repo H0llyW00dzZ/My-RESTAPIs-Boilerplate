@@ -6,6 +6,10 @@ package server
 
 import (
 	"bytes"
+	"crypto"
+	"crypto/ecdsa"
+	"crypto/rand"
+	"crypto/rsa"
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
@@ -51,24 +55,53 @@ const (
 
 // SubmitToCTLog submits the given certificate to the specified Certificate Transparency log.
 //
+// The function takes the following parameters:
+//   - cert: The X.509 certificate to be submitted to the CT log.
+//   - privateKey: The private key associated with the certificate.
+//   - ctLog: The CTLog struct representing the CT log server.
+//   - httpRequestMaker: An optional HTTPRequestMaker instance for making HTTP requests.
+//
+// The function performs the following steps:
+//  1. Encodes the certificate in DER format.
+//  2. Calculates the SHA-256 hash of the certificate.
+//  3. Creates a JSON payload containing the base64-encoded certificate.
+//  4. Sends an HTTP POST request to the CT log server with the JSON payload.
+//  5. Parses the response from the CT log server.
+//  6. Verifies the signed certificate timestamp (SCT) received in the response.
+//
+// If the submission is successful and the SCT is valid, the function returns nil.
+// If an error occurs during the submission or verification process, the function returns an error.
+//
 // Example Usage:
 //
-//	// Load the certificate from a PEM-encoded file
+//	// Load the certificate and private key
 //	certPEM, err := os.ReadFile("path/to/certificate.pem")
 //	if err != nil {
 //		log.Fatalf("failed to read certificate file: %v", err)
 //	}
-//
-//	// Decode the PEM-encoded certificate
-//	block, _ := pem.Decode(certPEM)
-//	if block == nil || block.Type != "CERTIFICATE" {
-//		log.Fatal("failed to decode PEM-encoded certificate")
+//	privateKeyPEM, err := os.ReadFile("path/to/private_key.pem")
+//	if err != nil {
+//		log.Fatalf("failed to read private key file: %v", err)
 //	}
 //
-//	// Parse the X.509 certificate
-//	cert, err := x509.ParseCertificate(block.Bytes)
+//	// Decode the PEM-encoded certificate and private key
+//	certBlock, _ := pem.Decode(certPEM)
+//	if certBlock == nil || certBlock.Type != "CERTIFICATE" {
+//		log.Fatal("failed to decode PEM-encoded certificate")
+//	}
+//	privateKeyBlock, _ := pem.Decode(privateKeyPEM)
+//	if privateKeyBlock == nil || privateKeyBlock.Type != "PRIVATE KEY" {
+//		log.Fatal("failed to decode PEM-encoded private key")
+//	}
+//
+//	// Parse the X.509 certificate and private key
+//	cert, err := x509.ParseCertificate(certBlock.Bytes)
 //	if err != nil {
 //		log.Fatalf("failed to parse certificate: %v", err)
+//	}
+//	privateKey, err := x509.ParsePKCS8PrivateKey(privateKeyBlock.Bytes)
+//	if err != nil {
+//		log.Fatalf("failed to parse private key: %v", err)
 //	}
 //
 //	// Define the CT log server URL
@@ -76,17 +109,21 @@ const (
 //		URL: "https://ct.example.com",
 //	}
 //
+//	// Create a Fiber server instance
+//	app := fiber.New()
+//	fiberServer := &server.FiberServer{App: app}
+//
 //	// Submit the certificate to the CT log
-//	err = server.SubmitToCTLog(cert, ctLog)
+//	err = fiberServer.SubmitToCTLog(cert, privateKey, ctLog, nil)
 //	if err != nil {
 //		log.Fatalf("failed to submit certificate to CT log: %v", err)
 //	}
-//	 fmt.Println("Certificate submitted to CT log successfully")
+//	fmt.Println("Certificate submitted to CT log successfully")
 //
-// Note: Currently unused and marked as TODO.
-func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, ctLog CTLog) error {
+// Note: Currently unused because it's boring to submit Certificate Transparency logs, unlike implementing a Cryptographic Protocol.
+func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, privateKey crypto.PrivateKey, ctLog CTLog, httpRequestMaker *HTTPRequestMaker) error {
 	// Encode the certificate in DER format
-	certDER, err := x509.CreateCertificate(nil, cert, cert, nil, nil)
+	certDER, err := x509.CreateCertificate(rand.Reader, cert, cert, publicKey(privateKey), privateKey)
 	if err != nil {
 		return fmt.Errorf("failed to encode certificate: %v", err)
 	}
@@ -104,7 +141,7 @@ func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, ctLog CTLog) error {
 
 	// Marshal the JSON payload
 	// Note: Reusable, instead of multiple calls to json encoder/decoder, following DRY (Don't Repeat Yourself)
-	jsonPayload, err := s.app.Config().JSONEncoder(payload)
+	jsonPayload, err := s.App.Config().JSONEncoder(payload)
 	if err != nil {
 		return fmt.Errorf("failed to marshal JSON payload: %v", err)
 	}
@@ -117,7 +154,7 @@ func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, ctLog CTLog) error {
 	req.Header.Set(ContentType, ContentTypeJSON)
 
 	// Send the HTTP request using the helper function
-	resp, err := s.makeHTTPRequest(req)
+	resp, err := httpRequestMaker.MakeHTTPRequest(req)
 	if err != nil {
 		return fmt.Errorf("failed to submit certificate to CT log: %v", err)
 	}
@@ -132,7 +169,7 @@ func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, ctLog CTLog) error {
 	}
 
 	// Note: Reusable, instead of multiple calls to json encoder/decoder, following DRY (Don't Repeat Yourself)
-	if err := s.app.Config().JSONDecoder(responseBody, &response); err != nil {
+	if err := s.App.Config().JSONDecoder(responseBody, &response); err != nil {
 		return fmt.Errorf("failed to parse response: %v", err)
 	}
 
@@ -173,10 +210,27 @@ func (v *SCTVerifier) VerifySCT() error {
 		return fmt.Errorf("invalid timestamp: %d", v.Response.Timestamp)
 	}
 
-	// Verify the signature
-	data := append(v.Hash[:], []byte(fmt.Sprintf("%d", v.Response.Timestamp))...)
-	if err := v.Cert.CheckSignature(v.Cert.SignatureAlgorithm, data, signature); err != nil {
-		return fmt.Errorf("failed to verify signature: %v", err)
+	// Calculate the hash of the certificate in DER format
+	hash := sha256.Sum256(v.Cert.Raw)
+
+	// Verify the signature based on the public key type
+	data := append(hash[:], []byte(fmt.Sprintf("%d", v.Response.Timestamp))...)
+	switch publicKey := v.Cert.PublicKey.(type) {
+	case *ecdsa.PublicKey:
+		if !ecdsa.VerifyASN1(publicKey, data, signature) {
+			return fmt.Errorf("failed to verify ECDSA signature")
+		}
+	case *rsa.PublicKey:
+		// Hash the data before verifying the RSA signature
+		hasher := sha256.New()
+		hasher.Write(data)
+		hashedData := hasher.Sum(nil)
+
+		if err := rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hashedData, signature); err != nil {
+			return fmt.Errorf("failed to verify RSA signature: %v", err)
+		}
+	default:
+		return fmt.Errorf("unsupported public key type: %T", v.Cert.PublicKey)
 	}
 
 	return nil
@@ -186,4 +240,16 @@ func (v *SCTVerifier) VerifySCT() error {
 func (v *SCTVerifier) VerifyTimestamp() bool {
 	now := time.Now().Unix()
 	return v.Response.Timestamp >= uint64(now-24*60*60) && v.Response.Timestamp <= uint64(now+24*60*60)
+}
+
+// publicKey returns the public key associated with the given private key.
+func publicKey(priv crypto.PrivateKey) crypto.PublicKey {
+	switch k := priv.(type) {
+	case *rsa.PrivateKey:
+		return &k.PublicKey
+	case *ecdsa.PrivateKey:
+		return &k.PublicKey
+	default:
+		return nil
+	}
 }

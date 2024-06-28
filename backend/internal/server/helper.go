@@ -167,10 +167,10 @@ func (r *fixedReader) Read(p []byte) (n int, err error) {
 	return rand.Read(p[:r.size])
 }
 
-// makeHTTPRequest is a helper function that makes an HTTP request using TLS 1.3.
+// MakeHTTPRequest is a helper function that makes an HTTP request using TLS 1.3.
 //
 // Note: This uses the standard library because it is only used for activation and certification, similar to them.
-func (s *FiberServer) makeHTTPRequest(req *http.Request) (*http.Response, error) {
+func (s *FiberServer) MakeHTTPRequest(req *http.Request) (*http.Response, error) {
 	// Create a custom TLS configuration with TLS 1.3 enabled
 	//
 	// Note: The cipher/preferred cipher in Go's standard TLS 1.3 implementation does not allow direct configuration of cipher suites. See the note about TLSConfig in "run.go".
@@ -201,4 +201,14 @@ func (s *FiberServer) makeHTTPRequest(req *http.Request) (*http.Response, error)
 	}
 
 	return resp, nil
+}
+
+// HTTPRequestMaker is a type that wraps the MakeHTTPRequest method.
+type HTTPRequestMaker struct {
+	MakeHTTPRequestFunc func(req *http.Request) (*http.Response, error)
+}
+
+// MakeHTTPRequest calls the wrapped MakeHTTPRequestFunc.
+func (h *HTTPRequestMaker) MakeHTTPRequest(req *http.Request) (*http.Response, error) {
+	return h.MakeHTTPRequestFunc(req)
 }
