@@ -29,11 +29,12 @@ type CTLog struct {
 
 // SCTResponse represents the response from the CT log server.
 type SCTResponse struct {
-	SCTVersion uint8  `json:"sct_version"`
-	ID         string `json:"id"`
-	Timestamp  uint64 `json:"timestamp"`
-	Extensions string `json:"extensions"`
-	Signature  string `json:"signature"`
+	SCTVersion   uint8  `json:"sct_version"`
+	ID           string `json:"id"`
+	Timestamp    uint64 `json:"timestamp"`
+	Extensions   string `json:"extensions"`
+	Signature    string `json:"signature"`
+	STHExtension string `json:"sth_extension,omitempty"`
 }
 
 const (
@@ -56,11 +57,11 @@ const (
 const (
 	// CTVersion1 represents version 1 of the Certificate Transparency (CT) protocol.
 	// It is defined using an iota constant, allowing for easy extensibility and readability.
-	CTVersion1 uint8 = iota + 1
+	CTVersion1 uint8 = iota + 1 // RFC 6962
 
 	// CTVersion2 represents version 2 of the Certificate Transparency (CT) protocol.
 	// It is automatically assigned the next value in the iota sequence.
-	CTVersion2
+	CTVersion2 // RFC 9162
 
 	// LatestCTVersion represents the latest version of the Certificate Transparency (CT) protocol.
 	// It should be updated whenever a new version is added.
@@ -198,7 +199,7 @@ func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, privateKey crypto.Pr
 		Hash:     hash,
 		Cert:     cert,
 	}
-	if err := sctVerifier.VerifySCT(); err != nil {
+	if err := sctVerifier.VerifySCT(s.App.Config().JSONEncoder); err != nil {
 		return err
 	}
 
@@ -213,7 +214,7 @@ type SCTVerifier struct {
 }
 
 // VerifySCT verifies the signed certificate timestamp (SCT).
-func (v *SCTVerifier) VerifySCT() error {
+func (v *SCTVerifier) VerifySCT(jsonEncoder func(v any) ([]byte, error)) error {
 	// Note: This is a method Go idiom that uses the constant iota sequence.
 	// It is particularly useful in cryptographic operations (e.g., implementing custom ciphers, custom protocols, or any cryptography-related tasks).
 	if v.Response.SCTVersion < CTVersion1 || v.Response.SCTVersion > LatestCTVersion {
@@ -233,17 +234,45 @@ func (v *SCTVerifier) VerifySCT() error {
 
 	// Calculate the hash of the certificate in DER format
 	// TODO: Do we really need to improve this to make it more flexible (e.g., if the certificate does not use SHA-256)?
+	var data []byte
 	hash := sha256.Sum256(v.Cert.Raw)
+	switch v.Response.SCTVersion {
+	case CTVersion1:
+		data = append(hash[:], []byte(fmt.Sprintf("%d", v.Response.Timestamp))...)
+		// Note: When there is another version (e.g., Version 3), this Version 2 logic should be extracted
+		// into a separate function to keep the code simple and maintainable.
+	case CTVersion2:
+		// Construct the TransItem structure for signature verification
+		transItem := struct {
+			SCTVersion   uint8
+			Timestamp    uint64
+			Extensions   []byte
+			STHExtension []byte
+		}{
+			SCTVersion:   v.Response.SCTVersion,
+			Timestamp:    v.Response.Timestamp,
+			Extensions:   []byte(v.Response.Extensions),
+			STHExtension: []byte(v.Response.STHExtension),
+		}
+
+		// Encode the TransItem structure using Fiber's JSON encoding configuration
+		transItemBytes, err := jsonEncoder(transItem)
+		if err != nil {
+			return fmt.Errorf("failed to encode TransItem: %v", err)
+		}
+		data = transItemBytes
+	default:
+		return fmt.Errorf("unsupported SCT version: %d", v.Response.SCTVersion)
+	}
 
 	// Verify the signature based on the public key type
-	data := append(hash[:], []byte(fmt.Sprintf("%d", v.Response.Timestamp))...)
 	switch publicKey := v.Cert.PublicKey.(type) {
 	case *ecdsa.PublicKey:
 		if !ecdsa.VerifyASN1(publicKey, data, signature) {
 			return fmt.Errorf("failed to verify ECDSA signature")
 		}
 	case *rsa.PublicKey:
-		// Hash the data before verifying the RSA
+		// Hash the data before verifying the RSA signature
 		// TODO: Do we really need to improve this to make it more flexible (e.g., if the certificate does not use SHA-256)?
 		hasher := sha256.New()
 		hasher.Write(data)
