@@ -20,6 +20,7 @@ import (
 	"io"
 	"math/big"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -316,4 +317,61 @@ func TestSubmitToCTLog(t *testing.T) {
 		t.Log("Hello Crypto: Certificate submitted to CT log successfully")
 	})
 
+	// Test case 5: Successful submission to CT log using MakeHTTPRequest directly
+	t.Run("SuccessfulSubmissionMakeHTTPRequest", func(t *testing.T) {
+		// Generate a self-signed certificate with a valid ECDSA private key
+		cert, privateKey, err := generateSelfSignedCertECDSA()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Create a test server that mocks the CT log server
+		testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Calculate the SHA-256 hash of the certificate
+			hash := sha256.Sum256(cert.Raw)
+
+			// Prepare the mock response with a valid SCT response
+			timestamp := uint64(time.Now().Unix())
+			data := append(hash[:], []byte(fmt.Sprintf("%d", timestamp))...)
+
+			signature, err := ecdsa.SignASN1(rand.Reader, privateKey, data)
+			if err != nil {
+				t.Fatalf("Failed to generate signature: %v", err)
+			}
+
+			sctResponse := server.SCTResponse{
+				SCTVersion: 0,
+				ID:         "test-ct-log",
+				Timestamp:  timestamp,
+				Extensions: "",
+				Signature:  base64.StdEncoding.EncodeToString(signature),
+			}
+			responseBody, _ := sonic.Marshal(sctResponse)
+			w.WriteHeader(http.StatusOK)
+			w.Write(responseBody)
+		}))
+		defer testServer.Close()
+
+		// Create a test CT log with the test server URL
+		ctLog := server.CTLog{
+			URL: testServer.URL,
+		}
+
+		// Create a test Fiber server
+		app := fiber.New()
+		fiberServer := &server.FiberServer{
+			App: app,
+		}
+
+		// Call the SubmitToCTLog method directly using MakeHTTPRequest
+		err = fiberServer.SubmitToCTLog(cert, privateKey, ctLog, nil)
+
+		// Assert the expectations
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+
+		// Verification & Certificate Transparency submitted successfully
+		t.Log("Hello Crypto: Certificate submitted to CT log successfully")
+	})
 }
