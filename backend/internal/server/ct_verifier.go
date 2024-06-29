@@ -41,7 +41,7 @@ type SCTData struct {
 
 // VerifyCertificateTransparency verifies the Certificate Transparency information for a given certificate.
 //
-// TODO: Improve this protocol, as it is currently unstable due to the difficulty of testing certificates in localhost.
+// TODO: Improve this protocol, as it is currently unstable due to the difficulty of testing using self certificates in localhost.
 func (ct *CTVerifier) VerifyCertificateTransparency(cert *x509.Certificate) error {
 	// Check if the certificate has SCTs (Signed Certificate Timestamps)
 	scts, err := ct.ExtractSCTsFromCertificate(cert)
@@ -65,7 +65,7 @@ func (ct *CTVerifier) VerifyCertificateTransparency(cert *x509.Certificate) erro
 
 // ExtractSCTsFromCertificate extracts the Signed Certificate Timestamps (SCTs) from a certificate.
 //
-// TODO: Improve this protocol, as it is currently unstable due to the difficulty of testing certificates in localhost.
+// TODO: Improve this protocol, as it is currently unstable due to the difficulty of testing using self certificates in localhost.
 func (ct *CTVerifier) ExtractSCTsFromCertificate(cert *x509.Certificate) ([]*SCTResponse, error) {
 	var scts []*SCTResponse
 
@@ -99,7 +99,7 @@ func (ct *CTVerifier) ExtractSCTsFromCertificate(cert *x509.Certificate) ([]*SCT
 
 // VerifySCT verifies a Signed Certificate Timestamp (SCT) against the certificate.
 //
-// TODO: Improve this protocol, as it is currently unstable due to the difficulty of testing certificates in localhost.
+// TODO: Improve this protocol, as it is currently unstable due to the difficulty of testing using self certificates in localhost.
 func (ct *CTVerifier) VerifySCT(sct *SCTResponse, cert *x509.Certificate) error {
 	jsonConfig := json{
 		Marshal:   sonic.Marshal,
