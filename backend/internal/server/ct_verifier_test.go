@@ -9,7 +9,6 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
-	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
@@ -255,7 +254,7 @@ func createTestCertificateValidSCTsForLTS(t *testing.T) (*x509.Certificate, cryp
 		BasicConstraintsValid: true,
 	}
 
-	// Generate a new private key
+	// Generate a new ECDSA private key
 	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		t.Fatalf("Failed to generate private key: %v", err)
@@ -299,8 +298,11 @@ func createTestCertificateValidSCTsForLTS(t *testing.T) (*x509.Certificate, cryp
 	sctData = append(sctData, cert.Raw...)
 
 	// Sign the SCT data
-	h := sha256.Sum256(sctData)
-	signature, err := ecdsa.SignASN1(rand.Reader, privateKey, h[:])
+	hash := crypto.SHA256
+	hasher := hash.New()
+	hasher.Write(sctData)
+	hashed := hasher.Sum(nil)
+	signature, err := ecdsa.SignASN1(rand.Reader, privateKey, hashed)
 	if err != nil {
 		t.Fatalf("Failed to generate signature: %v", err)
 	}
@@ -344,6 +346,8 @@ func createTestCertificateValidSCTsForLTS(t *testing.T) (*x509.Certificate, cryp
 }
 
 // TestVerifyCertificateTransparencyInTLSConnection tests the certificate transparency verification in a TLS connection.
+//
+// Note: This method currently works only with ECDSA certificates, not with other certificate.
 func TestVerifyCertificateTransparencyInTLSConnection(t *testing.T) {
 	// Create a test certificate with SCTs
 	cert, privateKey := createTestCertificateValidSCTsForLTS(t)
