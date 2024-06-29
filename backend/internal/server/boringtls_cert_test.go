@@ -230,12 +230,21 @@ func TestSubmitToCTLog(t *testing.T) {
 		// Create a mock HTTP client
 		mockHTTPClient := &MockHTTPClient{
 			DoFunc: func(req *http.Request) (*http.Response, error) {
-				// Calculate the SHA-256 hash of the certificate
-				hash := sha256.Sum256(cert.Raw)
-
 				// Prepare the mock response with a valid SCT response
 				timestamp := uint64(time.Now().Unix())
-				data := append(hash[:], []byte(fmt.Sprintf("%d", timestamp))...)
+				var data []byte
+				data = append(data, cert.Raw...)
+				data = append(data, byte(server.CTVersion1))
+				data = append(data, []byte("test-ct-log")...)
+				data = append(data, byte(timestamp>>56),
+					byte(timestamp>>48),
+					byte(timestamp>>40),
+					byte(timestamp>>32),
+					byte(timestamp>>24),
+					byte(timestamp>>16),
+					byte(timestamp>>8),
+					byte(timestamp))
+				data = append(data, []byte("")...)
 
 				signature, err := ecdsa.SignASN1(rand.Reader, privateKey, data)
 				if err != nil {
@@ -269,10 +278,10 @@ func TestSubmitToCTLog(t *testing.T) {
 		// Assert the expectations
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
+		} else {
+			// Verification & Certificate Transparency submitted successfully
+			t.Log("Hello Crypto: Certificate submitted to CT log successfully")
 		}
-
-		// Verification & Certificate Transparency submitted successfully
-		t.Log("Hello Crypto: Certificate submitted to CT log successfully")
 	})
 
 	// Test case 2: Failed submission to CT log
@@ -358,13 +367,21 @@ func TestSubmitToCTLog(t *testing.T) {
 		// Create a mock HTTP client
 		mockHTTPClient := &MockHTTPClient{
 			DoFunc: func(req *http.Request) (*http.Response, error) {
-				// Calculate the SHA-256 hash of the certificate
-				hash := sha256.Sum256(cert.Raw)
-
 				// Prepare the mock response with a valid SCT response
 				timestamp := uint64(time.Now().Unix())
-				data := append(hash[:], []byte(fmt.Sprintf("%d", timestamp))...)
-
+				var data []byte
+				data = append(data, cert.Raw...)
+				data = append(data, byte(server.CTVersion1))
+				data = append(data, []byte("test-ct-log")...)
+				data = append(data, byte(timestamp>>56),
+					byte(timestamp>>48),
+					byte(timestamp>>40),
+					byte(timestamp>>32),
+					byte(timestamp>>24),
+					byte(timestamp>>16),
+					byte(timestamp>>8),
+					byte(timestamp))
+				data = append(data, []byte("")...)
 				// Hash the data before signing
 				hasher := sha256.New()
 				hasher.Write(data)
@@ -402,10 +419,10 @@ func TestSubmitToCTLog(t *testing.T) {
 		// Assert the expectations
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
+		} else {
+			// Verification & Certificate Transparency submitted successfully
+			t.Log("Hello Crypto: Certificate submitted to CT log successfully")
 		}
-
-		// Verification & Certificate Transparency submitted successfully
-		t.Log("Hello Crypto: Certificate submitted to CT log successfully")
 	})
 
 	// Test case 5: Successful submission to CT log using MakeHTTPRequest directly
@@ -418,12 +435,21 @@ func TestSubmitToCTLog(t *testing.T) {
 
 		// Create a test server that mocks the CT log server
 		testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Calculate the SHA-256 hash of the certificate
-			hash := sha256.Sum256(cert.Raw)
-
 			// Prepare the mock response with a valid SCT response
 			timestamp := uint64(time.Now().Unix())
-			data := append(hash[:], []byte(fmt.Sprintf("%d", timestamp))...)
+			var data []byte
+			data = append(data, cert.Raw...)
+			data = append(data, byte(server.CTVersion1))
+			data = append(data, []byte("test-ct-log")...)
+			data = append(data, byte(timestamp>>56),
+				byte(timestamp>>48),
+				byte(timestamp>>40),
+				byte(timestamp>>32),
+				byte(timestamp>>24),
+				byte(timestamp>>16),
+				byte(timestamp>>8),
+				byte(timestamp))
+			data = append(data, []byte("")...)
 
 			signature, err := ecdsa.SignASN1(rand.Reader, privateKey, data)
 			if err != nil {
@@ -465,10 +491,10 @@ func TestSubmitToCTLog(t *testing.T) {
 		// Assert the expectations
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
+		} else {
+			// Verification & Certificate Transparency submitted successfully
+			t.Log("Hello Crypto: Certificate submitted to CT log successfully")
 		}
-
-		// Verification & Certificate Transparency submitted successfully
-		t.Log("Hello Crypto: Certificate submitted to CT log successfully")
 	})
 
 	// Test case 6: Successful submission to CT log with CTVersion2
@@ -530,10 +556,10 @@ func TestSubmitToCTLog(t *testing.T) {
 		// Assert the expectations
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
+		} else {
+			// Verification & Certificate Transparency submitted successfully
+			t.Log("Hello Crypto: Certificate submitted to CT log successfully")
 		}
-
-		// Verification & Certificate Transparency submitted successfully
-		t.Log("Hello Crypto: Certificate submitted to CT log successfully")
 	})
 
 	// Test case 7: Successful submission to CT log with RSA key and CTVersion2
@@ -600,10 +626,10 @@ func TestSubmitToCTLog(t *testing.T) {
 		// Assert the expectations
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
+		} else {
+			// Verification & Certificate Transparency submitted successfully
+			t.Log("Hello Crypto: Certificate submitted to CT log successfully")
 		}
-
-		// Verification & Certificate Transparency submitted successfully
-		t.Log("Hello Crypto: Certificate submitted to CT log successfully")
 	})
 
 	// Test case 8: Invalid signature decoding
@@ -669,12 +695,20 @@ func TestSubmitToCTLog(t *testing.T) {
 		mockHTTPClient := &MockHTTPClient{
 			DoFunc: func(req *http.Request) (*http.Response, error) {
 				// Prepare the mock response with a valid SCT response
-				// Calculate the SHA-256 hash of the certificate
-				hash := sha256.Sum256(cert.Raw)
-
-				// Prepare the mock response with a valid SCT response
 				timestamp := uint64(time.Now().Unix())
-				data := append(hash[:], []byte(fmt.Sprintf("%d", timestamp))...)
+				var data []byte
+				data = append(data, cert.Raw...)
+				data = append(data, byte(server.CTVersion1))
+				data = append(data, []byte("test-ct-log")...)
+				data = append(data, byte(timestamp>>56),
+					byte(timestamp>>48),
+					byte(timestamp>>40),
+					byte(timestamp>>32),
+					byte(timestamp>>24),
+					byte(timestamp>>16),
+					byte(timestamp>>8),
+					byte(timestamp))
+				data = append(data, []byte("")...)
 
 				signature, err := ecdsa.SignASN1(rand.Reader, privateKeyx, data)
 				if err != nil {
@@ -731,12 +765,20 @@ func TestSubmitToCTLog(t *testing.T) {
 		mockHTTPClient := &MockHTTPClient{
 			DoFunc: func(req *http.Request) (*http.Response, error) {
 				// Prepare the mock response with a valid SCT response
-				// Calculate the SHA-256 hash of the certificate
-				hash := sha256.Sum256(cert.Raw)
-
-				// Prepare the mock response with a valid SCT response
 				timestamp := uint64(time.Now().Unix())
-				data := append(hash[:], []byte(fmt.Sprintf("%d", timestamp))...)
+				var data []byte
+				data = append(data, cert.Raw...)
+				data = append(data, byte(server.CTVersion1))
+				data = append(data, []byte("test-ct-log")...)
+				data = append(data, byte(timestamp>>56),
+					byte(timestamp>>48),
+					byte(timestamp>>40),
+					byte(timestamp>>32),
+					byte(timestamp>>24),
+					byte(timestamp>>16),
+					byte(timestamp>>8),
+					byte(timestamp))
+				data = append(data, []byte("")...)
 
 				signature, err := ecdsa.SignASN1(rand.Reader, privateKeyx, data)
 				if err != nil {
@@ -834,12 +876,20 @@ func TestSubmitToCTLog(t *testing.T) {
 		mockHTTPClient := &MockHTTPClient{
 			DoFunc: func(req *http.Request) (*http.Response, error) {
 				// Prepare the mock response with a valid SCT response
-				// Calculate the SHA-256 hash of the certificate
-				hash := sha256.Sum256(cert.Raw)
-
-				// Prepare the mock response with a valid SCT response
 				timestamp := uint64(9999)
-				data := append(hash[:], []byte(fmt.Sprintf("%d", timestamp))...)
+				var data []byte
+				data = append(data, cert.Raw...)
+				data = append(data, byte(server.CTVersion1))
+				data = append(data, []byte("test-ct-log")...)
+				data = append(data, byte(timestamp>>56),
+					byte(timestamp>>48),
+					byte(timestamp>>40),
+					byte(timestamp>>32),
+					byte(timestamp>>24),
+					byte(timestamp>>16),
+					byte(timestamp>>8),
+					byte(timestamp))
+				data = append(data, []byte("")...)
 
 				signature, err := ecdsa.SignASN1(rand.Reader, privateKey, data)
 				if err != nil {
@@ -890,12 +940,21 @@ func TestSubmitToCTLog(t *testing.T) {
 		// Create a mock HTTP client
 		mockHTTPClient := &MockHTTPClient{
 			DoFunc: func(req *http.Request) (*http.Response, error) {
-				// Calculate the SHA-256 hash of the certificate
-				hash := sha256.Sum256(cert.Raw)
-
 				// Prepare the mock response with a valid SCT response
 				timestamp := uint64(time.Now().Unix())
-				data := append(hash[:], []byte(fmt.Sprintf("%d", timestamp))...)
+				var data []byte
+				data = append(data, cert.Raw...)
+				data = append(data, byte(server.CTVersion1))
+				data = append(data, []byte("test-ct-log")...)
+				data = append(data, byte(timestamp>>56),
+					byte(timestamp>>48),
+					byte(timestamp>>40),
+					byte(timestamp>>32),
+					byte(timestamp>>24),
+					byte(timestamp>>16),
+					byte(timestamp>>8),
+					byte(timestamp))
+				data = append(data, []byte("")...)
 
 				signature := ed25519.Sign(privateKey, data)
 
@@ -926,10 +985,10 @@ func TestSubmitToCTLog(t *testing.T) {
 		// Assert the expectations
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
+		} else {
+			// Verification & Certificate Transparency submitted successfully
+			t.Log("Hello Crypto: Certificate submitted to CT log successfully")
 		}
-
-		// Verification & Certificate Transparency submitted successfully
-		t.Log("Hello Crypto: Certificate submitted to CT log successfully")
 	})
 
 	// Test case 14: Successful submission to CT log with Ed25519 key and CTVersion2
@@ -988,10 +1047,10 @@ func TestSubmitToCTLog(t *testing.T) {
 		// Assert the expectations
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
+		} else {
+			// Verification & Certificate Transparency submitted successfully
+			t.Log("Hello Crypto: Certificate submitted to CT log successfully")
 		}
-
-		// Verification & Certificate Transparency submitted successfully
-		t.Log("Hello Crypto: Certificate submitted to CT log successfully")
 	})
 
 	// Test case 15: failed verify Ed25519 signature
