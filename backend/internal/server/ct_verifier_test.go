@@ -9,10 +9,13 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"encoding/asn1"
 	"encoding/base64"
+	"encoding/binary"
 	"fmt"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid/stream"
 	"h0llyw00dz-template/backend/internal/server"
@@ -486,4 +489,158 @@ func TestVerifyCertificateTransparencyInTLSConnection(t *testing.T) {
 	if err := <-errChan; err != nil {
 		t.Errorf("Server error: %v", err)
 	}
+}
+
+func generateSCTExtension(SCData server.SCTData) (pkix.Extension, error) {
+	// Marshal the SCT data into ASN.1 format
+	sctBytes, err := asn1.Marshal(SCData)
+	if err != nil {
+		return pkix.Extension{}, err
+	}
+
+	// Create the SCT extension
+	sctExtension := pkix.Extension{
+		Id:       server.OIDExtensionCTSCT,
+		Critical: false,
+		Value:    sctBytes,
+	}
+
+	return sctExtension, nil
+}
+
+// TestInvalidSCT tests the Invalid method of the CTVerifier.
+func TestInvalidSCT(t *testing.T) {
+	// Generate a dummy SCT data
+	timestamp := make([]byte, 8)
+	binary.BigEndian.PutUint64(timestamp, uint64(time.Now().Unix()))
+
+	// Create a new CTVerifier
+	ctVerifier := new(server.CTVerifier)
+
+	// Generate a random serial number
+	serialNumber, err := rand.Int(rand.Reader, big.NewInt(1<<62))
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	// Set the certificate subject and issuer
+	subject := pkix.Name{
+		Organization: []string{"Example Inc."},
+		CommonName:   "example.com",
+	}
+
+	// Set the certificate validity period
+	notBefore := time.Now()
+	notAfter := notBefore.Add(24 * time.Hour)
+
+	// Test case 1: Invalid SCT data (Insufficient Length)
+	t.Run("InvalidSCTDataInsufficientLength", func(t *testing.T) {
+		// Add an SCT extension to the certificate template
+		sctExtension, err := generateSCTExtension(
+			server.SCTData{
+				Version:    1,
+				LogID:      []byte("invalid"),
+				Timestamp:  asn1.RawValue{FullBytes: timestamp},
+				Extensions: []byte("invalid"),
+				Signature:  []byte("invalid"),
+			},
+		)
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+
+		// Generate a new RSA private key
+		privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+
+		// Generate a self-signed certificate with the SCT extension
+		template := x509.Certificate{
+			SerialNumber:    serialNumber,
+			Subject:         subject,
+			Issuer:          subject,
+			NotBefore:       notBefore,
+			NotAfter:        notAfter,
+			KeyUsage:        x509.KeyUsageDigitalSignature,
+			ExtKeyUsage:     []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			ExtraExtensions: []pkix.Extension{sctExtension},
+		}
+
+		// Create a self-signed certificate
+		certx, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+
+		// Parse the certificate
+		x509Cert, err := x509.ParseCertificate(certx)
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+
+		_, err = ctVerifier.ExtractSCTsFromCertificate(x509Cert)
+		if err == nil {
+			t.Errorf("Expected error due to invalid, but got nil.")
+		} else if err.Error() != "invalid SCT data: insufficient length" {
+			t.Errorf("Expected invalid SCT data: insufficient length, but got: %v", err)
+		} else {
+			t.Logf("Extract SCT Data failed as expected: %v", err)
+		}
+	})
+
+	// Test case 2: Invalid SCT data (insufficient length for signature)
+	t.Run("InvalidSCTDataInsufficientLengthSignature", func(t *testing.T) {
+		// Add an SCT extension to the certificate template
+		sctExtension, err := generateSCTExtension(
+			server.SCTData{
+				Version:    1,
+				LogID:      []byte("insufficient_signature"),
+				Timestamp:  asn1.RawValue{FullBytes: timestamp},
+				Extensions: []byte("insufficient_signature"),
+				Signature:  []byte("insufficient_signature"),
+			},
+		)
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+
+		// Generate a new RSA private key
+		privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+
+		// Generate a self-signed certificate with the SCT extension
+		template := x509.Certificate{
+			SerialNumber:    serialNumber,
+			Subject:         subject,
+			Issuer:          subject,
+			NotBefore:       notBefore,
+			NotAfter:        notAfter,
+			KeyUsage:        x509.KeyUsageDigitalSignature,
+			ExtKeyUsage:     []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			ExtraExtensions: []pkix.Extension{sctExtension},
+		}
+
+		// Create a self-signed certificate
+		certx, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+
+		// Parse the certificate
+		x509Cert, err := x509.ParseCertificate(certx)
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+		_, err = ctVerifier.ExtractSCTsFromCertificate(x509Cert)
+		if err == nil {
+			t.Errorf("Expected error due to invalid, but got nil.")
+		} else if err.Error() != "invalid SCT data: insufficient length for signature" {
+			t.Errorf("Expected invalid SCT data: insufficient length for signature, but got: %v", err)
+		} else {
+			t.Logf("Extract SCT Data failed as expected: %v", err)
+		}
+	})
 }
