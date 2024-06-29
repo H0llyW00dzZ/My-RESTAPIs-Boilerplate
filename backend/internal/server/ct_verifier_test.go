@@ -76,13 +76,19 @@ func createTestCertificateWithSCTs(t *testing.T) (*x509.Certificate, *server.SCT
 	// Create a self-signed certificate template
 	template := x509.Certificate{
 		SerialNumber: serialNumber,
+		Issuer: pkix.Name{
+			CommonName: "Gopher",
+		},
 		Subject: pkix.Name{
 			CommonName: "localhost",
 		},
-		NotBefore:             time.Now(),
-		NotAfter:              time.Now().Add(AheadTime24Hours),
-		KeyUsage:              x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		NotBefore: time.Now(),
+		NotAfter:  time.Now().Add(AheadTime24Hours),
+		KeyUsage:  x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
+		ExtKeyUsage: []x509.ExtKeyUsage{
+			x509.ExtKeyUsageServerAuth,
+			x509.ExtKeyUsageClientAuth,
+		},
 		BasicConstraintsValid: true,
 		ExtraExtensions: []pkix.Extension{
 			{
@@ -123,13 +129,19 @@ func createTestCertificateValidSCTs(t *testing.T) (*x509.Certificate, *server.SC
 	// Create a self-signed certificate template
 	template := x509.Certificate{
 		SerialNumber: serialNumber,
+		Issuer: pkix.Name{
+			CommonName: "Gopher",
+		},
 		Subject: pkix.Name{
 			CommonName: "localhost",
 		},
-		NotBefore:             time.Now(),
-		NotAfter:              time.Now().Add(AheadTime24Hours),
-		KeyUsage:              x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		NotBefore: time.Now(),
+		NotAfter:  time.Now().Add(AheadTime24Hours),
+		KeyUsage:  x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
+		ExtKeyUsage: []x509.ExtKeyUsage{
+			x509.ExtKeyUsageServerAuth,
+			x509.ExtKeyUsageClientAuth,
+		},
 		BasicConstraintsValid: true,
 	}
 
@@ -419,11 +431,6 @@ func TestVerifyCertificateTransparencyInTLSConnection(t *testing.T) {
 			return
 		}
 
-		if err := tlsConn.Handshake(); err != nil {
-			errChan <- fmt.Errorf("failed to perform TLS handshake: %v", err)
-			return
-		}
-
 		// Read the message from the client
 		buffer := make([]byte, stream.ChunkSize)
 		n, err := tlsConn.Read(buffer)
@@ -454,11 +461,6 @@ func TestVerifyCertificateTransparencyInTLSConnection(t *testing.T) {
 			return
 		}
 		defer conn.Close()
-
-		if err := conn.Handshake(); err != nil {
-			t.Errorf("Failed to perform TLS handshake: %v", err)
-			return
-		}
 
 		// Send a message to the server
 		message := "Hello, server!"
