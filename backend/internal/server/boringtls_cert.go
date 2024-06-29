@@ -251,10 +251,9 @@ func (v *SCTVerifier) VerifySCT() error {
 	// Calculate the hash of the certificate in DER format
 	// TODO: Do we really need to improve this to make it more flexible (e.g., if the certificate does not use SHA-256)?
 	var data []byte
-	h := sha256.Sum256(v.Cert.Raw)
 	switch v.Response.SCTVersion {
 	case CTVersion1:
-		data = append(h[:], []byte(fmt.Sprintf("%d", v.Response.Timestamp))...)
+		data = v.constructTransmissionItemV1()
 	case CTVersion2:
 		data, err = v.constructTransmissionItemV2()
 		if err != nil {
@@ -301,6 +300,25 @@ func publicKey(priv crypto.PrivateKey) crypto.PublicKey {
 	default:
 		return nil
 	}
+}
+
+// constructTransmissionItemV1 constructs the transmission Item structure for SCT version 1.
+func (v *SCTVerifier) constructTransmissionItemV1() []byte {
+	var data []byte
+	data = append(data, v.Cert.Raw...)
+	data = append(data, byte(v.Response.SCTVersion))
+	data = append(data, []byte(v.Response.ID)...)
+	data = append(data, byte(v.Response.Timestamp>>56),
+		byte(v.Response.Timestamp>>48),
+		byte(v.Response.Timestamp>>40),
+		byte(v.Response.Timestamp>>32),
+		byte(v.Response.Timestamp>>24),
+		byte(v.Response.Timestamp>>16),
+		byte(v.Response.Timestamp>>8),
+		byte(v.Response.Timestamp))
+	data = append(data, []byte(v.Response.Extensions)...)
+
+	return data
 }
 
 // constructTransmissionItemV2 constructs the transmission Item structure for SCT version 2.
