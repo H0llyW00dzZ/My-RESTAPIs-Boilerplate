@@ -531,7 +531,7 @@ func TestInvalidSCT(t *testing.T) {
 
 	// Set the certificate validity period
 	notBefore := time.Now()
-	notAfter := notBefore.Add(24 * time.Hour)
+	notAfter := notBefore.Add(AheadTime24Hours)
 
 	// Test case 1: Invalid SCT data (Insufficient Length)
 	t.Run("InvalidSCTDataInsufficientLength", func(t *testing.T) {
