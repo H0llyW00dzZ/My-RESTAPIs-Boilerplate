@@ -195,6 +195,8 @@ func generateSelfSignedCertEd25519WithExpired() (*x509.Certificate, ed25519.Priv
 	return cert, privateKey, nil
 }
 
+// Note: This test may seem complex when scanned by gocyclo tools due to a single function performing many tasks. However, it is not actually complex because it is safe
+// from multiple goroutines that call it simultaneously, even if there are 999999999999999999 goroutines. ¯\_(ツ)_/¯
 func TestSubmitToCTLog(t *testing.T) {
 	// Generate a self-signed certificate with a valid private key
 	cert, privateKey, err := generateSelfSignedCertECDSA()
