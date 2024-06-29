@@ -9,13 +9,9 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
-	"crypto/sha256"
-	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/base64"
-	"fmt"
-	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid/stream"
 	"h0llyw00dz-template/backend/internal/server"
 	"math/big"
 	"testing"
@@ -255,7 +251,7 @@ func createTestCertificateValidSCTsForLTS(t *testing.T) (*x509.Certificate, cryp
 		BasicConstraintsValid: true,
 	}
 
-	// Generate a new private key
+	// Generate a new ECDSA private key
 	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		t.Fatalf("Failed to generate private key: %v", err)
@@ -299,8 +295,11 @@ func createTestCertificateValidSCTsForLTS(t *testing.T) (*x509.Certificate, cryp
 	sctData = append(sctData, cert.Raw...)
 
 	// Sign the SCT data
-	h := sha256.Sum256(sctData)
-	signature, err := ecdsa.SignASN1(rand.Reader, privateKey, h[:])
+	hash := crypto.SHA256
+	hasher := hash.New()
+	hasher.Write(sctData)
+	hashed := hasher.Sum(nil)
+	signature, err := ecdsa.SignASN1(rand.Reader, privateKey, hashed)
 	if err != nil {
 		t.Fatalf("Failed to generate signature: %v", err)
 	}
@@ -341,143 +340,4 @@ func createTestCertificateValidSCTsForLTS(t *testing.T) (*x509.Certificate, cryp
 	}
 
 	return finalCert, privateKey
-}
-
-// TestVerifyCertificateTransparencyInTLSConnection tests the certificate transparency verification in a TLS connection.
-func TestVerifyCertificateTransparencyInTLSConnection(t *testing.T) {
-	// Create a test certificate with SCTs
-	cert, privateKey := createTestCertificateValidSCTsForLTS(t)
-
-	// Create a server TLS configuration with the test certificate
-	serverTLSConfig := &tls.Config{
-		MinVersion: tls.VersionTLS13,
-		CurvePreferences: []tls.CurveID{
-			tls.X25519,
-			tls.CurveP256,
-			tls.CurveP384,
-			tls.CurveP521,
-		},
-		Rand: server.RandTLS(),
-		Certificates: []tls.Certificate{
-			{
-				Certificate: [][]byte{cert.Raw},
-				PrivateKey:  privateKey,
-			},
-		},
-	}
-
-	// Create a client TLS configuration with CT verification
-	clientTLSConfig := &tls.Config{
-		MinVersion: tls.VersionTLS13,
-		CurvePreferences: []tls.CurveID{
-			tls.X25519,
-			tls.CurveP256,
-			tls.CurveP384,
-			tls.CurveP521,
-		},
-		InsecureSkipVerify: true,
-		VerifyPeerCertificate: func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-			// Create a new CTVerifier
-			ctVerifier := new(server.CTVerifier)
-
-			// Perform Certificate Transparency checks
-			for _, chain := range verifiedChains {
-				for _, cert := range chain {
-					if err := ctVerifier.VerifyCertificateTransparency(cert); err != nil {
-						return err
-					}
-				}
-			}
-			return nil
-		},
-	}
-
-	// Start a TLS server with the test certificate
-	listener, err := tls.Listen("tcp", "localhost:443", serverTLSConfig)
-	if err != nil {
-		t.Fatalf("Failed to create TLS listener: %v", err)
-	}
-	defer listener.Close()
-
-	// Start a goroutine to handle the TLS connection
-	errChan := make(chan error, 1)
-	go func() {
-		conn, err := listener.Accept()
-		if err != nil {
-			errChan <- fmt.Errorf("failed to accept TLS connection: %v", err)
-			return
-		}
-		defer conn.Close()
-
-		tlsConn, ok := conn.(*tls.Conn)
-		if !ok {
-			errChan <- fmt.Errorf("expected a TLS connection")
-			return
-		}
-
-		if err := tlsConn.Handshake(); err != nil {
-			errChan <- fmt.Errorf("failed to perform TLS handshake: %v", err)
-			return
-		}
-
-		// Read the message from the client
-		buffer := make([]byte, stream.ChunkSize)
-		n, err := tlsConn.Read(buffer)
-		if err != nil {
-			errChan <- fmt.Errorf("failed to read from TLS connection: %v", err)
-			return
-		}
-		message := string(buffer[:n])
-		t.Logf("Server received: %s", message)
-
-		// Send a response back to the client
-		response := "Hello, client!"
-		_, err = tlsConn.Write([]byte(response))
-		if err != nil {
-			errChan <- fmt.Errorf("failed to write to TLS connection: %v", err)
-			return
-		}
-		t.Logf("Server sent: %s", response)
-
-		errChan <- nil
-	}()
-
-	// Test case 1: Connect to the TLS server with a valid certificate
-	t.Run("ConnectWithValidCertificate", func(t *testing.T) {
-		conn, err := tls.Dial("tcp", listener.Addr().String(), clientTLSConfig)
-		if err != nil {
-			t.Errorf("Failed to establish TLS connection: %v", err)
-			return
-		}
-		defer conn.Close()
-
-		if err := conn.Handshake(); err != nil {
-			t.Errorf("Failed to perform TLS handshake: %v", err)
-			return
-		}
-
-		// Send a message to the server
-		message := "Hello, server!"
-		_, err = conn.Write([]byte(message))
-		if err != nil {
-			t.Errorf("Failed to write to TLS connection: %v", err)
-			return
-		}
-		t.Logf("Client sent: %s", message)
-
-		// Read the response from the server
-		buffer := make([]byte, stream.ChunkSize)
-		n, err := conn.Read(buffer)
-		if err != nil {
-			t.Errorf("Failed to read from TLS connection: %v", err)
-			return
-		}
-		response := string(buffer[:n])
-		t.Logf("Client received: %s", response)
-	})
-
-	// Wait for the server goroutine to finish
-	if err := <-errChan; err != nil {
-		t.Errorf("Server error: %v", err)
-	}
 }

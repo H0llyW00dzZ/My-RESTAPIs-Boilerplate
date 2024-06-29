@@ -9,7 +9,9 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid/stream"
@@ -17,6 +19,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"os"
 	"runtime"
 	"strings"
 	"sync"
@@ -49,6 +52,7 @@ func tlsConfig(cert tls.Certificate) *tls.Config {
 
 func clientTLSConfig() *tls.Config {
 	log.InitializeLogger("Boring TLS 1.3 Testing", "")
+	certPool, _ := createCertPoolFromFile("boring-cert.pem")
 	return &tls.Config{
 		MinVersion: tls.VersionTLS13,
 		CurvePreferences: []tls.CurveID{
@@ -60,8 +64,8 @@ func clientTLSConfig() *tls.Config {
 			tls.CurveP384,
 			tls.CurveP521,
 		},
-		InsecureSkipVerify: true,
-		ServerName:         "localhost",
+		RootCAs:    certPool,
+		ServerName: "localhost",
 	}
 }
 
@@ -442,8 +446,7 @@ func TestStreamClientWrongProtocol(t *testing.T) {
 			tls.X25519,
 			tls.CurveP256,
 		},
-		InsecureSkipVerify: true,
-		ServerName:         "localhost",
+		ServerName: "localhost",
 	}
 
 	// Create a TLS connection to the server
@@ -1167,6 +1170,11 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	certPool, err := createCertPoolFromFile("boring-cert.pem")
+	if err != nil {
+		t.Fatalf("Failed to create certificate pool: %v", err)
+	}
+
 	// Create a new Stream instance
 	// Note: When this is bound into a TLS connection by modifying from copies the standard library,
 	// for example, adding the stream encrypter/decrypter along with stream.New for the cipher suites,
@@ -1266,10 +1274,10 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 				}
 
 				tlsConn := tls.Client(conn, &tls.Config{
-					MinVersion:         tls.VersionTLS13,
-					InsecureSkipVerify: true,
-					ServerName:         "localhost",
-					CurvePreferences:   curves,
+					MinVersion:       tls.VersionTLS13,
+					ServerName:       "localhost",
+					CurvePreferences: curves,
+					RootCAs:          certPool,
 				})
 
 				if err := tlsConn.HandshakeContext(context.Background()); err != nil {
@@ -1600,16 +1608,21 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 		{tls.X25519, tls.CurveP384, tls.CurveP521, tls.CurveP256},
 	}
 
+	certPool, err := createCertPoolFromFile("boring-cert.pem")
+	if err != nil {
+		t.Fatalf("Failed to create certificate pool: %v", err)
+	}
+
 	// Note: This test case yields the same results as Boring TLS 1.3 Protocol. However, the cipher suite prioritizes "TLS_AES_128_GCM_SHA256" (bad common cipherText)
 	// and does not allow or support the use of "TLS_CHACHA20_POLY1305_SHA256", which could potentially improve performance due to its truncated nature.
 	transports := make([]*http.Transport, len(curvePreferences))
 	for i, curves := range curvePreferences {
 		transports[i] = &http.Transport{
 			TLSClientConfig: &tls.Config{
-				MinVersion:         tls.VersionTLS13,
-				InsecureSkipVerify: true,
-				ServerName:         "localhost",
-				CurvePreferences:   curves,
+				MinVersion:       tls.VersionTLS13,
+				ServerName:       "localhost",
+				CurvePreferences: curves,
+				RootCAs:          certPool,
 			},
 		}
 	}
@@ -1659,4 +1672,22 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 			t.Errorf("Expected response body to be '%s', but got '%s'", expectedBody, string(body))
 		}
 	}
+}
+
+func createCertPoolFromFile(certFilePath string) (*x509.CertPool, error) {
+	// Read the CA certificate from the file
+	caCert, err := os.ReadFile(certFilePath)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a new certificate pool
+	certPool := x509.NewCertPool()
+
+	// Append the CA certificate to the pool
+	if !certPool.AppendCertsFromPEM(caCert) {
+		return nil, errors.New("error appending CA certificate to pool")
+	}
+
+	return certPool, nil
 }
