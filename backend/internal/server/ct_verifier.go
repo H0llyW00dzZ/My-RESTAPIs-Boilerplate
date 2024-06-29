@@ -32,9 +32,9 @@ type CTVerifier struct {
 
 // SCTData represents the SCT data for ASN.1 marshaling.
 type SCTData struct {
-	Version    uint8
+	Version    int
 	LogID      []byte
-	Timestamp  uint64
+	Timestamp  asn1.RawValue `asn1:"bytes"`
 	Extensions []byte
 	Signature  []byte
 }
@@ -80,6 +80,12 @@ func (ct *CTVerifier) ExtractSCTsFromCertificate(cert *x509.Certificate) ([]*SCT
 			timestamp := binary.BigEndian.Uint64(ext.Value[33:41])
 			extensionsLen := int(ext.Value[41])
 			extensions := ext.Value[42 : 42+extensionsLen]
+
+			// Check if the length of ext.Value is sufficient for extracting the signature
+			if len(ext.Value) < 42+extensionsLen {
+				return nil, errors.New("invalid SCT data: insufficient length for signature")
+			}
+
 			signature := ext.Value[42+extensionsLen:]
 
 			sct := &SCTResponse{
