@@ -346,6 +346,8 @@ func createTestCertificateValidSCTsForLTS(t *testing.T) (*x509.Certificate, cryp
 }
 
 // TestVerifyCertificateTransparencyInTLSConnection tests the certificate transparency verification in a TLS connection.
+//
+// Note: This method currently works only with ECDSA certificates, not with other certificate.
 func TestVerifyCertificateTransparencyInTLSConnection(t *testing.T) {
 	// Create a test certificate with SCTs
 	cert, privateKey := createTestCertificateValidSCTsForLTS(t)
