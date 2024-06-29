@@ -9,6 +9,7 @@ import (
 	"encoding/asn1"
 	"encoding/base64"
 	"encoding/binary"
+	"errors"
 	"fmt"
 
 	"github.com/bytedance/sonic"
@@ -49,7 +50,7 @@ func (ct *CTVerifier) VerifyCertificateTransparency(cert *x509.Certificate) erro
 	}
 
 	if len(scts) == 0 {
-		return fmt.Errorf("certificate does not have any SCTs")
+		return errors.New("certificate does not have any SCTs")
 	}
 
 	// Verify each SCT against the CT logs
@@ -71,7 +72,7 @@ func (ct *CTVerifier) ExtractSCTsFromCertificate(cert *x509.Certificate) ([]*SCT
 	for _, ext := range cert.Extensions {
 		if ext.Id.Equal(OIDExtensionCTSCT) {
 			if len(ext.Value) < 44 {
-				return nil, fmt.Errorf("invalid SCT data: insufficient length")
+				return nil, errors.New("invalid SCT data: insufficient length")
 			}
 
 			version := ext.Value[0]
