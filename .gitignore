@@ -41,3 +41,8 @@ acm-cloudflare-priv8.pem
 # Note: This won't work in browser, only in go
 boring-client-cert.pem
 boring-client-key.pem
+
+# H0llyW00dzZ CA & RootCA TLS 1.3 cert
+# Note: RootCA and CA are different the RootCA Priv8 key are bound into hardware, however "boring-ca.pem" don't have any Priv8 key
+boring-ca.pem
+boring-RootCA.pem
