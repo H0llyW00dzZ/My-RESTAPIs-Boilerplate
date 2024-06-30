@@ -33,6 +33,7 @@ import (
 func tlsConfig(cert tls.Certificate) *tls.Config {
 	log.InitializeLogger("Boring TLS 1.3 Testing", "")
 	tlsHandler := &fiber.TLSHandler{}
+	RootCA, _ := createCertPoolFromFile("boring-RootCA.pem")
 	return &tls.Config{
 		MinVersion: tls.VersionTLS13,
 		CurvePreferences: []tls.CurveID{
@@ -45,6 +46,7 @@ func tlsConfig(cert tls.Certificate) *tls.Config {
 			tls.CurveP521,
 		},
 		Certificates:   []tls.Certificate{cert},
+		RootCAs:        RootCA,
 		GetCertificate: tlsHandler.GetClientInfo,
 		Rand:           server.RandTLS(),
 	}
@@ -52,7 +54,7 @@ func tlsConfig(cert tls.Certificate) *tls.Config {
 
 func clientTLSConfig() *tls.Config {
 	log.InitializeLogger("Boring TLS 1.3 Testing", "")
-	certPool, _ := createCertPoolFromFile("boring-cert.pem")
+	certPool, _ := createCertPoolFromFile("boring-ca.pem")
 	return &tls.Config{
 		MinVersion: tls.VersionTLS13,
 		CurvePreferences: []tls.CurveID{
@@ -64,7 +66,7 @@ func clientTLSConfig() *tls.Config {
 			tls.CurveP384,
 			tls.CurveP521,
 		},
-		RootCAs:    certPool,
+		ClientCAs:  certPool,
 		ServerName: "localhost",
 	}
 }
@@ -1170,7 +1172,7 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	certPool, err := createCertPoolFromFile("boring-cert.pem")
+	certPool, err := createCertPoolFromFile("boring-ca.pem")
 	if err != nil {
 		t.Fatalf("Failed to create certificate pool: %v", err)
 	}
@@ -1277,7 +1279,7 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 					MinVersion:       tls.VersionTLS13,
 					ServerName:       "localhost",
 					CurvePreferences: curves,
-					RootCAs:          certPool,
+					ClientCAs:        certPool,
 				})
 
 				if err := tlsConn.HandshakeContext(context.Background()); err != nil {
@@ -1608,7 +1610,7 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 		{tls.X25519, tls.CurveP384, tls.CurveP521, tls.CurveP256},
 	}
 
-	certPool, err := createCertPoolFromFile("boring-cert.pem")
+	certPool, err := createCertPoolFromFile("boring-ca.pem")
 	if err != nil {
 		t.Fatalf("Failed to create certificate pool: %v", err)
 	}
@@ -1622,7 +1624,7 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 				MinVersion:       tls.VersionTLS13,
 				ServerName:       "localhost",
 				CurvePreferences: curves,
-				RootCAs:          certPool,
+				ClientCAs:        certPool,
 			},
 		}
 	}
