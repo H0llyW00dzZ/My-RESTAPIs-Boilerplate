@@ -69,6 +69,11 @@ func (ct *CTVerifier) VerifyCertificateTransparency(cert *x509.Certificate) erro
 func (ct *CTVerifier) ExtractSCTsFromCertificate(cert *x509.Certificate) ([]*SCTResponse, error) {
 	var scts []*SCTResponse
 
+	// Note: This function extracts SCTs from a certificate.
+	// SCTs (Signed Certificate Timestamps) are typically embedded in certificates
+	// as an extension within a TLS/DTLS handshake. They are used for
+	// certificate transparency (CT), which is a security mechanism that allows
+	// independent verification of the certificate's validity and history.
 	for _, ext := range cert.Extensions {
 		if ext.Id.Equal(OIDExtensionCTSCT) {
 			if len(ext.Value) < 44 {
