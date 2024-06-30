@@ -1,6 +1,7 @@
 k8s-deployment/
 .env
-# H0llyW00dzZ boring TLS 1.3 cert
+
+# H0llyW00dzZ server boring TLS 1.3 cert
 boring-boring-boring.txt
 boring-cert.pem
 boring-key.pem
@@ -8,3 +9,8 @@ boring-key.pem
 # H0llyW00dzZ cloudflare acm TLS 1.3 cert
 acm-cloudflare.pem
 acm-cloudflare-priv8.pem
+
+# H0llyW00dzZ client boring TLS 1.3 cert
+# Note: This won't work in browser, only in go
+boring-client-cert.pem
+boring-client-key.pem
