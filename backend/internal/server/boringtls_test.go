@@ -48,7 +48,11 @@ func tlsConfig(cert tls.Certificate) *tls.Config {
 		Certificates:   []tls.Certificate{cert},
 		RootCAs:        RootCA,
 		GetCertificate: tlsHandler.GetClientInfo,
-		Rand:           server.RandTLS(),
+		// Note: This doesn't need to be explicitly set to "tls.RequireAndVerifyClientCert" because the Go TLS standard library
+		// defaults to verifying client certificates when ClientCAs is set.
+		// Also, note that ClientCAs refers to the chain of Certificate Authorities, which is why it's different from RootCAs.
+		ClientAuth: tls.RequireAndVerifyClientCert,
+		Rand:       server.RandTLS(),
 	}
 }
 
@@ -1276,10 +1280,15 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 				}
 
 				tlsConn := tls.Client(conn, &tls.Config{
-					MinVersion:       tls.VersionTLS13,
+					MinVersion: tls.VersionTLS13,
+					// Note: Don't forget to change this "ServerName", even for testing. It's recommended to avoid running tests in Hosted CI/CD unless the machine has the CA chains for client authentication installed.
 					ServerName:       "localhost",
 					CurvePreferences: curves,
 					ClientCAs:        certPool,
+					// Note: This doesn't need to be explicitly set to "tls.RequireAndVerifyClientCert" because the Go TLS standard library
+					// defaults to verifying client certificates when ClientCAs is set.
+					// Also, note that ClientCAs refers to the chain of Certificate Authorities, which is why it's different from RootCAs.
+					ClientAuth: tls.RequireAndVerifyClientCert,
 				})
 
 				if err := tlsConn.HandshakeContext(context.Background()); err != nil {
@@ -1621,10 +1630,15 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 	for i, curves := range curvePreferences {
 		transports[i] = &http.Transport{
 			TLSClientConfig: &tls.Config{
-				MinVersion:       tls.VersionTLS13,
+				MinVersion: tls.VersionTLS13,
+				// Note: Don't forget to change this "ServerName", even for testing. It's recommended to avoid running tests in Hosted CI/CD unless the machine has the CA chains for client authentication installed.
 				ServerName:       "localhost",
 				CurvePreferences: curves,
 				ClientCAs:        certPool,
+				// Note: This doesn't need to be explicitly set to "tls.RequireAndVerifyClientCert" because the Go TLS standard library
+				// defaults to verifying client certificates when ClientCAs is set.
+				// Also, note that ClientCAs refers to the chain of Certificate Authorities, which is why it's different from RootCAs.
+				ClientAuth: tls.RequireAndVerifyClientCert,
 			},
 		}
 	}
