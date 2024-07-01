@@ -30,6 +30,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// Note: This environment is for testing TLS 1.3. It's crucial to make testing TLS 1.3 as production-like as possible.
+// Setting InsecureSkipVerify to true would significantly hinder testing, as it wouldn't mimic real-world TLS behavior.
+// Also note that this must be a valid domain name that is bound to the host. While domain names are relatively inexpensive to acquire,
+// it's essential to use a valid one for accurate TLS 1.3 testing.
+var testHostName = os.Getenv("TEST_HOSTNAME") // Use Real domain (e.g, testing-tls.go.dev)
+
 func copySysCertPoolFromFile(certFilePath string) (*x509.CertPool, error) {
 	// Read the CA certificate from the file
 	caCert, err := os.ReadFile(certFilePath)
@@ -110,7 +116,7 @@ func clientTLSConfig() *tls.Config {
 			tls.CurveP521,
 		},
 		ClientCAs:  certPool,
-		ServerName: "localhost",
+		ServerName: testHostName,
 	}
 }
 
@@ -148,7 +154,7 @@ func generateSelfSignedCertECDSA() (*x509.Certificate, *ecdsa.PrivateKey, error)
 	template := x509.Certificate{
 		SerialNumber: serialNumber,
 		Subject: pkix.Name{
-			CommonName: "example.com",
+			CommonName: testHostName,
 		},
 		NotBefore: time.Now(),
 		NotAfter:  time.Now().Add(AheadTime24Hours),
@@ -185,7 +191,7 @@ func generateSelfSignedCertRSA() (*x509.Certificate, *rsa.PrivateKey, error) {
 	template := x509.Certificate{
 		SerialNumber: serialNumber,
 		Subject: pkix.Name{
-			CommonName: "example.com",
+			CommonName: testHostName,
 		},
 		NotBefore: time.Now(),
 		NotAfter:  time.Now().Add(AheadTime7Days),
@@ -220,7 +226,7 @@ func generateSelfSignedCertEd25519() (*x509.Certificate, ed25519.PrivateKey, err
 	template := x509.Certificate{
 		SerialNumber: serialNumber,
 		Subject: pkix.Name{
-			CommonName: "example.com",
+			CommonName: testHostName,
 		},
 		NotBefore: time.Now(),
 		NotAfter:  time.Now().Add(AheadTime30Days),
@@ -255,7 +261,7 @@ func generateSelfSignedCertEd25519WithExpired() (*x509.Certificate, ed25519.Priv
 	template := x509.Certificate{
 		SerialNumber: serialNumber,
 		Subject: pkix.Name{
-			CommonName: "example.com",
+			CommonName: testHostName,
 		},
 		NotBefore: time.Now().Add(Expired),      // Set NotBefore to 24 hours ago
 		NotAfter:  time.Now().Add(-time.Minute), // Set NotAfter to 1 minute ago
@@ -337,7 +343,7 @@ func createTestCertificateWithSCTs(t *testing.T) (*x509.Certificate, *server.SCT
 			CommonName: "Gopher",
 		},
 		Subject: pkix.Name{
-			CommonName: "localhost",
+			CommonName: testHostName,
 		},
 		NotBefore: time.Now(),
 		NotAfter:  time.Now().Add(AheadTime24Hours),
@@ -390,7 +396,7 @@ func createTestCertificateValidSCTs(t *testing.T) (*x509.Certificate, *server.SC
 			CommonName: "Gopher",
 		},
 		Subject: pkix.Name{
-			CommonName: "localhost",
+			CommonName: testHostName,
 		},
 		NotBefore: time.Now(),
 		NotAfter:  time.Now().Add(AheadTime24Hours),

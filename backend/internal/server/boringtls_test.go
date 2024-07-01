@@ -252,7 +252,7 @@ func TestStreamServerExplicitHTTPS(t *testing.T) {
 
 	// Create a TLS connection to the server
 	log.LogInfo("Client: Establishing TLS connection")
-	conn, err := tls.Dial("tcp", "localhost:8081", tlsClientConfig)
+	conn, err := tls.Dial("tcp", testHostName+":8081", tlsClientConfig)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -404,12 +404,12 @@ func TestStreamClientWrongProtocol(t *testing.T) {
 			tls.X25519,
 			tls.CurveP256,
 		},
-		ServerName: "localhost",
+		ServerName: testHostName,
 	}
 
 	// Create a TLS connection to the server
 	log.LogInfo("Client: Establishing TLS connection")
-	_, err = tls.Dial("tcp", "localhost:8082", tlsClientConfig)
+	_, err = tls.Dial("tcp", testHostName+":8082", tlsClientConfig)
 	if err == nil {
 		t.Fatal("Expected TLS handshake to fail due to wrong protocol version")
 	}
@@ -488,7 +488,7 @@ func TestStreamServerStupidMiddleman(t *testing.T) {
 
 	// Create a TLS connection to the server
 	log.LogInfo("Client: Establishing TLS connection")
-	conn, err := tls.Dial("tcp", "localhost:8083", tlsClientConfig)
+	conn, err := tls.Dial("tcp", testHostName+":8083", tlsClientConfig)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -775,7 +775,7 @@ func TestStreamConnDeadlines(t *testing.T) {
 	tlsClientConfig := clientTLSConfig()
 
 	// Create a TLS connection to the server
-	conn, err := tls.Dial("tcp", "localhost:8084", tlsClientConfig)
+	conn, err := tls.Dial("tcp", testHostName+":8084", tlsClientConfig)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -931,7 +931,7 @@ func TestStreamConnSetDeadline(t *testing.T) {
 	tlsClientConfig := clientTLSConfig()
 
 	// Create a TLS connection to the server
-	conn, err := tls.Dial("tcp", "localhost:8085", tlsClientConfig)
+	conn, err := tls.Dial("tcp", testHostName+":8085", tlsClientConfig)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1048,7 +1048,7 @@ func TestStreamServerWithoutAdditionalEncrypt(t *testing.T) {
 
 	// Create a TLS connection to the server
 	log.LogInfo("Client: Establishing TLS connection")
-	conn, err := tls.Dial("tcp", "localhost:8086", tlsClientConfig)
+	conn, err := tls.Dial("tcp", testHostName+":8086", tlsClientConfig)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1234,7 +1234,7 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 				tlsConn := tls.Client(conn, &tls.Config{
 					MinVersion: tls.VersionTLS13,
 					// Note: Don't forget to change this "ServerName", even for testing. It's recommended to avoid running tests in Hosted CI/CD unless the machine has the CA chains for client authentication installed.
-					ServerName:       "localhost",
+					ServerName:       testHostName,
 					CurvePreferences: curves,
 					ClientCAs:        certPool,
 					// Note: This doesn't need to be explicitly set to "tls.RequireAndVerifyClientCert" because the Go TLS standard library
@@ -1584,7 +1584,7 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 			TLSClientConfig: &tls.Config{
 				MinVersion: tls.VersionTLS13,
 				// Note: Don't forget to change this "ServerName", even for testing. It's recommended to avoid running tests in Hosted CI/CD unless the machine has the CA chains for client authentication installed.
-				ServerName:       "api-beta.btz.pm",
+				ServerName:       testHostName,
 				CurvePreferences: curves,
 				ClientCAs:        certPool,
 				// Note: This doesn't need to be explicitly set to "tls.RequireAndVerifyClientCert" because the Go TLS standard library
@@ -1609,7 +1609,7 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 
 		// Create a request with a body
 		requestBody := []byte(fmt.Sprintf("Request body from client %d", i+1)) // Encrypting transparently...
-		req, err := http.NewRequest("GET", "https://api-beta.btz.pm:443/test", bytes.NewBuffer(requestBody))
+		req, err := http.NewRequest("GET", "https://"+testHostName+":443/test", bytes.NewBuffer(requestBody))
 		if err != nil {
 			t.Fatal(err)
 		}

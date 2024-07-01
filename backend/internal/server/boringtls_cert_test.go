@@ -40,7 +40,7 @@ func TestSubmitToCTLog(t *testing.T) {
 
 	// Create a test CT log
 	ctLog := server.CTLog{
-		URL: "https://ct.example.com",
+		URL: "https://" + testHostName,
 	}
 
 	// Create a test Fiber server
