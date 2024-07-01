@@ -32,7 +32,7 @@ import (
 
 // Note: This environment is for testing TLS 1.3. It's crucial to make testing TLS 1.3 as production-like as possible.
 // Setting InsecureSkipVerify to true would significantly hinder testing, as it wouldn't mimic real-world TLS behavior.
-var testHostName = os.Getenv("TEST_HOSTNAME")
+var testHostName = os.Getenv("TEST_HOSTNAME") // Use Real domain (e.g, testing-tls.go.dev)
 
 func copySysCertPoolFromFile(certFilePath string) (*x509.CertPool, error) {
 	// Read the CA certificate from the file
