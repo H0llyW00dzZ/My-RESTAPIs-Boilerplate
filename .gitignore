@@ -48,5 +48,6 @@ boring-client-key.pem
 # because they are designed for private authorization purposes and are not self-signed (if they are self-signed it wouldn't work when using TLS go std library with InsecureSkipVerify false).
 # List of Current Methods (Well-Known) that Work:
 # - Cloudflare (see https://developers.cloudflare.com/ssl/origin-configuration/origin-ca/)
+# - Cloudflare ACM (see https://developers.cloudflare.com/ssl/origin-configuration/custom-origin-trust-store/)
 boring-ca.pem
 boring-RootCA.pem
