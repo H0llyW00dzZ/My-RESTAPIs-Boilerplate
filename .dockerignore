@@ -18,6 +18,6 @@ boring-client-key.pem
 # H0llyW00dzZ CA & RootCA TLS 1.3 cert
 # Note: RootCA and CA are different. The RootCA's Priv8 key is bound to hardware, while "boring-ca.pem" does not contain any Priv8 key. 
 # Additionally, RootCA or CA are not compatible with Trust Signed certificates (which are needed for browser compatibility) 
-# because they are designed for private authorization purposes and are not self-signed.
+# because they are designed for private authorization purposes and are not self-signed (if they are self-signed it wouldn't work when using TLS go std library with InsecureSkipVerify false).
 boring-ca.pem
 boring-RootCA.pem
