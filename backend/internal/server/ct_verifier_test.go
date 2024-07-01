@@ -89,7 +89,7 @@ func createTestCertificateValidSCTsForLTS(t *testing.T) (*x509.Certificate, cryp
 			CommonName: "Gopher",
 		},
 		Subject: pkix.Name{
-			CommonName: "localhost",
+			CommonName: testHostName,
 		},
 		NotBefore: notBefore,
 		NotAfter:  notAfter,
@@ -241,10 +241,11 @@ func TestVerifyCertificateTransparencyInTLSConnection(t *testing.T) {
 			}
 			return nil
 		},
+		ServerName: testHostName,
 	}
 
 	// Start a TLS server with the test certificate
-	listener, err := tls.Listen("tcp", "localhost:443", serverTLSConfig)
+	listener, err := tls.Listen("tcp", testHostName+":443", serverTLSConfig)
 	if err != nil {
 		t.Fatalf("Failed to create TLS listener: %v", err)
 	}
@@ -341,7 +342,7 @@ func TestInvalidSCT(t *testing.T) {
 	// Set the certificate subject and issuer
 	subject := pkix.Name{
 		Organization: []string{"Example Inc."},
-		CommonName:   "example.com",
+		CommonName:   testHostName,
 	}
 
 	// Set the certificate validity period
