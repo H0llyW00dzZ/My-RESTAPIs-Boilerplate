@@ -50,7 +50,7 @@ func tlsConfig(cert tls.Certificate) *tls.Config {
 		GetCertificate: tlsHandler.GetClientInfo,
 		// Note: This doesn't need to be explicitly set to "tls.RequireAndVerifyClientCert" because the Go TLS standard library
 		// defaults to verifying client certificates when ClientCAs is set.
-		// Also, note that ClientCAs refers to the chain of Certificate Authorities, which is why it's different from RootCAs.
+		// Also, note that ClientCAs refers to the chain of Certificate Authorities Pool that made & signed by RootCAs, which is why it's different from RootCAs.
 		ClientAuth: tls.RequireAndVerifyClientCert,
 		Rand:       server.RandTLS(),
 	}
@@ -1287,7 +1287,7 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 					ClientCAs:        certPool,
 					// Note: This doesn't need to be explicitly set to "tls.RequireAndVerifyClientCert" because the Go TLS standard library
 					// defaults to verifying client certificates when ClientCAs is set.
-					// Also, note that ClientCAs refers to the chain of Certificate Authorities, which is why it's different from RootCAs.
+					// Also, note that ClientCAs refers to the chain of Certificate Authorities Pool that made & signed by RootCAs, which is why it's different from RootCAs.
 					ClientAuth: tls.RequireAndVerifyClientCert,
 				})
 
@@ -1637,7 +1637,7 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 				ClientCAs:        certPool,
 				// Note: This doesn't need to be explicitly set to "tls.RequireAndVerifyClientCert" because the Go TLS standard library
 				// defaults to verifying client certificates when ClientCAs is set.
-				// Also, note that ClientCAs refers to the chain of Certificate Authorities, which is why it's different from RootCAs.
+				// Also, note that ClientCAs refers to the chain of Certificate Authorities Pool that made & signed by RootCAs, which is why it's different from RootCAs.
 				ClientAuth: tls.RequireAndVerifyClientCert,
 			},
 		}
