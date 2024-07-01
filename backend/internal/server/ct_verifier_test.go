@@ -14,7 +14,6 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
-	"encoding/base64"
 	"encoding/binary"
 	"fmt"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid/stream"
@@ -23,173 +22,6 @@ import (
 	"testing"
 	"time"
 )
-
-// createTestCertificateWithSCTs creates a test certificate with SCTs for testing purposes.
-func createTestCertificateWithSCTs(t *testing.T) (*x509.Certificate, *server.SCTResponse) {
-	// Generate an ECDSA private key
-	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	if err != nil {
-		t.Fatalf("Failed to generate ECDSA private key: %v", err)
-	}
-
-	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
-	if err != nil {
-		t.Fatalf("Failed to generate serial number: %v", err)
-	}
-
-	// Create SCT data with a valid timestamp
-	timestamp := uint64(time.Now().Unix())
-	logID := make([]byte, 32)
-	_, err = rand.Read(logID)
-	if err != nil {
-		t.Fatalf("Failed to generate log ID: %v", err)
-	}
-
-	extensions := []byte{0x00} // Empty extensions
-
-	sctData := make([]byte, 0, 44)
-	sctData = append(sctData, byte(server.CTVersion1))
-	sctData = append(sctData, logID...)
-	sctData = append(sctData, byte(timestamp>>56),
-		byte(timestamp>>48),
-		byte(timestamp>>40),
-		byte(timestamp>>32),
-		byte(timestamp>>24),
-		byte(timestamp>>16),
-		byte(timestamp>>8),
-		byte(timestamp))
-	sctData = append(sctData, byte(len(extensions)))
-	sctData = append(sctData, extensions...)
-
-	signature, err := ecdsa.SignASN1(rand.Reader, privateKey, sctData)
-	if err != nil {
-		t.Fatalf("Failed to generate signature: %v", err)
-	}
-
-	sctData = append(sctData, signature...)
-
-	sctResponse := &server.SCTResponse{
-		SCTVersion: server.CTVersion1,
-		ID:         base64.StdEncoding.EncodeToString(logID),
-		Timestamp:  timestamp,
-		Extensions: base64.StdEncoding.EncodeToString(extensions),
-		Signature:  base64.StdEncoding.EncodeToString(signature),
-	}
-
-	// Create a self-signed certificate template
-	template := x509.Certificate{
-		SerialNumber: serialNumber,
-		Issuer: pkix.Name{
-			CommonName: "Gopher",
-		},
-		Subject: pkix.Name{
-			CommonName: "localhost",
-		},
-		NotBefore: time.Now(),
-		NotAfter:  time.Now().Add(AheadTime24Hours),
-		KeyUsage:  x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
-		ExtKeyUsage: []x509.ExtKeyUsage{
-			x509.ExtKeyUsageServerAuth,
-			x509.ExtKeyUsageClientAuth,
-		},
-		BasicConstraintsValid: true,
-		ExtraExtensions: []pkix.Extension{
-			{
-				Id:       server.OIDExtensionCTSCT,
-				Critical: false,
-				Value:    sctData,
-			},
-		},
-	}
-
-	// Create the self-signed certificate
-	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
-	if err != nil {
-		t.Fatalf("Failed to create self-signed certificate: %v", err)
-	}
-
-	cert, err := x509.ParseCertificate(derBytes)
-	if err != nil {
-		t.Fatalf("Failed to parse certificate: %v", err)
-	}
-
-	return cert, sctResponse
-}
-
-// createTestCertificateValidSCTs creates a test certificate valid SCTs for testing purposes.
-func createTestCertificateValidSCTs(t *testing.T) (*x509.Certificate, *server.SCTResponse) {
-	// Generate an ECDSA private key
-	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	if err != nil {
-		t.Fatalf("Failed to generate ECDSA private key: %v", err)
-	}
-
-	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
-	if err != nil {
-		t.Fatalf("Failed to generate serial number: %v", err)
-	}
-
-	// Create a self-signed certificate template
-	template := x509.Certificate{
-		SerialNumber: serialNumber,
-		Issuer: pkix.Name{
-			CommonName: "Gopher",
-		},
-		Subject: pkix.Name{
-			CommonName: "localhost",
-		},
-		NotBefore: time.Now(),
-		NotAfter:  time.Now().Add(AheadTime24Hours),
-		KeyUsage:  x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
-		ExtKeyUsage: []x509.ExtKeyUsage{
-			x509.ExtKeyUsageServerAuth,
-			x509.ExtKeyUsageClientAuth,
-		},
-		BasicConstraintsValid: true,
-	}
-
-	// Create the self-signed certificate
-	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
-	if err != nil {
-		t.Fatalf("Failed to create self-signed certificate: %v", err)
-	}
-
-	cert, err := x509.ParseCertificate(derBytes)
-	if err != nil {
-		t.Fatalf("Failed to parse certificate: %v", err)
-	}
-
-	// Create SCT data with a valid timestamp
-	timestamp := uint64(time.Now().Unix())
-	var data []byte
-	data = append(data, cert.Raw...)
-	data = append(data, byte(server.CTVersion1))
-	data = append(data, []byte("test-ct-log")...)
-	data = append(data, byte(timestamp>>56),
-		byte(timestamp>>48),
-		byte(timestamp>>40),
-		byte(timestamp>>32),
-		byte(timestamp>>24),
-		byte(timestamp>>16),
-		byte(timestamp>>8),
-		byte(timestamp))
-	data = append(data, []byte("")...)
-
-	signature, err := ecdsa.SignASN1(rand.Reader, privateKey, data)
-	if err != nil {
-		t.Fatalf("Failed to generate signature: %v", err)
-	}
-
-	sctResponse := &server.SCTResponse{
-		SCTVersion: server.CTVersion1,
-		ID:         "test-ct-log",
-		Timestamp:  timestamp,
-		Extensions: "",
-		Signature:  base64.StdEncoding.EncodeToString(signature),
-	}
-
-	return cert, sctResponse
-}
 
 // TestExtractSCTsFromCertificate tests the ExtractSCTsFromCertificate method of the CTVerifier.
 func TestExtractSCTsFromCertificate(t *testing.T) {
@@ -489,23 +321,6 @@ func TestVerifyCertificateTransparencyInTLSConnection(t *testing.T) {
 	if err := <-errChan; err != nil {
 		t.Errorf("Server error: %v", err)
 	}
-}
-
-func generateSCTExtension(SCData server.SCTData) (pkix.Extension, error) {
-	// Marshal the SCT data into ASN.1 format
-	sctBytes, err := asn1.Marshal(SCData)
-	if err != nil {
-		return pkix.Extension{}, err
-	}
-
-	// Create the SCT extension
-	sctExtension := pkix.Extension{
-		Id:       server.OIDExtensionCTSCT,
-		Critical: false,
-		Value:    sctBytes,
-	}
-
-	return sctExtension, nil
 }
 
 // TestInvalidSCT tests the Invalid method of the CTVerifier.
