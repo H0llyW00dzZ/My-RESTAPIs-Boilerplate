@@ -14,7 +14,10 @@ import (
 // SuccessKeyAuthHandler is a custom success handler for the key authentication middleware.
 // It logs a message indicating successful API key authentication.
 func SuccessKeyAuthHandler(c *fiber.Ctx) error {
-	// Get the session from the context
+	// Get the session from the context.
+	//
+	// Note: This is not affected by CVE-2024-38513 (see https://github.com/gofiber/fiber/security/advisories/GHSA-98j2-3j3p-fw2v)
+	// because it retrieves the session from the local context storing it in a Redis database with an expiration time.
 	sess, ok := c.Locals("session").(*session.Session)
 	if !ok {
 		return fiber.ErrInternalServerError
