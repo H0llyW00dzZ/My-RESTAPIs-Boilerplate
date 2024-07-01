@@ -34,6 +34,8 @@ import (
 // Setting InsecureSkipVerify to true would significantly hinder testing, as it wouldn't mimic real-world TLS behavior.
 // Also note that this must be a valid domain name that is bound to the host. While domain names are relatively inexpensive to acquire,
 // it's essential to use a valid one for accurate TLS 1.3 testing.
+//
+// Demo: api-beta.btz.pm
 var testHostName = os.Getenv("TEST_HOSTNAME") // Use Real domain (e.g, testing-tls.go.dev)
 
 func copySysCertPoolFromFile(certFilePath string) (*x509.CertPool, error) {
