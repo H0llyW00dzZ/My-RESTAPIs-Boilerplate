@@ -24,3 +24,8 @@ boring-client-key.pem
 # - Cloudflare ACM (see https://developers.cloudflare.com/ssl/origin-configuration/custom-origin-trust-store/)
 boring-ca.pem
 boring-RootCA.pem
+
+# Google Trust Service (Well-Known)
+# Repo: https://pki.goog/repository/
+gts-ca.pem
+gts-RootCA.pem
