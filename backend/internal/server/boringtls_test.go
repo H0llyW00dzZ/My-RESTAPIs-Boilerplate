@@ -9,9 +9,7 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/tls"
-	"crypto/x509"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid/stream"
@@ -19,7 +17,6 @@ import (
 	"io"
 	"net"
 	"net/http"
-	"os"
 	"runtime"
 	"strings"
 	"sync"
@@ -29,51 +26,6 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 )
-
-func tlsConfig(cert tls.Certificate) *tls.Config {
-	log.InitializeLogger("Boring TLS 1.3 Testing", "")
-	tlsHandler := &fiber.TLSHandler{}
-	RootCA, _ := createCertPoolFromFile("boring-RootCA.pem")
-	return &tls.Config{
-		MinVersion: tls.VersionTLS13,
-		CurvePreferences: []tls.CurveID{
-			// Note: These are classical elliptic curves for TLS 1.3 key exchange.
-			// For experimental purposes related to post-quantum hybrid design, refer to:
-			// https://datatracker.ietf.org/doc/html/draft-ietf-tls-hybrid-design-10
-			tls.X25519,
-			tls.CurveP256,
-			tls.CurveP384,
-			tls.CurveP521,
-		},
-		Certificates:   []tls.Certificate{cert},
-		RootCAs:        RootCA,
-		GetCertificate: tlsHandler.GetClientInfo,
-		// Note: This doesn't need to be explicitly set to "tls.RequireAndVerifyClientCert" because the Go TLS standard library
-		// defaults to verifying client certificates when ClientCAs is set.
-		// Also, note that ClientCAs refers to the chain of Certificate Authorities Pool that made & signed by RootCAs, which is why it's different from RootCAs.
-		ClientAuth: tls.RequireAndVerifyClientCert,
-		Rand:       server.RandTLS(),
-	}
-}
-
-func clientTLSConfig() *tls.Config {
-	log.InitializeLogger("Boring TLS 1.3 Testing", "")
-	certPool, _ := createCertPoolFromFile("boring-ca.pem")
-	return &tls.Config{
-		MinVersion: tls.VersionTLS13,
-		CurvePreferences: []tls.CurveID{
-			// Note: These are classical elliptic curves for TLS 1.3 key exchange.
-			// For experimental purposes related to post-quantum hybrid design, refer to:
-			// https://datatracker.ietf.org/doc/html/draft-ietf-tls-hybrid-design-10
-			tls.X25519,
-			tls.CurveP256,
-			tls.CurveP384,
-			tls.CurveP521,
-		},
-		ClientCAs:  certPool,
-		ServerName: "localhost",
-	}
-}
 
 // Note: This is just a test that demonstrates a working example of using TLS 1.3 along with an additional encryption layer.
 // It is still unfinished. If finished, it would require writing a lot of functions when using a custom cipher for the cipher suite (might be copied from std/dependency injection).
@@ -113,7 +65,7 @@ func TestStreamServer(t *testing.T) {
 	}
 
 	// Create a TLS configuration for the server
-	tlsServerConfig := tlsConfig(cert)
+	tlsServerConfig := tlsServerConfig(cert)
 
 	// Create a listener
 	listener, err := net.Listen("tcp", ":8080")
@@ -272,7 +224,7 @@ func TestStreamServerExplicitHTTPS(t *testing.T) {
 	}
 
 	// Create a TLS configuration for the server
-	tlsServerConfig := tlsConfig(cert)
+	tlsServerConfig := tlsServerConfig(cert)
 
 	// Create a listener
 	listener, err := net.Listen("tcp", ":8081")
@@ -418,7 +370,7 @@ func TestStreamClientWrongProtocol(t *testing.T) {
 	}
 
 	// Create a TLS configuration for the server
-	tlsServerConfig := tlsConfig(cert)
+	tlsServerConfig := tlsServerConfig(cert)
 
 	// Create a listener
 	listener, err := net.Listen("tcp", ":8082")
@@ -508,7 +460,7 @@ func TestStreamServerStupidMiddleman(t *testing.T) {
 	}
 
 	// Create a TLS configuration for the server
-	tlsServerConfig := tlsConfig(cert)
+	tlsServerConfig := tlsServerConfig(cert)
 
 	// Create a listener
 	listener, err := net.Listen("tcp", ":8083")
@@ -751,7 +703,7 @@ func TestStreamConnDeadlines(t *testing.T) {
 	}
 
 	// Create a TLS configuration for the server
-	tlsServerConfig := tlsConfig(cert)
+	tlsServerConfig := tlsServerConfig(cert)
 
 	// Create a listener
 	listener, err := net.Listen("tcp", ":8084")
@@ -924,7 +876,7 @@ func TestStreamConnSetDeadline(t *testing.T) {
 	}
 
 	// Create a TLS configuration for the server
-	tlsServerConfig := tlsConfig(cert)
+	tlsServerConfig := tlsServerConfig(cert)
 
 	// Start the server
 	go func() {
@@ -1068,7 +1020,7 @@ func TestStreamServerWithoutAdditionalEncrypt(t *testing.T) {
 	}
 
 	// Create a TLS configuration for the server
-	tlsServerConfig := tlsConfig(cert)
+	tlsServerConfig := tlsServerConfig(cert)
 
 	// Create a listener
 	listener, err := net.Listen("tcp", ":8086")
@@ -1217,7 +1169,7 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 	}
 
 	// Create a TLS configuration for the server
-	tlsServerConfig := tlsConfig(cert)
+	tlsServerConfig := tlsServerConfig(cert)
 
 	// Create a regular TCP listener
 	ln, err := net.Listen("tcp", ":8087")
@@ -1380,7 +1332,7 @@ func TestUnsupportedBrowserRequest(t *testing.T) {
 	}
 
 	// Create a TLS configuration for the server
-	tlsServerConfig := tlsConfig(cert)
+	tlsServerConfig := tlsServerConfig(cert)
 
 	// Create a listener
 	listener, err := net.Listen("tcp", ":8088")
@@ -1466,7 +1418,7 @@ func TestPipeStreamConn(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	tlsServerConn := tls.Server(serverConn, tlsConfig(cert))
+	tlsServerConn := tls.Server(serverConn, tlsServerConfig(cert))
 
 	// Create a streamConn instance for the client
 	clientStreamConn := server.NewStreamConn(tlsClientConn, s)
@@ -1530,7 +1482,7 @@ func TestPipeStreamOutside(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	tlsServerConn := tls.Server(serverConn, tlsConfig(cert))
+	tlsServerConn := tls.Server(serverConn, tlsServerConfig(cert))
 
 	// Create a streamConn instance for the server
 	serverStreamConn := server.NewStreamConn(tlsServerConn, s)
@@ -1593,7 +1545,7 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 	}
 
 	// Create a TLS configuration for the server
-	tlsServerConfig := tlsConfig(cert)
+	tlsServerConfig := tlsServerConfig(cert)
 
 	// Create a regular TCP listener
 	ln, err := net.Listen(app.Config().Network, ":443")
@@ -1632,7 +1584,7 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 			TLSClientConfig: &tls.Config{
 				MinVersion: tls.VersionTLS13,
 				// Note: Don't forget to change this "ServerName", even for testing. It's recommended to avoid running tests in Hosted CI/CD unless the machine has the CA chains for client authentication installed.
-				ServerName:       "localhost",
+				ServerName:       "api-beta.btz.pm",
 				CurvePreferences: curves,
 				ClientCAs:        certPool,
 				// Note: This doesn't need to be explicitly set to "tls.RequireAndVerifyClientCert" because the Go TLS standard library
@@ -1657,7 +1609,7 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 
 		// Create a request with a body
 		requestBody := []byte(fmt.Sprintf("Request body from client %d", i+1)) // Encrypting transparently...
-		req, err := http.NewRequest("GET", "https://localhost:443/test", bytes.NewBuffer(requestBody))
+		req, err := http.NewRequest("GET", "https://api-beta.btz.pm:443/test", bytes.NewBuffer(requestBody))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -1688,22 +1640,4 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 			t.Errorf("Expected response body to be '%s', but got '%s'", expectedBody, string(body))
 		}
 	}
-}
-
-func createCertPoolFromFile(certFilePath string) (*x509.CertPool, error) {
-	// Read the CA certificate from the file
-	caCert, err := os.ReadFile(certFilePath)
-	if err != nil {
-		return nil, err
-	}
-
-	// Create a new certificate pool
-	certPool := x509.NewCertPool()
-
-	// Append the CA certificate to the pool
-	if !certPool.AppendCertsFromPEM(caCert) {
-		return nil, errors.New("error appending CA certificate to pool")
-	}
-
-	return certPool, nil
 }
