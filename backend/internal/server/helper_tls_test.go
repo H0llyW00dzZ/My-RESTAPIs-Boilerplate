@@ -36,6 +36,9 @@ import (
 // it's essential to use a valid one for accurate TLS 1.3 testing.
 //
 // Demo: api-beta.btz.pm
+// Server Backend: Heroku (Due it's free and perfect for demo/test about TLS)
+// Server Frontend: Cloudflare (Paid $10 to get ACM)
+// Scan Result (This site are accurate): https://decoder.link/sslchecker/api-beta.btz.pm/443
 var testHostName = os.Getenv("TEST_HOSTNAME") // Use Real domain (e.g, testing-tls.go.dev)
 
 func copySysCertPoolFromFile(certFilePath string) (*x509.CertPool, error) {
