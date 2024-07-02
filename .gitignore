@@ -57,8 +57,8 @@ boring-client-key.pem
 # - mTLS (Whatever it is)
 boring-ca.pem
 # boring-RootCA.pem = Root CA can be found in:
-# - Creating a private CA with self-signed certificates and then generating intermediate certificates. 
-# - Creating a private CA with certificates signed by a trusted CA (this is what I am personally using).
+# - Creating a private CA with self-signed certificates and then generating Subordinate (intermediate) certificates. 
+# - Creating a private CA with certificates signed by a trusted CA (this is what I am personally using) and then generating Subordinate (intermediate) certificates. 
 #
 # However, self-signed certificates & signed by a trusted CA are not recommended for testing (even when InsecureSkipVerify set to true). 
 # It's recommended to use a Subordinate (intermediate) CA which already made it then testing with InsecureSkipVerify false (default TLS Config Go std library).
