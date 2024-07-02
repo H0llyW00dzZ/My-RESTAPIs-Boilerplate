@@ -35,10 +35,11 @@ import (
 // Also note that this must be a valid domain name that is bound to the host. While domain names are relatively inexpensive to acquire,
 // it's essential to use a valid one for accurate TLS 1.3 testing.
 //
-// Demo: api-beta.btz.pm
-// Server Backend: Heroku (Due it's free and perfect for demo/test about TLS)
-// Server Frontend: Cloudflare (Paid $10 to get ACM)
-// Scan Result (This site are accurate): https://decoder.link/sslchecker/api-beta.btz.pm/443
+// Demo/Test :
+//   - Hostname: api-beta.btz.pm
+//   - Server Backend: Heroku (Due it's free and perfect for demo/test about TLS)
+//   - Server Frontend: Cloudflare (Paid $10 to get ACM that can be used for TLS over http)
+//   - Scan Result (This site are accurate): https://decoder.link/sslchecker/api-beta.btz.pm/443
 var testHostName = os.Getenv("TEST_HOSTNAME") // Use Real domain (e.g, testing-tls.go.dev)
 
 func copySysCertPoolFromFile(certFilePath string) (*x509.CertPool, error) {
