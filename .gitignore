@@ -42,26 +42,26 @@ acm-cloudflare-priv8.pem
 boring-client-cert.pem
 boring-client-key.pem
 
-# H0llyW00dzZ CA & RootCA TLS 1.3 certs
-# Note: RootCA and CA are different. The RootCA's private key is bound to hardware, while "boring-ca.pem" does not contain any private key. 
-# Additionally, RootCA or CA are not compatible with Trust Signed certificates (which are needed for browser compatibility) 
+# H0llyW00dzZ CA & RootCA TLS 1.3 certificates
+# Note: The RootCA and CA are different. The RootCA's private key and the private key in "boring-ca.pem" are both bound to hardware.
+# Additionally, RootCA or CA are not compatible with Trust Signed certificates (which are needed for browser compatibility)
 # because they are designed for private authorization purposes and are not self-signed. (If they were self-signed, they wouldn't work when using the TLS Go standard library with InsecureSkipVerify set to false.)
-# List of Current Methods (Well-Known) that Work:
+# List of Current Well-Known Methods that Work:
 # - Cloudflare (see https://developers.cloudflare.com/ssl/origin-configuration/origin-ca/)
 # - Cloudflare ACM (see https://developers.cloudflare.com/ssl/origin-configuration/custom-origin-trust-store/)
 #
 # boring-ca.pem = Subordinate (intermediate) CA + Pools that were made and signed by the RootCA. It's a CA chain, basically.
 # This Subordinate (intermediate) CA, once made and signed by the RootCA, can be used for:
-# - Leaf CA (where the domain will be bound then put this leaf CA in Cloud Provider Such as Heroku)
+# - Leaf CA (where the domain will be bound, then this leaf CA will be put in a Cloud Provider such as Heroku)
 # - Client/Server authentication (needed for authentication established over HTTP)
-# - mTLS (Whatever it is)
+# - mTLS (mutual TLS)
 boring-ca.pem
-# boring-RootCA.pem = Root CA can be found in:
-# - Creating a private CA with self-signed certificates and then generating Subordinate (intermediate) certificates. 
-# - Creating a private CA with certificates signed by a trusted CA (this is what I am personally using) and then generating Subordinate (intermediate) certificates. 
+# boring-RootCA.pem = The Root CA can be found in:
+# - Creating a private CA with self-signed certificates and then generating Subordinate (intermediate) certificates.
+# - Creating a private CA with certificates signed by a trusted CA (this is what I am personally using) and then generating Subordinate (intermediate) certificates.
 #
-# However, self-signed certificates & signed by a trusted CA are not recommended for testing (even when InsecureSkipVerify set to true). 
-# It's recommended to use a Subordinate (intermediate) CA which already made it then testing with InsecureSkipVerify false (default TLS Config Go std library).
+# However, self-signed certificates & certificates signed by a trusted CA are not recommended for testing (even when InsecureSkipVerify is set to true).
+# It's recommended to use a Subordinate (intermediate) CA which has already been made, then test with InsecureSkipVerify set to false (default TLS Config Go standard library).
 #
 # Important: Never test TLS with InsecureSkipVerify set to true (this is a bad practice).
 boring-RootCA.pem
