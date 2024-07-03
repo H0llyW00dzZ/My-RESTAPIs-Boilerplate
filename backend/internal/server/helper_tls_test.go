@@ -41,6 +41,7 @@ import (
 //   - Server Backend: Heroku (Due it's free and perfect for demo/test about TLS)
 //   - Server Frontend: Cloudflare (Paid $10 to get ACM that can be used for TLS over http)
 //   - Scan Result (This site are accurate): https://decoder.link/sslchecker/api-beta.btz.pm/443
+//   - CT Logs: https://crt.sh/?q=api-beta.btz.pm
 //
 // Secure Communication Channel:
 //   - The demo/test environment establishes a secure communication channel between the server backend (Heroku) and frontend (Cloudflare).
