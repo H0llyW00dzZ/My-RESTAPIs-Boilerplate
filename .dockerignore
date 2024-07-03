@@ -28,6 +28,18 @@ boring-client-key.pem
 # - Leaf CA (where the domain will be bound, then this leaf CA will be put in a Cloud Provider such as Heroku)
 # - Client/Server authentication (needed for authentication established over HTTP)
 # - mTLS (mutual TLS)
+# Out of topic (OOT) This Subordinate (intermediate) CA, once made and signed by the RootCA, can be used for:
+# - Secure Software Distribution (Code Signing)
+# - Email Signing and Encryption
+# - Document Signing and Encryption
+# - Database Encryption
+# - Virtual Machine (VM) Encryption
+# - Virtual Private Networks (VPNs): In VPN setups, list certificates can be used to authenticate clients or servers before allowing them to join the VPN.
+# - Peer-to-peer networks: In peer-to-peer networks, where nodes need to communicate directly with each other, list certificates can be used for mutual authentication.
+# - Internet of Things (IoT) devices: In IoT environments, where devices may have limited computational resources, list certificates can provide a lightweight authentication mechanism.
+# - Closed networks or intranets: In closed networks or intranets, where the participants are known and controlled, list certificates can be used for authentication instead of relying on a public certificate authority (CA).
+#
+# Note: The explained in list of use cases (VPN,P2P,IoT,Closed Networks) for the Subordinate (intermediate) CA is based on well-known knowledge.
 boring-ca.pem
 # boring-RootCA.pem = The Root CA can be found in:
 # - Creating a private CA with self-signed certificates and then generating Subordinate (intermediate) certificates.
