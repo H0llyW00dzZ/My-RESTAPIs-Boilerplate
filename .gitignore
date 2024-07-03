@@ -64,7 +64,8 @@ boring-client-key.pem
 # - Virtual Private Networks (VPNs): In VPN setups, list certificates can be used to authenticate clients or servers before allowing them to join the VPN.
 # - Peer-to-peer networks: In peer-to-peer networks, where nodes need to communicate directly with each other, list certificates can be used for mutual authentication.
 # - Internet of Things (IoT) devices: In IoT environments, where devices may have limited computational resources, list certificates can provide a lightweight authentication mechanism.
-# - Closed networks or intranets: In closed networks or intranets, where the participants are known and controlled, list certificates can be used for authentication instead of relying on a public certificate authority (CA).
+# - Closed networks or intranets (Currently used for Cloudflare (Frontend) & Heroku (Backend), which works well, allowing any browser or tools like curl to access api-beta.btz.pm): In closed networks or intranets, where the participants are known and controlled, 
+#   list certificates can be used for authentication instead of relying on a public certificate authority (CA).
 #
 # Note: The explained in list of use cases (VPN,P2P,IoT,Closed Networks) for the Subordinate (intermediate) CA is based on well-known knowledge.
 boring-ca.pem
