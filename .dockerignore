@@ -16,7 +16,7 @@ boring-client-cert.pem
 boring-client-key.pem
 
 # H0llyW00dzZ CA & RootCA TLS 1.3 certificates
-# Note: The RootCA and CA are different. The RootCA's private key and the private key in "boring-ca.pem" are both bound to hardware.
+# The RootCA and CA are different entities. Both the RootCA's private key and the private key in "boring-ca.pem" are bound to hardware security modules (see https://www.digicert.com/what-is-pki for information on PKI private keys).
 # Additionally, RootCA or CA are not compatible with Trust Signed certificates (which are needed for browser compatibility)
 # because they are designed for private authorization purposes and are not self-signed. (If they were self-signed, they wouldn't work when using the TLS Go standard library with InsecureSkipVerify set to false.)
 # List of Current Well-Known Methods that Work:
