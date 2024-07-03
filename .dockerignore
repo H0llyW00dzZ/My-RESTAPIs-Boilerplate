@@ -37,6 +37,10 @@ boring-ca.pem
 # It's recommended to use a Subordinate (intermediate) CA which has already been made, then test with InsecureSkipVerify set to false (default TLS Config Go standard library).
 #
 # Important: Never test TLS with InsecureSkipVerify set to true (this is a bad practice).
+#
+# Important: When creating a CA (Root CA or Subordinate (intermediate) CA), make sure it is correctly chained. If the chaining is incorrect,
+# regardless of whether it is legitimate or tampered with (non-legitimate, which is considered compromised by an attacker in the middle), it can lead to the CA being untrusted when scanned
+# (see demo at https://decoder.link/sslchecker/api-beta.btz.pm/443).
 boring-RootCA.pem
 
 # Google Trust Service (Well-Known)
