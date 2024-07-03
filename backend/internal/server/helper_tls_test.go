@@ -46,10 +46,11 @@ import (
 //   - The demo/test environment establishes a secure communication channel between the server backend (Heroku) and frontend (Cloudflare).
 //   - Cloudflare uses a client/root certificate to establish a secure connection to the backend, ensuring that all communication between
 //     Cloudflare and Heroku remains encrypted.
-//   - Without this server frontend setup, browsers and tools like curl would not be able to directly access the backend.
+//   - Without this server frontend setup, any browsers and any tools like curl would not be able to directly access the backend.
 //
 // No Man In the Middle:
-//   - The demo/test setup employs a secure communication channel using trusted certificates and end-to-end encryption. This makes it extremely difficult for an attacker to intercept and decipher the data exchanged between Heroku and Cloudflare.
+//   - The demo/test setup employs a secure communication channel using trusted certificates and end-to-end encryption.
+//     This makes it extremely difficult for an attacker to intercept and decipher the data exchanged between Heroku and Cloudflare.
 //   - Even if an attacker were able to intercept traffic, they would only see encrypted data, preventing them from gaining access to sensitive information.
 var testHostName = os.Getenv("TEST_HOSTNAME") // Use Real domain (e.g, testing-tls.go.dev)
 
