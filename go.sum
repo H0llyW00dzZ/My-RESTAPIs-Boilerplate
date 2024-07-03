@@ -77,8 +77,8 @@ github.com/gofiber/contrib/swagger v1.1.2 h1:qwyFR/yXEttI35JxAycC6KFuJu7rbhSsT1m
 github.com/gofiber/contrib/swagger v1.1.2/go.mod h1:o6hA4kifvR3xGNtAdWKNdSUGaWYtJ0Q5AWjsIHXLEWg=
 github.com/gofiber/fiber/v2 v2.52.5 h1:tWoP1MJQjGEe4GB5TUGOi7P2E0ZMMRx5ZTG4rT+yGMo=
 github.com/gofiber/fiber/v2 v2.52.5/go.mod h1:KEOE+cXMhXG0zHc9d8+E38hoX+ZN7bhOtgeF2oT6jrQ=
-github.com/gofiber/storage/redis/v3 v3.1.1 h1:dkmeTv8qmM6giR65yTAxXN4lP1UU/h7uXuWuQoJOjdI=
-github.com/gofiber/storage/redis/v3 v3.1.1/go.mod h1:BQ/vdV/MJKi8tcLvHfvBPXiM4pzitDx5YqqDz/XvF0I=
+github.com/gofiber/storage/redis/v3 v3.1.2 h1:qYHSRbkRQCD9HovLOOoswe+DoGF28/hwD4d8kmxDNcs=
+github.com/gofiber/storage/redis/v3 v3.1.2/go.mod h1:bwSKrd5Ux2blqXVT8tWOYTmZbFDMZR8dztn7rarDZiU=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
