@@ -96,7 +96,7 @@ func createCertPoolFromFile(certFilePath string) (*x509.CertPool, error) {
 func tlsServerConfig(cert tls.Certificate) *tls.Config {
 	log.InitializeLogger("Boring TLS 1.3 Testing", "")
 	tlsHandler := &fiber.TLSHandler{}
-	RootCA, _ := createCertPoolFromFile("boring-RootCA.pem")
+	RootCA, _ := createCertPoolFromFile("boring-ca.pem")
 	return &tls.Config{
 		MinVersion: tls.VersionTLS13,
 		CurvePreferences: []tls.CurveID{

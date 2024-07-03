@@ -68,14 +68,14 @@ This boilerplate is grounded in the Unix philosophy, emphasizing simplicity, mod
 
 ## Resource Memory Usage
 
-- `MySQL` without `Redis` + 100K `POST` Request (`Outdated` - `go1.23.2`)
+- `MySQL` without `Redis` + 100K `POST` Request (`Outdated` - `go1.22.2`)
 
 <img src="https://i.imgur.com/C9hZYDz.png" alt="Memory Usage with MYSQL">
 
 > [!NOTE]
 > The `Resource Memory Usage` section demonstrates how `Go` has stable and low memory overhead compared to other languages, especially `Java` (See [this article](https://learn.microsoft.com/en-us/azure/spring-apps/enterprise/concepts-for-java-memory-management) for more information on Java memory management Lmao.) hahaha.
 
-- `Idle` (`Outdated` - `go1.23.2`)
+- `Idle` (`Outdated` - `go1.22.2`)
 
 <img src="https://i.imgur.com/1dG4E9G.png" alt="Idle">
 
@@ -86,9 +86,9 @@ This boilerplate is grounded in the Unix philosophy, emphasizing simplicity, mod
 
 ### ***Latest***
 
-- `Idle` (`Latest Go Version` - `go1.23.3`)
+- `Idle` (`Outdated` - `go1.22.3`)
 
-<img src="https://i.imgur.com/9AstMIl.png" alt="Idle-go1.23.3">
+<img src="https://i.imgur.com/9AstMIl.png" alt="Idle-go1.22.3">
 
 ```sh
 sample#memory_total=8.01MB
@@ -117,6 +117,13 @@ sample#memory_quota=1024.00MB
 > <p align="center">
 >   <img src="https://i.imgur.com/PxjZ0Dz.png" alt="gopher run" />
 > </p>
+
+#### ***TLS 1.3 Connection Stable***
+
+- `Standard TLS 1.3` (`Latest Go Version` - `go1.22.5`)
+
+<img src="https://i.imgur.com/FzESWLM.png" alt="tls-go1.22.5">
+<img src="https://i.imgur.com/fGBOy2k.png" alt="tls-go1.22.5">
 
 
 ## Architecture
