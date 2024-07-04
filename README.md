@@ -122,9 +122,11 @@ sample#memory_quota=1024.00MB
 
 - `Standard TLS 1.3` (`Latest Go Version` - `go1.22.5`)
 
-<img src="https://i.imgur.com/FzESWLM.png" alt="tls-go1.22.5">
-<img src="https://i.imgur.com/fGBOy2k.png" alt="tls-go1.22.5">
+<img src="https://i.imgur.com/NiUdm8I.png" alt="tls-go1.22.5">
+<img src="https://i.imgur.com/jHgqAey.png" alt="tls-go1.22.5">
 
+> [!NOTE]
+> The screenshots provided demonstrate a `Standard TLS 1.3` connection using the `Closed networks or intranets` method, which involves Cloudflare (`Frontend`) and Heroku (`Backend`). Without Cloudflare, any browser or tools like curl won't be able to access the backend server.
 
 ## Architecture
 
