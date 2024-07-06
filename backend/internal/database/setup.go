@@ -115,6 +115,49 @@ func (config *RedisClientConfig) InitializeRedisClient() (*redis.Client, error) 
 }
 
 // InitializeMySQLDB initializes and returns a new MySQL database client.
+//
+// Example Configuration:
+//
+//	spec:
+//
+//	containers:
+//	- args:
+//	  - --ssl-cert=/etc/mysql/tls/db-chain.pem # (leaf,subsca,root)
+//	  - --ssl-key=/etc/mysql/tls/db.key.pem
+//	  - --ssl-capath=/etc/mysql/tls/root.pem # (rootCA)
+//	  - --ssl-capath=/etc/ssl/certs
+//	  env: # Secrets from environment variables, other secrets are bound into Hardware Security Modules It's Encrypted.
+//	  - name: MYSQL_ROOT_PASSWORD
+//	    valueFrom:
+//	      configMapKeyRef:
+//	        key: MYSQL_ROOT_PASSWORD
+//	        name: mysql-config-krmr
+//	  image: mysql:latest
+//	  imagePullPolicy: Always
+//	  name: mysql-1
+//	  resources:
+//	    limits:
+//	      cpu: 500m
+//	      ephemeral-storage: 1Gi
+//	      memory: 2Gi
+//	    requests:
+//	      cpu: 500m
+//	      ephemeral-storage: 1Gi
+//	      memory: 2Gi
+//	  securityContext:
+//	    capabilities:
+//	      drop:
+//	      - NET_RAW
+//	  terminationMessagePath: /dev/termination-log
+//	  terminationMessagePolicy: File
+//	  volumeMounts:
+//	  - mountPath: /etc/mysql/tls
+//	    name: mysql-tls
+//	  - mountPath: /etc/mysql/tls/ca-certs
+//	    name: mysql-ca-certs
+//	  - mountPath: /etc/mysql/conf.d/my.cnf
+//	    name: mysql-config
+//	    subPath: my.cnf
 func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
 	rootCAs, err := loadRootCA()
 	if err != nil {
