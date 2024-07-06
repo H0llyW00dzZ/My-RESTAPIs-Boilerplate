@@ -174,6 +174,7 @@ var (
 	redisPoolTimeout     = os.Getenv(EnvRedisDBPoolTimeout)
 	redisConnMaxIdleTime = os.Getenv(EnvRedisDBConnMaxIdleTime)
 	redisConnMaxLifetime = os.Getenv(EnvRedisDBConnMaxLifeTime)
+	tlsCAs               = os.Getenv(EnvTLSCAsBase64)
 	dbInstance           *service
 )
 
@@ -733,7 +734,12 @@ func (s *service) RestartRedisConnection() error {
 	}
 
 	// Reinitialize the Redis client.
-	s.redisClient = s.initRedis.InitializeRedisClient()
+	redisClient, err := s.initRedis.InitializeRedisClient()
+	if err != nil {
+		log.LogErrorf("Error initializing Redis client: %v", err)
+		return err
+	}
+	s.redisClient = redisClient
 
 	// Log the reconnection
 	log.LogInfo("Redis connection has been restarted.")

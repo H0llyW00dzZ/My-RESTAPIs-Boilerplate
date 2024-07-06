@@ -17,6 +17,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/go-sql-driver/mysql"
 	_ "github.com/go-sql-driver/mysql" // MySQL driver is used for connecting to MySQL databases.
 	"github.com/gofiber/fiber/v2"
 	redisStorage "github.com/gofiber/storage/redis/v3" // Alias the import to avoid conflict
@@ -76,7 +77,12 @@ type MySQLConfig struct {
 var maxConnections = 2 * runtime.NumCPU()
 
 // InitializeRedisClient initializes and returns a new Redis client.
-func (config *RedisClientConfig) InitializeRedisClient() *redis.Client {
+func (config *RedisClientConfig) InitializeRedisClient() (*redis.Client, error) {
+	rootCAs, err := loadRootCA()
+	if err != nil {
+		return nil, err
+	}
+
 	client := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", config.Address, config.Port),
 		Password: config.Password,
@@ -90,6 +96,7 @@ func (config *RedisClientConfig) InitializeRedisClient() *redis.Client {
 		TLSConfig: &tls.Config{
 			// Explicitly set the maximum and minimum TLS versions to 1.3 this server anyways.
 			// However Go's standard TLS 1.3 implementation is broken because it keeps forcing the use of the AES-GCM cipher suite.
+			ClientCAs:  rootCAs,
 			MaxVersion: tls.VersionTLS13,
 			MinVersion: tls.VersionTLS13,
 			CurvePreferences: []tls.CurveID{
@@ -104,13 +111,31 @@ func (config *RedisClientConfig) InitializeRedisClient() *redis.Client {
 		ContextTimeoutEnabled: config.ContextTimeoutEnabled, // adding back this for default.
 		MinIdleConns:          config.PoolSize / 4,          // Set minimum idle connections to 25% of the pool size
 	})
-	return client
+	return client, nil
 }
 
 // InitializeMySQLDB initializes and returns a new MySQL database client.
 func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
+	rootCAs, err := loadRootCA()
+	if err != nil {
+		return nil, err
+	}
+
 	dsn := fmt.Sprintf(MySQLConnect, config.Username, config.Password, config.Host, config.Port, config.Database)
-	db, err := sql.Open(dbMYSQL, dsn)
+
+	// Set the TLS configuration for the MySQL connection
+	err = mysql.RegisterTLSConfig("custom", &tls.Config{
+		RootCAs: rootCAs,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Set the TLS connection parameter in the DSN
+	dsnWithTLS := fmt.Sprintf("%s?tls=custom", dsn)
+
+	// Open a new connection with the updated DSN
+	db, err := sql.Open(dbMYSQL, dsnWithTLS)
 	if err != nil {
 		return nil, err
 	}
@@ -121,12 +146,24 @@ func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
 	db.SetConnMaxLifetime(0) // Connections are not closed due to being idle too long.
 	db.SetMaxIdleConns(50)   // Maximum number of connections in the idle connection pool.
 	db.SetMaxOpenConns(50)   // Maximum number of open connections to the database.
+
+	err = db.Ping()
+	if err != nil {
+		return nil, err
+	}
+	db.SetConnMaxIdleTime(time.Minute * 3)
+	db.SetMaxOpenConns(50)
 	return db, nil
 }
 
 // InitializeRedisStorage initializes and returns a new Redis storage instance
 // for use with Fiber middlewares such as rate limiting.
-func (config *FiberRedisClientConfig) InitializeRedisStorage() fiber.Storage {
+func (config *FiberRedisClientConfig) InitializeRedisStorage() (fiber.Storage, error) {
+	rootCAs, err := loadRootCA()
+	if err != nil {
+		return nil, err
+	}
+
 	storage := redisStorage.New(redisStorage.Config{
 		Host:     config.Address,
 		Port:     config.Port,
@@ -142,6 +179,7 @@ func (config *FiberRedisClientConfig) InitializeRedisStorage() fiber.Storage {
 		TLSConfig: &tls.Config{
 			// Explicitly set the maximum and minimum TLS versions to 1.3 this server anyways.
 			// However Go's standard TLS 1.3 implementation is broken because it keeps forcing the use of the AES-GCM cipher suite.
+			ClientCAs:  rootCAs,
 			MaxVersion: tls.VersionTLS13,
 			MinVersion: tls.VersionTLS13,
 			CurvePreferences: []tls.CurveID{
@@ -153,7 +191,8 @@ func (config *FiberRedisClientConfig) InitializeRedisStorage() fiber.Storage {
 		},
 		PoolSize: config.PoolSize, // Adjust the pool size as necessary.
 	})
-	return storage
+	return storage, nil
+
 }
 
 // parseRedisConfig parses the Redis configuration from environment variables and returns a RedisClientConfig struct.
@@ -213,7 +252,7 @@ func initializeRedisClient() (*redis.Client, error) {
 	}
 
 	// Initialize and return the Redis client using the provided configuration
-	return redisConfig.InitializeRedisClient(), nil
+	return redisConfig.InitializeRedisClient()
 }
 
 // initializeRedisStorage initializes the Redis storage for Fiber using the provided Redis configuration.
@@ -242,7 +281,7 @@ func initializeRedisStorage() (fiber.Storage, error) {
 	}
 
 	// Initialize and return the Redis storage using the provided configuration
-	return fiberRedisConfig.InitializeRedisStorage(), nil
+	return fiberRedisConfig.InitializeRedisStorage()
 }
 
 // initializeMySQLDB initializes the MySQL database using the provided MySQL configuration.
