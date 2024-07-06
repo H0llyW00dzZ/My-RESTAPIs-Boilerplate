@@ -248,9 +248,12 @@ func TLSConfig(cert tls.Certificate, leafCA, subCA, rootCA *x509.Certificate, cl
 		// TODO: Handle "VerifyPeerCertificate" for Certificate Transparency.
 	}
 
-	// Create a certificate pool for the CA certificates
+	// Create a certificate pool (basically CA chains) for the CA certificates
 	// Note: A correct implementation:
 	// leafCA (first), subCA (second), rootCA (third)
+	//
+	// Bad Practice:
+	// Using cat command for append it.
 	caCertPool := x509.NewCertPool()
 	if leafCA != nil {
 		caCertPool.AddCert(leafCA)
