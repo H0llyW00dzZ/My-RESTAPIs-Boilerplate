@@ -125,7 +125,9 @@ func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
 
 	// Set the TLS configuration for the MySQL connection
 	err = mysql.RegisterTLSConfig("custom", &tls.Config{
-		RootCAs: rootCAs,
+		RootCAs:    rootCAs,
+		MaxVersion: tls.VersionTLS13,
+		MinVersion: tls.VersionTLS13,
 	})
 	if err != nil {
 		return nil, err
