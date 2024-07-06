@@ -126,7 +126,7 @@ func (config *RedisClientConfig) InitializeRedisClient() (*redis.Client, error) 
 //	  - --ssl-key=/etc/mysql/tls/db.key.pem
 //	  - --ssl-capath=/etc/mysql/tls/root.pem # (rootCA)
 //	  - --ssl-capath=/etc/ssl/certs
-//	  env: # Secrets from environment variables, other secrets are bound into Hardware Security Modules.
+//	  env: # Secrets from environment variables, other secrets are bound into Hardware Security Modules It's Encrypted.
 //	  - name: MYSQL_ROOT_PASSWORD
 //	    valueFrom:
 //	      configMapKeyRef:
