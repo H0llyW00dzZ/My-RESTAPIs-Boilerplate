@@ -122,7 +122,7 @@ func (config *RedisClientConfig) InitializeRedisClient() (*redis.Client, error) 
 //
 //	containers:
 //	- args:
-//	  - --ssl-cert=/etc/mysql/tls/db-chain.pem # (leaf,subsca,root)
+//	  - --ssl-cert=/etc/mysql/tls/db-chain.pem # (leaf,subsca,root) Issued by Subsca
 //	  - --ssl-key=/etc/mysql/tls/db.key.pem # Private Key Issued by Subsca
 //	  - --ssl-capath=/etc/mysql/tls/root.pem # (rootCA)
 //	  - --ssl-capath=/etc/ssl/certs
