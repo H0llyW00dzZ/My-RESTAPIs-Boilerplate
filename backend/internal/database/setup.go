@@ -189,7 +189,7 @@ func (config *FiberRedisClientConfig) InitializeRedisStorage() (fiber.Storage, e
 				tls.CurveP521,
 			},
 		},
-		PoolSize: config.PoolSize,
+		PoolSize: config.PoolSize, // Adjust the pool size as necessary.
 	})
 	return storage, nil
 
