@@ -186,7 +186,7 @@ func getEnv(key, defaultValue string) string {
 //	handler.StartServer(server, addr, monitorPath, shutdownTimeout, gopherTLSConfig, nil) // Boring TLS 1.3 nil due it's my own protocol and currently unavailable.
 //
 // Note: This design is well-written and idiomatic, unlike designs that spliting functions (e.g., those related to TLS like "ListenTLS" "ListenMutualTLS" or whatever it is).
-func TLSConfig(cert tls.Certificate, clientCertPool *x509.CertPool) *tls.Config {
+func TLSConfig(cert tls.Certificate, leafCA, subCA, rootCA *x509.Certificate, clientCertPool *x509.CertPool) *tls.Config {
 	tlsHandler := &fiber.TLSHandler{}
 	// Note: Go's standard TLS 1.3 implementation does not allow direct configuration of cipher suites.
 	// This means that while one can specify cipher suites in Go code, the implementation will prioritize the use of
@@ -248,8 +248,29 @@ func TLSConfig(cert tls.Certificate, clientCertPool *x509.CertPool) *tls.Config 
 		// TODO: Handle "VerifyPeerCertificate" for Certificate Transparency.
 	}
 
+	// Create a certificate pool (basically CA chains) for the CA certificates
+	// Note: A correct implementation:
+	// leafCA (first), subCA (second), rootCA (third)
+	//
+	// Bad Practice:
+	// Using cat command for append it.
+	caCertPool := x509.NewCertPool()
+	if leafCA != nil {
+		caCertPool.AddCert(leafCA)
+	}
+	if subCA != nil {
+		caCertPool.AddCert(subCA)
+	}
+	if rootCA != nil {
+		caCertPool.AddCert(rootCA)
+	}
+
+	// Set the RootCAs field in the TLS config
+	tlsConfig.RootCAs = caCertPool
+
 	// Only enable client auth if clientCertPool is not nil
 	// TODO: Handle "GetClientCertificate" that might need.
+	// Note: This different, it for mTLS, unlike "caCertPool" that for HTTPS
 	if clientCertPool != nil {
 		tlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
 		tlsConfig.ClientCAs = clientCertPool
