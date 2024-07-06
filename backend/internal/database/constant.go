@@ -44,6 +44,14 @@ const (
 	EnvRedisDBConnMaxLifeTime = "REDIS_MAXCONN_LIFE_TIME"
 )
 
+const (
+	// EnvTLSCAsBase64 is the environment variable name for the base64-encoded root CA certificates.
+	//
+	// This environment variable is used to specify the root CA certificates that should be used for establishing
+	// secure connections to databases or other services that require TLS authentication.
+	EnvTLSCAsBase64 = "EXTRA_CERTS_TLS"
+)
+
 // Message constants for Redis-related operations.
 const (
 	MsgRedisHighConnectedClients = "Redis has a high number of connected clients"

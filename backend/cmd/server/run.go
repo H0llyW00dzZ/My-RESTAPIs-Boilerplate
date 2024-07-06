@@ -68,6 +68,11 @@ func main() {
 //   - REDIS_MAXCONN_IDLE_TIME: The maximum amount of time a Redis connection can remain idle in the connection pool (required).
 //   - REDIS_MAXCONN_LIFE_TIME: The maximum lifetime of a Redis connection in the connection pool (required).
 //
+// TLS Configuration:
+//
+//   - EXTRA_CERTS_TLS: Base64-encoded root CA certificates for establishing secure connections database.
+//     This environment variable is used to specify additional root CA certificates that should be trusted by the application.
+//
 // Note: Regarding TLS certificates, there are no environment variables defined. It is necessary to write custom code to handle TLS certificates to avoid conflicts.
 func getEnvVariables() (appName, port, monitorPath, timeFormat string, readTimeout, writeTimeout, shutdownTimeout time.Duration) {
 	// Get the APP_NAME, PORT, and MONITOR_PATH from environment variables or use default values.
