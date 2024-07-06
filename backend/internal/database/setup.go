@@ -123,7 +123,7 @@ func (config *RedisClientConfig) InitializeRedisClient() (*redis.Client, error) 
 //	containers:
 //	- args:
 //	  - --ssl-cert=/etc/mysql/tls/db-chain.pem # (leaf,subsca,root)
-//	  - --ssl-key=/etc/mysql/tls/db.key.pem
+//	  - --ssl-key=/etc/mysql/tls/db.key.pem # Private Key Issued by Subsca
 //	  - --ssl-capath=/etc/mysql/tls/root.pem # (rootCA)
 //	  - --ssl-capath=/etc/ssl/certs
 //	  env: # Secrets from environment variables, other secrets are bound into Hardware Security Modules It's Encrypted.
@@ -158,6 +158,10 @@ func (config *RedisClientConfig) InitializeRedisClient() (*redis.Client, error) 
 //	  - mountPath: /etc/mysql/conf.d/my.cnf
 //	    name: mysql-config
 //	    subPath: my.cnf
+//
+// Note: The Example Configuration It required Run As root because of Image.
+//
+// Best Practice: Remove Default CAs in the Image (Include Public (Trusted) CAs), then put 1 Private Root CAs.
 func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
 	rootCAs, err := loadRootCA()
 	if err != nil {
