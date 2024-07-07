@@ -1,4 +1,18 @@
-# rest-apis ingress controller configuration zer0 down-time by H0llyW00dzZ for external load balancer that running in k8s
+# REST API Ingress Controller Configuration [Zer0 Downtime] by H0llyW00dzZ for external load balancer that running in K8S.
+#
+# Important: When using Private CAs, it's recommended to implement an external handler (e.g., Cloudflare).
+# Then the external handler should use Public CAs and trust the private CA roots from backend service.
+#
+# For Cloudflare, refer to:
+#  - https://developers.cloudflare.com/ssl/edge-certificates/advanced-certificate-manager/
+#  - https://developers.cloudflare.com/ssl/origin-configuration/custom-origin-trust-store/
+#  - https://developers.cloudflare.com/ssl/edge-certificates/custom-certificates/
+#
+# Example architecture:
+# Frontend (External Handler, e.g., Cloudflare) -> Backend (This Repo)
+#
+# Once the frontend and backend are connected, management (e.g, traffic, security, etc) becomes easier through the frontend
+# (e.g, don't have to spend time for setup, maintenance traffic, other).
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
