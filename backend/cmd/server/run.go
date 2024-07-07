@@ -74,6 +74,9 @@ func main() {
 //     This environment variable is used to specify additional root CA certificates that should be trusted by the application.
 //
 // Note: Regarding TLS certificates, there are no environment variables defined. It is necessary to write custom code to handle TLS certificates to avoid conflicts.
+// Also note that "EXTRA_CERTS_TLS" is required for the application that should be trusted (e.g, Private CAs (Recommended for internal))
+// within internal networks used for database connection establishment (For example, in a gateway such as load balancing infrastructure)
+// then this REST API boilerplate can be bound to a external load balancer (e.g., Nginx) for external world exposure.
 func getEnvVariables() (appName, port, monitorPath, timeFormat string, readTimeout, writeTimeout, shutdownTimeout time.Duration) {
 	// Get the APP_NAME, PORT, and MONITOR_PATH from environment variables or use default values.
 	appName = getEnv("APP_NAME", "Gopher")
