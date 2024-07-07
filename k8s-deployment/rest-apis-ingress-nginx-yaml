@@ -29,7 +29,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: rest-api-service # change this
+                name: rest-api-service # change this for front-end route
                 port:
                   number: 80 # change this
   # Note: TLS are required and it's optional regarding cert, since personally I am using Private CAs
