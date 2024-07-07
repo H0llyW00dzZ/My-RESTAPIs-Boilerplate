@@ -18,6 +18,8 @@ spec:
     - host: localhost # change this
       http:
         paths:
+          # Note: This important to enable "CaseSensitive" and "StrictRouting" true in fiber configuration (see cmd/server/run.go)
+          # then in middleware don't forget configure a "DomainRouter" in RegisterRoutes (see middleware/routes.go)
           - path: /api/v1/ # change this for rest-apis route
             pathType: Prefix
             backend:
