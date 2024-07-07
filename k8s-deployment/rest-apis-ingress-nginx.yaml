@@ -11,6 +11,9 @@
 # Example architecture:
 # Frontend (External Handler, e.g., Cloudflare) -> Backend (This Repo)
 #
+# Demo:
+#  - https://dev.btz.pm (This Repo, you can see the favicon)
+#
 # Once the frontend and backend are connected, management (e.g, traffic, security, etc) becomes easier through the frontend
 # (e.g, don't have to spend time for setup, maintenance traffic, other).
 apiVersion: networking.k8s.io/v1
