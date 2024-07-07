@@ -1,0 +1,39 @@
+# rest-apis ingress controller configuration zer0 down-time by H0llyW00dzZ for external load balancer that running in k8s
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rest-api-ingress # change this
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    # nginx.ingress.kubernetes.io/ssl-passthrough: "true"  # Removed
+    nginx.ingress.kubernetes.io/ssl-certificate: "localhost-tls" # change this
+    nginx.ingress.kubernetes.io/ssl-certificate-key: "localhost-tls" # change this
+    nginx.ingress.kubernetes.io/ssl-protocols: "TLSv1.3"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: localhost # change this
+      http:
+        paths:
+          - path: /api/v1/ # change this for rest-apis route
+            pathType: Prefix
+            backend:
+              service:
+                name: rest-api-service # change this
+                port:
+                  number: 8080 # change this
+          - path: / # change this for front-end route
+            pathType: Prefix
+            backend:
+              service:
+                name: rest-api-service # change this for front-end route
+                port:
+                  number: 80 # change this
+  # Note: TLS are required and it's optional regarding cert, since personally I am using Private CAs
+  tls:
+    - hosts:
+        - localhost # change this
+      secretName: localhost-tls # change this
