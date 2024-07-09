@@ -54,6 +54,8 @@ func (v *viewData) renderErrorPage(c *fiber.Ctx, statusCode int, _ string, _ err
 func (v *viewData) PageNotFoundHandler(c *fiber.Ctx) error {
 	component := PageNotFound404(v.title, v.cfheader)
 
+	// Note: This Optional can be used to builder string. However,
+	// it is intended for low-level operations where the efficiency of using a string builder is not significant.
 	buf := new(bytes.Buffer)
 	if err := component.Render(c.Context(), buf); err != nil {
 		return v.renderErrorPage(c, fiber.StatusInternalServerError, "Error rendering PageNotFound: %v", err)
@@ -69,6 +71,8 @@ func (v *viewData) PageNotFoundHandler(c *fiber.Ctx) error {
 func (v *viewData) PageForbidden403Handler(c *fiber.Ctx) error {
 	component := PageForbidden403(v.title, v.cfheader)
 
+	// Note: This Optional can be used to builder string. However,
+	// it is intended for low-level operations where the efficiency of using a string builder is not significant.
 	buf := new(bytes.Buffer)
 	if err := component.Render(c.Context(), buf); err != nil {
 		return v.renderErrorPage(c, fiber.StatusInternalServerError, "Error rendering Forbidden Page: %v", err)
