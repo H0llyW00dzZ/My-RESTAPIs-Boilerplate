@@ -6,10 +6,11 @@ package frontend
 
 import "embed"
 
-// Files is an embedded file system containing the static files from the "images, js" directory.
+// Files is an embedded file system containing the static files from the "images, js, css" directory.
 //
 // Note: this is a "magic embedded" line and should not be removed, as it is initialized before other code (even another FS System).
 //
 //go:embed "assets/images"
 //go:embed "assets/js"
+//go:embed "assets/css"
 var Files embed.FS
