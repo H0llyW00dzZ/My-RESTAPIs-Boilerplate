@@ -4,7 +4,7 @@
 
 package htmx
 
-templ Base(titlePage, cfheader string) {
+templ Base(titlePage, cfheader, xRequestID string) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -23,6 +23,10 @@ templ Base(titlePage, cfheader string) {
 		    if cfheader != "" {
 				<div class="description-text animate__animated animate__fadeIn animate__delay-1s">
 					<section class="footer"><strong>Ray ID:</strong> { cfheader }</section>
+				</div>
+			} else if xRequestID  != "" {
+				<div class="description-text animate__animated animate__fadeIn animate__delay-1s">
+					<section class="footer"><strong>Request ID:</strong> { xRequestID }</section>
 				</div>
 			}
 		</body>

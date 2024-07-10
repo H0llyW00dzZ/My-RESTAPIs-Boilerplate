@@ -4,8 +4,8 @@
 
 package htmx
 
-templ PageNotFound404(titlePage, cfheader string) {
-	@Base(titlePage, cfheader) {
+templ PageNotFound404(titlePage, cfheader, xRequestID string) {
+	@Base(titlePage, cfheader, xRequestID) {
 		<div class="container">
 			<div class="row">
 				<div class="col">

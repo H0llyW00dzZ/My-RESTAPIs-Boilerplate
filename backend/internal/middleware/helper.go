@@ -26,6 +26,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/redirect"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/fiber/v2/middleware/rewrite"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/google/uuid"
@@ -964,4 +965,25 @@ func WithValidatorContextKey(contextKey string) func(*validator.Config) {
 //	}))
 func ptr(i int) *int {
 	return &i
+}
+
+// WithRequestIDHeader is an option function for NewRequestIDMiddleware that sets the header name for the request ID.
+func WithRequestIDHeader(header string) func(*requestid.Config) {
+	return func(config *requestid.Config) {
+		config.Header = header
+	}
+}
+
+// WithRequestIDHeaderContextKey is an option function for NewRequestIDMiddleware that sets the header Context Key name for the request ID.
+func WithRequestIDHeaderContextKey(headerContextKey string) func(*requestid.Config) {
+	return func(config *requestid.Config) {
+		config.ContextKey = headerContextKey
+	}
+}
+
+// WithRequestIDGenerator is an option function for NewRequestIDMiddleware that sets a custom generator function for the request ID.
+func WithRequestIDGenerator(generator func() string) func(*requestid.Config) {
+	return func(config *requestid.Config) {
+		config.Generator = generator
+	}
 }

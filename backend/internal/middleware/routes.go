@@ -33,6 +33,13 @@ type (
 // RegisterRoutes sets up the API routing for the application.
 // It organizes routes into versioned groups for better API version management.
 func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Service) {
+	// Generate Request ID
+	//
+	// Note: This just example and "visitor_uuid" contextkey can be used for c.Locals
+	// Previously I've been done implement this X-Request-ID bound into hash from TLS 1.3 with Private Protocols Cryptography (not open source) not UUID.
+	xRequestID := NewRequestIDMiddleware(
+		WithRequestIDHeaderContextKey("visitor_uuid"),
+	)
 	// Hosts
 	hosts := map[string]*Host{}
 	// Apply the combined middlewares
@@ -53,7 +60,7 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 	// Note: "htmx.NewErrorHandler" will apply to localhost:8080 by default.
 	// For "api.localhost:8080" to function correctly, REST API routes must be implemented.
 	// Additionally, define environment variables for "DOMAIN" and "API_SUB_DOMAIN" to enable multi-site support (up to 1 billion domains).
-	app.Use(htmx.NewErrorHandler, DomainRouter(hosts)) // When "htmx.NewErrorHandler" Applied, Generic Error (E.g, Crash/Panic will render "Internal Server Error" as JSON due It use recoverMiddleware)
+	app.Use(xRequestID, htmx.NewErrorHandler, DomainRouter(hosts)) // When "htmx.NewErrorHandler" Applied, Generic Error (E.g, Crash/Panic will render "Internal Server Error" as JSON due It use recoverMiddleware)
 }
 
 // registerRouteConfigMiddleware applies middleware configurations to the Fiber application.

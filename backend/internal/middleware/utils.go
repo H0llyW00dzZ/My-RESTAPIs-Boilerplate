@@ -29,6 +29,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
 	"github.com/gofiber/fiber/v2/middleware/redirect"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/fiber/v2/middleware/rewrite"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/fiber/v2/utils"
@@ -681,4 +682,26 @@ func NewValidatorMiddleware(options ...any) fiber.Handler {
 
 	// Return the Validator middleware.
 	return validatorMiddleware
+}
+
+// NewRequestIDMiddleware creates a new request ID middleware with optional custom configuration options.
+//
+// The request ID middleware generates a unique ID for each incoming request and adds it to the response headers.
+// It can be used for tracking and debugging purposes.
+func NewRequestIDMiddleware(options ...interface{}) fiber.Handler {
+	// Create a new request ID middleware configuration.
+	config := requestid.Config{}
+
+	// Apply any additional options to the request ID configuration.
+	for _, option := range options {
+		if optFunc, ok := option.(func(*requestid.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create the request ID middleware with the configured options.
+	requestIDMiddleware := requestid.New(config)
+
+	// Return the request ID middleware.
+	return requestIDMiddleware
 }
