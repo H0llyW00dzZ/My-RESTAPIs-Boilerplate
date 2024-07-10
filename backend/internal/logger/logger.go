@@ -205,6 +205,12 @@ func LogErrorf(format string, v ...any) {
 func LogUserActivity(c *fiber.Ctx, activity string) {
 	httpMethod := c.Method() // Get the HTTP method of the request
 	// Check if Cloudflare is involved
+	//
+	// Note: This required a load balancer, without load balancer this can be weak.
+	//
+	// Example architecture:
+	//
+	// Frontend (External Handler, e.g., Cloudflare) -> Backend (Nginx or Other + This Repo)
 	clientIP := c.Get(CloudflareConnectingIPHeader)
 	if clientIP == "" {
 		clientIP = c.IP()
