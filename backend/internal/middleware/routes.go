@@ -13,6 +13,7 @@ import (
 	"h0llyw00dz-template/backend/internal/database"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
+	htmx "h0llyw00dz-template/frontend/htmx/error_page_handler"
 )
 
 // Note: This method works well Docs: https://github.com/gofiber/fiber/issues/750
@@ -48,7 +49,12 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 	// Register the Static Frontend Routes
 	registerStaticFrontendRoutes(app, appName, db)
 	// Apply the subdomain routing middleware
-	app.Use(DomainRouter(hosts))
+	//
+	// Note: "htmx.NewErrorHandler" will apply to localhost:8080 by default.
+	// For "api.localhost:8080" to function correctly, REST API routes must be implemented.
+	// Additionally, define environment variables for "DOMAIN" and "API_SUB_DOMAIN" to enable multi-site support (up to 1 billion domains).
+	// As currently configured (Default Fiber), "htmx_min.js" will result in a 404 (Not Found) error. So It Must Implement both frontend and REST API routes for it to function properly.
+	app.Use(htmx.NewErrorHandler, DomainRouter(hosts)) // When "htmx.NewErrorHandler" Applied, Generic Error (E.g, Crash/Panic will render "Internal Server Error" as JSON due It use recoverMiddleware)
 }
 
 // registerRouteConfigMiddleware applies middleware configurations to the Fiber application.
