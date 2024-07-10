@@ -29,6 +29,7 @@ const (
 // https://developers.cloudflare.com/fundamentals/reference/http-request-headers
 const (
 	CloudflareRayIDHeader = "cf-ray"
+	XRequestID            = "visitor_uuid"
 )
 
 // NewErrorHandler is a middleware that handles errors for all routes (dynamic).
@@ -36,12 +37,17 @@ const (
 // This middleware intercepts any errors that occur during route handling
 // and provides a custom error response.
 func NewErrorHandler(c *fiber.Ctx) error {
+	// Get xRequestID Where it was generated.
+	xRequestID := c.Locals(XRequestID)
 	vd := &viewData{
 		views: &views{},
 	}
 	cloudflareRayID := c.Get(CloudflareRayIDHeader)
 	if cloudflareRayID != "" {
 		vd.cfheader = cloudflareRayID
+	} else if xRequestID != nil {
+		vd.xRequestID = xRequestID.(string)
+
 	}
 
 	// Call the next route handler and catch any errors
