@@ -23,6 +23,9 @@ const (
 )
 
 // Define Cloudflare formats.
+//
+// Note: Other header can be found here
+// https://developers.cloudflare.com/fundamentals/reference/http-request-headers
 const (
 	CloudflareRayIDHeader = "cf-ray"
 )
