@@ -48,7 +48,7 @@ const (
 	EXTRACERTTLS = "EXTRA_CERTS_TLS" // Base64-encoded root CA / subs CA certificates for establishing secure connections database (required).
 )
 
-// Site Configuration (Optional since it boilerplate and must rewrite a "DomainRouter" in RegisterRoutes (see backend/internal/middleware/routes.go))
+// Site Middleware Configuration (Optional since it boilerplate and must rewrite a "DomainRouter" in RegisterRoutes (see backend/internal/middleware/routes.go))
 const (
 	DOMAIN       = "DOMAIN"
 	APISUBDOMAIN = "API_SUB_DOMAIN"
