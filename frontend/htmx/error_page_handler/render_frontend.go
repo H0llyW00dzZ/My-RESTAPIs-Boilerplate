@@ -44,6 +44,9 @@ func handleError(c *fiber.Ctx, e *fiber.Error, vd *viewData) error {
 //
 // This function takes a Fiber context, a status code, a log message,
 // and an optional error and sends an error response to the client.
+//
+// Note: The "_" parameters were previously used for logging but have been removed
+// since logging is now handled at the internal package level and cannot be imported here.
 func (v *viewData) renderErrorPage(c *fiber.Ctx, statusCode int, _ string, _ error) error {
 	return helper.SendErrorResponse(c, statusCode, "An error occurred while rendering the page.")
 }
