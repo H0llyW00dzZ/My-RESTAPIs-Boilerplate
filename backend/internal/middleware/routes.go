@@ -53,13 +53,17 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 	// Note: "htmx.NewErrorHandler" will apply to localhost:8080 by default.
 	// For "api.localhost:8080" to function correctly, REST API routes must be implemented.
 	// Additionally, define environment variables for "DOMAIN" and "API_SUB_DOMAIN" to enable multi-site support (up to 1 billion domains).
-	// As currently configured (Default Fiber), "htmx_min.js" will result in a 404 (Not Found) error. So It Must Implement both frontend and REST API routes for it to function properly.
 	app.Use(htmx.NewErrorHandler, DomainRouter(hosts)) // When "htmx.NewErrorHandler" Applied, Generic Error (E.g, Crash/Panic will render "Internal Server Error" as JSON due It use recoverMiddleware)
 }
 
 // registerRouteConfigMiddleware applies middleware configurations to the Fiber application.
 // It sets up the necessary middleware such as recovery, logging, and custom error handling for manipulating panics.
 func registerRouteConfigMiddleware(app *fiber.App) {
+
+	// HTMX now It's enabled. this a idiomatic way and safe due use magic embedded unlike "Other FS" that need ROOT.
+	app.Static("/styles/js", "./frontend/htmx/error_page_handler/js", fiber.Static{
+		// Note: When running on K8S don't have to compress because it will handled by nginx or other controller.
+	})
 
 	// Favicon front end setup
 	// Note: this just an example
