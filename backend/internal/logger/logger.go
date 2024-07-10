@@ -204,8 +204,23 @@ func LogErrorf(format string, v ...any) {
 // LogUserActivity logs a user activity message along with the HTTP method, client IP, User-Agent, and query parameters (if any).
 func LogUserActivity(c *fiber.Ctx, activity string) {
 	httpMethod := c.Method() // Get the HTTP method of the request
-	clientIP := c.IP()
-	userAgent := c.Get("User-Agent")
+	// Check if Cloudflare is involved
+	clientIP := c.Get(CloudflareConnectingIPHeader)
+	if clientIP == "" {
+		clientIP = c.IP()
+	}
+
+	// Log request with Cloudflare Ray ID for security purposes.
+	cloudflareRayID := c.Get(CloudflareRayIDHeader)
+	if cloudflareRayID != "" {
+		activity += " - Cloudflare detected - Ray ID: " + cloudflareRayID
+	}
+	countryCode := c.Get(CloudflareIPCountryHeader)
+	if countryCode != "" {
+		clientIP += ", Country: " + countryCode
+	}
+
+	userAgent := c.Get(UserAgentHeader)
 	originalURL := c.OriginalURL() // This gets the full original URL including query parameters
 	// TODO: Will implement more features as required. Keep improving, keep coding in Go.
 

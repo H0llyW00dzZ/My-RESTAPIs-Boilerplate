@@ -29,3 +29,13 @@ const (
 	TimeFormatUnix    = "unix"
 	TimeFormatDefault = "default"
 )
+
+// Define Cloudflare formats.
+//
+// Note: This for internal only, different from frontend.
+const (
+	CloudflareConnectingIPHeader = "Cf-Connecting-IP"
+	UserAgentHeader              = "User-Agent"
+	CloudflareRayIDHeader        = "cf-ray"
+	CloudflareIPCountryHeader    = "cf-ipcountry"
+)
