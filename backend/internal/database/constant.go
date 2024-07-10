@@ -21,35 +21,8 @@ const (
 // Note: Ignore any false positives reported by code scanners, such as secret scanners or other tools, that are not 100% accurate LMAO hahaha.
 // For example, "Hardcoded Credentials" might be flagged incorrectly in this case.
 const (
-	MySQLConnect       = "%s:%s@tcp(%s:%s)/%s"
-	dbMYSQL            = "mysql"
-	EnvMYSQLDBName     = "DB_DATABASE"
-	EnvMYSQLDBPassword = "DB_PASSWORD"
-	EnvMYSQLDBUsername = "DB_USERNAME"
-	EnvMYSQLDBPort     = "DB_PORT"
-	EnvMYSQLDBHost     = "DB_HOST"
-)
-
-// Constants for Redis NoSQL name and environment variable names.
-//
-// Note: Ignore any false positives reported by code scanners, such as secret scanners or other tools, that are not 100% accurate LMAO hahaha.
-// For example, "Hardcoded Credentials" might be flagged incorrectly in this case.
-const (
-	EnvRedisDBName            = "RDB_DATABASE"
-	EnvRedisDBPassword        = "RDB_PASSWORD"
-	EnvRedisDBPort            = "RDB_PORT"
-	EnvRedisDBHost            = "RDB_ADDRESS"
-	EnvRedisDBPoolTimeout     = "RDB_POOL_TIMEOUT"
-	EnvRedisDBConnMaxIdleTime = "REDIS_MAXCONN_IDLE_TIME"
-	EnvRedisDBConnMaxLifeTime = "REDIS_MAXCONN_LIFE_TIME"
-)
-
-const (
-	// EnvTLSCAsBase64 is the environment variable name for the base64-encoded root CA certificates.
-	//
-	// This environment variable is used to specify the root CA certificates that should be used for establishing
-	// secure connections to databases or other services that require TLS authentication.
-	EnvTLSCAsBase64 = "EXTRA_CERTS_TLS"
+	MySQLConnect = "%s:%s@tcp(%s:%s)/%s"
+	dbMYSQL      = "mysql"
 )
 
 // Message constants for Redis-related operations.

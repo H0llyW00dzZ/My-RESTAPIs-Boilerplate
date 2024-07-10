@@ -13,6 +13,7 @@ import (
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/bcrypt"
+	"h0llyw00dz-template/env"
 	"math"
 	"os"
 	"strconv"
@@ -162,19 +163,19 @@ type service struct {
 //
 // Note: Regarding this Using environment variables in global variables, if you think this high risk you are fucking stupid as developer or security.
 var (
-	dbname               = os.Getenv(EnvMYSQLDBName)
-	password             = os.Getenv(EnvMYSQLDBPassword)
-	username             = os.Getenv(EnvMYSQLDBUsername)
-	port                 = os.Getenv(EnvMYSQLDBPort)
-	host                 = os.Getenv(EnvMYSQLDBHost)
-	redisAddress         = os.Getenv(EnvRedisDBHost)
-	redisPort            = os.Getenv(EnvRedisDBPort)
-	redisPassword        = os.Getenv(EnvRedisDBPassword)
-	redisDatabase        = os.Getenv(EnvRedisDBName)
-	redisPoolTimeout     = os.Getenv(EnvRedisDBPoolTimeout)
-	redisConnMaxIdleTime = os.Getenv(EnvRedisDBConnMaxIdleTime)
-	redisConnMaxLifetime = os.Getenv(EnvRedisDBConnMaxLifeTime)
-	tlsCAs               = os.Getenv(EnvTLSCAsBase64)
+	dbname               = os.Getenv(env.DBDATABASE)
+	password             = os.Getenv(env.DBPASSWORD)
+	username             = os.Getenv(env.DBUSERNAME)
+	port                 = os.Getenv(env.DBPORT)
+	host                 = os.Getenv(env.DBHOST)
+	redisAddress         = os.Getenv(env.RDBADDRESS)
+	redisPort            = os.Getenv(env.RDBPORT)
+	redisPassword        = os.Getenv(env.RDBPASSWORD)
+	redisDatabase        = os.Getenv(env.RDBDATABASE)
+	redisPoolTimeout     = os.Getenv(env.RDBPOOLTIMEOUT)
+	redisConnMaxIdleTime = os.Getenv(env.RDBMAXCONNLIFEIDLE)
+	redisConnMaxLifetime = os.Getenv(env.RDBMAXCONNLIFETIME)
+	tlsCAs               = os.Getenv(env.EXTRACERTTLS)
 	dbInstance           *service
 )
 
