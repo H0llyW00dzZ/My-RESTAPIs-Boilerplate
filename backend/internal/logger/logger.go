@@ -211,6 +211,8 @@ func LogUserActivity(c *fiber.Ctx, activity string) {
 	// Example architecture:
 	//
 	// Frontend (External Handler, e.g., Cloudflare) -> Backend (Nginx or Other + This Repo)
+	//
+	// Also note that when running in k8s it possible to made HTTP/3 in load balancer (Senior only) for the controller (e.g, Nginx).
 	clientIP := c.Get(CloudflareConnectingIPHeader)
 	if clientIP == "" {
 		clientIP = c.IP()
