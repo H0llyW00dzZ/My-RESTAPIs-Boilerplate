@@ -23,6 +23,9 @@ const (
 )
 
 // Define Cloudflare formats.
+//
+// Note: Other header can be found here
+// https://developers.cloudflare.com/fundamentals/reference/http-request-headers/#:~:text=%E2%80%8B%E2%80%8B%20CF-Connecting-IP,to%20Restoring%20original%20visitor%20IPs.
 const (
 	CloudflareRayIDHeader = "cf-ray"
 )
