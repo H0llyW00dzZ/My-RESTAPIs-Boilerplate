@@ -688,7 +688,7 @@ func NewValidatorMiddleware(options ...any) fiber.Handler {
 //
 // The request ID middleware generates a unique ID for each incoming request and adds it to the response headers.
 // It can be used for tracking and debugging purposes.
-func NewRequestIDMiddleware(options ...interface{}) fiber.Handler {
+func NewRequestIDMiddleware(options ...any) fiber.Handler {
 	// Create a new request ID middleware configuration.
 	config := requestid.Config{}
 
