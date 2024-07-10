@@ -45,7 +45,7 @@ func Base(titlePage, cfheader string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><style>\r\n\t\t\tbody {\r\n\t\t\t\tbackground-color: #f5f5f5;\r\n\t\t\t\tmargin-top: 8%;\r\n\t\t\t\tcolor: #5d5d5d;\r\n\t\t\t\tfont-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial,\r\n\t\t\t\t\t\"Noto Sans\", sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\",\r\n\t\t\t\t\t\"Noto Color Emoji\";\r\n\t\t\t\ttext-shadow: 0px 1px 1px rgba(255, 255, 255, 0.75);\r\n\t\t\t\ttext-align: center;\r\n\t\t\t}\r\n\r\n\t\t\th1 {\r\n\t\t\t\tfont-size: 2.45em;\r\n\t\t\t\tfont-weight: 700;\r\n\t\t\t\tcolor: #5d5d5d;\r\n\t\t\t\tletter-spacing: -0.02em;\r\n\t\t\t\tmargin-bottom: 30px;\r\n\t\t\t\tmargin-top: 30px;\r\n\t\t\t}\r\n\r\n\t\t\t.container {\r\n\t\t\t\twidth: 100%;\r\n\t\t\t\tmargin-right: auto;\r\n\t\t\t\tmargin-left: auto;\r\n\t\t\t}\r\n\r\n\t\t\t.animate__animated {\r\n\t\t\t\tanimation-duration: 1s;\r\n\t\t\t\tanimation-fill-mode: both;\r\n\t\t\t}\r\n\r\n\t\t\t.animate__fadeIn {\r\n\t\t\t\tanimation-name: fadeIn;\r\n\t\t\t}\r\n\r\n\t\t\t.info {\r\n\t\t\t\tcolor: #5594cf;\r\n\t\t\t\tfill: #5594cf;\r\n\t\t\t}\r\n\r\n\t\t\t.error {\r\n\t\t\t\tcolor: #c92127;\r\n\t\t\t\tfill: #c92127;\r\n\t\t\t}\r\n\r\n\t\t\t.warning {\r\n\t\t\t\tcolor: #ffcc33;\r\n\t\t\t\tfill: #ffcc33;\r\n\t\t\t}\r\n\r\n\t\t\t.success {\r\n\t\t\t\tcolor: #5aba47;\r\n\t\t\t\tfill: #5aba47;\r\n\t\t\t}\r\n\r\n\t\t\t.icon-large {\r\n\t\t\t\theight: 132px;\r\n\t\t\t\twidth: 132px;\r\n\t\t\t}\r\n\r\n\t\t\t.description-text {\r\n\t\t\t\tcolor: #707070;\r\n\t\t\t\tletter-spacing: -0.01em;\r\n\t\t\t\tfont-size: 1.25em;\r\n\t\t\t\tline-height: 20px;\r\n\t\t\t}\r\n\r\n\t\t\t.footer {\r\n\t\t\t\tmargin-top: 40px;\r\n\t\t\t\tfont-size: 0.7em;\r\n\t\t\t}\r\n\r\n\t\t\t.animate__delay-1s {\r\n\t\t\t\tanimation-delay: 1s;\r\n\t\t\t}\r\n\r\n\t\t\t@keyframes fadeIn {\r\n\t\t\t\tfrom {\r\n\t\t\t\t\topacity: 0;\r\n\t\t\t\t}\r\n\t\t\t\tto {\r\n\t\t\t\t\topacity: 1;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t</style><script src=\"/styles/js/htmx.min.js\"></script></head><body><main>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><link rel=\"stylesheet\" href=\"/styles/css/raw.css\"><script src=\"/styles/js/htmx.min.js\"></script></head><body><main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -65,7 +65,7 @@ func Base(titlePage, cfheader string) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(cfheader)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/error_page_handler/base.templ`, Line: 107, Col: 64}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/error_page_handler/base.templ`, Line: 25, Col: 64}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
