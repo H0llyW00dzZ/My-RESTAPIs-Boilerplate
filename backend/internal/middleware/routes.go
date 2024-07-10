@@ -59,13 +59,6 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 // registerRouteConfigMiddleware applies middleware configurations to the Fiber application.
 // It sets up the necessary middleware such as recovery, logging, and custom error handling for manipulating panics.
 func registerRouteConfigMiddleware(app *fiber.App) {
-
-	// HTMX now It's enabled. this a idiomatic way and safe due use magic embedded unlike "Other FS" that need ROOT.
-	// Also note that Don't remove magic_embbeded.go in "./frontend/htmx/error_page_handler/" because this won't work if magic_embedded.go got removed.
-	app.Static("/styles/js", "./frontend/htmx/error_page_handler/js", fiber.Static{
-		// Note: When running on K8S don't have to compress because it will handled by nginx or other controller.
-	})
-
 	// Favicon front end setup
 	// Note: this just an example
 	favicon := NewFaviconMiddleware(
