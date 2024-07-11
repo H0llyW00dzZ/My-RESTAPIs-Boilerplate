@@ -43,6 +43,10 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 	)
 
 	// Create a custom middleware to set the CSP header
+	//
+	// Note: This safe and secure, not possible to spoof/bypass due it designed backend at top level,
+	// even it's possible to try spoof/bypass, however browser will validate, and other Controller
+	// (e.g, cloudflare for frontend, and nginx for controller load balancer) will validate as well.
 	cspMiddleware := func(c *fiber.Ctx) error {
 		clientIP := c.Get(log.CloudflareConnectingIPHeader)
 		if clientIP == "" {
