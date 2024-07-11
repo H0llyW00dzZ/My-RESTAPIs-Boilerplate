@@ -4,8 +4,8 @@
 
 package htmx
 
-templ PageForbidden403(titlePage, cfheader, xRequestID, cspRandom string) {
-	@Base(titlePage, cfheader, xRequestID, cspRandom) {
+templ PageForbidden403(v viewData) {
+	@Base(v) {
 		<div class="container">
 			<div class="row">
 				<div class="col">
