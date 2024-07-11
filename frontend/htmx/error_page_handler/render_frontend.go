@@ -98,7 +98,7 @@ func (v *viewData) Page500InternalServerHandler(c *fiber.Ctx) error {
 	}
 
 	c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-	return c.Status(fiber.StatusForbidden).SendString(buf.String())
+	return c.Status(fiber.StatusInternalServerError).SendString(buf.String())
 }
 
 // GenericErrorInternalServerHandler handles Generic 500 Internal Server errors.
