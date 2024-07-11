@@ -30,6 +30,7 @@ const (
 const (
 	CloudflareRayIDHeader = "cf-ray"
 	XRequestID            = "visitor_uuid"
+	cspRandom             = "csp_random"
 )
 
 // NewErrorHandler is a middleware that handles errors for all routes (dynamic).
@@ -47,7 +48,12 @@ func NewErrorHandler(c *fiber.Ctx) error {
 		vd.cfheader = cloudflareRayID
 	} else if xRequestID != nil {
 		vd.xRequestID = xRequestID.(string)
+	}
 
+	// Get cspRandom Where it was generated.
+	cspRandom := c.Locals(cspRandom)
+	if cspRandom != nil {
+		vd.cspRandom = cspRandom.(string)
 	}
 
 	// Call the next route handler and catch any errors
