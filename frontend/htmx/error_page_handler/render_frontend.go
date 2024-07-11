@@ -83,7 +83,7 @@ func (v *viewData) PageForbidden403Handler(c *fiber.Ctx) error {
 	}
 
 	c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-	return c.Status(fiber.StatusInternalServerError).SendString(buf.String())
+	return c.Status(fiber.StatusForbidden).SendString(buf.String())
 }
 
 // Page500InternalServerHandler handles 500 Internal Server errors.
