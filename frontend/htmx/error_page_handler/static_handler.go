@@ -20,8 +20,14 @@ func NewStaticHandleVersionedAPIError(c *fiber.Ctx, e *fiber.Error) error {
 		vd.cfheader = cloudflareRayID
 	} else if xRequestID != nil {
 		vd.xRequestID = xRequestID.(string)
-
 	}
+
+	// Get cspRandom Where it was generated.
+	cspRandom := c.Locals(cspRandom)
+	if cspRandom != nil {
+		vd.cspRandom = cspRandom.(string)
+	}
+
 	return handleError(c, e, vd)
 }
 
@@ -37,7 +43,13 @@ func NewStaticHandleFrontendError(c *fiber.Ctx, e *fiber.Error) error {
 		vd.cfheader = cloudflareRayID
 	} else if xRequestID != nil {
 		vd.xRequestID = xRequestID.(string)
-
 	}
+
+	// Get cspRandom Where it was generated.
+	cspRandom := c.Locals(cspRandom)
+	if cspRandom != nil {
+		vd.cspRandom = cspRandom.(string)
+	}
+
 	return handleError(c, e, vd)
 }

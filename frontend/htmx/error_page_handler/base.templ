@@ -4,7 +4,7 @@
 
 package htmx
 
-templ Base(titlePage, cfheader, xRequestID string) {
+templ Base(titlePage, cfheader, xRequestID, cspRandom string) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -19,7 +19,7 @@ templ Base(titlePage, cfheader, xRequestID string) {
 			// When a client visits the website, they would receive CSS/JS files with names like "randomuuid.css" or "hash.js", where the randomuuid or hash portion is secure dynamically generated.
 			// This unique identifier could be associated with client-specific information like IP address, User-Agent, and other relevant factors.
 			<link rel="stylesheet" href="/styles/css/raw.css"/>
-			<script src="/styles/js/htmx.min.js"></script>
+			<script src="/styles/js/htmx.min.js" nonce={ cspRandom }></script>
 		</head>
 		<body>
 			<main>

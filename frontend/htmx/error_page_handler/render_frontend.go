@@ -18,6 +18,7 @@ type views struct {
 	title      string // The title of the page.
 	cfheader   string // A list of Content-Security-Policy headers (e.g, CF-Ray-ID).
 	xRequestID string // X-Request-ID Header
+	cspRandom  string // Content-Security-Policy
 }
 
 // viewData is a structure that contains the data for rendering a view.
@@ -56,7 +57,7 @@ func (v *viewData) renderErrorPage(c *fiber.Ctx, statusCode int, _ string, _ err
 //
 // This function takes a Fiber context and renders the 404 page.
 func (v *viewData) PageNotFoundHandler(c *fiber.Ctx) error {
-	component := PageNotFound404(v.title, v.cfheader, v.xRequestID)
+	component := PageNotFound404(v.title, v.cfheader, v.xRequestID, v.cspRandom)
 
 	// Note: This Optional can be used to builder string. However,
 	// it is intended for low-level operations where the efficiency of using a string builder is not significant.
@@ -73,7 +74,7 @@ func (v *viewData) PageNotFoundHandler(c *fiber.Ctx) error {
 //
 // This function takes a Fiber context and renders the 403 page.
 func (v *viewData) PageForbidden403Handler(c *fiber.Ctx) error {
-	component := PageForbidden403(v.title, v.cfheader, v.xRequestID)
+	component := PageForbidden403(v.title, v.cfheader, v.xRequestID, v.cspRandom)
 
 	// Note: This Optional can be used to builder string. However,
 	// it is intended for low-level operations where the efficiency of using a string builder is not significant.
@@ -88,7 +89,7 @@ func (v *viewData) PageForbidden403Handler(c *fiber.Ctx) error {
 
 // Page500InternalServerHandler handles 500 Internal Server errors.
 func (v *viewData) Page500InternalServerHandler(c *fiber.Ctx) error {
-	component := PageInternalServerError500(v.title, v.cfheader, v.xRequestID)
+	component := PageInternalServerError500(v.title, v.cfheader, v.xRequestID, v.cspRandom)
 
 	// Note: This Optional can be used to builder string. However,
 	// it is intended for low-level operations where the efficiency of using a string builder is not significant.

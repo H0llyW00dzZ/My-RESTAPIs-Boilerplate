@@ -5,6 +5,7 @@
 package middleware
 
 import (
+	"fmt"
 	"runtime/debug"
 
 	"github.com/gofiber/fiber/v2"
@@ -40,6 +41,34 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 	xRequestID := NewRequestIDMiddleware(
 		WithRequestIDHeaderContextKey("visitor_uuid"),
 	)
+
+	// Create a custom middleware to set the CSP header
+	cspMiddleware := func(c *fiber.Ctx) error {
+		clientIP := c.Get(log.CloudflareConnectingIPHeader)
+		if clientIP == "" {
+			clientIP = c.IP()
+		}
+		cloudflareRayID := c.Get(log.CloudflareRayIDHeader)
+		if cloudflareRayID != "" {
+			clientIP += " - Cloudflare detected - Ray ID: " + cloudflareRayID
+		}
+		countryCode := c.Get(log.CloudflareIPCountryHeader)
+		if countryCode != "" {
+			clientIP += ", Country: " + countryCode
+		}
+
+		// Digest a visitor
+		digest := digest(clientIP)
+
+		c.Locals("csp_random", digest)
+
+		// Set the CSP header
+		c.Set("Content-Security-Policy", fmt.Sprintf("script-src 'nonce-%s'", digest))
+
+		// Continue to the next middleware/route handler
+		return c.Next()
+	}
+
 	// Hosts
 	hosts := map[string]*Host{}
 	// Apply the combined middlewares
@@ -60,7 +89,7 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 	// Note: "htmx.NewErrorHandler" will apply to localhost:8080 by default.
 	// For "api.localhost:8080" to function correctly, REST API routes must be implemented.
 	// Additionally, define environment variables for "DOMAIN" and "API_SUB_DOMAIN" to enable multi-site support (up to 1 billion domains).
-	app.Use(xRequestID, htmx.NewErrorHandler, DomainRouter(hosts)) // When "htmx.NewErrorHandler" Applied, Generic Error (E.g, Crash/Panic will render "Internal Server Error" as JSON due It use recoverMiddleware)
+	app.Use(xRequestID, cspMiddleware, htmx.NewErrorHandler, DomainRouter(hosts)) // When "htmx.NewErrorHandler" Applied, Generic Error (E.g, Crash/Panic will render "Internal Server Error" as JSON due It use recoverMiddleware)
 }
 
 // registerRouteConfigMiddleware applies middleware configurations to the Fiber application.

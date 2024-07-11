@@ -5,6 +5,7 @@
 package middleware
 
 import (
+	"crypto/sha256"
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
@@ -986,4 +987,12 @@ func WithRequestIDGenerator(generator func() string) func(*requestid.Config) {
 	return func(config *requestid.Config) {
 		config.Generator = generator
 	}
+}
+
+func digest(clientIP string) string {
+	h := sha256.New()
+	h.Write([]byte(clientIP))
+	digest := h.Sum(nil)
+
+	return fmt.Sprintf("%x", digest)
 }
