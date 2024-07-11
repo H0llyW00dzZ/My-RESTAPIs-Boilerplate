@@ -36,8 +36,8 @@ func handleError(c *fiber.Ctx, e *fiber.Error, vd *viewData) error {
 		vd.title = PageForbidden + " - " + c.App().Config().AppName
 		return vd.PageForbidden403Handler(c)
 	default:
-		vd.title = InternalServerError + " - " + c.App().Config().AppName
-		return vd.Page500InternalServerHandler(c, e)
+		vd.title = PageInternalServerError + " - " + c.App().Config().AppName
+		return vd.Page500InternalServerHandler(c)
 	}
 }
 
@@ -87,7 +87,22 @@ func (v *viewData) PageForbidden403Handler(c *fiber.Ctx) error {
 }
 
 // Page500InternalServerHandler handles 500 Internal Server errors.
-func (v *viewData) Page500InternalServerHandler(c *fiber.Ctx, err error) error {
+func (v *viewData) Page500InternalServerHandler(c *fiber.Ctx) error {
+	component := PageInternalServerError500(v.title, v.cfheader, v.xRequestID)
+
+	// Note: This Optional can be used to builder string. However,
+	// it is intended for low-level operations where the efficiency of using a string builder is not significant.
+	buf := new(bytes.Buffer)
+	if err := component.Render(c.Context(), buf); err != nil {
+		return v.renderErrorPage(c, fiber.StatusInternalServerError, "Error rendering Internal Server Error Page: %v", err)
+	}
+
+	c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+	return c.Status(fiber.StatusInternalServerError).SendString(buf.String())
+}
+
+// GenericErrorInternalServerHandler handles Generic 500 Internal Server errors.
+func (v *viewData) GenericErrorInternalServerHandler(c *fiber.Ctx, err error) error {
 	// Return a JSON response with the 500 Internal Server Error status code
 	return helper.SendErrorResponse(c, fiber.StatusInternalServerError, fiber.ErrInternalServerError.Message)
 }
