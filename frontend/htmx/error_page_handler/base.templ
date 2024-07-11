@@ -9,6 +9,7 @@ templ Base(titlePage, cfheader, xRequestID string) {
 	<html lang="en">
 		<head>
 			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1" />
 			<title>{ titlePage }</title>
 			// TODO: Enhance CSS/JS delivery by implementing a system that generates unique filenames based on UUIDs or cryptographic hashes.
 			// When a client visits the website, they would receive CSS/JS files with names like "randomuuid.css" or "hash.js", where the randomuuid or hash portion is secure dynamically generated.

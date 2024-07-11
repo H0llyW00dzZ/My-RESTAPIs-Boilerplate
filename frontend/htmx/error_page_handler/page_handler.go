@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	// InternalServerError is the standard error message for a 500 Internal Server Error.
-	InternalServerError = "500 Internal Server Error"
+	// PageInternalServerError is the standard error message for a 500 Internal Server Error.
+	PageInternalServerError = "500 Internal Server Error"
 
 	// PageNotFound is the standard error message for a 404 Page Not Found error.
 	PageNotFound = "404 Page Not Found"
@@ -97,10 +97,14 @@ func handleFrontendError(c *fiber.Ctx, e *fiber.Error, vd *viewData) error {
 		// Render the 403 error page for frontend routes
 		vd.title = PageForbidden + " - " + c.App().Config().AppName
 		return vd.PageForbidden403Handler(c)
+	case fiber.StatusInternalServerError:
+		// Render the 500 error page for frontend routes
+		vd.title = PageInternalServerError + " - " + c.App().Config().AppName
+		return vd.Page500InternalServerHandler(c)
 	default:
-		vd.title = InternalServerError + " - " + c.App().Config().AppName
+		vd.title = PageInternalServerError + " - " + c.App().Config().AppName
 		// Fallback to the general error page for other errors in frontend routes
-		return vd.Page500InternalServerHandler(c, e)
+		return vd.Page500InternalServerHandler(c)
 	}
 }
 
@@ -110,6 +114,6 @@ func handleGenericError(c *fiber.Ctx, err error, vd *viewData, isAPI bool) error
 		return helper.SendErrorResponse(c, fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
-	vd.title = InternalServerError + " - " + c.App().Config().AppName
-	return vd.Page500InternalServerHandler(c, err)
+	vd.title = PageInternalServerError + " - " + c.App().Config().AppName
+	return vd.GenericErrorInternalServerHandler(c, err)
 }
