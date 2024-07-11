@@ -26,11 +26,11 @@ templ Base(titlePage, cfheader, xRequestID string) {
 				{ children... }
 			</main>
 			if cfheader != "" {
-				<div class="description-text animate__animated animate__fadeIn animate__delay-1s">
+				<div class="description-text animate__animated animate__fadeIn">
 					<section class="footer"><strong>Ray ID:</strong> { cfheader }</section>
 				</div>
 			} else if xRequestID  != "" {
-				<div class="description-text animate__animated animate__fadeIn animate__delay-1s">
+				<div class="description-text animate__animated animate__fadeIn">
 					<section class="footer"><strong>Request ID:</strong> { xRequestID }</section>
 				</div>
 			}

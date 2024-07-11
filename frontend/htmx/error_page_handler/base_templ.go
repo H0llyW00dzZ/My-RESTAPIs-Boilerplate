@@ -58,7 +58,7 @@ func Base(titlePage, cfheader, xRequestID string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if cfheader != "" {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"description-text animate__animated animate__fadeIn animate__delay-1s\"><section class=\"footer\"><strong>Ray ID:</strong> ")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"description-text animate__animated animate__fadeIn\"><section class=\"footer\"><strong>Ray ID:</strong> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -76,7 +76,7 @@ func Base(titlePage, cfheader, xRequestID string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else if xRequestID != "" {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"description-text animate__animated animate__fadeIn animate__delay-1s\"><section class=\"footer\"><strong>Request ID:</strong> ")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"description-text animate__animated animate__fadeIn\"><section class=\"footer\"><strong>Request ID:</strong> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
