@@ -104,7 +104,7 @@ func handleFrontendError(c *fiber.Ctx, e *fiber.Error, vd *viewData) error {
 	default:
 		vd.title = PageInternalServerError + " - " + c.App().Config().AppName
 		// Fallback to the general error page for other errors in frontend routes
-		return vd.Page500InternalServerHandler(c)
+		return vd.GenericErrorInternalServerHandler(c, e)
 	}
 }
 
