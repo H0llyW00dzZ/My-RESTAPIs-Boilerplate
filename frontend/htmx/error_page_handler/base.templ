@@ -6,7 +6,7 @@ package htmx
 
 templ Base(v viewData) {
 	<!DOCTYPE html>
-	<html lang="en">
+	<html lang="en" class="dark:bg-gray-900">
 		<head>
 			<meta charset="utf-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -24,17 +24,27 @@ templ Base(v viewData) {
 			<script src="/styles/js/htmx.min.js" nonce={ v.cspRandom }></script>
 			// Note: This safe & secure as well which it's already bound into CSP smiliar HTMX.
 			<script src="https://cdn.tailwindcss.com" nonce={ v.cspRandom }></script>
+			// Note: This seems risky due expose config in front, however this is Go, it's easy to secure, it's just that I'm lazy, due it only enable dark mode.
+			<script nonce={ v.cspRandom }>
+   			 	tailwind.config = {
+				darkMode: 'selector',
+    			}
+  			</script>
 			<title>{ v.title }</title>
 		</head>
-		<body class="bg-gray-100">
-			<header class="bg-white shadow-md py-4">
+		<body class="bg-gray-100 dark:bg-gray-900">
+			<header class="bg-white dark:bg-gray-800 shadow-md py-4">
 				<div class="container mx-auto flex justify-between items-center">
 					<a href="/" class="flex items-center">
 						// Logo + Header
 						// TODO: Move this along with footer by implement another package frontend for manage, monitoring, etc. 
 						<img src="/styles/images/logo/gopher-run.png" alt={ v.appName + " Logo" } class="h-8"/>
-						<span class="text-xl font-bold ml-2">{ v.appName }</span>
+						<span class="text-xl font-bold ml-2 text-gray-900 dark:text-white">{ v.appName }</span>
 					</a>
+					<button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+						<svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+						<svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+					</button>
 				</div>
 			</header>
 			<main class="container mx-auto px-4 mt-8">
@@ -44,12 +54,12 @@ templ Base(v viewData) {
 			// Note: This a better one, for example
 			// Copyright © 2024 Gopher All rights reserved. | Request ID: 1d9ed3a6-5657-41d3-ae61-541fb4d6c57c
 			// where both in middle
-			<footer class="bg-gray-200 text-gray-600 py-4 text-center mt-12 w-full">
+			<footer class="bg-gray-200 text-gray-600 py-4 text-center mt-12 w-full dark:bg-gray-700 dark:text-gray-300">
 				<div class="container mx-auto flex justify-center items-center">
 					<div class="flex items-center">
 						<span class="mx-auto">Copyright © { v.timeYears } { v.appName } All rights reserved.</span>
-						<span class="text-gray-500 text-sm ml-4">|</span>
-						<span class="text-gray-500 text-sm ml-2">
+						<span class="text-gray-500 text-sm ml-4 dark:text-gray-400">|</span>
+						<span class="text-gray-500 text-sm ml-2 dark:text-gray-400">
 							if v.cfheader != "" {
 								<span>Ray ID: { v.cfheader }</span>
 							} else if v.xRequestID != "" {
@@ -59,6 +69,9 @@ templ Base(v viewData) {
 					</div>
 				</div>
 			</footer>
+
+			// Load DarkMode
+			<script src="/styles/js/tailwind.min.dark.js" nonce={ v.cspRandom }></script>
 		</body>
 	</html>
 }
