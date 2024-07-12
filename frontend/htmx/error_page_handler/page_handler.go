@@ -23,6 +23,8 @@ const (
 
 	// PageForbidden is the standard error message for a 403 Forbidden error.
 	PageForbidden = "403 Forbidden"
+	// PageServiceUnavailableError is the standard error message for a 503 Service Unavailable
+	PageServiceUnavailableError = "503 Service Unvailable"
 )
 
 // Define Cloudflare formats.
@@ -93,7 +95,7 @@ func errorHandler(c *fiber.Ctx, err error, vd *viewData, isAPI bool) error {
 func handleAPIError(c *fiber.Ctx, e *fiber.Error) error {
 	// Customize API error handling, e.g., JSON responses with appropriate status codes.
 	switch e.Code {
-	case fiber.StatusNotFound, fiber.StatusForbidden:
+	case fiber.StatusNotFound, fiber.StatusForbidden, fiber.StatusServiceUnavailable:
 		// Return a JSON response for 404 or 403 errors in versioned APIs
 		return helper.SendErrorResponse(c, e.Code, e.Message)
 	default:
@@ -116,6 +118,10 @@ func handleFrontendError(c *fiber.Ctx, e *fiber.Error, vd *viewData) error {
 		// Render the 500 error page for frontend routes
 		vd.title = PageInternalServerError + " - " + c.App().Config().AppName
 		return vd.Page500InternalServerHandler(c)
+	case fiber.StatusServiceUnavailable:
+		// Render the 503 error page for frontend routes
+		vd.title = PageServiceUnavailableError + " - " + c.App().Config().AppName
+		return vd.PageServiceUnavailableHandler(c)
 	default:
 		vd.title = PageInternalServerError + " - " + c.App().Config().AppName
 		// Fallback to the general error page for other errors in frontend routes

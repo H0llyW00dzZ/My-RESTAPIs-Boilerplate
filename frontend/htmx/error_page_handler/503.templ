@@ -4,28 +4,28 @@
 
 package htmx
 
-templ PageInternalServerError500(v viewData) {
+templ PageServiceUnavailable(v viewData) {
 	@Base(v) {
 		<div class="container min-h-screen flex items-center justify-center dark:bg-gray-900">
 			<div class="bg-white dark:bg-gray-800 p-20 rounded-lg shadow-lg flex flex-col items-center text-center min-w-[1500px] min-h-[550px]">
 				<div class="animate__animated animate__fadeIn mb-8 flex flex-col items-center">
 					<svg
-						class="warning icon-large fa-exclamation-triangle w-50 h-50 text-red-500"
+						class="warning icon-large fa-hard-hat w-50 h-50 text-red-500"
 						xmlns="http://www.w3.org/2000/svg"
-						viewBox="0 0 576 512"
+						viewBox="0 0 512 512"
 					>
 						<path
-							d="M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"
+							d="M480 288c0-80.25-49.28-148.92-119.19-177.62L320 192V80a16 16 0 0 0-16-16h-96a16 16 0 0 0-16 16v112l-40.81-81.62C81.28 139.08 32 207.75 32 288v64h448zm16 96H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h480a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"
 						></path>
 					</svg>
-					<span class="text-8xl font-mono text-gray-800 dark:text-white mt-4">500</span>
+					<span class="text-8xl font-mono text-gray-800 dark:text-white mt-4">503</span>
 				</div>
 				<h1 class="animate__animated animate__fadeIn text-4xl font-mono text-gray-800 dark:text-white mb-4 mt-8">
-					Internal Server Error
+					Service Unavailable
 				</h1>
 				<p class="animate__animated animate__fadeIn text-gray-600 dark:text-gray-400 text-lg Roboto mb-8">
 					Oops! Something went wrong.
-					The server encountered an internal error or misconfiguration and was unable to complete your request.
+					We're temporarily down for maintenance. We'll be back up and running as soon as possible. Please check back later.
 				</p>
 				<button
 					type="button"

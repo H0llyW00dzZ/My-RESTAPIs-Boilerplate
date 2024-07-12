@@ -36,21 +36,33 @@ templ Base(v viewData) {
 			<header class="bg-white dark:bg-gray-800 shadow-md py-4">
 				<div class="container mx-auto flex justify-between items-center">
 					<a href="/" class="flex items-center">
-						// Logo + Header
-						// TODO: Move this along with footer by implement another package frontend such as panel for manage (e.g, REST APIs this repo), monitoring (e.g, K8S and Controller), etc.
-						<img src="/styles/images/logo/gopher-run.png" alt={ v.appName + " Logo" } class="h-8"/>
-						<span class="text-xl font-bold ml-2 text-gray-900 dark:text-white">{ v.appName }</span>
+						<img src="/styles/images/logo/gopher-run.png" alt={ v.appName + " Logo" } class="h-12 md:h-16"/>
+						<span class="text-2xl md:text-3xl font-semibold ml-2 text-gray-900 dark:text-white">{ v.appName }</span>
 					</a>
-					<button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
-						<svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-						<svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+					<button
+						id="theme-toggle"
+						type="button"
+						class="
+          text-gray-500 dark:text-gray-400 
+          hover:bg-gray-100 dark:hover:bg-gray-700 
+          focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 
+          rounded-lg 
+          p-2.5"
+					>
+						<svg id="theme-toggle-dark-icon" class="hidden w-6 h-6 md:w-8 md:h-8" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+							<path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+						</svg>
+						<svg id="theme-toggle-light-icon" class="hidden w-6 h-6 md:w-8 md:h-8" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+							<path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path>
+						</svg>
 					</button>
 				</div>
 			</header>
 			<main class="container mx-auto px-4 mt-8">
-				{ children... }
+				<div class="min-h-screen flex items-center justify-center dark:bg-gray-900">
+					{ children... }
+				</div>
 			</main>
-
 			// Note: This a better one, for example
 			// Copyright © 2024 Gopher All rights reserved. | Request ID: 1d9ed3a6-5657-41d3-ae61-541fb4d6c57c
 			// where both in middle
@@ -69,9 +81,9 @@ templ Base(v viewData) {
 					</div>
 				</div>
 			</footer>
-
 			// Load DarkMode
 			<script src="/styles/js/tailwind.min.dark.js" nonce={ v.cspRandom }></script>
+			<script src="/styles/js/htmx.indicator.min.js" nonce={ v.cspRandom }></script>
 		</body>
 	</html>
 }

@@ -141,7 +141,7 @@ func DomainRouter(hosts map[string]*Host) fiber.Handler {
 			// Note: Returning a new error is a better approach instead of returning directly,
 			// as it allows the error to be handled by the caller somewhere else in the codebase,
 			// especially when the codebase grows larger.
-			return fiber.NewError(fiber.StatusNotFound)
+			return fiber.NewError(fiber.StatusServiceUnavailable)
 		}
 		// Use c.Context() to pass the underlying context to the host's Fiber app.
 		host.Fiber.Handler()(c.Context())

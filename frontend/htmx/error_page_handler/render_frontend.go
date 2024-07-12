@@ -104,6 +104,21 @@ func (v *viewData) Page500InternalServerHandler(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusInternalServerError).SendString(buf.String())
 }
 
+// PageServiceUnavailableHandler handles 503 Service Unavailable errors.
+func (v *viewData) PageServiceUnavailableHandler(c *fiber.Ctx) error {
+	component := PageServiceUnavailable(*v) // magic pointer.
+
+	// Note: This Optional can be used to builder string. However,
+	// it is intended for low-level operations where the efficiency of using a string builder is not significant.
+	buf := new(bytes.Buffer)
+	if err := component.Render(c.Context(), buf); err != nil {
+		return v.renderErrorPage(c, fiber.StatusInternalServerError, "Error rendering Service Unavailable Error Page: %v", err)
+	}
+
+	c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+	return c.Status(fiber.StatusInternalServerError).SendString(buf.String())
+}
+
 // GenericErrorInternalServerHandler handles Generic 500 Internal Server errors.
 func (v *viewData) GenericErrorInternalServerHandler(c *fiber.Ctx, err error) error {
 	// Return a JSON response with the 500 Internal Server Error status code
