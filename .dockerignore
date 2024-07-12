@@ -60,3 +60,8 @@ boring-RootCA.pem
 # Repo: https://pki.goog/repository/
 gts-ca.pem
 gts-RootCA.pem
+
+# Tailwind.css contain input tailwind css for testing purpose.
+tailwind.css
+# Go CSS Generator (not available yet).
+tailwind.go
