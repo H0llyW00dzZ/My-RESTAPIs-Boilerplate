@@ -41,6 +41,7 @@ const (
 // and provides a custom error response.
 func NewErrorHandler(c *fiber.Ctx) error {
 	timeYearNow := time.Now().Year()
+	// Get xRequestID Where it was generated.
 	xRequestID := c.Locals(XRequestID)
 	vd := &viewData{
 		views: &views{},
