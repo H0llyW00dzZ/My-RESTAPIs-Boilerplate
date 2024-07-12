@@ -19,6 +19,8 @@ type views struct {
 	cfheader   string // A list of Content-Security-Policy headers (e.g, CF-Ray-ID).
 	xRequestID string // X-Request-ID Header
 	cspRandom  string // Content-Security-Policy
+	timeYears  string // Store the year as an string
+	appName    string // The Fiber application name
 }
 
 // viewData is a structure that contains the data for rendering a view.

@@ -50,6 +50,5 @@ func NewStaticHandleFrontendError(c *fiber.Ctx, e *fiber.Error) error {
 	if cspRandom != nil {
 		vd.cspRandom = cspRandom.(string)
 	}
-
 	return handleError(c, e, vd)
 }
