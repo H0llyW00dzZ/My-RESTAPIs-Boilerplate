@@ -1,0 +1,5 @@
+// Copyright (c) 2024 H0llyW00dz All rights reserved.
+//
+// License: BSD 3-Clause License
+
+const themeToggleDarkIcon=document.getElementById("theme-toggle-dark-icon"),themeToggleLightIcon=document.getElementById("theme-toggle-light-icon"),themeToggleBtn=document.getElementById("theme-toggle"),currentTheme=localStorage.getItem("theme")||"light";"dark"===currentTheme?(document.documentElement.classList.add("dark"),themeToggleLightIcon.classList.remove("hidden"),themeToggleDarkIcon.classList.add("hidden")):(themeToggleDarkIcon.classList.remove("hidden"),themeToggleLightIcon.classList.add("hidden")),themeToggleBtn.addEventListener("click",()=>{document.documentElement.classList.toggle("dark"),document.documentElement.classList.contains("dark")?(themeToggleLightIcon.classList.remove("hidden"),themeToggleDarkIcon.classList.add("hidden"),localStorage.setItem("theme","dark")):(themeToggleDarkIcon.classList.remove("hidden"),themeToggleLightIcon.classList.add("hidden"),localStorage.setItem("theme","light"))});

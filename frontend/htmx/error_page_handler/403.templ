@@ -6,8 +6,8 @@ package htmx
 
 templ PageForbidden403(v viewData) {
 	@Base(v) {
-		<div class="container min-h-screen flex items-center justify-center">
-			<div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full flex flex-col items-center">
+		<div class="container min-h-screen flex items-center justify-center dark:bg-gray-900">
+			<div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg max-w-md w-full flex flex-col items-center">
 				<div class="animate__animated animate__fadeIn mb-8">
 					<svg
 						class="error icon-large fa-question-circle"
@@ -19,17 +19,17 @@ templ PageForbidden403(v viewData) {
 						></path>
 					</svg>
 				</div>
-				<h1 class="text-4xl font-bold text-gray-800 animate__fadeIn mb-8">
+				<h1 class="text-4xl font-bold text-gray-800 dark:text-white animate__fadeIn mb-8">
 					<span class="text-red-500">403</span> - Forbidden Access
 				</h1>
-				<p class="text-gray-600 mb-6 text-center animate__fadeIn">
+				<p class="text-gray-600 dark:text-gray-400 mb-6 text-center animate__fadeIn">
 					You do not have permission to access this resource.
 					Please contact the administrator if you believe this is an error.
 				</p>
 				<div hx-boost="true"> // TODO Improve this Server Side Rendering unlike "Client Side" hahaha.
 					<a
 						href="/"
-						class="inline-block py-3 px-6 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold animate__fadeIn2s"
+						class="inline-block py-3 px-6 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold animate__fadeIn2s dark:bg-blue-600 dark:hover:bg-blue-700"
 					>
 						Go back to the homepage
 					</a>
