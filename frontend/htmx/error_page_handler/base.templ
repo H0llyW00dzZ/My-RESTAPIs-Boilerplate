@@ -30,15 +30,24 @@ templ Base(v viewData) {
 			<main class="container min-h-screen flex flex-col items-center justify-center px-3">
 				{ children... }
 			</main>
+
+			// Note: This a better one, for example
+			// Copyright © 2024 Gopher All rights reserved. | Request ID: 1d9ed3a6-5657-41d3-ae61-541fb4d6c57c
+			// where both in middle
 			<footer class="bg-gray-200 text-gray-600 py-4 text-center mt-12 w-full">
-				<span>
-					Copyright © { v.timeYears } { v.appName } All rights reserved. - 
-					if v.cfheader != "" {
-						<span>Ray ID: { v.cfheader }</span>
-					} else if v.xRequestID != "" {
-						<span>Request ID: { v.xRequestID }</span>
-					}
-				</span>
+				<div class="container mx-auto flex justify-center items-center">
+					<div class="flex items-center">
+						<span class="mx-auto">Copyright © { v.timeYears } { v.appName } All rights reserved.</span>
+						<span class="text-gray-500 text-sm ml-4">|</span>
+						<span class="text-gray-500 text-sm ml-2">
+							if v.cfheader != "" {
+								<span>Ray ID: { v.cfheader }</span>
+							} else if v.xRequestID != "" {
+								<span>Request ID: { v.xRequestID }</span>
+							}
+						</span>
+					</div>
+				</div>
 			</footer>
 		</body>
 	</html>
