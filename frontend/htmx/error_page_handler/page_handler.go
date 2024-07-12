@@ -8,6 +8,8 @@ import (
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
 	"h0llyw00dz-template/env"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -38,11 +40,17 @@ const (
 // This middleware intercepts any errors that occur during route handling
 // and provides a custom error response.
 func NewErrorHandler(c *fiber.Ctx) error {
-	// Get xRequestID Where it was generated.
+	timeYearNow := time.Now().Year()
 	xRequestID := c.Locals(XRequestID)
 	vd := &viewData{
 		views: &views{},
 	}
+
+	// Convert the integer year to a string
+	vd.timeYears = strconv.Itoa(timeYearNow)
+	// Get Application name
+	vd.appName = c.App().Config().AppName
+
 	cloudflareRayID := c.Get(CloudflareRayIDHeader)
 	if cloudflareRayID != "" {
 		vd.cfheader = cloudflareRayID

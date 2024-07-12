@@ -22,21 +22,23 @@ templ Base(v viewData) {
 			// This unique identifier could be associated with client-specific information like IP address, User-Agent, and other relevant factors.
 			<link rel="stylesheet" href="/styles/css/raw.css"/>
 			<script src="/styles/js/htmx.min.js" nonce={ v.cspRandom }></script>
+			<script src="https://cdn.tailwindcss.com" nonce={ v.cspRandom }></script>
 			<title>{ v.title }</title>
 		</head>
-		<body>
-			<main>
+		<body class="bg-gray-100">
+			<main class="container min-h-screen flex flex-col items-center justify-center px-3">
 				{ children... }
 			</main>
-			if v.cfheader != "" {
-				<div class="description-text animate__animated animate__fadeIn">
-					<section class="footer"><strong>Ray ID:</strong> { v.cfheader }</section>
-				</div>
-			} else if v.xRequestID != "" {
-				<div class="description-text animate__animated animate__fadeIn">
-					<section class="footer"><strong>Request ID:</strong> { v.xRequestID }</section>
-				</div>
-			}
+			<footer class="bg-gray-200 text-gray-600 py-4 text-center mt-12 w-full">
+				<span>
+					Copyright © { v.timeYears } { v.appName } All rights reserved. - 
+					if v.cfheader != "" {
+						<span>Ray ID: { v.cfheader }</span>
+					} else if v.xRequestID != "" {
+						<span>Request ID: { v.xRequestID }</span>
+					}
+				</span>
+			</footer>
 		</body>
 	</html>
 }
