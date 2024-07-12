@@ -27,7 +27,17 @@ templ Base(v viewData) {
 			<title>{ v.title }</title>
 		</head>
 		<body class="bg-gray-100">
-			<main class="container min-h-screen flex flex-col items-center justify-center px-3">
+			<header class="bg-white shadow-md py-4">
+				<div class="container mx-auto flex justify-between items-center">
+					<a href="/" class="flex items-center">
+						// Logo + Header
+						// TODO: Move this along with footer by implement another package frontend for manage, monitoring, etc. 
+						<img src="/styles/images/logo/gopher-run.png" alt={ v.appName + " Logo" } class="h-8"/>
+						<span class="text-xl font-bold ml-2">{ v.appName }</span>
+					</a>
+				</div>
+			</header>
+			<main class="container mx-auto px-4 mt-8">
 				{ children... }
 			</main>
 
