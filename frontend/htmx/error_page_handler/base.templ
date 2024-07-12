@@ -22,6 +22,7 @@ templ Base(v viewData) {
 			// This unique identifier could be associated with client-specific information like IP address, User-Agent, and other relevant factors.
 			<link rel="stylesheet" href="/styles/css/raw.css"/>
 			<script src="/styles/js/htmx.min.js" nonce={ v.cspRandom }></script>
+			// Note: This safe & secure as well which it's already bound into CSP smiliar HTMX.
 			<script src="https://cdn.tailwindcss.com" nonce={ v.cspRandom }></script>
 			<title>{ v.title }</title>
 		</head>
