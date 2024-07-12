@@ -67,6 +67,10 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 		c.Locals("csp_random", digest)
 
 		// Set the CSP header
+		//
+		// Important: Since this CSP header uses a direct digest (using SHA256) without base64 encoding plus immutable. which is idiomatic way.
+		// When using base64 encoding, consider storing the base64 encoded in c.Locals first or somewhere (e.g, database). Avoid fetching the value from
+		// the header and then putting it in the render or direct in the render, as the format will be different due to sanitization.
 		c.Set("Content-Security-Policy", fmt.Sprintf("script-src 'nonce-%s'", digest))
 
 		// Continue to the next middleware/route handler
