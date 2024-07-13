@@ -112,11 +112,11 @@ func (v *viewData) PageServiceUnavailableHandler(c *fiber.Ctx) error {
 	// it is intended for low-level operations where the efficiency of using a string builder is not significant.
 	buf := new(bytes.Buffer)
 	if err := component.Render(c.Context(), buf); err != nil {
-		return v.renderErrorPage(c, fiber.StatusInternalServerError, "Error rendering Service Unavailable Error Page: %v", err)
+		return v.renderErrorPage(c, fiber.StatusServiceUnavailable, "Error rendering Service Unavailable Error Page: %v", err)
 	}
 
 	c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-	return c.Status(fiber.StatusInternalServerError).SendString(buf.String())
+	return c.Status(fiber.StatusServiceUnavailable).SendString(buf.String())
 }
 
 // GenericErrorInternalServerHandler handles Generic 500 Internal Server errors.
