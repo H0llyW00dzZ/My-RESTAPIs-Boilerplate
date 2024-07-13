@@ -21,6 +21,7 @@ type views struct {
 	cspRandom  string // Content-Security-Policy
 	timeYears  string // Store the year as an string
 	appName    string // The Fiber application name
+	httpStatus string // HTTP Status Code as an string
 }
 
 // viewData is a structure that contains the data for rendering a view.

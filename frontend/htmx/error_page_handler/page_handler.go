@@ -82,6 +82,11 @@ func NewErrorHandler(c *fiber.Ctx) error {
 // You can add additional parameters as needed (e.g., a flag for API vs. frontend).
 func errorHandler(c *fiber.Ctx, err error, vd *viewData, isAPI bool) error {
 	if e, ok := err.(*fiber.Error); ok {
+		// Convert the integer httpStatusCode to a string
+		if e.Code != fiber.StatusOK {
+			vd.httpStatus = strconv.Itoa(e.Code)
+		}
+
 		// Handle specific error codes based on context
 		if isAPI {
 			return handleAPIError(c, e)

@@ -5,6 +5,8 @@
 package htmx
 
 import (
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -28,6 +30,11 @@ func NewStaticHandleVersionedAPIError(c *fiber.Ctx, e *fiber.Error) error {
 		vd.cspRandom = cspRandom.(string)
 	}
 
+	// Convert the integer httpStatusCode to a string
+	if e.Code != fiber.StatusOK {
+		vd.httpStatus = strconv.Itoa(e.Code)
+	}
+
 	return handleError(c, e, vd)
 }
 
@@ -49,6 +56,11 @@ func NewStaticHandleFrontendError(c *fiber.Ctx, e *fiber.Error) error {
 	cspRandom := c.Locals(cspRandom)
 	if cspRandom != nil {
 		vd.cspRandom = cspRandom.(string)
+	}
+
+	// Convert the integer httpStatusCode to a string
+	if e.Code != fiber.StatusOK {
+		vd.httpStatus = strconv.Itoa(e.Code)
 	}
 	return handleError(c, e, vd)
 }
