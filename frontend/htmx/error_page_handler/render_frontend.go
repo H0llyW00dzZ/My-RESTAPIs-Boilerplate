@@ -21,6 +21,7 @@ type views struct {
 	cspRandom  string // Content-Security-Policy
 	timeYears  string // Store the year as an string
 	appName    string // The Fiber application name
+	httpStatus string // HTTP Status Code as an string
 }
 
 // viewData is a structure that contains the data for rendering a view.
@@ -38,6 +39,9 @@ func handleError(c *fiber.Ctx, e *fiber.Error, vd *viewData) error {
 	case fiber.StatusForbidden:
 		vd.title = PageForbidden + " - " + c.App().Config().AppName
 		return vd.PageForbidden403Handler(c)
+	case fiber.StatusServiceUnavailable:
+		vd.title = PageServiceUnavailableError + " - " + c.App().Config().AppName
+		return vd.PageServiceUnavailableHandler(c)
 	default:
 		vd.title = PageInternalServerError + " - " + c.App().Config().AppName
 		return vd.Page500InternalServerHandler(c)
