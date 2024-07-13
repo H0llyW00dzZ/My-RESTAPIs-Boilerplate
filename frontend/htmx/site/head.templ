@@ -8,13 +8,7 @@ templ Head(cspRandom, title string) {
 	<head>
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<link rel="apple-touch-icon" sizes="180x180" href="/styles/images/apple-touch-icon.png"/>
-		<link rel="icon" type="image/png" sizes="32x32" href="/styles/images/favicon-32x32.png"/>
-		<link rel="icon" type="image/png" sizes="16x16" href="/styles/images/favicon-16x16.png"/>
-		<link rel="mask-icon" href="/styles/images/safari-pinned-tab.svg" color="#5bbad5"/>
-		<meta name="msapplication-TileColor" content="#da532c"/>
-		<meta name="theme-color" content="#2596BE"/>
-		<link rel="manifest" href="/styles/images/site.webmanifest"/>
+		@subHead()
 		// TODO: Enhance CSS/JS delivery by implementing a system that generates unique filenames based on UUIDs or cryptographic hashes.
 		// When a client visits the website, they would receive CSS/JS files with names like "randomuuid.css" or "hash.js", where the randomuuid or hash portion is secure dynamically generated.
 		// This unique identifier could be associated with client-specific information like IP address, User-Agent, and other relevant factors.
@@ -37,5 +31,19 @@ templ cSS() {
 				darkMode: 'selector',
     			}
   			</script>
+	}
+}
+
+var onceIcon = templ.NewOnceHandle()
+
+templ subHead() {
+	@onceIcon.Once() {
+		<link rel="apple-touch-icon" sizes="180x180" href="/styles/images/apple-touch-icon.png"/>
+		<link rel="icon" type="image/png" sizes="32x32" href="/styles/images/favicon-32x32.png"/>
+		<link rel="icon" type="image/png" sizes="16x16" href="/styles/images/favicon-16x16.png"/>
+		<link rel="mask-icon" href="/styles/images/safari-pinned-tab.svg" color="#5bbad5"/>
+		<meta name="msapplication-TileColor" content="#da532c"/>
+		<meta name="theme-color" content="#2596BE"/>
+		<link rel="manifest" href="/styles/images/site.webmanifest"/>
 	}
 }
