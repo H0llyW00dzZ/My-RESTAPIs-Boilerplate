@@ -20,6 +20,15 @@ templ Head(cspRandom, title string) {
 		// This unique identifier could be associated with client-specific information like IP address, User-Agent, and other relevant factors.
 		<link rel="stylesheet" href="/styles/css/raw.css"/>
 		<script src="/styles/js/htmx.min.js" nonce={ cspRandom }></script>
+		@css()
+		<title>{ title }</title>
+	</head>
+}
+
+var onceCSS = templ.NewOnceHandle()
+
+templ cSS() {
+	@onceCSS.Once() {
 		// Note: This safe & secure as well which it's already bound into CSP smiliar HTMX.
 		<script src="https://cdn.tailwindcss.com" nonce={ cspRandom }></script>
 		// Note: This seems risky due expose config in front, however this is Go, it's easy to secure, it's just that I'm lazy, due it only enable dark mode.
@@ -28,6 +37,5 @@ templ Head(cspRandom, title string) {
 				darkMode: 'selector',
     			}
   			</script>
-		<title>{ title }</title>
-	</head>
+	}
 }
