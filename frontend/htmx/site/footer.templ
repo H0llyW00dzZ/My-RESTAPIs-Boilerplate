@@ -1,0 +1,26 @@
+// Copyright (c) 2024 H0llyW00dz All rights reserved.
+//
+// License: BSD 3-Clause License
+
+package site
+
+templ Footer(cfheader, timeYears, appName, xRequestID string) {
+	// Note: This a better one, for example
+	// Copyright © 2024 Gopher All rights reserved. | Request ID: 1d9ed3a6-5657-41d3-ae61-541fb4d6c57c
+	// where both in middle
+	<footer class="bg-gray-200 text-gray-600 py-4 text-center mt-12 w-full dark:bg-gray-700 dark:text-gray-300">
+		<div class="container mx-auto flex justify-center items-center">
+			<div class="flex items-center">
+				<span class="mx-auto">Copyright © { timeYears } { appName } All rights reserved.</span>
+				<span class="text-gray-500 text-sm ml-4 dark:text-gray-400">|</span>
+				<span class="text-gray-500 text-sm ml-2 dark:text-gray-400">
+					if cfheader != "" {
+						<span>Ray ID: { cfheader }</span>
+					} else if xRequestID != "" {
+						<span>Request ID: { xRequestID }</span>
+					}
+				</span>
+			</div>
+		</div>
+	</footer>
+}

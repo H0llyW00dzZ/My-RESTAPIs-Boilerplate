@@ -4,84 +4,21 @@
 
 package htmx
 
+import "h0llyw00dz-template/frontend/htmx/site"
+
 templ Base(v viewData) {
 	<!DOCTYPE html>
 	<html lang="en" class="dark:bg-gray-900">
-		<head>
-			<meta charset="utf-8"/>
-			<meta name="viewport" content="width=device-width, initial-scale=1"/>
-			<link rel="apple-touch-icon" sizes="180x180" href="/styles/images/apple-touch-icon.png"/>
-			<link rel="icon" type="image/png" sizes="32x32" href="/styles/images/favicon-32x32.png"/>
-			<link rel="icon" type="image/png" sizes="16x16" href="/styles/images/favicon-16x16.png"/>
-			<link rel="mask-icon" href="/styles/images/safari-pinned-tab.svg" color="#5bbad5"/>
-			<meta name="msapplication-TileColor" content="#da532c"/>
-			<meta name="theme-color" content="#2596BE"/>
-			<link rel="manifest" href="/styles/images/site.webmanifest"/>
-			// TODO: Enhance CSS/JS delivery by implementing a system that generates unique filenames based on UUIDs or cryptographic hashes.
-			// When a client visits the website, they would receive CSS/JS files with names like "randomuuid.css" or "hash.js", where the randomuuid or hash portion is secure dynamically generated.
-			// This unique identifier could be associated with client-specific information like IP address, User-Agent, and other relevant factors.
-			<link rel="stylesheet" href="/styles/css/raw.css"/>
-			<script src="/styles/js/htmx.min.js" nonce={ v.cspRandom }></script>
-			// Note: This safe & secure as well which it's already bound into CSP smiliar HTMX.
-			<script src="https://cdn.tailwindcss.com" nonce={ v.cspRandom }></script>
-			// Note: This seems risky due expose config in front, however this is Go, it's easy to secure, it's just that I'm lazy, due it only enable dark mode.
-			<script nonce={ v.cspRandom }>
-   			 	tailwind.config = {
-				darkMode: 'selector',
-    			}
-  			</script>
-			<title>{ v.title }</title>
-		</head>
+		@site.Head(v.cspRandom, v.title)
 		<body class="bg-gray-100 dark:bg-gray-900">
-			<header class="bg-white dark:bg-gray-800 shadow-md py-4">
-				<div class="container mx-auto flex justify-between items-center">
-					<a href="/" class="flex items-center">
-						// Logo + Header
-						// TODO: Move this along with footer by implement another package frontend such as panel for manage (e.g, REST APIs this repo), 
-						// monitoring (e.g, K8S and Controller), etc.
-						<img src="/styles/images/logo/gopher-run.png" alt={ v.appName + " Logo" } class="h-12 md:h-16"/>
-						<span class="text-2xl md:text-3xl font-semibold ml-2 text-gray-900 dark:text-white">{ v.appName }</span>
-					</a>
-					<button
-						id="theme-toggle"
-						type="button"
-						class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg p-2.5"
-					>
-						<svg id="theme-toggle-dark-icon" class="hidden w-6 h-6 md:w-8 md:h-8" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-							<path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-						</svg>
-						<svg id="theme-toggle-light-icon" class="hidden w-6 h-6 md:w-8 md:h-8" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-							<path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path>
-						</svg>
-					</button>
-				</div>
-			</header>
+			@site.Header(v.appName)
 			<main class="container mx-auto px-4 mt-8">
 				<div class="min-h-screen flex items-center justify-center dark:bg-gray-900">
 					{ children... }
 				</div>
 			</main>
-			// Note: This a better one, for example
-			// Copyright © 2024 Gopher All rights reserved. | Request ID: 1d9ed3a6-5657-41d3-ae61-541fb4d6c57c
-			// where both in middle
-			<footer class="bg-gray-200 text-gray-600 py-4 text-center mt-12 w-full dark:bg-gray-700 dark:text-gray-300">
-				<div class="container mx-auto flex justify-center items-center">
-					<div class="flex items-center">
-						<span class="mx-auto">Copyright © { v.timeYears } { v.appName } All rights reserved.</span>
-						<span class="text-gray-500 text-sm ml-4 dark:text-gray-400">|</span>
-						<span class="text-gray-500 text-sm ml-2 dark:text-gray-400">
-							if v.cfheader != "" {
-								<span>Ray ID: { v.cfheader }</span>
-							} else if v.xRequestID != "" {
-								<span>Request ID: { v.xRequestID }</span>
-							}
-						</span>
-					</div>
-				</div>
-			</footer>
-			// Load DarkMode
-			<script src="/styles/js/tailwind.min.dark.js" nonce={ v.cspRandom }></script>
-			<script src="/styles/js/htmx.indicator.min.js" nonce={ v.cspRandom }></script>
+			@site.Footer(v.cfheader, v.timeYears, v.appName, v.xRequestID)
+			@site.ScriptJSClientSide(v.cspRandom)
 		</body>
 	</html>
 }
