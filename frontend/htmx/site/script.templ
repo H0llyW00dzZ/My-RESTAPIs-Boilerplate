@@ -4,7 +4,11 @@
 
 package site
 
+var onceClientJSSide = templ.NewOnceHandle()
+
 templ ScriptJSClientSide(cspRandom string) {
-	<script src="/styles/js/tailwind.min.dark.js" nonce={ cspRandom }></script>
-	<script src="/styles/js/htmx.indicator.min.js" nonce={ cspRandom }></script>
+	@onceClientJSSide.Once() {
+		<script src="/styles/js/tailwind.min.dark.js" nonce={ cspRandom }></script>
+		<script src="/styles/js/htmx.indicator.min.js" nonce={ cspRandom }></script>
+	}
 }
