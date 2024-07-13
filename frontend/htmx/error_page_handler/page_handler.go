@@ -24,7 +24,7 @@ const (
 	// PageForbidden is the standard error message for a 403 Forbidden error.
 	PageForbidden = "403 Forbidden"
 	// PageServiceUnavailableError is the standard error message for a 503 Service Unavailable
-	PageServiceUnavailableError = "503 Service Unvailable"
+	PageServiceUnavailableError = "503 Service Unavailable"
 )
 
 // Define Cloudflare formats.
