@@ -12,7 +12,7 @@
 # Frontend (External Handler, e.g., Cloudflare) -> Backend (This Repo)
 #
 # Demo:
-#  - https://dev.btz.pm (This Repo, you can see the favicon)
+#  - https://api-beta.btz.pm/ (This Repo, you can see the favicon and X-Connection-Hash (Priv8 Implementation), old site are down due SSL no configured)
 #
 # Once the frontend and backend are connected, management (e.g, traffic, security, etc) becomes easier through the frontend
 # (e.g, don't have to spend time for setup, maintenance traffic, other).
