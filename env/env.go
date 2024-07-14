@@ -53,3 +53,11 @@ const (
 	DOMAIN       = "DOMAIN"
 	APISUBDOMAIN = "API_SUB_DOMAIN"
 )
+
+// Cloudflare-KV Storage Configuration
+const (
+	CFKVKEY         = "CF_KV_KEY"          // The Cloudflare Auth Token (Required).
+	CFKVEMAIL       = "CF_KV_EMAIL"        // The Cloudflare Email (Required).
+	CFKVACCID       = "CF_KV_ACC_ID"       // The Cloudflare Account ID (Required).
+	CFKVNAMESPACEID = "CF_KV_NAMESPACE_ID" // The Cloudflare NameSpace ID (Required).
+)
