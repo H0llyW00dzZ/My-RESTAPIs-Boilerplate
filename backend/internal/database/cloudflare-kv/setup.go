@@ -10,6 +10,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/storage/cloudflarekv"
+	_ "github.com/joho/godotenv/autoload" // auto load env
 )
 
 // FiberCloudflareKVClientConfig defines the settings needed for Fiber Cloudflare-KV client initialization.
