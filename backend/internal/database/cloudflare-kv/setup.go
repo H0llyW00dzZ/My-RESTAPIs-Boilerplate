@@ -15,11 +15,11 @@ import (
 
 // FiberCloudflareKVClientConfig defines the settings needed for Fiber Cloudflare-KV client initialization.
 type FiberCloudflareKVClientConfig struct {
-	Key         string
-	Email       string
-	AccountID   string
-	NamespaceID string
-	Reset       bool
+	Key         string // The Cloudflare Auth Token (Required).
+	Email       string // The Cloudflare Email (Required).
+	AccountID   string // The Cloudflare Account ID (Required).
+	NamespaceID string // The Cloudflare NameSpace ID (Required).
+	Reset       bool   // Reset it used in fiber storage operation for each time server restarting it will reset (remove) entity data (Default: True).
 }
 
 var (
