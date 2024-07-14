@@ -32,6 +32,9 @@ var (
 // for use with Fiber middlewares such as rate limiting, caching which it suitable with network load balancer and cheap.
 //
 // Recommended Usage: MYSQL -> Cloudflare-KV
+//
+// Note: This must implement "vice versa" method, for example when the data such as username not stored in cloudflare kv storage
+// then fetch it from Mysql -> stored in this cloudflare kv storage with expiration
 func (config *FiberCloudflareKVClientConfig) InitializeCfkvStorage() (fiber.Storage, error) {
 
 	storage := cloudflarekv.New(cloudflarekv.Config{
