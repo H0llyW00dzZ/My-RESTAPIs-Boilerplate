@@ -79,7 +79,8 @@ type MySQLConfig struct {
 // with higher specifications. Ensure that the maximum number of connections
 // (maxConnections) is balanced with the Redis server's resources (CPU, memory,
 // network). An excessively SMALL connection pool (as currently implemented)
-// on a powerful Redis instance (higher specifications) can lead to POOL EXHAUSTION (e.g, Small Pool: You have a powerful Redis server, but the connection pool size (maxConnections) is small),
+// on a powerful Redis instance (higher specifications) can lead to POOL EXHAUSTION
+// (e.g, Small Pool: You have a powerful Redis server, but the connection pool size (maxConnections) is small),
 // where the application cannot obtain connections from the pool fast enough, limiting throughput,
 // even if there is ample free memory on the Redis server.
 var maxConnections = 2 * runtime.NumCPU()
