@@ -8,15 +8,15 @@ import "github.com/gofiber/fiber/v2"
 
 // ErrorResponse represents the structure of an error response.
 type ErrorResponse struct {
-	ErrorCode int    `json:"errorCode"` // rfc9083
-	Error     string `json:"error"`
+	Code  int    `json:"code"`
+	Error string `json:"error"`
 }
 
 // SendErrorResponse sends an error response with the specified status code and error message.
 func SendErrorResponse(c *fiber.Ctx, statusCode int, errorMessage string) error {
 	return c.Status(statusCode).JSON(ErrorResponse{
-		ErrorCode: statusCode,
-		Error:     errorMessage,
+		Code:  statusCode,
+		Error: errorMessage,
 	})
 }
 
