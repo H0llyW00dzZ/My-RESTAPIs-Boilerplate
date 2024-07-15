@@ -24,13 +24,7 @@ var onceCSS = templ.NewOnceHandle()
 templ cSS(cspRandom string) {
 	@onceCSS.Once() {
 		// Note: This safe & secure as well which it's already bound into CSP smiliar HTMX.
-		<script src="https://cdn.tailwindcss.com" nonce={ cspRandom }></script>
-		// Note: This seems risky due expose config in front, however this is Go, it's easy to secure, it's just that I'm lazy, due it only enable dark mode.
-		<script nonce={ cspRandom }>
-   			 	tailwind.config = {
-				darkMode: 'selector',
-    			}
-  			</script>
+		<link rel="stylesheet" href="/styles/css/base-tailwind.css"/>
 	}
 }
 
