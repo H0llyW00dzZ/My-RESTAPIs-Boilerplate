@@ -549,6 +549,12 @@ func (s *service) evaluateRedisStats(redisInfo, stats map[string]string) map[str
 		stats["redis_message"] = MsgRedisHighPoolUtilization
 	}
 
+	// this possible reached 100%++ (e.g, 150%) due wrong configuration.
+	boltneckThreshold := 100.0
+	if poolUtilization > boltneckThreshold {
+		stats["redis_message"] = MsgRedisHighPoolBoltnecks
+	}
+
 	return stats
 }
 

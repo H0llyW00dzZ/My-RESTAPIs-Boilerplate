@@ -34,4 +34,5 @@ const (
 	MsgRedisFailedToRetrieveInfo = "Failed to retrieve Redis info: %v"
 	MsgRedisHighIdleConnections  = "Redis has a high number of idle connections"
 	MsgRedisHighPoolUtilization  = "Redis connection pool utilization is high"
+	MsgRedisHighPoolBoltnecks    = "CRITICAL: Redis connection pool bottlenecked! Utilization exceeds 100%. Possible misconfiguration!"
 )

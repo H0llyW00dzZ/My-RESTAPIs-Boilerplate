@@ -83,6 +83,9 @@ type MySQLConfig struct {
 // (e.g, Small Pool: You have a powerful Redis server, but the connection pool size (maxConnections) is small),
 // where the application cannot obtain connections from the pool fast enough, limiting throughput,
 // even if there is ample free memory on the Redis server.
+//
+// Best Practice: Maintaining a pool utilization of around 70% is generally considered healthy.
+// This balance helps ensure enough available connections while minimizing idle and stale connections.
 var maxConnections = 2 * runtime.NumCPU()
 
 // InitializeRedisClient initializes and returns a new Redis client.
