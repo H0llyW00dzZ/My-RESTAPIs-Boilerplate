@@ -64,6 +64,8 @@ type UptimeFields struct {
 }
 
 // RedisHealth represents the health statistics for Redis.
+//
+// Demo: https://api-beta.btz.pm/v1/health/db?filter=redis (Better REST Formatting)
 type RedisHealth struct {
 	Status  string      `json:"status"`
 	Message string      `json:"message,omitempty"`
