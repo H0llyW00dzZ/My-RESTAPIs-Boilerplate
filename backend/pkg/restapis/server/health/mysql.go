@@ -21,6 +21,8 @@ type ConnectionStats struct {
 }
 
 // MySQLHealth represents the health statistics for MySQL.
+//
+// Demo: https://api-beta.btz.pm/v1/health/db?filter=mysql (Better REST Formatting)
 type MySQLHealth struct {
 	Status  string           `json:"status"`
 	Message string           `json:"message,omitempty"`
