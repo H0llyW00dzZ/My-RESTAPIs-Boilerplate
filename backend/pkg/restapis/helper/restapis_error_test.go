@@ -38,8 +38,8 @@ func TestSendErrorResponse_BadRequest(t *testing.T) {
 	}
 
 	expectedErrorCode := fiber.StatusBadRequest
-	if errorResponse.ErrorCode != expectedErrorCode {
-		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.ErrorCode)
+	if errorResponse.Code != expectedErrorCode {
+		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.Code)
 	}
 
 	expectedErrorMessage := "Invalid request"
@@ -71,8 +71,8 @@ func TestSendErrorResponse_Unauthorized(t *testing.T) {
 	}
 
 	expectedErrorCode := fiber.StatusUnauthorized
-	if errorResponse.ErrorCode != expectedErrorCode {
-		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.ErrorCode)
+	if errorResponse.Code != expectedErrorCode {
+		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.Code)
 	}
 
 	expectedErrorMessage := "Unauthorized access"
@@ -104,8 +104,8 @@ func TestSendErrorResponse_Forbidden(t *testing.T) {
 	}
 
 	expectedErrorCode := fiber.StatusForbidden
-	if errorResponse.ErrorCode != expectedErrorCode {
-		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.ErrorCode)
+	if errorResponse.Code != expectedErrorCode {
+		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.Code)
 	}
 
 	expectedErrorMessage := "Forbidden resource"
@@ -137,8 +137,8 @@ func TestSendErrorResponse_NotFound(t *testing.T) {
 	}
 
 	expectedErrorCode := fiber.StatusNotFound
-	if errorResponse.ErrorCode != expectedErrorCode {
-		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.ErrorCode)
+	if errorResponse.Code != expectedErrorCode {
+		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.Code)
 	}
 
 	expectedErrorMessage := "Resource not found"
@@ -170,8 +170,8 @@ func TestSendErrorResponse_Conflict(t *testing.T) {
 	}
 
 	expectedErrorCode := fiber.StatusConflict
-	if errorResponse.ErrorCode != expectedErrorCode {
-		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.ErrorCode)
+	if errorResponse.Code != expectedErrorCode {
+		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.Code)
 	}
 
 	expectedErrorMessage := "Duplicate resource"
@@ -203,8 +203,8 @@ func TestSendErrorResponse_BadGateway(t *testing.T) {
 	}
 
 	expectedErrorCode := fiber.StatusBadGateway
-	if errorResponse.ErrorCode != expectedErrorCode {
-		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.ErrorCode)
+	if errorResponse.Code != expectedErrorCode {
+		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.Code)
 	}
 
 	expectedErrorMessage := "Bad gateway"
@@ -236,8 +236,8 @@ func TestSendErrorResponse_InternalServerError(t *testing.T) {
 	}
 
 	expectedErrorCode := fiber.StatusInternalServerError
-	if errorResponse.ErrorCode != expectedErrorCode {
-		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.ErrorCode)
+	if errorResponse.Code != expectedErrorCode {
+		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.Code)
 	}
 
 	expectedErrorMessage := "Internal server error"
@@ -269,8 +269,8 @@ func TestSendErrorResponse_TooManyRequests(t *testing.T) {
 	}
 
 	expectedErrorCode := fiber.StatusTooManyRequests
-	if errorResponse.ErrorCode != expectedErrorCode {
-		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.ErrorCode)
+	if errorResponse.Code != expectedErrorCode {
+		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.Code)
 	}
 
 	expectedErrorMessage := "Too many requests"
@@ -308,8 +308,8 @@ func TestErrorHandler(t *testing.T) {
 	}
 
 	expectedErrorCode := fiber.StatusInternalServerError
-	if errorResponse.ErrorCode != expectedErrorCode {
-		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.ErrorCode)
+	if errorResponse.Code != expectedErrorCode {
+		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.Code)
 	}
 
 	expectedErrorMessage := fiber.ErrInternalServerError.Message
