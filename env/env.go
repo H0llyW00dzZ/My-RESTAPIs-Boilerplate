@@ -55,10 +55,10 @@ const (
 	APISUBDOMAIN = "API_SUB_DOMAIN"
 )
 
-// Cloudflare-KV Storage Configuration
+// Cloudflare-KV Storage Configuration (Optional since it alternative Redis that with better network plus cheap which is suitable for load balancer)
 const (
-	CFKVKEY         = "CF_KV_KEY"          // The Cloudflare Auth Token (Required).
-	CFKVEMAIL       = "CF_KV_EMAIL"        // The Cloudflare Email (Required).
-	CFKVACCID       = "CF_KV_ACC_ID"       // The Cloudflare Account ID (Required).
-	CFKVNAMESPACEID = "CF_KV_NAMESPACE_ID" // The Cloudflare NameSpace ID (Required).
+	CFKVKEY         = "CF_KV_KEY"          // The Cloudflare Auth Token.
+	CFKVEMAIL       = "CF_KV_EMAIL"        // The Cloudflare Email.
+	CFKVACCID       = "CF_KV_ACC_ID"       // The Cloudflare Account ID.
+	CFKVNAMESPACEID = "CF_KV_NAMESPACE_ID" // The Cloudflare NameSpace ID.
 )
