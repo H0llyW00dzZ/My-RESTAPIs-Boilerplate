@@ -111,7 +111,9 @@ func (v *viewData) GenericErrorInternalServerHandler(c *fiber.Ctx, err error) er
 // and sends the rendered HTML content as an HTTP response with the specified status code.
 //
 // This function utilizes valyala/bytebufferpool for efficient string building,
-// ensuring reduced garbage collection overhead.
+// ensuring reduced garbage collection overhead, however it not possible to made it
+// cracked zer0-ms response (required senior only) in production, unless encapsulating
+// load balancer so it might possible to made it cracked zer0-ms response (required senior only).
 //
 // It follows the DRY principle (Don't Repeat Yourself) by encapsulating the
 // common logic for rendering and sending HTMX component responses,
