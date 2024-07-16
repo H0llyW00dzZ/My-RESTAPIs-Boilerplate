@@ -80,25 +80,25 @@ func (v *viewData) PageNotFoundHandler(c *fiber.Ctx) error {
 // This function takes a Fiber context and renders the 403 page.
 func (v *viewData) PageForbidden403Handler(c *fiber.Ctx) error {
 	component := PageForbidden403(*v) // magic pointer.
-	return v.renderAndSend(c, fiber.StatusNotFound, component)
+	return v.renderAndSend(c, fiber.StatusForbidden, component)
 }
 
 // Page500InternalServerHandler handles 500 Internal Server errors.
 func (v *viewData) Page500InternalServerHandler(c *fiber.Ctx) error {
 	component := PageInternalServerError500(*v) // magic pointer.
-	return v.renderAndSend(c, fiber.StatusNotFound, component)
+	return v.renderAndSend(c, fiber.StatusInternalServerError, component)
 }
 
 // PageServiceUnavailableHandler handles 503 Service Unavailable errors.
 func (v *viewData) PageServiceUnavailableHandler(c *fiber.Ctx) error {
 	component := PageServiceUnavailable(*v) // magic pointer.
-	return v.renderAndSend(c, fiber.StatusNotFound, component)
+	return v.renderAndSend(c, fiber.StatusServiceUnavailable, component)
 }
 
 // PageUnauthorizeHandler handles 401 Authentication required.
 func (v *viewData) PageUnauthorizeHandler(c *fiber.Ctx) error {
 	component := PageUnauthorize401(*v) // magic pointer.
-	return v.renderAndSend(c, fiber.StatusNotFound, component)
+	return v.renderAndSend(c, fiber.StatusUnauthorized, component)
 }
 
 // GenericErrorInternalServerHandler handles Generic 500 Internal Server errors.
