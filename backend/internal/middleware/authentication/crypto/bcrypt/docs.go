@@ -1,6 +1,7 @@
 // Copyright (c) 2024 H0llyW00dz All rights reserved.
 //
-// License: BSD 3-Clause License
+// By accessing or using this software, you agree to be bound by the terms
+// of the License Agreement, which you can find at LICENSE files.
 
 // Package bcrypt provides a secure way to hash and compare passwords using the ancient bcrypt algorithm.
 // It is suitable for basic authentication and user management when interacting with a database.

@@ -1,5 +1,4 @@
-BSD 3-Clause License
------------
+## BSD 3-Clause License
 
 Copyright (c) 2024, H0llyW00dzZ
 All rights reserved.
@@ -29,8 +28,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-MIT License
------------
+## MIT License
 
 The following files are provided under the MIT License, courtesy of Melkeydev (go-blueprint author):
 

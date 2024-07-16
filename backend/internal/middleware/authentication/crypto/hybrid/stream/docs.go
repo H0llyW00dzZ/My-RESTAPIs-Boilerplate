@@ -1,3 +1,8 @@
+// Copyright (c) 2024 H0llyW00dz All rights reserved.
+//
+// By accessing or using this software, you agree to be bound by the terms
+// of the License Agreement, which you can find at LICENSE files.
+
 // Package stream provides a hybrid encryption scheme that combines AES-CTR and XChaCha20-Poly1305 algorithms
 // for secure encryption and decryption of data streams. It also supports optional HMAC authentication for added
 // integrity and authenticity.

@@ -5,7 +5,9 @@
 
 //
 
-// License: BSD 3-Clause License
+// By accessing or using this software, you agree to be bound by the terms
+
+// of the License Agreement, which you can find at LICENSE files.
 
 package site
 
@@ -39,7 +41,7 @@ func Header(appName string) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(appName + " Logo")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/header.templ`, Line: 15, Col: 73}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/header.templ`, Line: 16, Col: 73}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -52,7 +54,7 @@ func Header(appName string) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(appName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/header.templ`, Line: 16, Col: 97}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/header.templ`, Line: 17, Col: 97}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {

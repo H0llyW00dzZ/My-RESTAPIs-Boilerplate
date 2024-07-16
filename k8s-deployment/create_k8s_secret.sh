@@ -1,7 +1,8 @@
 #!/bin/bash
 # Copyright (c) 2024 H0llyW00dz All rights reserved.
 # 
-# License: BSD 3-Clause License
+# By accessing or using this software, you agree to be bound by the terms
+# of the License Agreement, which you can find at LICENSE files.
 #
 # Tool: K8S Secret Generator for HSM by H0llyW00dzZ
 # Description: Creates Kubernetes secrets from a file, encoding values with base64 

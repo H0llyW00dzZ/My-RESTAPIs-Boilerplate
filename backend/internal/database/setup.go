@@ -1,6 +1,7 @@
 // Copyright (c) 2024 H0llyW00dz All rights reserved.
 //
-// License: BSD 3-Clause License
+// By accessing or using this software, you agree to be bound by the terms
+// of the License Agreement, which you can find at LICENSE files.
 
 // Note: The database package here is not covered by tests and won't have tests implemented for it,
 // as it is not worth testing the database that requires authentication. (literally stupid testing that requires authentication unlike mock)
