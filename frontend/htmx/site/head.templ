@@ -15,14 +15,14 @@ templ Head(cspRandom, title string) {
 		// This unique identifier could be associated with client-specific information like IP address, User-Agent, and other relevant factors.
 		<link rel="stylesheet" href="/styles/css/raw.css"/>
 		<script src="/styles/js/htmx.min.js" nonce={ cspRandom }></script>
-		@cSS(cspRandom)
+		@cSS()
 		<title>{ title }</title>
 	</head>
 }
 
 var onceCSS = templ.NewOnceHandle()
 
-templ cSS(cspRandom string) {
+templ cSS() {
 	@onceCSS.Once() {
 		// Note: This safe & secure as well which it's already bound into CSP smiliar HTMX.
 		<link rel="stylesheet" href="/styles/css/base-tailwind.css"/>
