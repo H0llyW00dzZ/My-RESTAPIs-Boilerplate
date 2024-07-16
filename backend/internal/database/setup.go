@@ -121,6 +121,8 @@ func (config *RedisClientConfig) InitializeRedisClient() (*redis.Client, error) 
 		PoolTimeout:           config.PoolTimeout,           // PoolTimeout should already be a time.Duration
 		PoolSize:              config.PoolSize,              // adding back this for default.
 		ContextTimeoutEnabled: config.ContextTimeoutEnabled, // adding back this for default.
+		ConnMaxIdleTime:       config.ConnMaxIdleTime,       // Required ENV = REDIS_MAXCONN_IDLE_TIME
+		ConnMaxLifetime:       config.ConnMaxLifetime,       // Required ENV = REDIS_MAXCONN_LIFE_TIME
 		MinIdleConns:          config.PoolSize / 4,          // Set minimum idle connections to 25% of the pool size
 	})
 	return client, nil
