@@ -43,6 +43,9 @@ func handleError(c *fiber.Ctx, e *fiber.Error, vd *viewData) error {
 	case fiber.StatusServiceUnavailable:
 		vd.title = PageServiceUnavailableError + " - " + c.App().Config().AppName
 		return vd.PageServiceUnavailableHandler(c)
+	case fiber.StatusUnauthorized:
+		vd.title = fiber.ErrUnauthorized.Message + " - " + c.App().Config().AppName
+		return vd.PageUnauthorizeHandler(c)
 	default:
 		vd.title = PageInternalServerError + " - " + c.App().Config().AppName
 		return vd.Page500InternalServerHandler(c)
