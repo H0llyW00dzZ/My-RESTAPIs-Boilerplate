@@ -34,7 +34,7 @@ type viewData struct {
 // handleError is a general error handler for both API and frontend routes.
 //
 // Note: This different way, unlike static "handleFrontendError" or "handleAPIError", and this useful for multipe website (e.g, frontend, restapi, hostname)
-// and this used for hostname (e.g, host.example.com) smiliar a default load balancer index page (e.g, nginx)
+// also this used for hostname (e.g, host.example.com) smiliar a default load balancer index page (e.g, nginx)
 func handleError(c *fiber.Ctx, e *fiber.Error, vd *viewData) error {
 	switch e.Code {
 	case fiber.StatusNotFound:
