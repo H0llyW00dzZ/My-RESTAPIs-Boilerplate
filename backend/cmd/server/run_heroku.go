@@ -1,6 +1,7 @@
 // Copyright (c) 2024 H0llyW00dz All rights reserved.
 //
-// License: BSD 3-Clause License
+// By accessing or using this software, you agree to be bound by the terms
+// of the License Agreement, which you can find at LICENSE files.
 
 // Note: Bubble Tea's spinner must disabled on Heroku because it relies on
 // TTY, which is not supported in the Heroku environment. This package is used

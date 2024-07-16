@@ -1,6 +1,7 @@
 // Copyright (c) 2024 H0llyW00dz All rights reserved.
 //
-// License: BSD 3-Clause License
+// By accessing or using this software, you agree to be bound by the terms
+// of the License Agreement, which you can find at LICENSE files.
 
 // Note: This "helper_tls_test.go" file contains helper functions used for testing purpose.
 // Reason for extraction: Making testing easier by ensuring TLS tests are as production-like as possible (e.g., TLS Config must set InsecureSkipVerify to false).
