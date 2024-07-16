@@ -3,7 +3,7 @@
 // By accessing or using this software, you agree to be bound by the terms
 // of the License Agreement, which you can find at LICENSE files.
 
-// Demo: dev.btz.pm
+// Demo: closed atm due lazy setup everything.
 
 package htmx
 
