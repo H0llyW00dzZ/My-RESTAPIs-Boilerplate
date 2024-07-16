@@ -8,10 +8,11 @@
 package htmx
 
 import (
-	"bytes"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
 
+	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
+	bpool "github.com/valyala/bytebufferpool"
 )
 
 // views represents the data that will be passed to the view template.
@@ -71,16 +72,7 @@ func (v *viewData) renderErrorPage(c *fiber.Ctx, statusCode int, _ string, _ err
 // This function takes a Fiber context and renders the 404 page.
 func (v *viewData) PageNotFoundHandler(c *fiber.Ctx) error {
 	component := PageNotFound404(*v) // magic pointer.
-
-	// Note: This Optional can be used to builder string. However,
-	// it is intended for low-level operations where the efficiency of using a string builder is not significant.
-	buf := new(bytes.Buffer)
-	if err := component.Render(c.Context(), buf); err != nil {
-		return v.renderErrorPage(c, fiber.StatusInternalServerError, "Error rendering PageNotFound: %v", err)
-	}
-
-	c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-	return c.Status(fiber.StatusNotFound).SendString(buf.String())
+	return v.renderAndSend(c, fiber.StatusNotFound, component)
 }
 
 // PageForbidden403Handler renders the 403 Forbidden error page.
@@ -88,65 +80,64 @@ func (v *viewData) PageNotFoundHandler(c *fiber.Ctx) error {
 // This function takes a Fiber context and renders the 403 page.
 func (v *viewData) PageForbidden403Handler(c *fiber.Ctx) error {
 	component := PageForbidden403(*v) // magic pointer.
-
-	// Note: This Optional can be used to builder string. However,
-	// it is intended for low-level operations where the efficiency of using a string builder is not significant.
-	buf := new(bytes.Buffer)
-	if err := component.Render(c.Context(), buf); err != nil {
-		return v.renderErrorPage(c, fiber.StatusInternalServerError, "Error rendering Forbidden Page: %v", err)
-	}
-
-	c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-	return c.Status(fiber.StatusForbidden).SendString(buf.String())
+	return v.renderAndSend(c, fiber.StatusForbidden, component)
 }
 
 // Page500InternalServerHandler handles 500 Internal Server errors.
 func (v *viewData) Page500InternalServerHandler(c *fiber.Ctx) error {
 	component := PageInternalServerError500(*v) // magic pointer.
-
-	// Note: This Optional can be used to builder string. However,
-	// it is intended for low-level operations where the efficiency of using a string builder is not significant.
-	buf := new(bytes.Buffer)
-	if err := component.Render(c.Context(), buf); err != nil {
-		return v.renderErrorPage(c, fiber.StatusInternalServerError, "Error rendering Internal Server Error Page: %v", err)
-	}
-
-	c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-	return c.Status(fiber.StatusInternalServerError).SendString(buf.String())
+	return v.renderAndSend(c, fiber.StatusInternalServerError, component)
 }
 
 // PageServiceUnavailableHandler handles 503 Service Unavailable errors.
 func (v *viewData) PageServiceUnavailableHandler(c *fiber.Ctx) error {
 	component := PageServiceUnavailable(*v) // magic pointer.
-
-	// Note: This Optional can be used to builder string. However,
-	// it is intended for low-level operations where the efficiency of using a string builder is not significant.
-	buf := new(bytes.Buffer)
-	if err := component.Render(c.Context(), buf); err != nil {
-		return v.renderErrorPage(c, fiber.StatusServiceUnavailable, "Error rendering Service Unavailable Error Page: %v", err)
-	}
-
-	c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-	return c.Status(fiber.StatusServiceUnavailable).SendString(buf.String())
+	return v.renderAndSend(c, fiber.StatusServiceUnavailable, component)
 }
 
 // PageUnauthorizeHandler handles 401 Authentication required.
 func (v *viewData) PageUnauthorizeHandler(c *fiber.Ctx) error {
 	component := PageUnauthorize401(*v) // magic pointer.
-
-	// Note: This Optional can be used to builder string. However,
-	// it is intended for low-level operations where the efficiency of using a string builder is not significant.
-	buf := new(bytes.Buffer)
-	if err := component.Render(c.Context(), buf); err != nil {
-		return v.renderErrorPage(c, fiber.StatusUnauthorized, "Error rendering Authentication required Error Page: %v", err)
-	}
-
-	c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-	return c.Status(fiber.StatusUnauthorized).SendString(buf.String())
+	return v.renderAndSend(c, fiber.StatusUnauthorized, component)
 }
 
 // GenericErrorInternalServerHandler handles Generic 500 Internal Server errors.
 func (v *viewData) GenericErrorInternalServerHandler(c *fiber.Ctx, err error) error {
 	// Return a JSON response with the 500 Internal Server Error status code
 	return helper.SendErrorResponse(c, fiber.StatusInternalServerError, fiber.ErrInternalServerError.Message)
+}
+
+// renderAndSend renders the given HTMX component using the provided Fiber context
+// and sends the rendered HTML content as an HTTP response with the specified status code.
+//
+// This function utilizes valyala/bytebufferpool for efficient string building,
+// ensuring reduced garbage collection overhead.
+//
+// It follows the DRY principle (Don't Repeat Yourself) by encapsulating the
+// common logic for rendering and sending HTMX component responses,
+// making the code cleaner and easier to maintain.
+func (v *viewData) renderAndSend(c *fiber.Ctx, statusCode int, component templ.Component) error {
+	// Note: This Optional can be used to builder string. However,
+	// it is intended for low-level operations where the efficiency of using a string builder is not significant.
+	//
+	// Get a buffer from the pool for efficient string building.
+	buf := bpool.Get()
+
+	// Use defer to guarantee buffer cleanup (reset and return to the pool)
+	// even if an error occurs during rendering.
+	defer func() {
+		buf.Reset()    // Reset the buffer to prevent data leaks.
+		bpool.Put(buf) // Return the buffer to the pool for reuse.
+	}()
+
+	// Render the HTMX component into the byte buffer.
+	if err := component.Render(c.Context(), buf); err != nil {
+		// Handle any rendering errors by returning an internal server error page.
+		return v.renderErrorPage(c, fiber.StatusInternalServerError, "Error rendering component: %v", err)
+	}
+
+	// Send the response
+	c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+	// Send the rendered HTML content as a response with the appropriate status code.
+	return c.Status(statusCode).SendString(buf.String())
 }
