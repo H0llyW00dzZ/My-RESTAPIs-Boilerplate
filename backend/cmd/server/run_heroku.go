@@ -12,4 +12,6 @@
 
 package main
 
-import _ "github.com/heroku/x/hmetrics/onload" // When this installed, see Docs https://devcenter.heroku.com/articles/language-runtime-metrics-go
+// When this installed, see Docs https://devcenter.heroku.com/articles/language-runtime-metrics-go
+// also note that it connected to "run.go", due this method idiom go
+import _ "github.com/heroku/x/hmetrics/onload"
