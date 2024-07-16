@@ -11,5 +11,6 @@ templ ScriptJSClientSide(cspRandom string) {
 	@onceClientJSSide.Once() {
 		<script src="/styles/js/tailwind.min.dark.js" nonce={ cspRandom }></script>
 		<script src="/styles/js/htmx.indicator.min.js" nonce={ cspRandom }></script>
+		// TODO: Handle Cloudflare rocket loader js (idk whatever it is) it got Refused because it violates the following Content Security Policy hahaha.
 	}
 }
