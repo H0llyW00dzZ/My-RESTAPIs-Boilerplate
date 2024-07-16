@@ -7,17 +7,25 @@ package htmx
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 // NewStaticHandleVersionedAPIError handles errors for versioned static REST API routes.
 func NewStaticHandleVersionedAPIError(c *fiber.Ctx, e *fiber.Error) error {
+	timeYearNow := time.Now().Year()
 	// Get xRequestID Where it was generated.
 	xRequestID := c.Locals(XRequestID)
 	vd := &viewData{
 		views: &views{},
 	}
+
+	// Convert the integer year to a string
+	vd.timeYears = strconv.Itoa(timeYearNow)
+	// Get Application name
+	vd.appName = c.App().Config().AppName
+
 	cloudflareRayID := c.Get(CloudflareRayIDHeader)
 	if cloudflareRayID != "" {
 		vd.cfheader = cloudflareRayID
@@ -41,11 +49,18 @@ func NewStaticHandleVersionedAPIError(c *fiber.Ctx, e *fiber.Error) error {
 
 // NewStaticHandleFrontendError handles errors for static frontend routes.
 func NewStaticHandleFrontendError(c *fiber.Ctx, e *fiber.Error) error {
+	timeYearNow := time.Now().Year()
 	// Get xRequestID Where it was generated.
 	xRequestID := c.Locals(XRequestID)
 	vd := &viewData{
 		views: &views{},
 	}
+
+	// Convert the integer year to a string
+	vd.timeYears = strconv.Itoa(timeYearNow)
+	// Get Application name
+	vd.appName = c.App().Config().AppName
+
 	cloudflareRayID := c.Get(CloudflareRayIDHeader)
 	if cloudflareRayID != "" {
 		vd.cfheader = cloudflareRayID
