@@ -33,3 +33,8 @@ const (
 	// ipToKeyPrefix is the prefix used for the key to store the IP to valid filters key mapping in Redis.
 	ipToKeyPrefix = "DBHealthCheckIPKey:"
 )
+
+// Define Cloudflare formats.
+const (
+	CloudflareConnectingIPHeader = "Cf-Connecting-IP"
+)
