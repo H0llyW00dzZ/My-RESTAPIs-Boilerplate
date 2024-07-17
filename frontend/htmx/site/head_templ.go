@@ -16,7 +16,16 @@ package site
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func Head(cspRandom, title string) templ.Component {
+type Component struct {
+	Title      string
+	Cfheader   string
+	XRequestID string
+	CspRandom  string
+	TimeYears  string
+	AppName    string
+}
+
+func (c Component) Head() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -47,9 +56,9 @@ func Head(cspRandom, title string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(cspRandom)
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(c.CspRandom)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/head.templ`, Line: 17, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/head.templ`, Line: 26, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -68,9 +77,9 @@ func Head(cspRandom, title string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(title)
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(c.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/head.templ`, Line: 19, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/head.templ`, Line: 28, Col: 18}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {

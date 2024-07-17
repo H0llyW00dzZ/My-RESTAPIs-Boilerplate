@@ -10,16 +10,28 @@ import "h0llyw00dz-template/frontend/htmx/site"
 templ Base(v viewData) {
 	<!DOCTYPE html>
 	<html lang="en" class="dark:bg-gray-900">
-		@site.Head(v.cspRandom, v.title)
+		@site.Component{
+			Title:     v.title,
+			CspRandom: v.cspRandom,
+		}.Head()
 		<body class="bg-gray-100 dark:bg-gray-900">
-			@site.Header(v.appName)
+			@site.Component{
+				AppName: v.appName,
+			}.Header()
 			<main class="container mx-auto px-4 mt-8">
 				<div class="min-h-screen flex items-center justify-center dark:bg-gray-900">
 					{ children... }
 				</div>
 			</main>
-			@site.Footer(v.cfheader, v.timeYears, v.appName, v.xRequestID)
-			@site.ScriptJSClientSide(v.cspRandom)
+			@site.Component{
+				Cfheader:   v.cfheader,
+				TimeYears:  v.timeYears,
+				AppName:    v.appName,
+				XRequestID: v.xRequestID,
+			}.Footer()
+			@site.Component{
+				CspRandom: v.cspRandom,
+			}.ScriptJSClientSide()
 		</body>
 	</html>
 }

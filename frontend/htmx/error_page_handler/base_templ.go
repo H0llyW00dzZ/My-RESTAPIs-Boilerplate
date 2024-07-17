@@ -40,7 +40,10 @@ func Base(v viewData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = site.Head(v.cspRandom, v.title).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = site.Component{
+			Title:     v.title,
+			CspRandom: v.cspRandom,
+		}.Head().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -48,7 +51,9 @@ func Base(v viewData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = site.Header(v.appName).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = site.Component{
+			AppName: v.appName,
+		}.Header().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -64,11 +69,18 @@ func Base(v viewData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = site.Footer(v.cfheader, v.timeYears, v.appName, v.xRequestID).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = site.Component{
+			Cfheader:   v.cfheader,
+			TimeYears:  v.timeYears,
+			AppName:    v.appName,
+			XRequestID: v.xRequestID,
+		}.Footer().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = site.ScriptJSClientSide(v.cspRandom).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = site.Component{
+			CspRandom: v.cspRandom,
+		}.ScriptJSClientSide().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

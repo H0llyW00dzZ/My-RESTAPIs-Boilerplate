@@ -16,7 +16,7 @@ package site
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func Footer(cfheader, timeYears, appName, xRequestID string) templ.Component {
+func (c Component) Footer() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -38,13 +38,13 @@ func Footer(cfheader, timeYears, appName, xRequestID string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if cfheader != "" {
-			templ_7745c5c3_Err = cfHeader(cfheader, timeYears, appName).Render(ctx, templ_7745c5c3_Buffer)
+		if c.Cfheader != "" {
+			templ_7745c5c3_Err = c.cfHeader().Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-		} else if xRequestID != "" {
-			templ_7745c5c3_Err = xRequestIDHeader(xRequestID, timeYears, appName).Render(ctx, templ_7745c5c3_Buffer)
+		} else if c.XRequestID != "" {
+			templ_7745c5c3_Err = c.xRequestIDHeader().Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -57,7 +57,7 @@ func Footer(cfheader, timeYears, appName, xRequestID string) templ.Component {
 	})
 }
 
-func cfHeader(cfheader, timeYears, appName string) templ.Component {
+func (c Component) cfHeader() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -80,9 +80,9 @@ func cfHeader(cfheader, timeYears, appName string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(timeYears)
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(c.TimeYears)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/footer.templ`, Line: 26, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/footer.templ`, Line: 26, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -93,9 +93,9 @@ func cfHeader(cfheader, timeYears, appName string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(appName)
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(c.AppName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/footer.templ`, Line: 26, Col: 59}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/footer.templ`, Line: 26, Col: 63}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -106,9 +106,9 @@ func cfHeader(cfheader, timeYears, appName string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(cfheader)
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(c.Cfheader)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/footer.templ`, Line: 29, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/footer.templ`, Line: 29, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -122,7 +122,7 @@ func cfHeader(cfheader, timeYears, appName string) templ.Component {
 	})
 }
 
-func xRequestIDHeader(xRequestID, timeYears, appName string) templ.Component {
+func (c Component) xRequestIDHeader() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -145,9 +145,9 @@ func xRequestIDHeader(xRequestID, timeYears, appName string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(timeYears)
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(c.TimeYears)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/footer.templ`, Line: 34, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/footer.templ`, Line: 34, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -158,9 +158,9 @@ func xRequestIDHeader(xRequestID, timeYears, appName string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(appName)
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(c.AppName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/footer.templ`, Line: 34, Col: 59}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/footer.templ`, Line: 34, Col: 63}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -171,9 +171,9 @@ func xRequestIDHeader(xRequestID, timeYears, appName string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 string
-		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(xRequestID)
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(c.XRequestID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/footer.templ`, Line: 37, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/htmx/site/footer.templ`, Line: 37, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {

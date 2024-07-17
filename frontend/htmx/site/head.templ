@@ -5,7 +5,16 @@
 
 package site
 
-templ Head(cspRandom, title string) {
+type Component struct {
+	Title      string
+	Cfheader   string
+	XRequestID string
+	CspRandom  string
+	TimeYears  string
+	AppName    string
+}
+
+templ (c Component) Head() {
 	<head>
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -14,9 +23,9 @@ templ Head(cspRandom, title string) {
 		// When a client visits the website, they would receive CSS/JS files with names like "randomuuid.css" or "hash.js", where the randomuuid or hash portion is secure dynamically generated.
 		// This unique identifier could be associated with client-specific information like IP address, User-Agent, and other relevant factors.
 		<link rel="stylesheet" href="/styles/css/raw.css"/>
-		<script src="/styles/js/htmx.min.js" nonce={ cspRandom }></script>
+		<script src="/styles/js/htmx.min.js" nonce={ c.CspRandom }></script>
 		@cSS()
-		<title>{ title }</title>
+		<title>{ c.Title }</title>
 	</head>
 }
 

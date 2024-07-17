@@ -6,15 +6,15 @@
 
 package site
 
-templ Header(appName string) {
+templ (c Component) Header() {
 	<header class="bg-white dark:bg-gray-800 shadow-md py-4">
 		<div class="container mx-auto flex justify-between items-center">
 			<a href="/" class="flex items-center">
 				// Logo + Header
 				// TODO: Move this along with footer by implement another package frontend such as panel for manage (e.g, REST APIs this repo), 
 				// monitoring (e.g, K8S and Controller), etc.
-				<img src="/styles/images/logo/gopher-run.png" alt={ appName + " Logo" } class="h-12 md:h-16"/>
-				<span class="text-2xl md:text-3xl font-semibold ml-2 text-gray-900 dark:text-white">{ appName }</span>
+				<img src="/styles/images/logo/gopher-run.png" alt={ c.AppName + " Logo" } class="h-12 md:h-16"/>
+				<span class="text-2xl md:text-3xl font-semibold ml-2 text-gray-900 dark:text-white">{ c.AppName }</span>
 			</a>
 			<button
 				id="theme-toggle"
