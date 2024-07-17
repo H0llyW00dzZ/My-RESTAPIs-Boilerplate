@@ -50,6 +50,9 @@ func handleError(c *fiber.Ctx, e *fiber.Error, vd *viewData) error {
 	case fiber.StatusUnauthorized:
 		vd.title = fiber.ErrUnauthorized.Message + " - " + c.App().Config().AppName
 		return vd.PageUnauthorizeHandler(c)
+	case fiber.StatusBadRequest:
+		vd.title = fiber.ErrBadRequest.Message + " - " + c.App().Config().AppName
+		return vd.PageBadRequestHandler(c)
 	default:
 		vd.title = PageInternalServerError + " - " + c.App().Config().AppName
 		return vd.Page500InternalServerHandler(c)
@@ -99,6 +102,12 @@ func (v *viewData) PageServiceUnavailableHandler(c *fiber.Ctx) error {
 func (v *viewData) PageUnauthorizeHandler(c *fiber.Ctx) error {
 	component := PageUnauthorize401(*v) // magic pointer.
 	return v.renderAndSend(c, fiber.StatusUnauthorized, component)
+}
+
+// PageBadRequestHandler handles 400 Bad Request.
+func (v *viewData) PageBadRequestHandler(c *fiber.Ctx) error {
+	component := PageBadRequest400(*v) // magic pointer.
+	return v.renderAndSend(c, fiber.StatusBadRequest, component)
 }
 
 // GenericErrorInternalServerHandler handles Generic 500 Internal Server errors.
