@@ -7,10 +7,10 @@ package site
 
 var onceClientJSSide = templ.NewOnceHandle()
 
-templ ScriptJSClientSide(cspRandom string) {
+templ (c Component) ScriptJSClientSide() {
 	@onceClientJSSide.Once() {
-		<script src="/styles/js/tailwind.min.dark.js" nonce={ cspRandom }></script>
-		<script src="/styles/js/htmx.indicator.min.js" nonce={ cspRandom }></script>
+		<script src="/styles/js/tailwind.min.dark.js" nonce={ c.CspRandom }></script>
+		<script src="/styles/js/htmx.indicator.min.js" nonce={ c.CspRandom }></script>
 		// TODO: Handle Cloudflare rocket loader js (idk whatever it is) it got Refused because it violates the following Content Security Policy hahaha.
 	}
 }
