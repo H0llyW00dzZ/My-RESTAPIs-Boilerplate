@@ -102,8 +102,9 @@ func handleAPIError(c *fiber.Ctx, e *fiber.Error) error {
 	// Customize API error handling, e.g., JSON responses with appropriate status codes.
 	switch e.Code {
 	case fiber.StatusNotFound, fiber.StatusForbidden,
-		fiber.StatusServiceUnavailable, fiber.StatusUnauthorized:
-		// Return a JSON response for 404, 403, 503, 401 errors in versioned APIs
+		fiber.StatusServiceUnavailable, fiber.StatusUnauthorized,
+		fiber.StatusBadRequest:
+		// Return a JSON response for 404, 403, 503, 401, 400 errors in versioned APIs
 		return helper.SendErrorResponse(c, e.Code, e.Message)
 	default:
 		return helper.SendErrorResponse(c, fiber.StatusInternalServerError, "Internal Server Error")
@@ -133,6 +134,10 @@ func handleFrontendError(c *fiber.Ctx, e *fiber.Error, vd *viewData) error {
 		// Render the 401 error page for frontend routes
 		vd.title = fiber.ErrUnauthorized.Message + " - " + c.App().Config().AppName
 		return vd.PageUnauthorizeHandler(c)
+	case fiber.StatusBadRequest:
+		// Render the 400 error page for frontend routes
+		vd.title = fiber.ErrBadRequest.Message + " - " + c.App().Config().AppName
+		return vd.PageBadRequestHandler(c)
 	default:
 		vd.title = PageInternalServerError + " - " + c.App().Config().AppName
 		// Fallback to the general error page for other errors in frontend routes
