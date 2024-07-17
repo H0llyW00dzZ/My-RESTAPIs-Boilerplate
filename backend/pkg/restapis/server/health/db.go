@@ -24,6 +24,8 @@ type Response struct {
 // DBHandler is a Fiber handler that checks the health of the database and Redis.
 // It logs the user activity and the health status of MySQL and Redis.
 // The detailed health statistics are returned as a structured JSON response.
+//
+// TODO: Implement a Frontend (HTMX+TEMPL) Server-Side Rendering version, instead of JSON (boring), it possible, plus it can streaming from database -> HTML hahahaha.
 func DBHandler(db database.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Note: It is important to call this when using encrypted cookies.
@@ -31,7 +33,10 @@ func DBHandler(db database.Service) fiber.Handler {
 		// Additionally, use encryption from Boring TLS 1.3 when it's available, which is a better approach.
 		c.SendString("value=" + c.Cookies("GhoperCookie"))
 		// Get the IP address from the request context
-		ipAddress := c.IP()
+		ipAddress := c.Get(CloudflareConnectingIPHeader)
+		if ipAddress == "" {
+			ipAddress = c.IP()
+		}
 
 		// Initialize the valid filters slice using the fiber.Storage and IP address
 		initValidFiltersSlice(db.FiberStorage(), ipAddress)
