@@ -30,5 +30,5 @@ const (
 
 // job represents a unit of work for the worker pool.
 type job struct {
-	c *fiber.Ctx // this optional it can bound to other.
+	c *fiber.Ctx // this optional it can bound to other (e.g, database for streaming html hahaha).
 }
