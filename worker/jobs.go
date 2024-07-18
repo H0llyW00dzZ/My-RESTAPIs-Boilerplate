@@ -18,6 +18,13 @@ var (
 
 const (
 	// NumWorkers it for set how many worker, for example I am using 100 worker
+	// that used for handle high traffic + large go application (600+ files) not waste memory.
+	//
+	// Also note that there is the price:
+	//
+	// 100 worker = 100mb ~ 150mb++ memory consumed (Approx)
+	//
+	// under 50 worker still consider cheap.
 	NumWorkers = 5
 )
 
