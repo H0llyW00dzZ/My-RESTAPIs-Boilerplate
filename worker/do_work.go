@@ -29,7 +29,7 @@ type Pool struct {
 
 // NewDoWork creates a new pool and do work just like human being.
 //
-// Note: This requried global variable for example put this in somewhere:
+// Note: This required global variable for example put this in somewhere:
 //
 //	var pool = worker.NewDoWork()
 //
