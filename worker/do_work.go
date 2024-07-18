@@ -33,7 +33,21 @@ type Pool struct {
 //
 //	var pool = worker.NewDoWork()
 //
-// also note that this safe and idiom go.
+// Then Call it Example:
+//
+//	func myWorkerDoingStreaming(c *fiber.Ctx) error {
+//		streamingHTML, err := pool.Submit(c)
+//		  if err != nil {
+//			 // handle error you poggers
+//		  }
+//
+//		 // Send the response
+//		c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+//		// Send the rendered HTML content as a response with the appropriate status code.
+//		return c.Status(statusCode).SendString(buf.String())
+//	}
+//
+// Also note that this safe and idiom go.
 func NewDoWork() *Pool {
 	ctx, cancel := context.WithCancel(context.Background())
 	wp := &Pool{
