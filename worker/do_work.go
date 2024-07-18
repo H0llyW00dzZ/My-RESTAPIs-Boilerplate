@@ -21,8 +21,8 @@ type Pool struct {
 	cancel     context.CancelFunc
 	wg         sync.WaitGroup // Use a single WaitGroup for both startup & shutdown
 	jobs       chan job
-	results    chan string
-	activeJobs int32 // Track the number of active jobs
+	results    chan string // TODO: Improve this, instead of string.
+	activeJobs int32       // Track the number of active jobs
 	isRunning  uint32
 	mu         sync.Mutex
 }
