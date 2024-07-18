@@ -84,6 +84,7 @@ func (wp *Pool) Start() {
 	if !atomic.CompareAndSwapUint32(&wp.isRunning, 0, 1) {
 		return
 	}
+	// Note: this used std logger, due it not possible import internal package in the backend to outside (not allowed).
 	log.Print("Worker pool started.")
 	go func() {
 		defer atomic.StoreUint32(&wp.isRunning, 0)
