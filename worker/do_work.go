@@ -117,7 +117,7 @@ func (wp *Pool) Start() {
 		wp.wg.Wait()
 
 		for {
-			time.Sleep(1 * time.Second) // Check for idleness every second
+			time.Sleep(DefaultWorkerSleepTime) // Check for idleness every second
 			if atomic.LoadInt32(&wp.activeJobs) == 0 {
 				wp.Stop()
 				return // Exit the loop when the pool is stopped

@@ -7,6 +7,7 @@ package worker
 
 import (
 	"errors"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -26,6 +27,13 @@ const (
 	//
 	// under 50 worker still consider cheap.
 	NumWorkers = 5
+)
+
+// Default Worker Configuration
+const (
+	// Note: This Recommended and Suitable for handling long traffic
+	// (e.g, long request http till next billion years then it stop), high traffic, a perfect scheduler, other worker (e.g, background).
+	DefaultWorkerSleepTime = 1 * time.Second
 )
 
 // job represents a unit of work for the worker pool.
