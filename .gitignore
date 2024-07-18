@@ -21,6 +21,8 @@ tmp/
 # IDE specific files
 .vscode
 .idea
+# https://idx.google.com it's free
+.idx
 
 # .env file
 .env
