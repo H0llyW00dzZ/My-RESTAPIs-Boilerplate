@@ -110,6 +110,13 @@ func (wp *Pool) Start() {
 			go func() {
 				defer wp.wg.Done() // Signal when a worker is ready
 				// Important: Put Function here so they will starting doing work just like human being
+				//
+				// Example:
+				//
+				// 	JobsStreaming(wp.ctx, wp.jobs, wp.results)
+				//
+				// Also note that result currently only supported string.
+
 			}()
 		}
 
