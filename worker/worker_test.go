@@ -1,0 +1,108 @@
+// Copyright (c) 2024 H0llyW00dz All rights reserved.
+//
+// By accessing or using this software, you agree to be bound by the terms
+// of the License Agreement, which you can find at LICENSE files.
+
+package worker_test
+
+import (
+	"context"
+	"errors"
+	"h0llyw00dz-template/worker"
+	"testing"
+	"time"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+// MockJob is a simple job implementation for testing.
+type MockJob struct {
+	result string
+	err    error
+}
+
+// Execute simulates job execution.
+func (j *MockJob) Execute(ctx context.Context) (string, error) {
+	return j.result, j.err
+}
+
+func TestPool_Submit(t *testing.T) {
+	pool := worker.NewDoWork()
+
+	// Register a test job
+	pool.RegisterJob("testJob", func(c *fiber.Ctx) worker.Job {
+		return &MockJob{result: "worker failed to get something from job", err: nil}
+	})
+
+	// Submit a job and verify the result
+	result, err := pool.Submit(nil, "testJob")
+	if err != nil {
+		t.Fatalf("Unexpected error during job submission: %v", err)
+	}
+	if result != "worker failed to get something from job" {
+		t.Errorf("Expected result 'worker failed to get something from job', got %s", result)
+	}
+
+	// Submit a job that returns an error
+	pool.RegisterJob("errorJob", func(c *fiber.Ctx) worker.Job {
+		return &MockJob{result: "", err: errors.New("worker failed to get something from job")}
+	})
+
+	result, err = pool.Submit(nil, "errorJob")
+	if err == nil {
+		t.Errorf("Expected error during job submission, but got nil")
+	}
+	if result != "" {
+		t.Errorf("Expected empty result, got %s", result)
+	}
+	if err.Error() != worker.ErrFailedToGetSomething.Error() {
+		t.Errorf("Expected error message 'test error', got %s", err.Error())
+	}
+
+	// Submit a job that does not exist
+	result, err = pool.Submit(nil, "nonexistentJob")
+	if err == nil {
+		t.Errorf("Expected error during job submission, but got nil")
+	}
+	if result != "" {
+		t.Errorf("Expected empty result, got %s", result)
+	}
+	if err.Error() != "job not found: nonexistentJob" {
+		t.Errorf("Expected error message 'job not found: nonexistentJob', got %s", err.Error())
+	}
+}
+
+// Example test for the worker loop
+// Note: This is a basic example. You should write more comprehensive tests
+// covering different scenarios, edge cases, and potential race conditions.
+func TestPool_WorkerLoop(t *testing.T) {
+	pool := worker.NewDoWork()
+
+	// Register a test job that takes some time to execute
+	pool.RegisterJob("slowJob", func(c *fiber.Ctx) worker.Job {
+		return &MockJob{result: "slow result", err: nil}
+	})
+
+	// Start the pool
+	pool.Start()
+
+	// Submit a few jobs
+	for i := 0; i < 5; i++ {
+		result, err := pool.Submit(nil, "slowJob")
+		if err != nil {
+			t.Fatalf("Unexpected error during job submission: %v", err)
+		}
+		if result != "slow result" {
+			t.Errorf("Expected result 'slow result', got %s", result)
+		}
+	}
+
+	// Wait for a short period to allow the jobs to be processed
+	time.Sleep(100 * time.Millisecond)
+
+	// Stop the pool
+	pool.Stop()
+
+	// Wait for the worker loop to exit (this might be necessary depending on your test setup)
+	time.Sleep(worker.DefaultWorkerSleepTime)
+}

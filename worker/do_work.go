@@ -7,6 +7,7 @@ package worker
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"sync"
 	"sync/atomic"
@@ -20,11 +21,15 @@ type Pool struct {
 	ctx        context.Context
 	cancel     context.CancelFunc
 	wg         sync.WaitGroup // Use a single WaitGroup for both startup & shutdown
-	jobs       chan job
-	results    chan string // TODO: Improve this, instead of string.
-	activeJobs int32       // Track the number of active jobs
+	jobs       chan Job       // Queue for jobs
+	results    chan string    // Results channel, TODO: Improve this, instead of string.
+	activeJobs int32          // Track the number of active jobs
 	isRunning  uint32
 	mu         sync.Mutex
+	// Store registered job functions
+	//
+	// Note: this optional it can bound to other instead of [fiber.Ctx] (e.g, database for streaming html hahaha).
+	registeredJobs map[string]func(*fiber.Ctx) Job
 }
 
 // NewDoWork creates a new pool and do work just like human being.
@@ -51,14 +56,15 @@ type Pool struct {
 func NewDoWork() *Pool {
 	ctx, cancel := context.WithCancel(context.Background())
 	wp := &Pool{
-		ctx:        ctx,
-		cancel:     cancel,
-		wg:         sync.WaitGroup{},
-		jobs:       make(chan job, NumWorkers),
-		results:    make(chan string, NumWorkers),
-		activeJobs: 0,
-		isRunning:  0,
-		mu:         sync.Mutex{},
+		ctx:            ctx,
+		cancel:         cancel,
+		wg:             sync.WaitGroup{},
+		jobs:           make(chan Job, NumWorkers),
+		results:        make(chan string, NumWorkers),
+		activeJobs:     0,
+		isRunning:      0,
+		mu:             sync.Mutex{},
+		registeredJobs: make(map[string]func(*fiber.Ctx) Job),
 	}
 	return wp
 }
@@ -77,20 +83,29 @@ func (wp *Pool) Stop() {
 }
 
 // Submit a job to the worker pool
-func (wp *Pool) Submit(c *fiber.Ctx) (string, error) {
+func (wp *Pool) Submit(c *fiber.Ctx, jobName string) (string, error) {
 	if atomic.LoadUint32(&wp.isRunning) == 0 {
 		wp.Start()
+	}
+
+	wp.mu.Lock()
+	jobFunc, ok := wp.registeredJobs[jobName]
+	wp.mu.Unlock()
+
+	if !ok {
+		return "", fmt.Errorf("%w: %s", ErrJobsNotFound, jobName)
 	}
 
 	atomic.AddInt32(&wp.activeJobs, 1)        // Increment job counter
 	defer atomic.AddInt32(&wp.activeJobs, -1) // Decrement on function exit
 
-	wp.jobs <- job{c: c}
-	something := <-wp.results
-	if something == "" {
+	job := jobFunc(c)
+	wp.jobs <- job
+	result := <-wp.results
+	if result == "" {
 		return "", ErrFailedToGetSomething
 	}
-	return something, nil
+	return result, nil
 }
 
 // Start a job to the worker pool
@@ -109,14 +124,15 @@ func (wp *Pool) Start() {
 		for w := 0; w < NumWorkers; w++ {
 			go func() {
 				defer wp.wg.Done() // Signal when a worker is ready
-				// Important: Put Function here so they will starting doing work just like human being
-				//
-				// Example:
-				//
-				// 	JobsStreaming(wp.ctx, wp.jobs, wp.results)
-				//
-				// Also note that result currently only supported string.
-
+				for job := range wp.jobs {
+					result, err := job.Execute(wp.ctx)
+					if err != nil {
+						log.Printf("Error executing job: %v", err)
+						wp.results <- "" // Signal error
+					} else {
+						wp.results <- result
+					}
+				}
 			}()
 		}
 
@@ -131,4 +147,17 @@ func (wp *Pool) Start() {
 			}
 		}
 	}()
+}
+
+// RegisterJob adds a new job function to the pool.
+//
+// Example:
+//
+//	pool.RegisterJob("myStreamingJob", func(c *fiber.Ctx) Job {
+//	    return &MyStreamingJob{c: c}
+//	})
+func (wp *Pool) RegisterJob(name string, jobFunc func(*fiber.Ctx) Job) {
+	wp.mu.Lock()
+	defer wp.mu.Unlock()
+	wp.registeredJobs[name] = jobFunc
 }

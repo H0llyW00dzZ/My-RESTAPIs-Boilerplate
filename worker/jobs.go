@@ -6,15 +6,16 @@
 package worker
 
 import (
+	"context"
 	"errors"
 	"time"
-
-	"github.com/gofiber/fiber/v2"
 )
 
 var (
 	// ErrFailedToGetSomething is returned when failed to get something..
 	ErrFailedToGetSomething = errors.New("worker failed to get something from job")
+	// ErrJobsNotFound is returned when a job with the specified name is not registered with the worker pool.
+	ErrJobsNotFound = errors.New("job not found")
 )
 
 const (
@@ -38,7 +39,8 @@ const (
 	DefaultWorkerSleepTime = 1 * time.Second
 )
 
-// job represents a unit of work for the worker pool.
-type job struct {
-	c *fiber.Ctx // this optional it can bound to other (e.g, database for streaming html hahaha).
+// Job represents a unit of work for the worker pool.
+type Job interface {
+	// Execute runs the job, returning a result (or an error if it failed)
+	Execute(ctx context.Context) (string, error)
 }
