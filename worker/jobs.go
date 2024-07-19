@@ -32,7 +32,9 @@ const (
 // Default Worker Configuration
 const (
 	// Note: This Recommended and Suitable for handling long traffic
-	// (e.g, long request http till next billion years then it stop), high traffic, a perfect scheduler, other worker (e.g, background).
+	// (e.g, long request http till next billion years then it stop),
+	// high traffic (e.g, many request incoming from different client source, unlike long traffic),
+	// a perfect scheduler (e.g, 24/7 automated updated value for example in database), other worker (e.g, background, assistant garbage collector).
 	DefaultWorkerSleepTime = 1 * time.Second
 )
 
