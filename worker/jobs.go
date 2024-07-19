@@ -54,6 +54,25 @@ type Job interface {
 //	pool.RegisterJob("myStreamingJob", func(c *fiber.Ctx) worker.Job {
 //	    return &MyStreamingJob{c: c}
 //	})
+//
+// Example with Init (Recommended then put in somewhere):
+//
+//	func init() {
+//		pool.RegisterJob("myStreamingJob", func(c *fiber.Ctx) worker.Job {
+//			return &MyStreamingJob{c: c}
+//		})
+//	}
+//
+// Execute the job:
+//
+//	func (s *MyStreamingJob) Execute(ctx context.Context) (string, error) {
+//		// Your Function Poggers...
+//		return "", worker.ErrFailedToGetSomething
+//	}
+//
+// Then call the worker.Submit see (worker.NewDoWork).
+//
+// Note: New design it more flexibility, unlike previous design.
 func (wp *Pool) RegisterJob(name string, jobFunc func(*fiber.Ctx) Job) {
 	wp.mu.Lock()
 	defer wp.mu.Unlock()
