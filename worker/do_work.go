@@ -148,16 +148,3 @@ func (wp *Pool) Start() {
 		}
 	}()
 }
-
-// RegisterJob adds a new job function to the pool.
-//
-// Example:
-//
-//	pool.RegisterJob("myStreamingJob", func(c *fiber.Ctx) worker.Job {
-//	    return &MyStreamingJob{c: c}
-//	})
-func (wp *Pool) RegisterJob(name string, jobFunc func(*fiber.Ctx) Job) {
-	wp.mu.Lock()
-	defer wp.mu.Unlock()
-	wp.registeredJobs[name] = jobFunc
-}

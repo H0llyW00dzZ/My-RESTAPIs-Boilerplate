@@ -9,6 +9,8 @@ import (
 	"context"
 	"errors"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 var (
@@ -43,4 +45,17 @@ const (
 type Job interface {
 	// Execute runs the job, returning a result (or an error if it failed)
 	Execute(ctx context.Context) (string, error)
+}
+
+// RegisterJob adds a new job function to the pool.
+//
+// Example:
+//
+//	pool.RegisterJob("myStreamingJob", func(c *fiber.Ctx) worker.Job {
+//	    return &MyStreamingJob{c: c}
+//	})
+func (wp *Pool) RegisterJob(name string, jobFunc func(*fiber.Ctx) Job) {
+	wp.mu.Lock()
+	defer wp.mu.Unlock()
+	wp.registeredJobs[name] = jobFunc
 }
