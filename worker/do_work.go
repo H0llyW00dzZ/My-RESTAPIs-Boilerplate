@@ -131,6 +131,7 @@ func (wp *Pool) Start() {
 						wp.results <- "" // Signal error
 					} else {
 						wp.results <- result
+						log.Printf("worker finished job with result: %s", result)
 					}
 				}
 			}()
