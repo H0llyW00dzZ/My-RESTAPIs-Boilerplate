@@ -153,7 +153,7 @@ func (wp *Pool) Start() {
 //
 // Example:
 //
-//	pool.RegisterJob("myStreamingJob", func(c *fiber.Ctx) Job {
+//	pool.RegisterJob("myStreamingJob", func(c *fiber.Ctx) worker.Job {
 //	    return &MyStreamingJob{c: c}
 //	})
 func (wp *Pool) RegisterJob(name string, jobFunc func(*fiber.Ctx) Job) {
