@@ -55,7 +55,7 @@ type Job interface {
 //	    return &MyStreamingJob{c: c}
 //	})
 //
-// Example with Init (Recommended then put in somewhere):
+// Example with Init (Recommended when put in somewhere e.g, outside of worker package):
 //
 //	func init() {
 //		pool.RegisterJob("myStreamingJob", func(c *fiber.Ctx) worker.Job {
