@@ -13,6 +13,7 @@ import (
 	"h0llyw00dz-template/backend/internal/database"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -188,11 +189,16 @@ func (s *FiberServer) MakeHTTPRequest(req *http.Request) (*http.Response, error)
 	}
 
 	// Create an HTTP client with the custom TLS configuration
-	// TODO: HTTP/2 ?
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: tlsConfig,
+			// Note: This should be enough for HTTP Client in the backend server.
+			MaxIdleConns:          25,
+			IdleConnTimeout:       5 * time.Second,
+			ResponseHeaderTimeout: 5 * time.Second,
+			ForceAttemptHTTP2:     true,
 		},
+		Timeout: 10 * time.Second,
 	}
 
 	// Send the HTTP request using the client
