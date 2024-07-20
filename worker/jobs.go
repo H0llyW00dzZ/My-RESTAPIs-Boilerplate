@@ -74,6 +74,7 @@ type Job interface {
 //
 // Note: The new design is more flexible (unlike previous design) and eliminates the need for explicit mutex locks/unlocks when implementing the [Execute] function.
 // This is because the use of channels and atomic operations in the worker pool ensures that data is accessed and modified safely without the risk of data races.
+//
 // In general, it's important to remember the following principles when working with shared memory and concurrency in Go:
 //   - Don't communicate by sharing memory; share memory by communicating.
 //     This means using channels or other synchronization primitives to communicate and exchange data between goroutines, rather than directly accessing shared memory locations.
