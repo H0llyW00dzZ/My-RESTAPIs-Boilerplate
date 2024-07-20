@@ -72,9 +72,11 @@ type Job interface {
 //
 // Then call the worker.Submit see (worker.NewDoWork).
 //
-// Note: The new design is more flexible (unlike previous design) and eliminates the need for explicit mutex locks/unlocks when implementing the [Execute] function. This is because the use of channels and atomic operations in the worker pool ensures that data is accessed and modified safely without the risk of data races.
+// Note: The new design is more flexible (unlike previous design) and eliminates the need for explicit mutex locks/unlocks when implementing the [Execute] function.
+// This is because the use of channels and atomic operations in the worker pool ensures that data is accessed and modified safely without the risk of data races.
 // In general, it's important to remember the following principles when working with shared memory and concurrency in Go:
-//   - Don't communicate by sharing memory; share memory by communicating. This means using channels or other synchronization primitives to communicate and exchange data between goroutines, rather than directly accessing shared memory locations.
+//   - Don't communicate by sharing memory; share memory by communicating.
+//     This means using channels or other synchronization primitives to communicate and exchange data between goroutines, rather than directly accessing shared memory locations.
 //   - Use atomic operations to modify shared data safely. Atomic operations guarantee that each access to the shared data is atomic, meaning that the value of the data is always consistent.
 //   - Use synchronization primitives such as mutexes or channels to control access to shared resources and prevent data races.
 func (wp *Pool) RegisterJob(name string, jobFunc func(*fiber.Ctx) Job) {
