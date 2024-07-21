@@ -119,3 +119,39 @@ func TestPool_WorkerLoop(t *testing.T) {
 	// Wait for the worker loop to exit (this might be necessary depending on your test setup)
 	time.Sleep(worker.DefaultWorkerSleepTime)
 }
+
+// coverage should be 100% now.
+func TestPool_StartStopLoopZ(t *testing.T) {
+	pool := worker.NewDoWork()
+
+	// Register a test job that takes some time to execute
+	pool.RegisterJob("testJob", func(c *fiber.Ctx) worker.Job {
+		return &MockJob{result: "test result", err: nil}
+	})
+
+	// Submit & Start Job the pool
+	pool.Submit(nil, "testJob")
+
+	// Verify that the pool is running
+	if !pool.IsRunning() {
+		t.Error("Expected pool to be running")
+	}
+
+	// Start Again the pool
+	pool.Start()
+
+	// Wait for a short period to allow the jobs to be processed
+	time.Sleep(100 * time.Millisecond)
+
+	// Stop the pool
+	pool.Stop()
+
+	// Wait for the worker loop to exit.
+	time.Sleep(worker.DefaultWorkerSleepTime)
+
+	// Verify that the pool is stopped
+	if pool.IsRunning() {
+		t.Error("Expected pool to be stopped")
+	}
+
+}

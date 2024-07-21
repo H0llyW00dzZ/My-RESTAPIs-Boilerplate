@@ -149,3 +149,10 @@ func (wp *Pool) Start() {
 		}
 	}()
 }
+
+// IsRunning checks if the worker pool is currently running.
+//
+// It returns true if the pool is running, false otherwise.
+func (wp *Pool) IsRunning() bool {
+	return atomic.LoadUint32(&wp.isRunning) == 1
+}
