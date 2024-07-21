@@ -17,19 +17,20 @@ import (
 )
 
 // Pool manages a pool of goroutines for work.
-type Pool struct {
+type Pool[T any] struct {
 	ctx        context.Context
 	cancel     context.CancelFunc
 	wg         sync.WaitGroup // Use a single WaitGroup for both startup & shutdown
-	jobs       chan Job       // Queue for jobs
-	results    chan string    // Results channel, TODO: Improve this, instead of string.
+	jobs       chan Job[T]    // Queue for jobs
+	results    chan T         // Results channel, now generic, it more easier instead of only string.
+	errors     chan error     // Error channel collections
 	activeJobs int32          // Track the number of active jobs
 	isRunning  uint32
 	mu         sync.Mutex
 	// Store registered job functions
 	//
 	// Note: this optional it can bound to other instead of [fiber.Ctx] (e.g, database for streaming html hahaha).
-	registeredJobs map[string]func(*fiber.Ctx) Job
+	registeredJobs map[string]func(*fiber.Ctx) Job[T]
 }
 
 // NewDoWork creates a new pool and do work just like human being.
@@ -53,24 +54,25 @@ type Pool struct {
 //	}
 //
 // Also note that this safe and idiom go.
-func NewDoWork() *Pool {
+func NewDoWork[T any]() *Pool[T] {
 	ctx, cancel := context.WithCancel(context.Background())
-	wp := &Pool{
+	wp := &Pool[T]{
 		ctx:            ctx,
 		cancel:         cancel,
 		wg:             sync.WaitGroup{},
-		jobs:           make(chan Job, NumWorkers),
-		results:        make(chan string, NumWorkers),
+		jobs:           make(chan Job[T], NumWorkers),
+		results:        make(chan T, NumWorkers),
 		activeJobs:     0,
 		isRunning:      0,
 		mu:             sync.Mutex{},
-		registeredJobs: make(map[string]func(*fiber.Ctx) Job),
+		registeredJobs: make(map[string]func(*fiber.Ctx) Job[T]),
+		errors:         make(chan error, NumWorkers),
 	}
 	return wp
 }
 
 // Stop gracefully shuts down the worker pool
-func (wp *Pool) Stop() {
+func (wp *Pool[T]) Stop() {
 	if atomic.CompareAndSwapUint32(&wp.isRunning, 1, 0) {
 		wp.mu.Lock()
 		defer wp.mu.Unlock()
@@ -83,7 +85,7 @@ func (wp *Pool) Stop() {
 }
 
 // Submit a job to the worker pool
-func (wp *Pool) Submit(c *fiber.Ctx, jobName string) (string, error) {
+func (wp *Pool[T]) Submit(c *fiber.Ctx, jobName string) (T, error) {
 	if atomic.LoadUint32(&wp.isRunning) == 0 {
 		wp.Start()
 	}
@@ -93,7 +95,8 @@ func (wp *Pool) Submit(c *fiber.Ctx, jobName string) (string, error) {
 	wp.mu.Unlock()
 
 	if !ok {
-		return "", fmt.Errorf("%w: %s", ErrJobsNotFound, jobName)
+		var zero T // Might want to return an appropriate "zero" value for generic type here.
+		return zero, fmt.Errorf("%w: %s", ErrJobsNotFound, jobName)
 	}
 
 	atomic.AddInt32(&wp.activeJobs, 1)        // Increment job counter
@@ -101,15 +104,16 @@ func (wp *Pool) Submit(c *fiber.Ctx, jobName string) (string, error) {
 
 	job := jobFunc(c)
 	wp.jobs <- job
-	result := <-wp.results
-	if result == "" {
-		return "", ErrFailedToGetSomething
+	select {
+	case result := <-wp.results:
+		return result, nil
+	case err := <-wp.errors:
+		return *new(T), err // Return the zero value of T and the error
 	}
-	return result, nil
 }
 
 // Start a job to the worker pool
-func (wp *Pool) Start() {
+func (wp *Pool[T]) Start() {
 	if !atomic.CompareAndSwapUint32(&wp.isRunning, 0, 1) {
 		return
 	}
@@ -128,10 +132,10 @@ func (wp *Pool) Start() {
 					result, err := job.Execute(wp.ctx)
 					if err != nil {
 						log.Printf("Error executing job: %v", err)
-						wp.results <- "" // Signal error
+						wp.errors <- err // Signal error
 					} else {
 						wp.results <- result
-						log.Printf("worker finished job with result: %s", result)
+						log.Printf("worker finished job with result: %v", result)
 					}
 				}
 			}()
@@ -153,6 +157,6 @@ func (wp *Pool) Start() {
 // IsRunning checks if the worker pool is currently running.
 //
 // It returns true if the pool is running, false otherwise.
-func (wp *Pool) IsRunning() bool {
+func (wp *Pool[T]) IsRunning() bool {
 	return atomic.LoadUint32(&wp.isRunning) == 1
 }

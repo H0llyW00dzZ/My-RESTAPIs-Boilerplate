@@ -16,22 +16,22 @@ import (
 )
 
 // MockJob is a simple job implementation for testing.
-type MockJob struct {
-	result string
+type MockJob[T any] struct {
+	result T
 	err    error
 }
 
 // Execute simulates job execution.
-func (j *MockJob) Execute(ctx context.Context) (string, error) {
+func (j *MockJob[T]) Execute(ctx context.Context) (T, error) {
 	return j.result, j.err
 }
 
 func TestPool_Submit(t *testing.T) {
-	pool := worker.NewDoWork()
+	pool := worker.NewDoWork[string]()
 
 	// Register a test job
-	pool.RegisterJob("testJob", func(c *fiber.Ctx) worker.Job {
-		return &MockJob{result: "worker failed to get something from job", err: nil}
+	pool.RegisterJob("testJob", func(c *fiber.Ctx) worker.Job[string] {
+		return &MockJob[string]{result: "worker failed to get something from job", err: nil}
 	})
 
 	// Submit a job and verify the result
@@ -44,8 +44,8 @@ func TestPool_Submit(t *testing.T) {
 	}
 
 	// Submit a job that returns an error
-	pool.RegisterJob("errorJob", func(c *fiber.Ctx) worker.Job {
-		return &MockJob{result: "", err: errors.New("worker failed to get something from job")}
+	pool.RegisterJob("errorJob", func(c *fiber.Ctx) worker.Job[string] {
+		return &MockJob[string]{result: "", err: errors.New("worker failed to get something from job")}
 	})
 
 	result, err = pool.Submit(nil, "errorJob")
@@ -89,11 +89,11 @@ func TestPool_Submit(t *testing.T) {
 //   - Latest: 140MB
 //   - Average: 164MB
 func TestPool_WorkerLoop(t *testing.T) {
-	pool := worker.NewDoWork()
+	pool := worker.NewDoWork[string]()
 
 	// Register a test job that takes some time to execute
-	pool.RegisterJob("slowJob", func(c *fiber.Ctx) worker.Job {
-		return &MockJob{result: "slow result", err: nil}
+	pool.RegisterJob("slowJob", func(c *fiber.Ctx) worker.Job[string] {
+		return &MockJob[string]{result: "slow result", err: nil}
 	})
 
 	// Start the pool
@@ -122,11 +122,11 @@ func TestPool_WorkerLoop(t *testing.T) {
 
 // coverage should be 100% now.
 func TestPool_StartStopLoopZ(t *testing.T) {
-	pool := worker.NewDoWork()
+	pool := worker.NewDoWork[string]()
 
 	// Register a test job that takes some time to execute
-	pool.RegisterJob("testJob", func(c *fiber.Ctx) worker.Job {
-		return &MockJob{result: "test result", err: nil}
+	pool.RegisterJob("testJob", func(c *fiber.Ctx) worker.Job[string] {
+		return &MockJob[string]{result: "test result", err: nil}
 	})
 
 	// Submit & Start Job the pool
