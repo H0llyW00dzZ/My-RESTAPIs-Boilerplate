@@ -62,11 +62,11 @@ func NewDoWork[T any]() *Pool[T] {
 		wg:             sync.WaitGroup{},
 		jobs:           make(chan Job[T], NumWorkers),
 		results:        make(chan T, NumWorkers),
+		errors:         make(chan error, NumWorkers),
 		activeJobs:     0,
 		isRunning:      0,
 		mu:             sync.Mutex{},
 		registeredJobs: make(map[string]func(*fiber.Ctx) Job[T]),
-		errors:         make(chan error, NumWorkers),
 	}
 	return wp
 }
