@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"h0llyw00dz-template/worker"
+	"math/rand"
 	"testing"
 	"time"
 
@@ -93,6 +94,8 @@ func TestPool_WorkerLoop(t *testing.T) {
 
 	// Register a test job that takes some time to execute
 	pool.RegisterJob("slowJob", func(c *fiber.Ctx) worker.Job[string] {
+		// Simulate some work (potentially with random delays)
+		time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
 		return &MockJob[string]{result: "slow result", err: nil}
 	})
 
@@ -111,7 +114,7 @@ func TestPool_WorkerLoop(t *testing.T) {
 	}
 
 	// Wait for a short period to allow the jobs to be processed
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
 
 	// Stop the pool
 	pool.Stop()
@@ -141,7 +144,7 @@ func TestPool_StartStopLoopZ(t *testing.T) {
 	pool.Start()
 
 	// Wait for a short period to allow the jobs to be processed
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
 
 	// Stop the pool
 	pool.Stop()
