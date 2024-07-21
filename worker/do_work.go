@@ -23,7 +23,7 @@ type Pool[T any] struct {
 	wg         sync.WaitGroup // Use a single WaitGroup for both startup & shutdown
 	jobs       chan Job[T]    // Queue for jobs
 	results    chan T         // Results channel, now generic, it more easier instead of only string.
-	errors     chan error     // Error channel collections
+	errors     chan error     // Error channel collections, each worker had their own error channel for communication same as results channel (e.g, 1000 worker/goroutines then 1000 error).
 	activeJobs int32          // Track the number of active jobs
 	isRunning  uint32
 	mu         sync.Mutex
