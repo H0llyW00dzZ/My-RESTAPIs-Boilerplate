@@ -37,7 +37,7 @@ type Pool[T any] struct {
 //
 // Note: This required global variable for example put this in somewhere:
 //
-//	var pool = worker.NewDoWork()
+//	var pool = worker.NewDoWork[string]()
 //
 // Then Call it Example:
 //

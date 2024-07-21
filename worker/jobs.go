@@ -51,23 +51,28 @@ type Job[T any] interface {
 //
 // Example:
 //
-//	pool.RegisterJob("myStreamingJob", func(c *fiber.Ctx) worker.Job {
-//	    return &MyStreamingJob{c: c}
+//	pool.RegisterJob("myStreamingJob", func(c *fiber.Ctx) worker.Job[string] {
+//	    return &MyStreamingJob[string]{c: c}
 //	})
 //
 // Example with Init (Recommended when put in somewhere e.g, outside of worker package):
 //
 //	func init() {
-//		pool.RegisterJob("myStreamingJob", func(c *fiber.Ctx) worker.Job {
-//			return &MyStreamingJob{c: c}
+//		pool.RegisterJob("myStreamingJob", func(c *fiber.Ctx) worker.Job[string] {
+//			return &MyStreamingJob[string]{c: c}
 //		})
 //	}
 //
 // Execute the job:
 //
-//	func (s *MyStreamingJob) Execute(ctx context.Context) (string, error) {
+//	func (s *MyStreamingJob[T]) Execute(ctx context.Context) (T, error) {
+//
 //		// Your Function Poggers...
-//		return "", worker.ErrFailedToGetSomething
+//	    // Perform the job logic here
+//	    // For example, make database queries, process data, or interact with external services.
+//
+//	    // Return the result of the job and an error if any.
+//	    return someResult, nil // Replace someResult with the actual result of your job.
 //	}
 //
 // Then call the worker.Submit see (worker.NewDoWork).
