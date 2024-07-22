@@ -125,7 +125,7 @@ func TestPool_WorkerLoop(t *testing.T) {
 
 // coverage should be 100% now.
 func TestPool_StartStopLoopZ(t *testing.T) {
-	pool := worker.NewDoWork[string]()
+	pool := worker.NewDoWork(worker.WithNumWorkers[string](1))
 
 	// Register a test job that takes some time to execute
 	pool.RegisterJob("testJob", func(c *fiber.Ctx) worker.Job[string] {
