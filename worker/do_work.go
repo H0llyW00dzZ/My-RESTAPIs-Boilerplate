@@ -24,6 +24,7 @@ type Pool[T any] struct {
 	jobs       chan Job[T]    // Queue for jobs
 	results    chan T         // Results channel, now generic, it more easier instead of only string.
 	errors     chan error     // Error channel collections, each worker had their own error channel for communication same as results channel (e.g, 1000 worker/goroutines then 1000 error).
+	numWorkers int            // Store the number of workers
 	activeJobs int32          // Track the number of active jobs
 	isRunning  uint32
 	mu         sync.Mutex
@@ -54,7 +55,9 @@ type Pool[T any] struct {
 //	}
 //
 // Also note that this safe and idiom go.
-func NewDoWork[T any]() *Pool[T] {
+// NewDoWorkOption defines a functional option for configuring the worker pool.
+// NewDoWork creates a new pool and do work just like human being.
+func NewDoWork[T any](opts ...NewDoWorkOption[T]) *Pool[T] {
 	ctx, cancel := context.WithCancel(context.Background())
 	wp := &Pool[T]{
 		ctx:            ctx,
@@ -63,11 +66,18 @@ func NewDoWork[T any]() *Pool[T] {
 		jobs:           make(chan Job[T], NumWorkers),
 		results:        make(chan T, NumWorkers),
 		errors:         make(chan error, NumWorkers),
+		numWorkers:     NumWorkers,
 		activeJobs:     0,
 		isRunning:      0,
 		mu:             sync.Mutex{},
 		registeredJobs: make(map[string]func(*fiber.Ctx) Job[T]),
 	}
+
+	// Apply functional options
+	for _, opt := range opts {
+		opt(wp)
+	}
+
 	return wp
 }
 
@@ -124,8 +134,8 @@ func (wp *Pool[T]) Start() {
 		defer log.Print("Worker pool exiting.")
 
 		// Use the WaitGroup to wait for workers to start
-		wp.wg.Add(NumWorkers)
-		for w := 0; w < NumWorkers; w++ {
+		wp.wg.Add(wp.numWorkers)
+		for w := 0; w < wp.numWorkers; w++ {
 			go func() {
 				defer wp.wg.Done() // Signal when a worker is ready
 				for job := range wp.jobs {
