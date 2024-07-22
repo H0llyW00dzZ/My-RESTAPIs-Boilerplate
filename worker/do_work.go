@@ -55,8 +55,6 @@ type Pool[T any] struct {
 //	}
 //
 // Also note that this safe and idiom go.
-// NewDoWorkOption defines a functional option for configuring the worker pool.
-// NewDoWork creates a new pool and do work just like human being.
 func NewDoWork[T any](opts ...NewDoWorkOption[T]) *Pool[T] {
 	ctx, cancel := context.WithCancel(context.Background())
 	wp := &Pool[T]{
