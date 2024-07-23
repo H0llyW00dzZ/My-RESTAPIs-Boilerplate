@@ -161,7 +161,7 @@ func (wp *Pool[T]) Start() {
 
 		// Idle worker monitoring and shutdown logic SHOULD BE HERE!
 		// Wait for all workers to signal they are ready
-		//wp.wg.Wait() //<- This was the issue. Move this inside the loop!
+		wp.wg.Wait() //<- This Correct reallocation for long-running (e.g, zer0-downtime, till next billion years) task.
 
 		for {
 			time.Sleep(DefaultWorkerSleepTime) // Check for idleness every second
@@ -171,7 +171,7 @@ func (wp *Pool[T]) Start() {
 			}
 			// Now we wait for all workers to be done before checking if
 			// we need to shut down
-			wp.wg.Wait()
+			//wp.wg.Wait() // <- This will be problem for long running-task, so disabled by commented out here.
 		}
 	}()
 }
