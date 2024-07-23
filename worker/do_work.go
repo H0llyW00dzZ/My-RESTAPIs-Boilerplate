@@ -161,7 +161,7 @@ func (wp *Pool[T]) Start() {
 
 		// Idle worker monitoring and shutdown logic SHOULD BE HERE!
 		// Wait for all workers to signal they are ready
-		wp.wg.Wait() //<- This Correct reallocation for long-running (e.g, zer0-downtime, till next billion years) task.
+		wp.wg.Wait() // <- This Correct reallocation for long-running (e.g, zer0-downtime, till next billion years, handling http traffic "keep-alive") task.
 
 		for {
 			time.Sleep(DefaultWorkerSleepTime) // Check for idleness every second
@@ -171,7 +171,10 @@ func (wp *Pool[T]) Start() {
 			}
 			// Now we wait for all workers to be done before checking if
 			// we need to shut down
-			//wp.wg.Wait() // <- This will be problem for long running-task, so disabled by commented out here.
+			// Note: This will be problematic (e.g, crash cause the caller (other goroutine) sending to closed channel) for long running-task for example when the worker pool has shutdown
+			// there is no chance for the caller (other goroutine) to submit/start again when implement the execute function,
+			// unless application must be restart (e.g, shutdown then start again), so disabled by commented out here.
+			//wp.wg.Wait() // <- Disabled due it problematic for long-running task.
 		}
 	}()
 }
