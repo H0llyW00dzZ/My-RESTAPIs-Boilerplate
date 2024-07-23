@@ -149,14 +149,30 @@ func (wp *Pool[T]) Start() {
 		for w := 0; w < wp.numWorkers; w++ {
 			go func() {
 				defer wp.wg.Done() // Signal when a worker is ready
-				for job := range wp.jobs {
-					result, err := job.Execute(wp.ctx)
-					if err != nil {
-						log.Printf("Error executing job: %v", err)
-						wp.errors <- err // Signal error
-					} else {
-						wp.results <- result
-						log.Printf("worker finished job with result: %v", result)
+				for {
+					select {
+					case job, ok := <-wp.jobs:
+						// Check if the channel is closed
+						if !ok {
+							return // Exit the worker goroutine
+						}
+						result, err := job.Execute(wp.ctx)
+						if err != nil {
+							log.Printf("Error executing job: %v", err)
+
+							// Safe error sending: check if the pool is still running
+							if wp.IsRunning() {
+								wp.errors <- err // Signal error
+							}
+						} else {
+							// Safe result sending
+							if wp.IsRunning() {
+								wp.results <- result
+								log.Printf("worker finished job with result: %v", result)
+							}
+						}
+					case <-wp.ctx.Done(): // Listen for context cancellation for shutdown
+						return
 					}
 				}
 			}()
