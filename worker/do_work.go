@@ -29,6 +29,8 @@ type Pool[T any] struct {
 	isRunning  uint32
 	mu         sync.Mutex
 	// Store registered job functions
+	//
+	// Note: this optional it can bound to other instead of [fiber.Ctx] (e.g, database for streaming html hahaha).
 	registeredJobs map[string]func(*fiber.Ctx) Job[T]
 
 	// Channel options
