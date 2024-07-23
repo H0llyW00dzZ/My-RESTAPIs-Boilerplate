@@ -29,9 +29,12 @@ type Pool[T any] struct {
 	isRunning  uint32
 	mu         sync.Mutex
 	// Store registered job functions
-	//
-	// Note: this optional it can bound to other instead of [fiber.Ctx] (e.g, database for streaming html hahaha).
 	registeredJobs map[string]func(*fiber.Ctx) Job[T]
+
+	// Channel options
+	jobChannelOpts    []ChanOption[Job[T]]
+	resultChannelOpts []ChanOption[T]
+	errorChannelOpts  []ChanOption[error]
 }
 
 // NewDoWork creates a new pool and do work just like human being.
@@ -61,20 +64,25 @@ func NewDoWork[T any](opts ...NewDoWorkOption[T]) *Pool[T] {
 		ctx:            ctx,
 		cancel:         cancel,
 		wg:             sync.WaitGroup{},
-		jobs:           make(chan Job[T], NumWorkers),
-		results:        make(chan T, NumWorkers),
-		errors:         make(chan error, NumWorkers),
 		numWorkers:     NumWorkers,
 		activeJobs:     0,
 		isRunning:      0,
 		mu:             sync.Mutex{},
 		registeredJobs: make(map[string]func(*fiber.Ctx) Job[T]),
+
+		// Initialize channels with default options
+		jobs:    make(chan Job[T], NumWorkers),
+		results: make(chan T, NumWorkers),
+		errors:  make(chan error, NumWorkers),
 	}
 
 	// Apply functional options
 	for _, opt := range opts {
 		opt(wp)
 	}
+
+	// Apply channel options
+	wp.applyChanOptions()
 
 	return wp
 }
@@ -149,8 +157,9 @@ func (wp *Pool[T]) Start() {
 			}()
 		}
 
+		// Idle worker monitoring and shutdown logic SHOULD BE HERE!
 		// Wait for all workers to signal they are ready
-		wp.wg.Wait()
+		//wp.wg.Wait() //<- This was the issue. Move this inside the loop!
 
 		for {
 			time.Sleep(DefaultWorkerSleepTime) // Check for idleness every second
@@ -158,6 +167,9 @@ func (wp *Pool[T]) Start() {
 				wp.Stop()
 				return // Exit the loop when the pool is stopped
 			}
+			// Now we wait for all workers to be done before checking if
+			// we need to shut down
+			wp.wg.Wait()
 		}
 	}()
 }
@@ -167,4 +179,31 @@ func (wp *Pool[T]) Start() {
 // It returns true if the pool is running, false otherwise.
 func (wp *Pool[T]) IsRunning() bool {
 	return atomic.LoadUint32(&wp.isRunning) == 1
+}
+
+// applyChanOptions applies the configured channel options.
+func (wp *Pool[T]) applyChanOptions() {
+	for _, opt := range wp.jobChannelOpts {
+		wp.applyChanOption(wp.jobs, opt)
+	}
+	for _, opt := range wp.resultChannelOpts {
+		wp.applyChanOption(wp.results, opt)
+	}
+	for _, opt := range wp.errorChannelOpts {
+		wp.applyChanOption(wp.errors, opt)
+	}
+}
+
+// applyChanOption applies a channel option to a channel.
+func (wp *Pool[T]) applyChanOption(ch any, opt any) {
+	switch o := opt.(type) {
+	case ChanOption[Job[T]]:
+		o(ch.(chan Job[T]))
+	case ChanOption[T]:
+		o(ch.(chan T))
+	case ChanOption[error]:
+		o(ch.(chan error))
+	default:
+		panic(fmt.Sprintf("unsupported channel option type: %T", opt))
+	}
 }

@@ -6,8 +6,6 @@
 package worker
 
 // NewDoWorkOption defines a functional option for configuring the worker pool.
-//
-// TODO: Improve this, which it should be configurable for another channel as well (e.g, jobs, results, errors) instead of explicit.
 type NewDoWorkOption[T any] func(*Pool[T])
 
 // WithNumWorkers sets the number of workers in the pool.
@@ -16,5 +14,38 @@ type NewDoWorkOption[T any] func(*Pool[T])
 //
 //	pool := worker.NewDoWork(worker.WithNumWorkers[uint32](10))
 func WithNumWorkers[T any](numWorkers int) NewDoWorkOption[T] {
-	return func(wp *Pool[T]) { wp.numWorkers = numWorkers }
+	return func(wp *Pool[T]) {
+		wp.numWorkers = numWorkers
+	}
+}
+
+// ChanOption defines a functional option for configuring channels.
+type ChanOption[C any] func(ch chan C)
+
+// WithJobChannelOptions configures the job channel.
+func WithJobChannelOptions[T any](opts ...ChanOption[Job[T]]) NewDoWorkOption[T] {
+	return func(wp *Pool[T]) {
+		wp.jobChannelOpts = opts
+	}
+}
+
+// WithResultChannelOptions configures the results channel.
+func WithResultChannelOptions[T any](opts ...ChanOption[T]) NewDoWorkOption[T] {
+	return func(wp *Pool[T]) {
+		wp.resultChannelOpts = opts
+	}
+}
+
+// WithErrorChannelOptions configures the errors channel.
+func WithErrorChannelOptions[T any](opts ...ChanOption[error]) NewDoWorkOption[T] {
+	return func(wp *Pool[T]) {
+		wp.errorChannelOpts = opts
+	}
+}
+
+// WithChanBuffer sets the buffer size of a channel.
+func WithChanBuffer[C any](bufferSize int) ChanOption[C] {
+	return func(ch chan C) {
+		ch = make(chan C, bufferSize)
+	}
 }

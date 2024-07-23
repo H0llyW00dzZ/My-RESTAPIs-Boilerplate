@@ -18,12 +18,16 @@ import (
 
 // MockJob is a simple job implementation for testing.
 type MockJob[T any] struct {
-	result T
-	err    error
+	result    T
+	err       error
+	sleepTime time.Duration
 }
 
 // Execute simulates job execution.
 func (j *MockJob[T]) Execute(ctx context.Context) (T, error) {
+	if j.sleepTime > 0 {
+		time.Sleep(j.sleepTime)
+	}
 	return j.result, j.err
 }
 
@@ -123,13 +127,17 @@ func TestPool_WorkerLoop(t *testing.T) {
 	time.Sleep(worker.DefaultWorkerSleepTime)
 }
 
-// coverage should be 100% now.
 func TestPool_StartStopLoopZ(t *testing.T) {
-	pool := worker.NewDoWork(worker.WithNumWorkers[string](1))
+	pool := worker.NewDoWork(
+		worker.WithNumWorkers[string](1),
+		worker.WithJobChannelOptions(worker.WithChanBuffer[worker.Job[string]](1)),
+		worker.WithResultChannelOptions(worker.WithChanBuffer[string](1)),
+		worker.WithErrorChannelOptions[string](),
+	)
 
 	// Register a test job that takes some time to execute
 	pool.RegisterJob("testJob", func(c *fiber.Ctx) worker.Job[string] {
-		return &MockJob[string]{result: "test result", err: nil}
+		return &MockJob[string]{result: "test result", sleepTime: time.Millisecond * 50}
 	})
 
 	// Submit & Start Job the pool
@@ -137,13 +145,13 @@ func TestPool_StartStopLoopZ(t *testing.T) {
 
 	// Verify that the pool is running
 	if !pool.IsRunning() {
-		t.Error("Expected pool to be running")
+		t.Error("Expected pool to be running after job submission")
 	}
 
-	// Start Again the pool
+	// Attempt to start the pool again (should be a no-op)
 	pool.Start()
 
-	// Wait for a short period to allow the jobs to be processed
+	// Wait for a short period to allow the job to be processed
 	time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
 
 	// Stop the pool
@@ -154,7 +162,7 @@ func TestPool_StartStopLoopZ(t *testing.T) {
 
 	// Verify that the pool is stopped
 	if pool.IsRunning() {
-		t.Error("Expected pool to be stopped")
+		t.Error("Expected pool to be stopped after Stop()")
 	}
 
 }
