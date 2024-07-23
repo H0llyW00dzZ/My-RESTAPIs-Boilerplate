@@ -132,7 +132,7 @@ func TestPool_StartStopLoopZ(t *testing.T) {
 		worker.WithNumWorkers[string](1),
 		worker.WithJobChannelOptions(worker.WithChanBuffer[worker.Job[string]](1)),
 		worker.WithResultChannelOptions(worker.WithChanBuffer[string](1)),
-		worker.WithErrorChannelOptions[string](),
+		worker.WithErrorChannelOptions[string](worker.WithChanBuffer[error](1)),
 	)
 
 	// Register a test job that takes some time to execute
