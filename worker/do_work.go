@@ -37,6 +37,8 @@ type Pool[T any] struct {
 	jobChannelOpts    []ChanOption[Job[T]]
 	resultChannelOpts []ChanOption[T]
 	errorChannelOpts  []ChanOption[error]
+	// Configurable idle check interval
+	idleCheckInterval time.Duration
 }
 
 // NewDoWork creates a new pool and do work just like human being.
@@ -73,9 +75,10 @@ func NewDoWork[T any](opts ...NewDoWorkOption[T]) *Pool[T] {
 		registeredJobs: make(map[string]func(*fiber.Ctx) Job[T]),
 
 		// Initialize channels with default options
-		jobs:    make(chan Job[T], NumWorkers),
-		results: make(chan T, NumWorkers),
-		errors:  make(chan error, NumWorkers),
+		jobs:              make(chan Job[T], NumWorkers),
+		results:           make(chan T, NumWorkers),
+		errors:            make(chan error, NumWorkers),
+		idleCheckInterval: DefaultWorkerSleepTime, // Default value
 	}
 
 	// Apply functional options
@@ -146,14 +149,30 @@ func (wp *Pool[T]) Start() {
 		for w := 0; w < wp.numWorkers; w++ {
 			go func() {
 				defer wp.wg.Done() // Signal when a worker is ready
-				for job := range wp.jobs {
-					result, err := job.Execute(wp.ctx)
-					if err != nil {
-						log.Printf("Error executing job: %v", err)
-						wp.errors <- err // Signal error
-					} else {
-						wp.results <- result
-						log.Printf("worker finished job with result: %v", result)
+				for {
+					select {
+					case job, ok := <-wp.jobs:
+						// Check if the channel is closed
+						if !ok {
+							return // Exit the worker goroutine
+						}
+						result, err := job.Execute(wp.ctx)
+						if err != nil {
+							log.Printf("Error executing job: %v", err)
+
+							// Safe error sending: check if the pool is still running
+							if wp.IsRunning() {
+								wp.errors <- err // Signal error
+							}
+						} else {
+							// Safe result sending
+							if wp.IsRunning() {
+								wp.results <- result
+								log.Printf("worker finished job with result: %v", result)
+							}
+						}
+					case <-wp.ctx.Done(): // Listen for context cancellation for shutdown
+						return
 					}
 				}
 			}()
@@ -163,11 +182,16 @@ func (wp *Pool[T]) Start() {
 		// Wait for all workers to signal they are ready
 		wp.wg.Wait() // <- This Correct reallocation for long-running (e.g, zer0-downtime, till next billion years, handling http traffic "keep-alive") task.
 
+		idleTicker := time.NewTicker(wp.idleCheckInterval) // Use default or configured
+		defer idleTicker.Stop()
+
 		for {
-			time.Sleep(DefaultWorkerSleepTime) // Check for idleness every second
-			if atomic.LoadInt32(&wp.activeJobs) == 0 {
-				wp.Stop()
-				return // Exit the loop when the pool is stopped
+			select { // Check for idleness every second if use default or configured
+			case <-idleTicker.C:
+				if atomic.LoadInt32(&wp.activeJobs) == 0 {
+					wp.Stop()
+					return // Exit the loop when the pool is stopped
+				}
 			}
 			// Now we wait for all workers to be done before checking if
 			// we need to shut down
@@ -200,6 +224,8 @@ func (wp *Pool[T]) applyChanOptions() {
 }
 
 // applyChanOption applies a channel option to a channel.
+//
+// Note: This not using pointer that's why it implement this function
 func (wp *Pool[T]) applyChanOption(ch any, opt any) {
 	switch o := opt.(type) {
 	case ChanOption[Job[T]]:

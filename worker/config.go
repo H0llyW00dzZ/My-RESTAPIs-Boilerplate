@@ -5,6 +5,8 @@
 
 package worker
 
+import "time"
+
 // NewDoWorkOption defines a functional option for configuring the worker pool.
 type NewDoWorkOption[T any] func(*Pool[T])
 
@@ -47,5 +49,13 @@ func WithErrorChannelOptions[T any](opts ...ChanOption[error]) NewDoWorkOption[T
 func WithChanBuffer[C any](bufferSize int) ChanOption[C] {
 	return func(ch chan C) {
 		ch = make(chan C, bufferSize)
+	}
+}
+
+// WithIdleCheckInterval sets the interval at which the worker pool checks
+// for idleness and potentially shuts down.
+func WithIdleCheckInterval[T any](interval time.Duration) NewDoWorkOption[T] {
+	return func(wp *Pool[T]) {
+		wp.idleCheckInterval = interval
 	}
 }
