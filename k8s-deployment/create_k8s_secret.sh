@@ -9,6 +9,9 @@
 #              (Note: Base64 automated by kubectl, when your k8s had HSM it will encrypted as well).
 # Important:  Run this script where kubectl is installed. 
 #             This script Required HSM and the format must be like "key=value", then run it where kubectl installed.
+#
+# Known Bugs (Bash bug): The following value format will cause issues: "key=value-value-value:value%!@value(value:value)/value?tls=value" it won't work       
+#                        also note that it cannot be fixed with regular expressions due it bash problem (even it's possible, it just too complex), It might work-wells in unix-shellz.
 
 # --- Configuration ---
 ENV_FILE="worker-secret.txt" # Your secret file in "key=value" format (e.g, .env).
