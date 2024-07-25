@@ -137,6 +137,8 @@ func registerRouteConfigMiddleware(app *fiber.App) {
 // as it eliminates the need for multiple containers. It also supports integration with the Kubernetes ecosystem,
 // such as pointing to CNAME/NS or manually (if not using Kubernetes).
 // Also note that For TLS certificates, a wildcard/advanced certificate is required.
+//
+// TODO: Consider moving this middleware into a separate package for better maintainability. This might involve creating a new repository.
 func DomainRouter(hosts map[string]*Host) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		host := hosts[c.Hostname()]
