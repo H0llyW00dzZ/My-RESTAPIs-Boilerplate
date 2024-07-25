@@ -12,3 +12,5 @@ data:
   ssl-protocols: TLSv1.3
   use-upstream-server-addr: "true" # pretty useful for communication through internal mode (e.g, private cluster, never exposed to service)
 kind: ConfigMap
+name: ingress-nginx-controller # this optional due it can be customized, basically it just reference before sailing
+namespace: ingress-nginx # this optional due it can be customized, basically it just reference before sailing
