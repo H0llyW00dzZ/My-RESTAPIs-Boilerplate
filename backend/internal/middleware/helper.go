@@ -768,8 +768,9 @@ func WithSwaggerCacheAge(cacheAge int) func(*swagger.Config) {
 //	*redirect.Config: Sets the Next function for the redirect middleware.
 //	*swagger.Config: Sets the Next function for the Swagger middleware.
 //	*validator.Config: Sets the Next function for the Validator middleware.
+//	*healthcheck.Config: Sets the Next function for the HealthZ Check middleware.
 //
-// The Next function takes a *fiber.Ctx as a parameter and returns a boolean value.
+// The Next function takes a [fiber.Ctx] as a parameter and returns a boolean value.
 // If the Next function returns true, the middleware will be skipped for the current request.
 //
 // Example usage:
@@ -798,6 +799,9 @@ func WithSwaggerCacheAge(cacheAge int) func(*swagger.Config) {
 //
 //	// Use the WithNext option function to set the Next function for the Validator middleware
 //	validatorMiddleware := NewValidatorMiddleware(WithNext(customNext))
+//
+//	// Use the WithNext option function to set the Next function for the HealthZ Check middleware
+//	healthzcheckMiddleware := NewHealthZCheck(WithNext(customNext))
 //
 // Note:
 //   - If an unsupported middleware configuration is passed to WithNext, it will panic with an error message.
