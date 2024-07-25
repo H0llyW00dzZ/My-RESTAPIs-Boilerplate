@@ -24,6 +24,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
+	"github.com/gofiber/fiber/v2/middleware/healthcheck"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/idempotency"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
@@ -705,4 +706,27 @@ func NewRequestIDMiddleware(options ...any) fiber.Handler {
 
 	// Return the request ID middleware.
 	return requestIDMiddleware
+}
+
+// NewHealthZCheck creates a new HealthZ Check middleware for the Fiber web framework.
+//
+// The HealthZ Check middleware is used to perform health checks on the application and its dependencies.
+// It is particularly useful in cloud environments to ensure the application is functioning correctly and
+// to monitor its health status.
+func NewHealthZCheck(options ...any) fiber.Handler {
+	// Create a new health check middleware configuration.
+	config := healthcheck.Config{}
+
+	// Apply any additional options to the HealthZ Check configuration.
+	for _, option := range options {
+		if optFunc, ok := option.(func(*healthcheck.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create the health check middleware with the configured options.
+	healthzCheckMiddleware := healthcheck.New(config)
+
+	// Return the health check middleware.
+	return healthzCheckMiddleware
 }
