@@ -23,6 +23,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
+	"github.com/gofiber/fiber/v2/middleware/healthcheck"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/idempotency"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
@@ -816,6 +817,8 @@ func WithNext(next func(c *fiber.Ctx) bool) any {
 			cfg.Next = next
 		case *validator.Config:
 			cfg.Next = next
+		case *healthcheck.Config:
+			cfg.Next = next
 		default:
 			panic(fmt.Sprintf("unsupported config type: %T", config))
 		}
@@ -996,4 +999,32 @@ func digest(clientIP string) string {
 	digest := h.Sum(nil)
 
 	return fmt.Sprintf("%x", digest)
+}
+
+// WithLivenessProbe is an option function for NewHealthZCheck that sets the liveness probe function.
+func WithLivenessProbe(livenessProbe healthcheck.HealthChecker) func(*healthcheck.Config) {
+	return func(config *healthcheck.Config) {
+		config.LivenessProbe = livenessProbe
+	}
+}
+
+// WithLivenessEndpoint is an option function for NewHealthZCheck that sets the HTTP endpoint for the liveness probe.
+func WithLivenessEndpoint(livenessEndpoint string) func(*healthcheck.Config) {
+	return func(config *healthcheck.Config) {
+		config.LivenessEndpoint = livenessEndpoint
+	}
+}
+
+// WithReadinessProbe is an option function for NewHealthZCheck that sets the readiness probe function.
+func WithReadinessProbe(readinessProbe healthcheck.HealthChecker) func(*healthcheck.Config) {
+	return func(config *healthcheck.Config) {
+		config.ReadinessProbe = readinessProbe
+	}
+}
+
+// WithReadinessEndpoint is an option function for NewHealthZCheck that sets the HTTP endpoint for the readiness probe.
+func WithReadinessEndpoint(readinessEndpoint string) func(*healthcheck.Config) {
+	return func(config *healthcheck.Config) {
+		config.ReadinessEndpoint = readinessEndpoint
+	}
 }
