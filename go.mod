@@ -5,7 +5,7 @@ go 1.22.5
 require (
 	github.com/H0llyW00dzZ/FiberValidator v0.5.2
 	github.com/a-h/templ v0.2.747
-	github.com/ansrivas/fiberprometheus/v2 v2.6.1
+	github.com/ansrivas/fiberprometheus/v2 v2.7.0
 	github.com/bytedance/sonic v1.11.9
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.26.6
@@ -57,7 +57,6 @@ require (
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/go-openapi/validate v0.24.0 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
-	github.com/gofiber/adaptor/v2 v2.2.1 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
