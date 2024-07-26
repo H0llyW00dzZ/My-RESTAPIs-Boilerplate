@@ -6,7 +6,6 @@
 package middleware
 
 import (
-	"fmt"
 	"runtime/debug"
 
 	"github.com/gofiber/fiber/v2"
@@ -44,41 +43,7 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 	)
 
 	// Create a custom middleware to set the CSP header
-	//
-	// Note: This safe and secure, not possible to spoof/bypass due it designed backend at top level,
-	// even it's possible to try spoof/bypass, however browser will validate, and other Controller
-	// (e.g, cloudflare for frontend, and nginx for controller load balancer) will validate as well.
-	//
-	// TODO: Consider moving this middleware into a separate package for better maintainability. This might involve creating a new repository.
-	cspMiddleware := func(c *fiber.Ctx) error {
-		clientIP := c.Get(log.CloudflareConnectingIPHeader)
-		if clientIP == "" {
-			clientIP = c.IP()
-		}
-		cloudflareRayID := c.Get(log.CloudflareRayIDHeader)
-		if cloudflareRayID != "" {
-			clientIP += " - Cloudflare detected - Ray ID: " + cloudflareRayID
-		}
-		countryCode := c.Get(log.CloudflareIPCountryHeader)
-		if countryCode != "" {
-			clientIP += ", Country: " + countryCode
-		}
-
-		// Digest a visitor
-		digest := digest(clientIP)
-
-		c.Locals("csp_random", digest)
-
-		// Set the CSP header
-		//
-		// Important: Since this CSP header uses a direct digest (using SHA256) without base64 encoding plus immutable. which is idiomatic way.
-		// When using base64 encoding, consider storing the base64 encoded in c.Locals first or somewhere (e.g, database). Avoid fetching the value from
-		// the header and then putting it in the render or direct in the render, as the format will be different due to sanitization.
-		c.Set("Content-Security-Policy", fmt.Sprintf("script-src 'nonce-%s'", digest))
-
-		// Continue to the next middleware/route handler
-		return c.Next()
-	}
+	cspMiddleware := NewCSPHeaderGenerator()
 
 	// Hosts
 	hosts := map[string]*Host{}

@@ -6,9 +6,9 @@
 package middleware
 
 import (
-	"crypto/sha256"
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
+	"h0llyw00dz-template/backend/internal/middleware/csp"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
 	"hash/fnv"
 	"time"
@@ -199,10 +199,44 @@ func WithKeyLookup(keyLookup string) func(*keyauth.Config) {
 	}
 }
 
-// WithContextKey is an option function for NewKeyAuthMiddleware that sets a custom context key.
-func WithContextKey(contextKey string) func(*keyauth.Config) {
-	return func(config *keyauth.Config) {
-		config.ContextKey = contextKey
+// WithContextKey is an option function that sets the context key for storing and retrieving data in the request context.
+//
+// It supports the following middleware configurations:
+//
+//	*keyauth.Config: Sets the context key for the Key Auth middleware.
+//	*csp.Config: Sets the context key for the CSP Header Generator middleware.
+//
+// The context key is a string value that is used to store and retrieve data in the request context.
+// It should be a unique and descriptive key to avoid conflicts with other middleware or application data.
+//
+// Example usage:
+//
+//	// Use the WithContextKey option function to set the context key for the Key Auth middleware
+//	keyAuthMiddleware := NewKeyAuthMiddleware(WithContextKey("keyauth-data"))
+//
+//	// Use the WithContextKey option function to set the context key for the CSP Header Generator middleware
+//	cspHeaderGeneratorMiddleware := NewCSPHeaderGenerator(WithContextKey("csp-data"))
+//
+//	// In the middleware handler or application code, you can access the data using the context key
+//	func handler(c *fiber.Ctx) error {
+//	    keyAuthData := c.Locals(keyAuthContextKey)
+//	    cspData := c.Locals(cspContextKey)
+//	    // ...
+//	}
+//
+// Note:
+//   - If an unsupported middleware configuration is passed to WithContextKey, it will panic with an error message.
+//   - Additional context key functionality for other middlewares will be added based on future requirements.
+func WithContextKey(contextKey string) any {
+	return func(config any) {
+		switch cfg := config.(type) {
+		case *keyauth.Config:
+			cfg.ContextKey = contextKey
+		case *csp.Config:
+			cfg.ContextKey = contextKey
+		default:
+			panic(fmt.Sprintf("unsupported config type: %T", config))
+		}
 	}
 }
 
@@ -769,6 +803,7 @@ func WithSwaggerCacheAge(cacheAge int) func(*swagger.Config) {
 //	*swagger.Config: Sets the Next function for the Swagger middleware.
 //	*validator.Config: Sets the Next function for the Validator middleware.
 //	*healthcheck.Config: Sets the Next function for the HealthZ Check middleware.
+//	*csp.Config: Sets the Next function for the CSP Header Generator middleware.
 //
 // The Next function takes a [fiber.Ctx] as a parameter and returns a boolean value.
 // If the Next function returns true, the middleware will be skipped for the current request.
@@ -803,6 +838,9 @@ func WithSwaggerCacheAge(cacheAge int) func(*swagger.Config) {
 //	// Use the WithNext option function to set the Next function for the HealthZ Check middleware
 //	healthzcheckMiddleware := NewHealthZCheck(WithNext(customNext))
 //
+//	// Use the WithNext option function to set the Next function for the CSP Header Generator
+//	cspHeaderGeneratorMiddleware := NewCSPHeaderGenerator(WithNext(customNext))
+//
 // Note:
 //   - If an unsupported middleware configuration is passed to WithNext, it will panic with an error message.
 //   - Additional "Next" functionality for other middlewares will be added based on future requirements.
@@ -822,6 +860,8 @@ func WithNext(next func(c *fiber.Ctx) bool) any {
 		case *validator.Config:
 			cfg.Next = next
 		case *healthcheck.Config:
+			cfg.Next = next
+		case *csp.Config:
 			cfg.Next = next
 		default:
 			panic(fmt.Sprintf("unsupported config type: %T", config))
@@ -997,14 +1037,6 @@ func WithRequestIDGenerator(generator func() string) func(*requestid.Config) {
 	}
 }
 
-func digest(clientIP string) string {
-	h := sha256.New()
-	h.Write([]byte(clientIP))
-	digest := h.Sum(nil)
-
-	return fmt.Sprintf("%x", digest)
-}
-
 // WithLivenessProbe is an option function for NewHealthZCheck that sets the liveness probe function.
 func WithLivenessProbe(livenessProbe healthcheck.HealthChecker) func(*healthcheck.Config) {
 	return func(config *healthcheck.Config) {
@@ -1030,5 +1062,12 @@ func WithReadinessProbe(readinessProbe healthcheck.HealthChecker) func(*healthch
 func WithReadinessEndpoint(readinessEndpoint string) func(*healthcheck.Config) {
 	return func(config *healthcheck.Config) {
 		config.ReadinessEndpoint = readinessEndpoint
+	}
+}
+
+// WithRandomnessGenerator is an option function for NewCSPHeaderGenerator that sets the randomness generator function.
+func WithRandomnessGenerator(customRand func(string) string) func(*csp.Config) {
+	return func(config *csp.Config) {
+		config.RandomnessGenerator = customRand
 	}
 }

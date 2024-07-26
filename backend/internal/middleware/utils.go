@@ -12,6 +12,7 @@ import (
 	"time"
 
 	log "h0llyw00dz-template/backend/internal/logger"
+	"h0llyw00dz-template/backend/internal/middleware/csp"
 
 	validator "github.com/H0llyW00dzZ/FiberValidator"
 	"github.com/gofiber/contrib/swagger"
@@ -729,4 +730,27 @@ func NewHealthZCheck(options ...any) fiber.Handler {
 
 	// Return the health check middleware.
 	return healthzCheckMiddleware
+}
+
+// NewCSPHeaderGenerator creates a new Content Security Policy (CSP) header generator middleware for the Fiber web framework.
+//
+// The CSP header generator middleware is used to generate and set the Content Security Policy headers in the HTTP response.
+// It helps to prevent cross-site scripting (XSS), clickjacking, and other code injection attacks by specifying the allowed
+// sources of content and restricting the behavior of web pages.
+func NewCSPHeaderGenerator(options ...any) fiber.Handler {
+	// Create a new CSP configuration.
+	config := csp.Config{}
+
+	// Apply any additional options to the CSP configuration.
+	for _, option := range options {
+		if optFunc, ok := option.(func(*csp.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create a new CSP header generator with the configured options.
+	cspgenerator := csp.New(config)
+
+	// Return the CSP header generator middleware.
+	return cspgenerator
 }
