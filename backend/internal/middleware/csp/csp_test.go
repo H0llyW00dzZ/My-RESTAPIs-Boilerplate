@@ -65,7 +65,7 @@ func TestCSPMiddleware(t *testing.T) {
 		t.Errorf("Unexpected Content-Security-Policy header value: %s", resp.Header.Get("Content-Security-Policy"))
 	}
 
-	var responseBody map[string]interface{}
+	var responseBody map[string]any
 	err = json.NewDecoder(resp.Body).Decode(&responseBody)
 	if err != nil {
 		t.Fatalf("Failed to decode response body: %v", err)
