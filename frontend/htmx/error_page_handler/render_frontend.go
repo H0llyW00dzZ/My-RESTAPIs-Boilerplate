@@ -148,7 +148,7 @@ func (v *viewData) renderAndSend(c *fiber.Ctx, statusCode int, component templ.C
 	}
 
 	// Send the response
-	c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+	c.Set(fiber.HeaderContentType, fiber.MIMETextHTMLCharsetUTF8) // Suitable in HTTP/3 syncing with cloud load balancer
 	// Send the rendered HTML content as a response with the appropriate status code.
 	return c.Status(statusCode).SendString(buf.String())
 }
