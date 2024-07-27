@@ -87,6 +87,9 @@ type MySQLConfig struct {
 //
 // Best Practice: Maintaining a pool utilization of around 70% is generally considered healthy.
 // This balance helps ensure enough available connections while minimizing idle and stale connections.
+//
+// TODO: Improve this dynamically based on available resources by implementing a helper function that can be suitable in a cloud environment,
+// such as auto-pilot Kubernetes, for enhance [Zer0 Downtime].
 var maxConnections = 2 * runtime.NumCPU()
 
 // InitializeRedisClient initializes and returns a new Redis client.
