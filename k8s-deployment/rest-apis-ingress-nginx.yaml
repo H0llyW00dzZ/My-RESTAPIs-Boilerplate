@@ -29,6 +29,9 @@ metadata:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
+    nginx.ingress.kubernetes.io/http2: "false" # Enable / Disable HTTP/2 (Optional)
+    nginx.ingress.kubernetes.io/http3: "true" # Enable / Disable Enable HTTP/3 (Optional, However it recommended for HTMX Frontend)
+    # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS" # Use HTTPS for backend communication (Optional Recommended used priv8 CAs for this.)
 spec:
   ingressClassName: nginx
   rules:
