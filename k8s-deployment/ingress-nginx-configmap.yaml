@@ -11,6 +11,7 @@ data:
     $upstream_status $req_id'
   ssl-protocols: TLSv1.3
   use-upstream-server-addr: "true" # pretty useful for communication through internal mode (e.g, private cluster, never exposed to service)
+  generate-request-id: "false" # disable default nginx request-id generation as it is already handled by the fiber framework
 kind: ConfigMap
 name: ingress-nginx-controller # this optional due it can be customized, basically it just reference before sailing
 namespace: ingress-nginx # this optional due it can be customized, basically it just reference before sailing
