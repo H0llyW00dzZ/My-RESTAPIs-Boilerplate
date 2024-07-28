@@ -738,8 +738,8 @@ func NewHealthZCheck(options ...any) fiber.Handler {
 // It helps to prevent cross-site scripting (XSS), clickjacking, and other code injection attacks by specifying the allowed
 // sources of content and restricting the behavior of web pages.
 func NewCSPHeaderGenerator(options ...any) fiber.Handler {
-	// Create a new CSP configuration.
-	config := csp.Config{}
+	// Create a new CSP configuration with default values.
+	config := csp.DefaultConfig()
 
 	// Apply any additional options to the CSP configuration.
 	for _, option := range options {
