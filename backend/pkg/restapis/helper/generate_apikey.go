@@ -15,6 +15,9 @@ import (
 //
 //	length to specify the length of the random byte slice (default is 50)
 //	prefix to specify a custom prefix for the API key (default is "sk-")
+//
+// Note: When using this function for cryptographic purposes (e.g., encryption, decryption, or authenticated signing) by combining logic for enhances security,
+// consider setting the length to 32 instead of the default value of 50.
 func GenerateAPIKey(options ...any) string {
 	// Set the default length to 50 and default prefix to "sk-"
 	apiKeyLength := 50
@@ -36,7 +39,7 @@ func GenerateAPIKey(options ...any) string {
 	randomBytes := make([]byte, apiKeyLength)
 	_, err := rand.Read(randomBytes)
 	if err != nil {
-		// Note: this not possible.
+		// Note: This is not possible.
 		panic(err)
 	}
 
