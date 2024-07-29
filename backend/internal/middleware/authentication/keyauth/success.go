@@ -19,7 +19,7 @@ func SuccessKeyAuthHandler(c *fiber.Ctx) error {
 	//
 	// Note: This is not affected by CVE-2024-38513 (see https://github.com/gofiber/fiber/security/advisories/GHSA-98j2-3j3p-fw2v)
 	// because it retrieves the session from the local context storing it in a Redis database with an expiration time.
-	sess, ok := c.Locals("session").(*session.Session)
+	sess, ok := c.Locals(sessionKey).(*session.Session)
 	if !ok {
 		return fiber.ErrInternalServerError
 	}
@@ -27,8 +27,8 @@ func SuccessKeyAuthHandler(c *fiber.Ctx) error {
 	// Note: This is for encryption and works in conjunction with the session middleware logic.
 	// It is specifically useful for web front-end client-side authentication using session cookies (e.g., in browsers).
 	// Additionally, it is secure because it would require an 99999999999 cpu to attack this encryptcookie. 🤪
-	sess.Get("api_key")
-	sess.Get("api_key_expired")
+	sess.Get(apiKey)
+	sess.Get(apiKeyExpired)
 	log.LogUserActivity(c, "API key authenticated successfully")
 	return c.Next()
 }
