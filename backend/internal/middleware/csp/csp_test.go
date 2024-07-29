@@ -7,6 +7,7 @@ package csp_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"h0llyw00dz-template/backend/internal/middleware/csp"
 	"net/http/httptest"
 	"testing"
@@ -22,7 +23,7 @@ func TestCSPMiddleware(t *testing.T) {
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
-			"csp_random": c.Locals("csp_random"),
+			"message": "Hell0 W0rldz",
 		})
 	})
 
@@ -32,7 +33,8 @@ func TestCSPMiddleware(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
-	if resp.Header.Get("Content-Security-Policy") != "script-src 'nonce-37d7a80604871e579850a658c7add2ae7557d0c6abcc9b31ecddc4424207eba3'" {
+	expectedCSP := "script-src 'nonce-37d7a80604871e579850a658c7add2ae7557d0c6abcc9b31ecddc4424207eba3'"
+	if resp.Header.Get("Content-Security-Policy") != expectedCSP {
 		t.Errorf("Unexpected Content-Security-Policy header value: %s", resp.Header.Get("Content-Security-Policy"))
 	}
 	if resp.Header.Get("Content-Security-Policy") == "" {
@@ -45,6 +47,10 @@ func TestCSPMiddleware(t *testing.T) {
 			return "custom_randomness"
 		},
 		ContextKey: "custom_csp_key",
+		CSPValueGenerator: func(randomness string, customValues map[string]string) string {
+			customValues["default-src"] = "'self'"
+			return fmt.Sprintf("script-src 'nonce-%s' %s", randomness, customValues["default-src"])
+		},
 	}))
 
 	app.Get("/custom", func(c *fiber.Ctx) error {
@@ -61,7 +67,8 @@ func TestCSPMiddleware(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
-	if resp.Header.Get("Content-Security-Policy") != "script-src 'nonce-custom_randomness'" {
+	expectedCSP = "script-src 'nonce-custom_randomness' 'self'"
+	if resp.Header.Get("Content-Security-Policy") != expectedCSP {
 		t.Errorf("Unexpected Content-Security-Policy header value: %s", resp.Header.Get("Content-Security-Policy"))
 	}
 

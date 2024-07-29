@@ -8,6 +8,8 @@ package csp
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -30,7 +32,13 @@ type Config struct {
 	// It should be a unique and descriptive key to avoid conflicts with other middleware or application data.
 	//
 	// Optional. Default: "csp_random"
-	ContextKey string
+	ContextKey any
+
+	// CSPValueGenerator is a function that generates the CSP header value based on the provided randomness and custom values.
+	// It takes the generated randomness and a map of custom values as input and returns the desired CSP header value.
+	//
+	// Optional. Default: A default CSP value generator function provided by the CSP middleware.
+	CSPValueGenerator func(string, map[string]string) string
 }
 
 // DefaultConfig returns the default configuration for the CSP middleware.
@@ -39,6 +47,7 @@ func DefaultConfig() Config {
 		RandomnessGenerator: defaultRandomnessGenerator,
 		ContextKey:          "csp_random",
 		Next:                nil,
+		CSPValueGenerator:   defaultCSPValueGenerator,
 	}
 }
 
@@ -46,4 +55,15 @@ func DefaultConfig() Config {
 func defaultRandomnessGenerator(clientIP string) string {
 	hash := sha256.Sum256([]byte(clientIP))
 	return hex.EncodeToString(hash[:])
+}
+
+// defaultCSPValueGenerator generates the default CSP header value using the provided randomness and custom values.
+// It sets the 'script-src' directives with a nonce value based on the randomness.
+func defaultCSPValueGenerator(randomness string, customValues map[string]string) string {
+	var cspBuilder strings.Builder
+
+	// Add script-src directive
+	cspBuilder.WriteString(fmt.Sprintf("script-src 'nonce-%s'", randomness))
+
+	return cspBuilder.String()
 }

@@ -1071,3 +1071,12 @@ func WithRandomnessGenerator(customRand func(string) string) func(*csp.Config) {
 		config.RandomnessGenerator = customRand
 	}
 }
+
+// WithCSPValueGenerator is an option function for NewCSPHeaderGenerator that sets the Content-Security-Policy Value generator function.
+func WithCSPValueGenerator(cspvalue func(string, map[string]string) string) func(*csp.Config) {
+	return func(config *csp.Config) {
+		config.CSPValueGenerator = func(randomness string, customValues map[string]string) string {
+			return cspvalue(randomness, customValues)
+		}
+	}
+}
