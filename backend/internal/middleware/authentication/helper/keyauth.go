@@ -16,7 +16,10 @@ func GetAPIKeyStatusFromCache(db database.ServiceAuth, key string) (APIKeyStatus
 	cachedStatus, err := db.FiberStorage().Get(key)
 	if err != nil {
 		log.LogErrorf("Failed to get API key status from cache: %v", err)
-		return APIKeyExpired, err
+		// Returning APIKeyUnknown is better than returning APIKeyExpired.
+		// If the key is not found in the cache, it will return APIKeyUnknown without an error.
+		// Otherwise, it will return APIKeyUnknown with an error if an error occurs.
+		return APIKeyUnknown, err
 	}
 	status := string(cachedStatus)
 	switch status {
