@@ -176,7 +176,8 @@ var (
 	redisPoolTimeout     = os.Getenv(env.RDBPOOLTIMEOUT)
 	redisConnMaxIdleTime = os.Getenv(env.RDBMAXCONNLIFEIDLE)
 	redisConnMaxLifetime = os.Getenv(env.RDBMAXCONNLIFETIME)
-	tlsCAs               = os.Getenv(env.EXTRACERTTLS)
+	mysqltlsCAs          = os.Getenv(env.MYSQLCERTTLS)
+	redistlsCAs          = os.Getenv(env.REDISCERTTLS)
 	dbInstance           *service
 )
 
