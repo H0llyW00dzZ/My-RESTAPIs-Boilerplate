@@ -46,7 +46,9 @@ const (
 // TLS Configuration
 const (
 	// This environment variable is used to specify additional root CA / subs CA certificates that should be trusted by the application.
-	EXTRACERTTLS = "EXTRA_CERTS_TLS" // Base64-encoded root CA / subs CA certificates for establishing secure connections database (required).
+	MYSQLCERTTLS = "MYSQL_CERTS_TLS" // Base64-encoded root CA / subs CA certificates for establishing secure connections MySQL database (required).
+	REDISCERTTLS = "REDIS_CERTS_TLS" // Base64-encoded root CA / subs CA certificates for establishing secure connections Redis database (required).
+
 )
 
 // Site Middleware Configuration (Optional since it boilerplate and must rewrite a "DomainRouter" in RegisterRoutes (see backend/internal/middleware/routes.go))

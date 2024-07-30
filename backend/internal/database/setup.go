@@ -94,7 +94,7 @@ var maxConnections = 2 * runtime.NumCPU()
 
 // InitializeRedisClient initializes and returns a new Redis client.
 func (config *RedisClientConfig) InitializeRedisClient() (*redis.Client, error) {
-	rootCAs, err := loadRootCA()
+	rootCAs, err := loadRedisRootCA()
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +181,7 @@ func (config *RedisClientConfig) InitializeRedisClient() (*redis.Client, error) 
 //
 // Best Practice: Remove Default CAs in the Image (Include Public (Trusted) CAs), then put 1 Private Root CAs.
 func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
-	rootCAs, err := loadRootCA()
+	rootCAs, err := loadMySQLRootCA()
 	if err != nil {
 		return nil, err
 	}
@@ -189,6 +189,12 @@ func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
 	dsn := fmt.Sprintf(MySQLConnect, config.Username, config.Password, config.Host, config.Port, config.Database)
 
 	// Set the TLS configuration for the MySQL connection
+	//
+	// Note: When connecting via mTLS, set the parameter to "?tls=required".
+	// Also, note that for private CAs, when trying to connect via IP, the leaf CA must add the IP into the SANs (Subject Alternative Names).
+	//
+	// Best Practice: Never set the parameter to "?tls=skip-verify" or disable certificate verification, as it compromises security.
+	// Always ensure proper certificate verification is in place to maintain a secure connection.
 	err = mysql.RegisterTLSConfig("custom", &tls.Config{
 		RootCAs:    rootCAs,
 		MaxVersion: tls.VersionTLS13,
@@ -199,6 +205,12 @@ func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
 	}
 
 	// Set the TLS connection parameter in the DSN
+	//
+	// Note: When connecting via mTLS, set the parameter to "?tls=required".
+	// Also, note that for private CAs, when trying to connect via IP, the leaf CA must add the IP into the SANs (Subject Alternative Names).
+	//
+	// Best Practice: Never set the parameter to "?tls=skip-verify" or disable certificate verification, as it compromises security.
+	// Always ensure proper certificate verification is in place to maintain a secure connection.
 	dsnWithTLS := fmt.Sprintf("%s?tls=custom", dsn)
 
 	// Open a new connection with the updated DSN
@@ -226,7 +238,7 @@ func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
 // InitializeRedisStorage initializes and returns a new Redis storage instance
 // for use with Fiber middlewares such as rate limiting.
 func (config *FiberRedisClientConfig) InitializeRedisStorage() (fiber.Storage, error) {
-	rootCAs, err := loadRootCA()
+	rootCAs, err := loadRedisRootCA()
 	if err != nil {
 		return nil, err
 	}
