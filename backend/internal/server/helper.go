@@ -189,6 +189,12 @@ func (s *FiberServer) MakeHTTPRequest(req *http.Request) (*http.Response, error)
 	}
 
 	// Create an HTTP client with the custom TLS configuration
+	//
+	// TODO: Implement a helper function for handling httpcookiejar/cookiejar. This might be needed for transport if the HTTP server response sends cookies.
+	// Then Store the cookies in a file with a JSON format, and encrypt the JSON values. However, it requires storage of around 500MB ~ 1GB or lowerthan 500mb for the container.
+	//
+	// Also, note that when building an image (from this repo) for a container (e.g., for K8s), make sure to set the container to a non-root user (never set it to root).
+	// Because This repository does not rely on the operating system or any other specific dependencies, only the resources of the machine (e.g., memory, cpu, disk) and networking.
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: tlsConfig,
