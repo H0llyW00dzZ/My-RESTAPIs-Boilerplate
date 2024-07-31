@@ -5,6 +5,8 @@
 
 package database
 
+import "time"
+
 // Error and message constants for database-related operations.
 const (
 	ErrDBDown                    = "db down: %v"
@@ -36,4 +38,8 @@ const (
 	MsgRedisHighIdleConnections  = "Redis has a high number of idle connections"
 	MsgRedisHighPoolUtilization  = "Redis connection pool utilization is high"
 	MsgRedisHighPoolBottleneck   = "CRITICAL: Redis connection pool bottlenecked! Utilization exceeds 100%. Possible misconfiguration!"
+)
+
+const (
+	defaultCtxTimeout = 5 * time.Minute
 )
