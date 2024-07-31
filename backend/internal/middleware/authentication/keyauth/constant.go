@@ -8,9 +8,10 @@ package keyauth
 import "time"
 
 const (
-	sessionKey    = "session"
-	apiKey        = "api_key"
-	apiKeyExpired = "api_key_expired"
+	sessionKey       = "session"
+	apiKey           = "api_key"
+	apiKeyExpired    = "api_key_expired"
+	keyAuthRequestID = "requestid"
 )
 
 const (
