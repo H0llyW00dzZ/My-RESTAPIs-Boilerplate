@@ -146,6 +146,9 @@ type Service interface {
 
 	// AuthUser returns the ServiceAuth interface for managing user authentication-related database operations.
 	Auth() ServiceAuth
+
+	// SetKeysAtPipeline efficiently sets multiple key-value pairs in Redis with a specified TTL (Time To Live) using pipelining.
+	SetKeysAtPipeline(keyValues map[string]any, ttl time.Duration) error
 }
 
 // service is a concrete implementation of the Service interface.
@@ -337,7 +340,7 @@ func (s *service) Close() error {
 // Health checks the health of the database and Redis connections.
 // It returns a map with keys indicating various health statistics.
 func (s *service) Health(filter string) map[string]string {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), defaultCtxTimeout)
 	defer cancel()
 
 	stats := make(map[string]string)
@@ -632,7 +635,7 @@ func (s *service) ScanAndDel(patterns ...string) error {
 
 	// Use a context with a timeout to avoid hanging indefinitely
 	// Note: This should fix an issue where the function hangs when using RedisClientConfig with "ContextTimeoutEnabled" set to true.
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), defaultCtxTimeout)
 	defer cancel()
 
 	var totalDeleted int
@@ -784,4 +787,36 @@ func (s *service) RestartMySQLConnection() error {
 // AuthUser returns the ServiceAuth interface for managing user authentication-related database operations.
 func (s *service) Auth() ServiceAuth {
 	return s.auth
+}
+
+// SetKeysAtPipeline reduces the latency cost associated with round-trip time (RTT) by batching multiple commands into a single network request.
+// This method is particularly useful for bulk-insert scenarios where performance is critical.
+//
+// Note: On my rack-server machine, it has a 0-ms (backend) and 20-ms (frontend for visitor/client in the SEA region) response time because we are neighbors, so ¯\_(ツ)_/¯
+func (s *service) SetKeysAtPipeline(keyValues map[string]any, ttl time.Duration) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// Use a context with a timeout to avoid hanging indefinitely
+	ctx, cancel := context.WithTimeout(context.Background(), defaultCtxTimeout)
+	defer cancel()
+
+	// Initialize a new pipeline.
+	pipe := s.redisClient.Pipeline()
+
+	// Iterate over the provided key-value pairs, queuing up each one in the pipeline.
+	for key, value := range keyValues {
+		// Queue a SET command for the key-value pair with the given TTL.
+		pipe.Set(ctx, key, value, ttl)
+	}
+
+	// Execute the pipelined commands in a single round-trip to the Redis server.
+	_, err := pipe.Exec(ctx)
+	if err != nil {
+		// Return an enhanced error if the pipelining fails, wrapping the original error for more context.
+		return fmt.Errorf("Pipeline execution failed: %w", err)
+	}
+
+	// signify successful execution.
+	return nil
 }
