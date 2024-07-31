@@ -18,6 +18,11 @@ import (
 // ErrorKeyAuthHandler is a custom error handler for the key authentication middleware.
 // It handles different types of authentication errors and sends appropriate error responses.
 func ErrorKeyAuthHandler(c *fiber.Ctx, err error) error {
+	// Header KeyAuth + Session Middleware Logic Request ID for enhancement
+	//
+	// Note: This is a different request ID. Even though the header is the same ("x-request-id"),
+	// it can be connected to the key auth + session middleware logic.
+	c.Locals(keyAuthRequestID)
 	switch {
 	case errors.Is(err, keyauth.ErrMissingOrMalformedAPIKey):
 		// Log the authentication attempt.
