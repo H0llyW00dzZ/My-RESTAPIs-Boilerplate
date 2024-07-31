@@ -5,8 +5,14 @@
 
 package keyauth
 
+import "time"
+
 const (
 	sessionKey    = "session"
 	apiKey        = "api_key"
 	apiKeyExpired = "api_key_expired"
+)
+
+const (
+	defaultExpryContextKey = time.Second * 2
 )
