@@ -55,6 +55,9 @@ func UpdateCacheWithExpiredStatus(db database.ServiceAuth, identifier, key strin
 		Identifier: identifier,
 		APIKey:     key,
 		Status:     APIKeyExpired.String(),
+		Authorization: AuthorizationData{
+			AuthTime: time.Now().UTC(), // Time Server not client
+		},
 	}
 
 	// Note: Custom JSON encoder/decoder configuration, similar to what Fiber currently supports,
@@ -82,6 +85,10 @@ func UpdateCacheWithActiveStatus(db database.ServiceAuth, identifier, key string
 		Identifier: identifier,
 		APIKey:     key,
 		Status:     APIKeyActive.String(),
+		Authorization: AuthorizationData{
+			AuthTime:    time.Now().UTC(), // Time Server not client
+			ExpiredTime: expirationDate,
+		},
 	}
 
 	// Note: Custom JSON encoder/decoder configuration, similar to what Fiber currently supports,

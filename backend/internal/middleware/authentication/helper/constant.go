@@ -49,13 +49,15 @@ const (
 // 	- Identifier: The unique identifier associated with the API key.
 // 	- APIKey: The actual API key value.
 // 	- Status: The status of the API key (e.g., "active", "expired").
+// 	- Authorization: The authorization data of the API key.
 //
 // Note: This structure is only for Redis, as it is used solely for caching + better performance.
 // for relational database (MySQL) marked as TODO.
 type APIKeyData struct {
-	Identifier string `json:"identifier"`
-	APIKey     string `json:"apikey"`
-	Status     string `json:"status"`
+	Identifier    string            `json:"identifier"`
+	APIKey        string            `json:"apikey"`
+	Status        string            `json:"status"`
+	Authorization AuthorizationData `json:"authorization,omitempty"`
 }
 
 // KeyAuthSessData is a type alias for map[string]any.
@@ -63,3 +65,20 @@ type APIKeyData struct {
 // The keys are strings, and the values can be of any type (any).
 // This type alias provides a convenient way to work with session data in a flexible manner.
 type KeyAuthSessData map[string]any
+
+// AuthorizationData represents the authorization data of an API key.
+// It includes the following fields:
+// 	- AuthTime: The time of the last authorization.
+// 	- ExpiredTime: The expiration time of the API key.
+//
+// Note: Current format, and may subject to changed:
+// {
+// 	"authorization": {
+// 	  "time": "2024-08-01T21:24:28.4352685Z",
+// 	  "apikey_expired_time": "2024-10-26T21:18:17Z"
+// 	}
+// }
+type AuthorizationData struct {
+	AuthTime    time.Time `json:"time,omitempty"`
+	ExpiredTime time.Time `json:"apikey_expired_time,omitempty"`
+}
