@@ -65,8 +65,12 @@ func UpdateCacheWithExpiredStatus(db database.ServiceAuth, identifier, key strin
 		return
 	}
 
+	pipeLine := KeyAuthSessData{
+		cacheKey: jsonData,
+	}
+
 	// Note: This should be set 5 minute as minimum, because it will covered by rate limiter.
-	if err := db.FiberStorage().Set(cacheKey, jsonData, CacheExpiredTTL); err != nil {
+	if err := db.SetKeysAtPipeline(pipeLine, CacheExpiredTTL); err != nil {
 		log.LogErrorf("Failed to update Redis cache for expired API key: %v", err)
 	}
 }
@@ -88,8 +92,12 @@ func UpdateCacheWithActiveStatus(db database.ServiceAuth, identifier, key string
 		return
 	}
 
+	pipeLine := KeyAuthSessData{
+		cacheKey: jsonData,
+	}
+
 	// Note: This should be set 5 minute as minimum, because it will covered by rate limiter.
-	if err := db.FiberStorage().Set(cacheKey, jsonData, CacheExpiredTTL); err != nil {
+	if err := db.SetKeysAtPipeline(pipeLine, CacheExpiredTTL); err != nil {
 		log.LogErrorf("Failed to update Redis cache for active API key: %v", err)
 	}
 }
