@@ -147,8 +147,11 @@ type Service interface {
 	// AuthUser returns the ServiceAuth interface for managing user authentication-related database operations.
 	Auth() ServiceAuth
 
-	// SetKeysAtPipeline efficiently sets multiple key-value pairs in Redis with a specified TTL (Time To Live) using pipelining.
+	// SetKeysAtPipeline efficiently sets multiple key-value pairs in Redis/Valkey with a specified TTL (Time To Live) using pipelining.
 	SetKeysAtPipeline(keyValues map[string]any, ttl time.Duration) error
+
+	// GetKeysAtPipeline efficiently retrieves the values for the given keys from Redis/Valkey using pipelining.
+	GetKeysAtPipeline(keys []string) (map[string]any, error)
 }
 
 // service is a concrete implementation of the Service interface.
@@ -792,6 +795,18 @@ func (s *service) Auth() ServiceAuth {
 // SetKeysAtPipeline reduces the latency cost associated with round-trip time (RTT) by batching multiple commands into a single network request.
 // This method is particularly useful for bulk-insert scenarios where performance is critical.
 //
+// Example Usage:
+//
+//	data := map[string]any{
+//	    "name":      "Gopher",
+//	    "isStudent": true,
+//	}
+//
+// Type assert to their respective types (type-safe manner):
+//
+//	name := data["name"].(string)
+//	isStudent := data["isStudent"].(bool)
+//
 // Note: On my rack-server machine, it has a 0-ms (backend) and 20-ms (frontend for visitor/client in the SEA region) response time because we are neighbors, so ¯\_(ツ)_/¯
 func (s *service) SetKeysAtPipeline(keyValues map[string]any, ttl time.Duration) error {
 	s.mu.Lock()
@@ -819,4 +834,57 @@ func (s *service) SetKeysAtPipeline(keyValues map[string]any, ttl time.Duration)
 
 	// signify successful execution.
 	return nil
+}
+
+// GetKeysAtPipeline reduces the latency cost associated with round-trip time (RTT) by batching multiple commands into a single network request.
+// This method is particularly useful for bulk-insert scenarios where performance is critical.
+//
+// Note:
+//   - If a key does not exist in Redis/Valkey, its corresponding value in the returned map will be nil.
+func (s *service) GetKeysAtPipeline(keys []string) (map[string]any, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// Use a context with a timeout to avoid hanging indefinitely
+	ctx, cancel := context.WithTimeout(context.Background(), defaultCtxTimeout)
+	defer cancel()
+
+	// Initialize a new pipeline
+	pipe := s.redisClient.Pipeline()
+
+	// Create a slice to hold the Redis commands and a map to store the results
+	cmds := make([]*redis.StringCmd, len(keys))
+	results := make(map[string]any)
+
+	// Iterate over the keys and queue a Get command for each key
+	for i, key := range keys {
+		cmds[i] = pipe.Get(ctx, key)
+	}
+
+	// Execute the pipelined commands in a single round-trip to the Redis server
+	_, err := pipe.Exec(ctx)
+	if err != nil {
+		// Return an enhanced error if the pipelining fails, wrapping the original error for more context
+		return nil, fmt.Errorf("Pipeline execution failed: %w", err)
+	}
+
+	// Iterate over the command results, checking for errors and populating the results map
+	for i, cmd := range cmds {
+		result, err := cmd.Result()
+		if err != nil {
+			if err == redis.Nil {
+				// If the key does not exist, set its value to nil in the results map
+				results[keys[i]] = nil
+			} else {
+				// Return an enhanced error if there's an error getting a key, including the key in the error message
+				return nil, fmt.Errorf("Error getting key '%s': %w", keys[i], err)
+			}
+		} else {
+			// If the key exists and there's no error, store its value in the results map
+			results[keys[i]] = result
+		}
+	}
+
+	// Return the populated results map and a nil error to signify successful execution
+	return results, nil
 }
