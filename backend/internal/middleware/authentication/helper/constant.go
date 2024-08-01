@@ -39,3 +39,27 @@ func (s APIKeyStatus) String() string {
 		return "unknown"
 	}
 }
+
+const (
+	prefixKey = "key_auth_session:"
+)
+
+// APIKeyData represents the structure of the API key data stored in the cache.
+// It includes the following fields:
+// 	- Identifier: The unique identifier associated with the API key.
+// 	- APIKey: The actual API key value.
+// 	- Status: The status of the API key (e.g., "active", "expired").
+//
+// Note: This structure is only for Redis, as it is used solely for caching + better performance.
+// for relational database (MySQL) marked as TODO.
+type APIKeyData struct {
+	Identifier string `json:"identifier"`
+	APIKey     string `json:"apikey"`
+	Status     string `json:"status"`
+}
+
+// KeyAuthSessData is a type alias for map[string]any.
+// It represents a map of key-value pairs used to store session data related to key authentication.
+// The keys are strings, and the values can be of any type (any).
+// This type alias provides a convenient way to work with session data in a flexible manner.
+type KeyAuthSessData map[string]any
