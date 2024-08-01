@@ -51,7 +51,7 @@ const (
 // 	- Status: The status of the API key (e.g., "active", "expired").
 // 	- Authorization: The authorization data of the API key.
 //
-// Note: This structure is only for Redis, as it is used solely for caching + better performance.
+// Note: This structure is only for Redis/Valkey, as it is used solely for caching + better performance.
 // for relational database (MySQL) marked as TODO.
 type APIKeyData struct {
 	Identifier    string            `json:"identifier"`
