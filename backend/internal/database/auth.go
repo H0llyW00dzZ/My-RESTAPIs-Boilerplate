@@ -11,6 +11,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"time"
 
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/bcrypt"
 
@@ -29,6 +30,9 @@ var (
 type ServiceAuth interface {
 	// FiberStorage returns the [fiber.Storage] interface for fiber storage middleware.
 	FiberStorage() fiber.Storage
+
+	// SetKeysAtPipeline efficiently sets multiple key-value pairs in Redis with a specified TTL (Time To Live) using pipelining.
+	SetKeysAtPipeline(keyValues map[string]any, ttl time.Duration) error
 }
 
 // serviceAuth is a concrete implementation of the ServiceAuth interface.
@@ -54,4 +58,12 @@ func NewServiceAuth(db *sql.DB, fiberStorage fiber.Storage, bcryptService bcrypt
 // API Keys in the auth middleware.
 func (s *serviceAuth) FiberStorage() fiber.Storage {
 	return s.fiberStorage
+}
+
+// SetKeysAtPipeline reduces the latency cost associated with round-trip time (RTT) by batching multiple commands into a single network request.
+// This method is particularly useful for bulk-insert scenarios where performance is critical.
+//
+// Note: On my rack-server machine, it has a 0-ms (backend) and 20-ms (frontend for visitor/client in the SEA region) response time because we are neighbors, so ¯\_(ツ)_/¯
+func (s *serviceAuth) SetKeysAtPipeline(keyValues map[string]any, ttl time.Duration) error {
+	return s.SetKeysAtPipeline(keyValues, ttl)
 }

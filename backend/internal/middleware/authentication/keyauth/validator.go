@@ -28,19 +28,19 @@ func ValidatorKeyAuthHandler(c *fiber.Ctx, key string, db database.Service) (boo
 }
 
 // isAPIKeyValidInSession checks if the API key is valid and not expired in the session.
-// It returns two boolean values: isAPIKeyValid and expired.
-func isAPIKeyValidInSession(sess *session.Session, key string) (bool, bool) {
-	sessionAPIKey := sess.Get(apiKey)
+// It returns one string values (UUID) and two boolean values: isAPIKeyValid and expired.
+func isAPIKeyValidInSession(sess *session.Session, key string) (string, bool, bool) {
+	sessionAPIKey := sess.Get("x_api_key")
 	if sessionAPIKey != nil && sessionAPIKey.(string) == key {
-		expiredInSession := sess.Get(apiKeyExpired)
+		expiredInSession := sess.Get("x_api_key_expired")
 		if expiredInSession != nil && expiredInSession.(bool) {
 			sess.Destroy()
 			log.LogInfof("API key %s found in session but marked as expired", key)
-			return true, true
+			return sess.ID(), true, true
 		}
-		return true, false
+		return sess.ID(), true, false
 	}
-	return false, false
+	return "", false, false
 }
 
 // saveAPIKeyInSession saves the API key and its expiration status in the session.
