@@ -810,7 +810,8 @@ func (s *service) Auth() ServiceAuth {
 // Note: On my rack-server machine, it has a 0-ms (backend) and 20-ms (frontend for visitor/client in the SEA region) response time because we are neighbors, so ¯\_(ツ)_/¯
 //
 // Important:
-//   - For better performance, avoid using Redis/Valkey JSON commands. String commands are sufficient as they are immutable and can easily enhance performance by utilizing other JSON encoders/decoders. so ¯\_(ツ)_/¯
+//   - For better performance, avoid using Redis/Valkey JSON commands.
+//     String commands are sufficient as they are immutable and can easily enhance performance by utilizing other JSON encoders/decoders (Most Important Go) for the value key. so ¯\_(ツ)_/¯
 func (s *service) SetKeysAtPipeline(keyValues map[string]any, ttl time.Duration) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -846,7 +847,8 @@ func (s *service) SetKeysAtPipeline(keyValues map[string]any, ttl time.Duration)
 //   - If a key does not exist in Redis/Valkey, its corresponding value in the returned map will be nil.
 //
 // Important:
-//   - For better performance, avoid using Redis/Valkey JSON commands. String commands are sufficient as they are immutable and can easily enhance performance by utilizing other JSON encoders/decoders. so ¯\_(ツ)_/¯
+//   - For better performance, avoid using Redis/Valkey JSON commands.
+//     String commands are sufficient as they are immutable and can easily enhance performance by utilizing other JSON encoders/decoders (Most Important Go) for the value key. so ¯\_(ツ)_/¯
 func (s *service) GetKeysAtPipeline(keys []string) (map[string]any, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
