@@ -64,6 +64,9 @@ type APIKeyData struct {
 // It represents a map of key-value pairs used to store session data related to key authentication.
 // The keys are strings, and the values can be of any type (any).
 // This type alias provides a convenient way to work with session data in a flexible manner.
+//
+// Note: This is currently unused because key-auth and session middleware logic are bound to Fiber storage.
+// However, for other cache handlers (without being bound to Fiber storage), this can be useful.
 type KeyAuthSessData map[string]any
 
 // AuthorizationData represents the authorization data of an API key.
