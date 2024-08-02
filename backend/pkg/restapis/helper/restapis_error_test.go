@@ -32,6 +32,11 @@ func TestSendErrorResponse_BadRequest(t *testing.T) {
 		t.Errorf("Expected status code %d, got %d", fiber.StatusBadRequest, resp.StatusCode)
 	}
 
+	contentType := resp.Header.Get("Content-Type")
+	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
+	}
+
 	var errorResponse helper.ErrorResponse
 	err = sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse)
 	if err != nil {
@@ -63,6 +68,11 @@ func TestSendErrorResponse_Unauthorized(t *testing.T) {
 
 	if resp.StatusCode != fiber.StatusUnauthorized {
 		t.Errorf("Expected status code %d, got %d", fiber.StatusUnauthorized, resp.StatusCode)
+	}
+
+	contentType := resp.Header.Get("Content-Type")
+	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -98,6 +108,11 @@ func TestSendErrorResponse_Forbidden(t *testing.T) {
 		t.Errorf("Expected status code %d, got %d", fiber.StatusForbidden, resp.StatusCode)
 	}
 
+	contentType := resp.Header.Get("Content-Type")
+	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
+	}
+
 	var errorResponse helper.ErrorResponse
 	err = sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse)
 	if err != nil {
@@ -129,6 +144,11 @@ func TestSendErrorResponse_NotFound(t *testing.T) {
 
 	if resp.StatusCode != fiber.StatusNotFound {
 		t.Errorf("Expected status code %d, got %d", fiber.StatusNotFound, resp.StatusCode)
+	}
+
+	contentType := resp.Header.Get("Content-Type")
+	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -164,6 +184,11 @@ func TestSendErrorResponse_Conflict(t *testing.T) {
 		t.Errorf("Expected status code %d, got %d", fiber.StatusConflict, resp.StatusCode)
 	}
 
+	contentType := resp.Header.Get("Content-Type")
+	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
+	}
+
 	var errorResponse helper.ErrorResponse
 	err = sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse)
 	if err != nil {
@@ -195,6 +220,11 @@ func TestSendErrorResponse_BadGateway(t *testing.T) {
 
 	if resp.StatusCode != fiber.StatusBadGateway {
 		t.Errorf("Expected status code %d, got %d", fiber.StatusBadGateway, resp.StatusCode)
+	}
+
+	contentType := resp.Header.Get("Content-Type")
+	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -230,6 +260,11 @@ func TestSendErrorResponse_InternalServerError(t *testing.T) {
 		t.Errorf("Expected status code %d, got %d", fiber.StatusInternalServerError, resp.StatusCode)
 	}
 
+	contentType := resp.Header.Get("Content-Type")
+	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
+	}
+
 	var errorResponse helper.ErrorResponse
 	err = sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse)
 	if err != nil {
@@ -261,6 +296,11 @@ func TestSendErrorResponse_TooManyRequests(t *testing.T) {
 
 	if resp.StatusCode != fiber.StatusTooManyRequests {
 		t.Errorf("Expected status code %d, got %d", fiber.StatusTooManyRequests, resp.StatusCode)
+	}
+
+	contentType := resp.Header.Get("Content-Type")
+	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -300,6 +340,11 @@ func TestErrorHandler(t *testing.T) {
 
 	if resp.StatusCode != fiber.StatusInternalServerError {
 		t.Errorf("Expected status code %d, got %d", fiber.StatusInternalServerError, resp.StatusCode)
+	}
+
+	contentType := resp.Header.Get("Content-Type")
+	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse

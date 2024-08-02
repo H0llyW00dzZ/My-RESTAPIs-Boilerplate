@@ -46,6 +46,7 @@ func TestParseNumericalValue(t *testing.T) {
 }
 
 func TestParseInt64Value(t *testing.T) {
+	log.InitializeLogger("Gopher Testing", "unix")
 	tests := []struct {
 		name     string
 		value    string
