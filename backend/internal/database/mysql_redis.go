@@ -792,7 +792,7 @@ func (s *service) Auth() ServiceAuth {
 	return s.auth
 }
 
-// SetKeysAtPipeline reduces the latency cost associated with round-trip time (RTT) by batching multiple commands into a single network request.
+// SetKeysAtPipeline reduces the latency cost associated with round-trip time (RTT) by batching multiple commands (e.g, 1 billion commands that save cost money $$$) into a single network request.
 // This method is particularly useful for bulk-insert scenarios where performance is critical.
 //
 // Example Usage:
@@ -840,7 +840,7 @@ func (s *service) SetKeysAtPipeline(keyValues map[string]any, ttl time.Duration)
 	return nil
 }
 
-// GetKeysAtPipeline reduces the latency cost associated with round-trip time (RTT) by batching multiple commands into a single network request.
+// GetKeysAtPipeline reduces the latency cost associated with round-trip time (RTT) by batching multiple commands (e.g, 1 billion commands that save cost money $$$) into a single network request.
 // This method is particularly useful for bulk-insert scenarios where performance is critical.
 //
 // Note:
