@@ -15,11 +15,11 @@ type ErrorResponse struct {
 
 const (
 
-	// MimeApplicationProblemJSON represents the MIME type for problem+json (RFC 7807).
-	MimeApplicationProblemJSON = "application/problem+json"
+	// MIMEApplicationProblemJSON represents the MIME type for problem+json (RFC 7807).
+	MIMEApplicationProblemJSON = "application/problem+json"
 
-	// MimeApplicationProblemJSONCharsetUTF8 represents the MIME type for problem+json with UTF-8 charset (RFC 7807 Enhancement).
-	MimeApplicationProblemJSONCharsetUTF8 = "application/problem+json; charset=utf-8"
+	// MIMEApplicationProblemJSONCharsetUTF8 represents the MIME type for problem+json with UTF-8 charset (RFC 7807 Enhancement).
+	MIMEApplicationProblemJSONCharsetUTF8 = "application/problem+json; charset=utf-8"
 )
 
 // SendErrorResponse sends an error response with the specified status code and error message.
@@ -27,7 +27,7 @@ func SendErrorResponse(c *fiber.Ctx, statusCode int, errorMessage string) error 
 	return c.Status(statusCode).JSON(ErrorResponse{
 		Code:  statusCode,
 		Error: errorMessage,
-	}, MimeApplicationProblemJSONCharsetUTF8)
+	}, MIMEApplicationProblemJSONCharsetUTF8)
 }
 
 // ErrorHandler is the error handling middleware that runs after other middleware.

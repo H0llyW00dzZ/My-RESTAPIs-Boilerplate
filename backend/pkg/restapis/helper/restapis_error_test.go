@@ -33,8 +33,8 @@ func TestSendErrorResponse_BadRequest(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -71,8 +71,8 @@ func TestSendErrorResponse_Unauthorized(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -109,8 +109,8 @@ func TestSendErrorResponse_Forbidden(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -147,8 +147,8 @@ func TestSendErrorResponse_NotFound(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -185,8 +185,8 @@ func TestSendErrorResponse_Conflict(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -223,8 +223,8 @@ func TestSendErrorResponse_BadGateway(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -261,8 +261,8 @@ func TestSendErrorResponse_InternalServerError(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -299,8 +299,8 @@ func TestSendErrorResponse_TooManyRequests(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -343,8 +343,8 @@ func TestErrorHandler(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MimeApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MimeApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
