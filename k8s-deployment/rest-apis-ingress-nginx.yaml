@@ -16,6 +16,9 @@
 #
 # Once the frontend and backend are connected, management (e.g, traffic, security, etc) becomes easier through the frontend
 # (e.g, don't have to spend time for setup, maintenance traffic, other).
+#
+# Also, note that for the deployment/app/service related to this repository (REST API Boilerplate), don't forget to set HPA (Horizontal Pod Autoscaler) with CPU and Memory.
+# Start with a minimum of 1 pod. Additionally, while idle, the average memory usage of this repository (REST API Boilerplate) is between 10MB and 15MB, sometimes even under 10MB (the power of fiber zer0-allocation).
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
