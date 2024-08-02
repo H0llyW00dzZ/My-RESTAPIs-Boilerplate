@@ -881,6 +881,20 @@ func (s *service) GetKeysAtPipeline(keys []string) (map[string]any, error) {
 	// 	}
 	// 	return nil, fmt.Errorf("error retrieving from cache: %w", err)
 	// }
+	//
+	// Additionally, for more suitable + idiom go best practices error handling, implement an [errors.Is] mechanism by using a switch statement (not multiple if-else statements)
+	// because this error handling will depend on the server and it's different when it's in production unlike in testing/mock testing. For Example:
+	//
+	// cachedData, err := db.GetKeysAtPipeline([]string{stackCachePrefix})
+	// if err != nil {
+	// 	switch {
+	// 	case errors.Is(err, "Pipeline execution failed: redis: nil"):
+	// 		Logger.LogInfof("Stack Data: %s not found in Cache", stackData)
+	// 		return nil, nil // Not found in cache, return nil data and nil error
+	// 	default:
+	// 		return nil, fmt.Errorf("error retrieving from cache: %w", err)
+	// 	}
+	// }
 	_, err := pipe.Exec(ctx)
 	if err != nil {
 		// Return an enhanced error if the pipelining fails, wrapping the original error for more context
