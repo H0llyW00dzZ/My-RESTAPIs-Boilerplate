@@ -811,7 +811,7 @@ func (s *service) Auth() ServiceAuth {
 //
 // Important:
 //   - For better performance, avoid using Redis/Valkey JSON commands.
-//     String commands are sufficient as they are immutable and can easily enhance performance by utilizing other JSON encoders/decoders (Most Important Go) for the value key. so ¯\_(ツ)_/¯
+//     String commands are sufficient as they are immutable and can easily enhance performance by utilizing other JSON encoders/decoders (Most Important Go, unlike other language) for the value key. so ¯\_(ツ)_/¯
 func (s *service) SetKeysAtPipeline(keyValues map[string]any, ttl time.Duration) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -848,7 +848,7 @@ func (s *service) SetKeysAtPipeline(keyValues map[string]any, ttl time.Duration)
 //
 // Important:
 //   - For better performance, avoid using Redis/Valkey JSON commands.
-//     String commands are sufficient as they are immutable and can easily enhance performance by utilizing other JSON encoders/decoders (Most Important Go) for the value key. so ¯\_(ツ)_/¯
+//     String commands are sufficient as they are immutable and can easily enhance performance by utilizing other JSON encoders/decoders (Most Important Go, unlike other language) for the value key. so ¯\_(ツ)_/¯
 func (s *service) GetKeysAtPipeline(keys []string) (map[string]any, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -869,7 +869,18 @@ func (s *service) GetKeysAtPipeline(keys []string) (map[string]any, error) {
 		cmds[i] = pipe.Get(ctx, key)
 	}
 
-	// Execute the pipelined commands in a single round-trip to the Redis server
+	// Execute the pipelined commands in a single round-trip to the Redis/Valkey server
+	//
+	// Note: For handling Redis/Valkey Nil, in this Pipe execution, it must be handled by the caller. For example:
+	//
+	// cachedData, err := db.GetKeysAtPipeline([]string{stackCachePrefix})
+	// if err != nil {
+	// 	if err.Error() == "Pipeline execution failed: redis: nil" {
+	// 		Logger.LogInfof("Stack Data: %s not found in Cache", stackData)
+	// 		return nil, nil // Not found in cache, return nil data and nil error
+	// 	}
+	// 	return nil, fmt.Errorf("error retrieving from cache: %w", err)
+	// }
 	_, err := pipe.Exec(ctx)
 	if err != nil {
 		// Return an enhanced error if the pipelining fails, wrapping the original error for more context
