@@ -50,6 +50,10 @@ func saveAPIKeyInSession(sess *session.Session, key string, expired bool) {
 	if expired {
 		sess.SetExpiry(defaultExpryContextKey)
 	}
+
+	// Note: This is safe if it's encrypted by the Encrypted Cookies middleware (src https://docs.gofiber.io/api/middleware/encryptcookie).
+	// If it's not encrypted, then it's not safe. Also note that when using Encrypted Cookies middleware (src https://docs.gofiber.io/api/middleware/encryptcookie),
+	// consider using a Hex Encoder/Decoder instead of Base64 because the Base64-encoded value may not LGTM.
 	if err := sess.Save(); err != nil {
 		log.LogErrorf("Failed to save session: %v", err)
 	}
