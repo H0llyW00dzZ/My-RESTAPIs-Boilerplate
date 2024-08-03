@@ -6,6 +6,7 @@
 package keyauth
 
 import (
+	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
 
 	"github.com/gofiber/fiber/v2"
@@ -27,8 +28,12 @@ func SuccessKeyAuthHandler(c *fiber.Ctx) error {
 	// Note: This is for encryption and works in conjunction with the session middleware logic.
 	// It is specifically useful for web front-end client-side authentication using session cookies (e.g., in browsers).
 	// Additionally, it is secure because it would require an 99999999999 cpu to attack this encryptcookie. 🤪
-	sess.Get(apiKey)
-	sess.Get(apiKeyExpired)
-	log.LogUserActivity(c, "API key authenticated successfully")
+	if sess.Get(apiKey) != "" {
+		setAPIKeyAuthSuccess := fmt.Sprintf("API key authenticated successfully Session ID %s", sess.ID())
+		log.LogUserActivity(c, setAPIKeyAuthSuccess)
+	} else {
+		log.LogUserActivity(c, "API key authenticated successfully")
+	}
+
 	return c.Next()
 }
