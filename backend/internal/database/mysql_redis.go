@@ -193,7 +193,7 @@ var (
 //
 // Note: For better connection establishment, it's recommended to put this in the "func init()"
 // so that it will initialize before the "func main()" runs. This is because the connection will be
-// shared across the entire codebase (Sharing is caring).
+// shared across the entire codebase (sharing is caring), even if the codebase grows to billions of lines of Go code (e.g, Senior Golang).
 func New() Service {
 	if dbInstance != nil {
 		return dbInstance
