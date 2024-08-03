@@ -500,6 +500,9 @@ func CleanupExpiredSessions(store *session.Store, interval time.Duration) {
 // Note:
 //   - If an unsupported middleware configuration is passed to WithStorage, it will panic with an error message.
 //   - Additional storage support for other middlewares will be implemented in the future as needed.
+//
+// TODO: Extract this into separate functions for each middleware to avoid potential issues/bugs that may arise
+// from using an in-memory database instead of an actual database (e.g., Redis, MySQL).
 func WithStorage(storage fiber.Storage) any {
 	return func(config any) {
 		switch cfg := config.(type) {
