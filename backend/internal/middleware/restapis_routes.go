@@ -113,7 +113,7 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 	// Note: This method is called "higher-order function" which is better than (if-else statement which is bad)
 	gopherStorage := db.FiberStorage()
 	rateLimiterRESTAPIs := NewRateLimiter(
-		WithStorage(gopherStorage),
+		WithRateLimiterStorage(gopherStorage),
 		WithMax(maxRequestRESTAPIsRateLimiter),
 		WithExpiration(maxExpirationRESTAPIsRateLimiter),
 		WithLimitReached(ratelimiterMsg(MsgRESTAPIsVisitorGotRateLimited)),

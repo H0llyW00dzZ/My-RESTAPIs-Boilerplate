@@ -385,13 +385,6 @@ func WithSessionExpiration(expiration time.Duration) func(*session.Config) {
 	}
 }
 
-// WithSessionStorage is an option function for NewSessionMiddleware that sets the session storage backend.
-func WithSessionStorage(storage fiber.Storage) func(*session.Config) {
-	return func(config *session.Config) {
-		config.Storage = storage
-	}
-}
-
 // WithSessionKeyLookup is an option function for NewSessionMiddleware that sets the session key lookup.
 func WithSessionKeyLookup(keyLookup string) func(*session.Config) {
 	return func(config *session.Config) {
@@ -461,63 +454,6 @@ func CleanupExpiredSessions(store *session.Store, interval time.Duration) {
 		if err != nil {
 			// Log any errors that occur during the reset process.
 			log.LogErrorf("Failed to reset session store: %v", err)
-		}
-	}
-}
-
-// WithStorage is an option function that sets the storage backend for various Fiber middlewares.
-//
-// It supports the following middleware configurations:
-//
-//	*cache.Config: Sets the storage backend for the cache middleware.
-//	*session.Config: Sets the storage backend for the session middleware.
-//	*limiter.Config: Sets the storage backend for the rate limiter middleware.
-//	*csrf.Config: Sets the storage backend for the CSRF middleware.
-//	*idempotency.Config: Sets the storage backend for the idempotency middleware.
-//
-// The storage backend must implement the fiber.Storage interface.
-//
-// Example usage:
-//
-//	// Create a custom storage backend
-//	storage := myCustomStorage{}
-//
-//	// Use the WithStorage option function to set the storage backend for the cache middleware
-//	cacheMiddleware := NewCacheMiddleware(WithStorage(storage))
-//
-//	// Use the WithStorage option function to set the storage backend for the session middleware
-//	sessionMiddleware := NewSessionMiddleware(WithStorage(storage))
-//
-//	// Use the WithStorage option function to set the storage backend for the rate limiter middleware
-//	rateLimiterMiddleware := NewRateLimiter(WithStorage(storage))
-//
-//	// Use the WithStorage option function to set the storage backend for the CSRF middleware
-//	csrfMiddleware := NewCSRFMiddleware(WithStorage(storage))
-//
-//	// Use the WithStorage option function to set the storage backend for the idempotency middleware
-//	idempotencyMiddleware := NewIdempotencyMiddleware(WithStorage(storage))
-//
-// Note:
-//   - If an unsupported middleware configuration is passed to WithStorage, it will panic with an error message.
-//   - Additional storage support for other middlewares will be implemented in the future as needed.
-//
-// TODO: Extract this into separate functions for each middleware to avoid potential issues/bugs that may arise
-// from using an in-memory database instead of an actual database (e.g., Redis, MySQL).
-func WithStorage(storage fiber.Storage) any {
-	return func(config any) {
-		switch cfg := config.(type) {
-		case *cache.Config:
-			cfg.Storage = storage
-		case *session.Config:
-			cfg.Storage = storage
-		case *limiter.Config:
-			cfg.Storage = storage
-		case *csrf.Config:
-			cfg.Storage = storage
-		case *idempotency.Config:
-			cfg.Storage = storage
-		default:
-			panic(fmt.Sprintf("unsupported config type: %T", config))
 		}
 	}
 }
