@@ -630,6 +630,13 @@ func (s *service) QueryRow(ctx context.Context, query string, args ...any) *sql.
 }
 
 // FiberStorage returns the [fiber.Storage] interface for fiber storage middleware.
+//
+// Note: For structured databases, it is recommended to use a relational database and a stable package
+// such as the standard library's [database/sql] package with a MySQL driver. This is because when using
+// FiberStorage, you must implement the storage functionality from scratch to make it structurable,
+// such as storing JSON data in Redis (See Key-Auth + Session Middleware Logic). Also Note that, this doesn't matter for FiberStorage in other Go code
+// (e.g., auth.go) once the connection to the database has been established, as it will be shared across
+// the codebase (sharing is caring).
 func (s *service) FiberStorage() fiber.Storage {
 	return s.rdb
 }
