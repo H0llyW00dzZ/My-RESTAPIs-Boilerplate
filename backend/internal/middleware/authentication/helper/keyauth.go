@@ -56,7 +56,8 @@ func UpdateCacheWithExpiredStatus(db database.ServiceAuth, identifier, key strin
 		APIKey:     key,
 		Status:     APIKeyExpired.String(),
 		Authorization: AuthorizationData{
-			AuthTime: time.Now().UTC(), // Time Server not client
+			// Time Server not client
+			AuthTime: time.Now().UTC(),
 		},
 	}
 
@@ -82,7 +83,11 @@ func UpdateCacheWithActiveStatus(db database.ServiceAuth, identifier, key string
 		APIKey:     key,
 		Status:     APIKeyActive.String(),
 		Authorization: AuthorizationData{
-			AuthTime:    time.Now().UTC(), // Time Server not client
+			// Time Server not client
+			AuthTime: time.Now().UTC(),
+			// Note: This expiration time is retrieved from the relational database (MySQL).
+			// The performance speed might be somewhat slow (taking an average of 1s response time in the frontend) during the first query due to the relational database (always slow).
+			// However, when it hits Redis and is released into cookies with encryption, the speed can be faster (possibly 0ms ~ 1ms response time).
 			ExpiredTime: expirationDate,
 		},
 	}
