@@ -80,7 +80,7 @@ func saveAPIKeyInSession(sess *session.Session, key string, expired bool, expira
 			return
 		}
 
-		sess.Set(apiKeyExpired, jsonData)
+		sess.Set(apiKey, jsonData)
 		sess.SetExpiry(defaultExpryContextKey)
 	}
 
