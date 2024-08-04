@@ -5,18 +5,29 @@
 
 package keyidentifier
 
+import (
+	"crypto/ecdsa"
+	"hash"
+)
+
 // Config represents the configuration options for the key identifier.
 //
 // Note: The Prefix here is not actually a key, it's a group-key. For example, "session_id_authorized:<uuid>",
 // where <uuid> is the actual key to get the value. This is because memory storage is unstructured, unlike
 // relational databases that use queries and tables.
 type Config struct {
-	Prefix string
+	Prefix           string
+	PrivateKey       *ecdsa.PrivateKey
+	Digest           func() hash.Hash
+	SignedContextKey any
 }
 
 // ConfigDefault is the default configuration for the key identifier.
 var ConfigDefault = Config{
-	Prefix: "session_id_authorized:",
+	Prefix:           "session_id_authorized:",
+	PrivateKey:       nil,
+	Digest:           nil,
+	SignedContextKey: nil,
 }
 
 // KeyIdentifier represents the key identifier.
