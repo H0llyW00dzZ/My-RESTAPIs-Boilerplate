@@ -8,6 +8,7 @@ package keyidentifier
 import (
 	"crypto/ecdsa"
 	"hash"
+	"io"
 )
 
 // Config represents the configuration options for the key identifier.
@@ -20,6 +21,7 @@ type Config struct {
 	PrivateKey       *ecdsa.PrivateKey
 	Digest           func() hash.Hash
 	SignedContextKey any
+	Rand             io.Reader
 }
 
 // ConfigDefault is the default configuration for the key identifier.
@@ -28,6 +30,7 @@ var ConfigDefault = Config{
 	PrivateKey:       nil,
 	Digest:           nil,
 	SignedContextKey: nil,
+	Rand:             nil,
 }
 
 // KeyIdentifier represents the key identifier.
