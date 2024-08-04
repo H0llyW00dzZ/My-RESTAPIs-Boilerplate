@@ -77,6 +77,8 @@ func setupFiber(appName string, readTimeout, writeTimeout time.Duration) *fiber.
 		// Note: It's important to set Prefork to false because if it's enabled and running in Kubernetes,
 		// it may get killed by an Out-of-Memory (OOM) error due to a conflict with the Horizontal Pod Autoscaler (HPA).
 		Prefork: false,
+		// Which is suitable for streaming AI Response.
+		StreamRequestBody: true,
 	})
 }
 
