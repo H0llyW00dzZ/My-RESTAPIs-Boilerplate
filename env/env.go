@@ -46,6 +46,10 @@ const (
 // TLS Configuration
 const (
 	// This environment variable is used to specify additional root CA / subs CA certificates that should be trusted by the application.
+	//
+	// Best Practice: Use Private CAs, and ensure that the leaf CA adds the IP into the SANs (Subject Alternative Names).
+	// This can be easily achieved by implementing a tool like PKIX for CSR generation in Go, instead of using Public CAs (e.g., Trusted CAs).
+	// Then it can be easily bound to the network infrastructure (e.g., load balancers, etc.).
 	MYSQLCERTTLS = "MYSQL_CERTS_TLS" // Base64-encoded root CA / subs CA certificates for establishing secure connections MySQL database (required).
 	REDISCERTTLS = "REDIS_CERTS_TLS" // Base64-encoded root CA / subs CA certificates for establishing secure connections Redis database (required).
 
