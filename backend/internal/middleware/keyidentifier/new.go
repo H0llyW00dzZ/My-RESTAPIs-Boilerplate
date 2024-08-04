@@ -6,6 +6,10 @@
 package keyidentifier
 
 // Config represents the configuration options for the key identifier.
+//
+// Note: The Prefix here is not actually a key, it's a group-key. For example, "session_id_authorized:<uuid>",
+// where <uuid> is the actual key to get the value. This is because memory storage is unstructured, unlike
+// relational databases that use queries and tables.
 type Config struct {
 	Prefix string
 }
