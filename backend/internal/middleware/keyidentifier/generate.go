@@ -19,6 +19,8 @@ func (k *KeyIdentifier) GetKeyFunc() func(*fiber.Ctx) string {
 		id := utils.UUIDv4()
 
 		// Sign the UUID using ECDSA
+		//
+		// Note: When ECDSA configured then it become premium UUID that can be continue into ASN Programming.
 		if k.config.PrivateKey != nil && k.config.SignedContextKey != nil {
 			signature, err := k.signUUID(id)
 			if err != nil {
