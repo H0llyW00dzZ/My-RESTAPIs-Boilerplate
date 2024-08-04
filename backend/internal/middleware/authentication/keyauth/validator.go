@@ -18,6 +18,8 @@ import (
 
 // ValidatorKeyAuthHandler is a custom validator for the key authentication middleware.
 // It checks if the provided API key is valid and active by querying the Redis cache and the database.
+//
+// TODO: Finishing this, however performance kinda slow due it's mysql performance issue unlike Redis/Valkey, unless implementing own TLS/Cryptographic Protocol (e.g, TLS 1.4, etc)
 func ValidatorKeyAuthHandler(c *fiber.Ctx, key string, db database.Service) (bool, error) {
 	// Log the authentication attempt.
 	log.LogUserActivity(c, "Attempted Authentication")
