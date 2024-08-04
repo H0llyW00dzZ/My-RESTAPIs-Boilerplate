@@ -54,7 +54,7 @@ const (
 // Note: This structure is only for Redis/Valkey, as it is used solely for caching + better performance.
 // for relational database (MySQL) marked as TODO.
 type APIKeyData struct {
-	Identifier    string            `json:"identifier"`
+	Identifier    string            `json:"identifier,omitempty"`
 	APIKey        string            `json:"apikey"`
 	Status        string            `json:"status"`
 	Authorization AuthorizationData `json:"authorization,omitempty"`
