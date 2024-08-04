@@ -68,8 +68,8 @@ type MySQLConfig struct {
 //
 // Redis RAM Spec:
 //   - 2 GB total
-//   - 1 GB for master known as "primary node" or "master node"
-//   - 1 GB for slave known as "replica node" or "slave node" (automated synchronization replica)
+//   - 1 GB for master, known as "primary node" or "master node"
+//   - 1 GB for slave, known as "replica node" or "slave node" (automated synchronization replica)
 //
 // Tested Env Configuration:
 //   - RDB_POOL_TIMEOUT: 5m
@@ -87,9 +87,27 @@ type MySQLConfig struct {
 //
 // Best Practice: Maintaining a pool utilization of around 70% is generally considered healthy.
 // This balance helps ensure enough available connections while minimizing idle and stale connections.
+// For Example, a Healthy Pool:
+//
+//	{
+//	    "redis_health": {
+//	        "status": "up",
+//	        "message": "It's healthy",
+//	        "stats": {
+//	            "version": "7.2.4",
+//	            "mode": "standalone",
+//	            "connected_clients": "8",
+//	            "memory": { "used": { "mb": "85.64", "gb": "0.08" }, "peak": { "mb": "111.48", "gb": "0.11" }, "free": { "mb": "5120.00", "gb": "5.00" }, "percentage": "1.67%" },
+//	            "uptime": [{ "day": "6", "hour": "3", "minute": "55", "second": "20" }, { "stats": "6 days, 3 hours, 55 minutes, 20 seconds" }],
+//	            "pooling": { "figures": { "hits": "16559", "misses": "4", "timeouts": "0", "total": "5", "stale": "95", "idle": "5", "active": "0", "percentage": "50.00%" }, "observed_total": "16663" }
+//	        }
+//	    }
+//	}
+//
+// "connected_clients" is 8; however, the hits indicate that 8 goroutines in the pool are handling 10k++ hits.
 //
 // TODO: Improve this dynamically based on available resources by implementing a helper function that can be suitable in a cloud environment,
-// such as auto-pilot Kubernetes, for enhance [Zer0 Downtime].
+// such as auto-pilot Kubernetes, to enhance [Zer0 Downtime].
 var maxConnections = 2 * runtime.NumCPU()
 
 // InitializeRedisClient initializes and returns a new Redis client.
