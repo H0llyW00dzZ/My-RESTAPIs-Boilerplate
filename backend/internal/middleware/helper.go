@@ -106,6 +106,9 @@ func ratelimiterMsg(customMessage string) func(*fiber.Ctx) error {
 // Note:
 //   - If an unsupported middleware configuration is passed to WithKeyGenerator, it will panic with an error message.
 //   - Additional key generator support for other middlewares will be added based on future requirements.
+//
+// TODO: Extract this into separate functions (high-order function smiliar Storage and other) for each middleware to avoid potential issues/bugs that may arise
+// from using an default instead of an actual keyGenerator where it implemented (This issue smiliar Storage).
 func WithKeyGenerator(keyGenerator func(*fiber.Ctx) string) any {
 	return func(config any) {
 		// Note: This a better switch-statement, it doesn't matter if there is so many switch (e.g, 1 billion switch case)
@@ -783,6 +786,9 @@ func WithSwaggerCacheAge(cacheAge int) func(*swagger.Config) {
 // Note:
 //   - If an unsupported middleware configuration is passed to WithNext, it will panic with an error message.
 //   - Additional "Next" functionality for other middlewares will be added based on future requirements.
+//
+// TODO: Extract this into separate functions (high-order function smiliar Storage and other) for each middleware to avoid potential issues/bugs that may arise
+// from using an default instead of an actual next func(c *fiber.Ctx) where it implemented (This issue smiliar Storage).
 func WithNext(next func(c *fiber.Ctx) bool) any {
 	return func(config any) {
 		switch cfg := config.(type) {
@@ -902,6 +908,9 @@ func WithIdempotencyLock(lock idempotency.Locker) func(*idempotency.Config) {
 //
 // Note:
 //   - If an unsupported middleware configuration is passed to WithRules, it will panic with an error message.
+//
+// TODO: Extract this into separate functions (high-order function smiliar Storage and other) for each middleware to avoid potential issues/bugs that may arise
+// from using an default instead of an actual rules map[string]string where it implemented (This issue smiliar Storage).
 func WithRules(rules map[string]string) any {
 	// Note: now, this reusable, get good get golang.
 	return func(config any) {
