@@ -10,18 +10,15 @@ import (
 	"crypto/rand"
 	"fmt"
 	"io"
+
+	"errors"
 )
 
 // signUUID signs the given UUID using ECDSA and returns the signature in ASN.1 DER format.
 func (k *KeyIdentifier) signUUID(uuid string) ([]byte, error) {
-	// Check if the private key is set in the configuration
-	if k.config.PrivateKey == nil {
-		return nil, fmt.Errorf("private key is not set in the configuration")
-	}
-
 	// Check if the hash function is set in the configuration
 	if k.config.Digest == nil {
-		return nil, fmt.Errorf("hash function is not set in the configuration")
+		return nil, errors.New("crypto/keyidentifier: hash function is not set in the configuration")
 	}
 
 	// Digest the UUID using the configured hash function
@@ -51,7 +48,7 @@ func (k *KeyIdentifier) signUUID(uuid string) ([]byte, error) {
 func (k *KeyIdentifier) secureRandom() io.Reader {
 	// If no custom random number generator is provided in the configuration,
 	if k.config.Rand == nil {
-		// use the default [crypto/Reader] as the secure random number generator.
+		// use the default [crypto/rand] as the secure random number generator.
 		return rand.Reader
 	}
 
