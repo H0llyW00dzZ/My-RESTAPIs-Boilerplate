@@ -21,6 +21,11 @@ func (k *KeyIdentifier) GetKeyFunc() func(*fiber.Ctx) string {
 		// Sign the UUID using ECDSA
 		//
 		// Note: When ECDSA configured then it become premium UUID that can be continue into ASN Programming.
+		// Also note that this ECDSA is suitable for workers as well, such as goroutine workers, for example:
+		// - Maintaining/securing internal mechanisms (e.g, database, ingress, etc)
+		// In other hand:
+		// - Implementing cryptographic authentication mechanisms for clients instead of using JWT, email, password, username, or other credentials
+		// It's not only for TLS/code signing or other mechanisms that only maintain/secure external mechanisms. That's why it's implemented here.
 		if k.config.PrivateKey != nil && k.config.SignedContextKey != nil {
 			signature, err := k.signUUID(id)
 			if err != nil {
