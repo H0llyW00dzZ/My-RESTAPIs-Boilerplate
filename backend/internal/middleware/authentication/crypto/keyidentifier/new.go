@@ -6,6 +6,7 @@
 package keyidentifier
 
 import (
+	"crypto"
 	"crypto/ecdsa"
 	"hash"
 	"io"
@@ -22,6 +23,7 @@ type Config struct {
 	Digest           func() hash.Hash
 	SignedContextKey any
 	Rand             io.Reader
+	HSM              crypto.Signer
 }
 
 // ConfigDefault is the default configuration for the key identifier.
@@ -31,6 +33,7 @@ var ConfigDefault = Config{
 	Digest:           nil,
 	SignedContextKey: nil,
 	Rand:             nil,
+	HSM:              nil,
 }
 
 // KeyIdentifier represents the key identifier.
