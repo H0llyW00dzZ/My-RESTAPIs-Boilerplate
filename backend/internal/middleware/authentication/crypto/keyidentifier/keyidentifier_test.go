@@ -12,7 +12,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"h0llyw00dz-template/backend/internal/middleware/keyidentifier"
+	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/keyidentifier"
 	"h0llyw00dz-template/backend/internal/server"
 	"net/http"
 	"net/http/httptest"
