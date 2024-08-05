@@ -27,7 +27,18 @@ func (k *KeyIdentifier) signUUID(uuid string) ([]byte, error) {
 	digest := h.Sum(nil)
 
 	// Sign the Digest using ECDSA and return the signature in ASN.1 DER format
-	signature, err := ecdsa.SignASN1(k.secureRandom(), k.config.PrivateKey, digest)
+	var signature []byte
+	var err error
+
+	// Note: Test Skipped for HSM
+	if k.config.HSM != nil {
+		// If an HSM is provided, use the Sign method
+		signature, err = k.config.HSM.Sign(k.secureRandom(), digest, nil)
+	} else {
+		// If no HSM is provided, use SignASN1 with the private key
+		signature, err = ecdsa.SignASN1(k.secureRandom(), k.config.PrivateKey, digest)
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to sign UUID: %v", err)
 	}
