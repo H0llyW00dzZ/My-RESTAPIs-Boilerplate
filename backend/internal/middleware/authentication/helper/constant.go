@@ -81,6 +81,8 @@ type KeyAuthSessData map[string]any
 // 	  "apikey_expired_time": "2024-10-26T21:18:17Z"
 // 	}
 // }
+//
+// TODO: Handle Signature ECDSA, might implement as raw byte instead of string for Signature ECDSA.
 type AuthorizationData struct {
 	AuthTime time.Time `json:"time,omitempty"`
 	// Note: This expiration time is retrieved from the relational database (MySQL).
