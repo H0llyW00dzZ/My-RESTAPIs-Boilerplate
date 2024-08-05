@@ -42,6 +42,21 @@ type KeyIdentifier struct {
 }
 
 // New creates a new instance of the key identifier with the given configuration.
+//
+// Note: It is recommended not to implement this function as a global variable across the codebase,
+// as it may result in the same UUID being generated for all instances, rather than unique UUIDs.
+//
+// Example Usage:
+//
+//	func generateUUID() {
+//		// Create a new key identifier with custom configuration
+//		uuid := keyidentifier.New(keyidentifier.Config{
+//			Prefix: "custom_prefix:",
+//			// Set other configuration options as needed
+//		})
+//		// Use the key identifier
+//		// ...
+//	}
 func New(config ...Config) *KeyIdentifier {
 	cfg := ConfigDefault
 
