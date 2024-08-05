@@ -14,8 +14,8 @@ import (
 	"errors"
 )
 
-// signUUID signs the given UUID using ECDSA and returns the signature in ASN.1 DER format.
-func (k *KeyIdentifier) signUUID(uuid string) ([]byte, error) {
+// signUUIDWithECDSA signs the given UUID using ECDSA and returns the signature in ASN.1 DER format.
+func (k *KeyIdentifier) signUUIDWithECDSA(uuid string) ([]byte, error) {
 	// Check if the hash function is set in the configuration
 	if k.config.Digest == nil {
 		return nil, errors.New("crypto/keyidentifier: hash function is not set in the configuration")
@@ -27,20 +27,9 @@ func (k *KeyIdentifier) signUUID(uuid string) ([]byte, error) {
 	digest := h.Sum(nil)
 
 	// Sign the Digest using ECDSA and return the signature in ASN.1 DER format
-	var signature []byte
-	var err error
-
-	// Note: Test Skipped for HSM
-	if k.config.HSM != nil {
-		// If an HSM is provided, use the Sign method
-		signature, err = k.config.HSM.Sign(k.secureRandom(), digest, nil)
-	} else {
-		// If no HSM is provided, use SignASN1 with the private key
-		signature, err = ecdsa.SignASN1(k.secureRandom(), k.config.PrivateKey, digest)
-	}
-
+	signature, err := ecdsa.SignASN1(k.secureRandom(), k.config.PrivateKey, digest)
 	if err != nil {
-		return nil, fmt.Errorf("failed to sign UUID: %v", err)
+		return nil, fmt.Errorf("failed to sign UUID with ECDSA: %v", err)
 	}
 
 	return signature, nil
@@ -66,4 +55,25 @@ func (k *KeyIdentifier) secureRandom() io.Reader {
 	// If a custom random number generator is provided in the configuration,
 	// return it as the secure random number generator.
 	return k.config.Rand
+}
+
+// signUUIDWithHSM signs the given UUID using the HSM and returns the signature.
+func (k *KeyIdentifier) signUUIDWithHSM(uuid string) ([]byte, error) {
+	// Check if the hash function is set in the configuration
+	if k.config.Digest == nil {
+		return nil, errors.New("crypto/keyidentifier: hash function is not set in the configuration")
+	}
+
+	// Digest the UUID using the configured hash function
+	h := k.config.Digest()
+	h.Write([]byte(uuid))
+	digest := h.Sum(nil)
+
+	// Sign the Digest using the HSM and return the signature
+	signature, err := k.config.HSM.Sign(k.secureRandom(), digest, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to sign UUID with HSM: %v", err)
+	}
+
+	return signature, nil
 }

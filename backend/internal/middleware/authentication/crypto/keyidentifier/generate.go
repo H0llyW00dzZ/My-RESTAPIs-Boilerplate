@@ -18,21 +18,28 @@ func (k *KeyIdentifier) GetKeyFunc() func(*fiber.Ctx) string {
 		// Generate a random UUID
 		id := utils.UUIDv4()
 
-		// Sign the UUID using ECDSA
+		// Sign the UUID using ECDSA or HSM
 		//
-		// Note: When ECDSA configured then it become premium UUID that can be continue into ASN Programming.
-		// Also note that this ECDSA is suitable for workers as well, such as goroutine workers, for example:
-		// - Maintaining/securing internal mechanisms (e.g, database, ingress, etc)
-		// In other hand:
+		// Note: When ECDSA or HSM is configured, it becomes a premium UUID that can be used in ASN programming.
+		// Also note that this ECDSA or HSM is suitable for workers as well, such as goroutine workers, for example:
+		// - Maintaining/securing internal mechanisms (e.g., database, ingress, etc.)
+		// On the other hand:
 		// - Implementing cryptographic authentication mechanisms for clients instead of using JWT, email, password, username, or other credentials
 		// It's not only for TLS/code signing or other mechanisms that only maintain/secure external mechanisms. That's why it's implemented here.
-		if k.config.PrivateKey != nil && k.config.SignedContextKey != nil {
-			signature, err := k.signUUID(id)
+		switch {
+		case k.config.PrivateKey != nil && k.config.SignedContextKey != nil:
+			signature, err := k.signUUIDWithECDSA(id)
 			if err != nil {
 				panic(fmt.Errorf("failed to sign UUID: %v", err))
 			}
+			c.Locals(k.config.SignedContextKey, signature)
 
-			// Store the Signature for future use
+			// Test Skipped for HSM
+		case k.config.HSM != nil && k.config.SignedContextKey != nil:
+			signature, err := k.signUUIDWithHSM(id)
+			if err != nil {
+				panic(fmt.Errorf("failed to sign UUID: %v", err))
+			}
 			c.Locals(k.config.SignedContextKey, signature)
 		}
 
