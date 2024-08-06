@@ -87,7 +87,7 @@ type AuthorizationData struct {
 	AuthTime time.Time `json:"time,omitempty"`
 	// Note: This expiration time is retrieved from the relational database (MySQL).
 	// The performance speed might be somewhat slow (taking an average of 1s response time in the frontend) during the first query due to the relational database (always slow).
-	// However, when it hits Redis and is released into cookies with encryption, the speed can be faster (possibly 0ms ~ 1ms response time).
+	// However, when it hits Redis/Valkey and is released into cookies with encryption, the speed can be faster (possibly 0ms ~ 1ms response time).
 	ExpiredTime time.Time `json:"apikey_expired_time,omitempty"`
 	Signature   any       `json:"signature,omitempty"`
 }
