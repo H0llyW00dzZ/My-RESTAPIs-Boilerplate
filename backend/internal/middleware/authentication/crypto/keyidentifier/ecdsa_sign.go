@@ -95,6 +95,6 @@ func (k *KeyIdentifier) signUUIDWithHSM(uuid string) ([]byte, error) {
 func (k *KeyIdentifier) digest(uuid []byte) []byte {
 	// Digest the UUID using the configured hash function
 	h := k.config.Digest()
-	h.Write([]byte(uuid))
+	h.Write(uuid)
 	return h.Sum(nil)
 }
