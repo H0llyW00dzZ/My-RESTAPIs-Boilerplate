@@ -21,10 +21,7 @@ func (k *KeyIdentifier) signUUIDWithECDSA(uuid string) ([]byte, error) {
 		return nil, errors.New("crypto/keyidentifier: hash function is not set in the configuration")
 	}
 
-	// Digest the UUID using the configured hash function
-	h := k.config.Digest()
-	h.Write([]byte(uuid))
-	digest := h.Sum(nil)
+	digest := k.digest([]byte(uuid))
 
 	// Sign the Digest using ECDSA and return the signature in ASN.1 DER format
 	signature, err := ecdsa.SignASN1(k.secureRandom(), k.config.PrivateKey, digest)
@@ -67,10 +64,7 @@ func (k *KeyIdentifier) signUUIDWithHSM(uuid string) ([]byte, error) {
 		return nil, errors.New("crypto/keyidentifier: hash function is not set in the configuration")
 	}
 
-	// Digest the UUID using the configured hash function
-	h := k.config.Digest()
-	h.Write([]byte(uuid))
-	digest := h.Sum(nil)
+	digest := k.digest([]byte(uuid))
 
 	// Sign the digest using the HSM and return the signature
 	signature, err := k.config.HSM.Sign(k.secureRandom(), digest, nil)
@@ -79,4 +73,28 @@ func (k *KeyIdentifier) signUUIDWithHSM(uuid string) ([]byte, error) {
 	}
 
 	return signature, nil
+}
+
+// digest computes the hash of the given UUID using the configured hash function.
+//
+// It takes the following parameter:
+//   - uuid: The UUID as a byte slice.
+//
+// It returns the computed hash of the UUID as a byte slice.
+//
+// This function is used internally by the [signUUIDWithECDSA] and [signUUIDWithHSM] functions
+// to compute the hash of the UUID before signing it. The hash function used for the digest
+// is determined by the "Digest" field in the [Config] struct.
+//
+// Example usage:
+//
+//	digest := k.digest([]byte(uuid))
+//
+// Note: The "Digest" field in the [Config] struct must be set to a valid hash function.
+// If the [Digest] field is not set, an error will be returned by the calling function.
+func (k *KeyIdentifier) digest(uuid []byte) []byte {
+	// Digest the UUID using the configured hash function
+	h := k.config.Digest()
+	h.Write([]byte(uuid))
+	return h.Sum(nil)
 }
