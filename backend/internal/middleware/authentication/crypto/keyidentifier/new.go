@@ -17,6 +17,8 @@ import (
 // Note: The Prefix here is not actually a key, it's a group-key. For example, "session_id_authorized:<uuid>",
 // where <uuid> is the actual key to get the value. This is because memory storage is unstructured, unlike
 // relational databases that use queries and tables.
+// Also Note That, When you see logs in redis/valkey or redis/valkey commander panel, the "session_id_authorized:" will be categorized as a group,
+// and <uuid> will be the key to get the value.
 type Config struct {
 	Prefix           string
 	PrivateKey       *ecdsa.PrivateKey
