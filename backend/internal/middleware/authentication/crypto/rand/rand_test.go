@@ -6,6 +6,7 @@
 package rand_test
 
 import (
+	"crypto/elliptic"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand"
 	"testing"
 )
@@ -83,5 +84,49 @@ func TestFixedReaderRead(t *testing.T) {
 	// Check for any errors
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+func TestFixedSizeECDSA(t *testing.T) {
+	curves := []elliptic.Curve{
+		elliptic.P256(),
+		elliptic.P384(),
+		elliptic.P521(),
+	}
+
+	for _, curve := range curves {
+		r := rand.FixedSizeECDSA(curve)
+
+		// Determine the expected size based on the curve
+		expectedSize := 32
+		if curve.Params().BitSize > 256 {
+			expectedSize = 48
+		}
+
+		// Test reading from the reader
+		buf := make([]byte, expectedSize)
+		n, err := r.Read(buf)
+
+		// Check the number of bytes read
+		if n != expectedSize {
+			t.Errorf("Expected to read %d bytes for curve %s, but read %d bytes", expectedSize, curve.Params().Name, n)
+		}
+
+		// Check for any errors
+		if err != nil {
+			t.Errorf("Unexpected error for curve %s: %v", curve.Params().Name, err)
+		}
+
+		// Test reading again to ensure it generates new random bytes
+		buf2 := make([]byte, expectedSize)
+		_, err = r.Read(buf2)
+		if err != nil {
+			t.Errorf("Unexpected error for curve %s: %v", curve.Params().Name, err)
+		}
+
+		// Check that the two reads generate different random bytes
+		if string(buf) == string(buf2) {
+			t.Errorf("Expected different random bytes on subsequent reads for curve %s", curve.Params().Name)
+		}
 	}
 }
