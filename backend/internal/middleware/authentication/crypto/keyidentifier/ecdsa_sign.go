@@ -98,3 +98,29 @@ func (k *KeyIdentifier) digest(uuid []byte) []byte {
 	h.Write(uuid)
 	return h.Sum(nil)
 }
+
+// GetECDSAPubKey extracts the public key from the private key.
+//
+// It takes the following parameter:
+//   - privateKey: The ECDSA private key.
+//
+// It returns the corresponding ECDSA public key.
+//
+// If the private key is not set in the configuration, an error is returned.
+//
+// Example usage:
+//
+//	pubKey := k.GetECDSAPubKey()
+//
+// Note: The private key must be set in the configuration for this function to work.
+func (k *KeyIdentifier) GetECDSAPubKey() (*ecdsa.PublicKey, error) {
+	// Check if the private key is set in the configuration
+	if k.config.PrivateKey == nil {
+		return nil, errors.New("crypto/keyidentifier: private key is not set in the configuration")
+	}
+
+	// Extract the public key from the private key
+	pubKey := k.config.PrivateKey.Public().(*ecdsa.PublicKey)
+
+	return pubKey, nil
+}

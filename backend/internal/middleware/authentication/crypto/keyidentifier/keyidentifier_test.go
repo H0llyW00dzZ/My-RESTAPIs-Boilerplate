@@ -29,9 +29,6 @@ func TestKeyIdentifier(t *testing.T) {
 		t.Fatalf("Failed to generate ECDSA private key: %v", err)
 	}
 
-	// Get the public key from the private key
-	publicKey := privateKey.Public().(*ecdsa.PublicKey)
-
 	// Create a new instance of KeyIdentifier with the desired configuration
 	const ecdsaUUID = "ecdsa_authorized:"
 	keyIdentifier := keyidentifier.New(keyidentifier.Config{
@@ -40,6 +37,12 @@ func TestKeyIdentifier(t *testing.T) {
 		Digest:           sha256.New,
 		SignedContextKey: "signature",
 	})
+
+	// Extract the public key from the private key
+	publicKey, err := keyIdentifier.GetECDSAPubKey()
+	if err != nil {
+		t.Fatalf("Failed to extract public key from the private key: %v", err)
+	}
 
 	// Create a new Fiber app
 	app := fiber.New()
@@ -123,9 +126,6 @@ func TestKeyIdentifierWithFixedRand(t *testing.T) {
 		t.Fatalf("Failed to generate ECDSA private key: %v", err)
 	}
 
-	// Get the public key from the private key
-	publicKey := privateKey.Public().(*ecdsa.PublicKey)
-
 	// Create a new instance of KeyIdentifier with the desired configuration
 	const ecdsaUUID = "ecdsa_fixed_rand_authorized:"
 	keyIdentifier := keyidentifier.New(keyidentifier.Config{
@@ -135,6 +135,12 @@ func TestKeyIdentifierWithFixedRand(t *testing.T) {
 		SignedContextKey: "signature",
 		Rand:             server.RandTLS(),
 	})
+
+	// Extract the public key from the private key
+	publicKey, err := keyIdentifier.GetECDSAPubKey()
+	if err != nil {
+		t.Fatalf("Failed to extract public key from the private key: %v", err)
+	}
 
 	// Create a new Fiber app
 	app := fiber.New()
