@@ -79,49 +79,17 @@ func ratelimiterMsg(customMessage string) func(*fiber.Ctx) error {
 	}
 }
 
-// WithKeyGenerator is an option function that sets a custom key generator for various Fiber middlewares.
-//
-// It supports the following middleware configurations:
-//
-//	*cache.Config: Sets the key generator for the cache middleware.
-//	*limiter.Config: Sets the key generator for the rate limiter middleware.
-//
-// The key generator is a function that takes a *fiber.Ctx as a parameter and returns a string key.
-// It is used to generate a unique key for each request, which is used for caching or rate limiting.
-//
-// Example usage:
-//
-//	// Define a custom key generator function
-//	func customKeyGenerator(c *fiber.Ctx) string {
-//	    // Custom logic to generate a unique key based on the request
-//	    return c.Path() + c.IP()
-//	}
-//
-//	// Use the WithKeyGenerator option function to set the key generator for the cache middleware
-//	cacheMiddleware := NewCacheMiddleware(WithKeyGenerator(customKeyGenerator))
-//
-//	// Use the WithKeyGenerator option function to set the key generator for the rate limiter middleware
-//	rateLimiterMiddleware := NewRateLimiter(WithKeyGenerator(customKeyGenerator))
-//
-// Note:
-//   - If an unsupported middleware configuration is passed to WithKeyGenerator, it will panic with an error message.
-//   - Additional key generator support for other middlewares will be added based on future requirements.
-//
-// TODO: Extract this into separate functions (high-order function smiliar Storage and other) for each middleware to avoid potential issues/bugs that may arise
-// from using an default instead of an actual keyGenerator where it implemented (This issue smiliar Storage).
-func WithKeyGenerator(keyGenerator func(*fiber.Ctx) string) any {
-	return func(config any) {
-		// Note: This a better switch-statement, it doesn't matter if there is so many switch (e.g, 1 billion switch case)
-		switch cfg := config.(type) {
-		case *cache.Config:
-			cfg.KeyGenerator = keyGenerator
-			// TODO: Implement a custom key generator for any sensitive data such as API keys or OAuth tokens,
-			// since the default rate limiter key in Fiber is based on c.IP()
-		case *limiter.Config:
-			cfg.KeyGenerator = keyGenerator
-		default:
-			panic(fmt.Sprintf("unsupported config type: %T", config))
-		}
+// WithLimiterKeyGenerator is an option function that sets a custom key generator for the rate limiter middleware.
+func WithLimiterKeyGenerator(keyGenerator func(*fiber.Ctx) string) func(*limiter.Config) {
+	return func(config *limiter.Config) {
+		config.KeyGenerator = keyGenerator
+	}
+}
+
+// WithCacheKeyGenerator is an option function that sets a custom key generator for the cache middleware.
+func WithCacheKeyGenerator(keyGenerator func(*fiber.Ctx) string) func(*cache.Config) {
+	return func(config *cache.Config) {
+		config.KeyGenerator = keyGenerator
 	}
 }
 
