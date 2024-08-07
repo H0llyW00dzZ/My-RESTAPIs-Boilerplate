@@ -1,0 +1,87 @@
+// Copyright (c) 2024 H0llyW00dz All rights reserved.
+//
+// By accessing or using this software, you agree to be bound by the terms
+// of the License Agreement, which you can find at LICENSE files.
+
+package rand_test
+
+import (
+	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand"
+	"testing"
+)
+
+func TestFixedSize32Bytes(t *testing.T) {
+	r := rand.FixedSize32Bytes()
+
+	// Test reading from the reader
+	buf := make([]byte, 32)
+	n, err := r.Read(buf)
+
+	// Check the number of bytes read
+	if n != 32 {
+		t.Errorf("Expected to read 32 bytes, but read %d bytes", n)
+	}
+
+	// Check for any errors
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	// Test reading again to ensure it generates new random bytes
+	buf2 := make([]byte, 32)
+	_, err = r.Read(buf2)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	// Check that the two reads generate different random bytes
+	if string(buf) == string(buf2) {
+		t.Error("Expected different random bytes on subsequent reads")
+	}
+}
+
+func TestFixedReaderRead(t *testing.T) {
+	r := rand.FixedSize32Bytes()
+
+	// Test reading with a buffer smaller than the fixed size
+	buf := make([]byte, 16)
+	n, err := r.Read(buf)
+
+	// Check the number of bytes read
+	if n != 16 {
+		t.Errorf("Expected to read 16 bytes, but read %d bytes", n)
+	}
+
+	// Check for any errors
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	// Test reading with a buffer larger than the fixed size
+	buf = make([]byte, 64)
+	n, err = r.Read(buf)
+
+	// Check the number of bytes read
+	if n != 32 {
+		t.Errorf("Expected to read 32 bytes, but read %d bytes", n)
+	}
+
+	// Check for any errors
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	// Test reading with an empty buffer
+	buf = make([]byte, 0)
+	n, err = r.Read(buf)
+
+	// Check the number of bytes read
+	if n != 0 {
+		t.Errorf("Expected to read 0 bytes, but read %d bytes", n)
+	}
+
+	// Check for any errors
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}

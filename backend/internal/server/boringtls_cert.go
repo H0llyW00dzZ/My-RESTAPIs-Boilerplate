@@ -16,6 +16,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand"
 	"io"
 	"net/http"
 	"time"
@@ -143,7 +144,7 @@ func (s *FiberServer) SubmitToCTLog(cert *x509.Certificate, privateKey crypto.Pr
 	// Note: The [RandTLS()] function provides sufficient randomness for the purposes of [x509.CreateCertificate],
 	// including generating serial numbers and signing certificates with any type of key,
 	// instead of multiple calls to [io.Reader], following DRY (Don't Repeat Yourself).
-	certDER, err := x509.CreateCertificate(RandTLS(), cert, cert, publicKey(privateKey), privateKey)
+	certDER, err := x509.CreateCertificate(rand.FixedSize32Bytes(), cert, cert, publicKey(privateKey), privateKey)
 	if err != nil {
 		return fmt.Errorf("failed to encode certificate: %v", err)
 	}
