@@ -219,7 +219,7 @@ func TestKeyIdentifierWithFixedRand(t *testing.T) {
 }
 
 // Note: If test fail then the fixed size it's incorrect
-func TestKeyIdentifierWithFixedRandEDCSA(t *testing.T) {
+func TestKeyIdentifierWithFixedRandECDSA(t *testing.T) {
 	// Generate an ECDSA private key
 	privateKey, err := ecdsa.GenerateKey(elliptic.P384(), rand.FixedSizeECDSA(elliptic.P384()))
 	if err != nil {
