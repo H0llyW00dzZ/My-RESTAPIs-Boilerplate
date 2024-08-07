@@ -8,12 +8,12 @@ package keyidentifier_test
 import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
-	"crypto/rand"
+	std "crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/keyidentifier"
-	"h0llyw00dz-template/backend/internal/server"
+	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -24,7 +24,7 @@ import (
 
 func TestKeyIdentifier(t *testing.T) {
 	// Generate an ECDSA private key
-	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), std.Reader)
 	if err != nil {
 		t.Fatalf("Failed to generate ECDSA private key: %v", err)
 	}
@@ -121,7 +121,7 @@ func TestKeyIdentifier(t *testing.T) {
 
 func TestKeyIdentifierWithFixedRand(t *testing.T) {
 	// Generate an ECDSA private key
-	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), server.RandTLS())
+	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.FixedSize32Bytes())
 	if err != nil {
 		t.Fatalf("Failed to generate ECDSA private key: %v", err)
 	}
@@ -133,7 +133,7 @@ func TestKeyIdentifierWithFixedRand(t *testing.T) {
 		PrivateKey:       privateKey,
 		Digest:           sha256.New,
 		SignedContextKey: "signature",
-		Rand:             server.RandTLS(),
+		Rand:             rand.FixedSize32Bytes(),
 	})
 
 	// Extract the public key from the private key

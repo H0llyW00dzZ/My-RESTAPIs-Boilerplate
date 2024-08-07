@@ -13,7 +13,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/elliptic"
-	"crypto/rand"
+	std "crypto/rand"
 	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
@@ -22,6 +22,7 @@ import (
 	"encoding/base64"
 	"errors"
 	log "h0llyw00dz-template/backend/internal/logger"
+	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand"
 	"h0llyw00dz-template/backend/internal/server"
 	"math/big"
 	"net/http"
@@ -117,7 +118,7 @@ func tlsServerConfig(cert tls.Certificate) *tls.Config {
 		// defaults to verifying client certificates when ClientCAs is set.
 		// Also, note that ClientCAs refers to the chain of Certificate Authorities Pool that made & signed by RootCAs, which is why it's different from RootCAs.
 		ClientAuth: tls.RequireAndVerifyClientCert,
-		Rand:       server.RandTLS(),
+		Rand:       rand.FixedSize32Bytes(),
 	}
 }
 
@@ -161,12 +162,12 @@ func (m *MockHTTPClient) Do(req *http.Request) (*http.Response, error) {
 }
 
 func generateSelfSignedCertECDSA() (*x509.Certificate, *ecdsa.PrivateKey, error) {
-	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), std.Reader)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
+	serialNumber, err := std.Int(std.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -184,7 +185,7 @@ func generateSelfSignedCertECDSA() (*x509.Certificate, *ecdsa.PrivateKey, error)
 		BasicConstraintsValid: true,
 	}
 
-	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
+	derBytes, err := x509.CreateCertificate(std.Reader, &template, &template, &privateKey.PublicKey, privateKey)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -198,12 +199,12 @@ func generateSelfSignedCertECDSA() (*x509.Certificate, *ecdsa.PrivateKey, error)
 }
 
 func generateSelfSignedCertRSA() (*x509.Certificate, *rsa.PrivateKey, error) {
-	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	privateKey, err := rsa.GenerateKey(std.Reader, 2048)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
+	serialNumber, err := std.Int(std.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -221,7 +222,7 @@ func generateSelfSignedCertRSA() (*x509.Certificate, *rsa.PrivateKey, error) {
 		BasicConstraintsValid: true,
 	}
 
-	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
+	derBytes, err := x509.CreateCertificate(std.Reader, &template, &template, &privateKey.PublicKey, privateKey)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -238,7 +239,7 @@ func generateSelfSignedCertEd25519() (*x509.Certificate, ed25519.PrivateKey, err
 	privateKey := ed25519.NewKeyFromSeed(make([]byte, ed25519.SeedSize))
 	publicKey := privateKey.Public().(ed25519.PublicKey)
 
-	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
+	serialNumber, err := std.Int(std.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -256,7 +257,7 @@ func generateSelfSignedCertEd25519() (*x509.Certificate, ed25519.PrivateKey, err
 		BasicConstraintsValid: true,
 	}
 
-	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, publicKey, privateKey)
+	derBytes, err := x509.CreateCertificate(std.Reader, &template, &template, publicKey, privateKey)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -273,7 +274,7 @@ func generateSelfSignedCertEd25519WithExpired() (*x509.Certificate, ed25519.Priv
 	privateKey := ed25519.NewKeyFromSeed(make([]byte, ed25519.SeedSize))
 	publicKey := privateKey.Public().(ed25519.PublicKey)
 
-	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
+	serialNumber, err := std.Int(std.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -291,7 +292,7 @@ func generateSelfSignedCertEd25519WithExpired() (*x509.Certificate, ed25519.Priv
 		BasicConstraintsValid: true,
 	}
 
-	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, publicKey, privateKey)
+	derBytes, err := x509.CreateCertificate(std.Reader, &template, &template, publicKey, privateKey)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -307,12 +308,12 @@ func generateSelfSignedCertEd25519WithExpired() (*x509.Certificate, ed25519.Priv
 // createTestCertificateWithSCTs creates a test certificate with SCTs for testing purposes.
 func createTestCertificateWithSCTs(t *testing.T) (*x509.Certificate, *server.SCTResponse) {
 	// Generate an ECDSA private key
-	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), std.Reader)
 	if err != nil {
 		t.Fatalf("Failed to generate ECDSA private key: %v", err)
 	}
 
-	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
+	serialNumber, err := std.Int(std.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
 	if err != nil {
 		t.Fatalf("Failed to generate serial number: %v", err)
 	}
@@ -320,7 +321,7 @@ func createTestCertificateWithSCTs(t *testing.T) (*x509.Certificate, *server.SCT
 	// Create SCT data with a valid timestamp
 	timestamp := uint64(time.Now().Unix())
 	logID := make([]byte, 32)
-	_, err = rand.Read(logID)
+	_, err = std.Read(logID)
 	if err != nil {
 		t.Fatalf("Failed to generate log ID: %v", err)
 	}
@@ -341,7 +342,7 @@ func createTestCertificateWithSCTs(t *testing.T) (*x509.Certificate, *server.SCT
 	sctData = append(sctData, byte(len(extensions)))
 	sctData = append(sctData, extensions...)
 
-	signature, err := ecdsa.SignASN1(rand.Reader, privateKey, sctData)
+	signature, err := ecdsa.SignASN1(std.Reader, privateKey, sctData)
 	if err != nil {
 		t.Fatalf("Failed to generate signature: %v", err)
 	}
@@ -383,7 +384,7 @@ func createTestCertificateWithSCTs(t *testing.T) (*x509.Certificate, *server.SCT
 	}
 
 	// Create the self-signed certificate
-	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
+	derBytes, err := x509.CreateCertificate(std.Reader, &template, &template, &privateKey.PublicKey, privateKey)
 	if err != nil {
 		t.Fatalf("Failed to create self-signed certificate: %v", err)
 	}
@@ -399,12 +400,12 @@ func createTestCertificateWithSCTs(t *testing.T) (*x509.Certificate, *server.SCT
 // createTestCertificateValidSCTs creates a test certificate valid SCTs for testing purposes.
 func createTestCertificateValidSCTs(t *testing.T) (*x509.Certificate, *server.SCTResponse) {
 	// Generate an ECDSA private key
-	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), std.Reader)
 	if err != nil {
 		t.Fatalf("Failed to generate ECDSA private key: %v", err)
 	}
 
-	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
+	serialNumber, err := std.Int(std.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
 	if err != nil {
 		t.Fatalf("Failed to generate serial number: %v", err)
 	}
@@ -429,7 +430,7 @@ func createTestCertificateValidSCTs(t *testing.T) (*x509.Certificate, *server.SC
 	}
 
 	// Create the self-signed certificate
-	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
+	derBytes, err := x509.CreateCertificate(std.Reader, &template, &template, &privateKey.PublicKey, privateKey)
 	if err != nil {
 		t.Fatalf("Failed to create self-signed certificate: %v", err)
 	}
@@ -455,7 +456,7 @@ func createTestCertificateValidSCTs(t *testing.T) (*x509.Certificate, *server.SC
 		byte(timestamp))
 	data = append(data, []byte("")...)
 
-	signature, err := ecdsa.SignASN1(rand.Reader, privateKey, data)
+	signature, err := ecdsa.SignASN1(std.Reader, privateKey, data)
 	if err != nil {
 		t.Fatalf("Failed to generate signature: %v", err)
 	}
@@ -491,7 +492,7 @@ func generateSCTExtension(SCData server.SCTData) (pkix.Extension, error) {
 // createTestCertificateValidSCTsForLTS creates a test certificate valid SCTs for testing purposes.
 func createTestCertificateValidSCTsForLTS(t *testing.T) (*x509.Certificate, crypto.PrivateKey) {
 	// Generate a random serial number
-	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
+	serialNumber, err := std.Int(std.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
 	if err != nil {
 		t.Fatalf("Failed to generate serial number: %v", err)
 	}
@@ -520,13 +521,13 @@ func createTestCertificateValidSCTsForLTS(t *testing.T) (*x509.Certificate, cryp
 	}
 
 	// Generate a new ECDSA private key
-	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), std.Reader)
 	if err != nil {
 		t.Fatalf("Failed to generate private key: %v", err)
 	}
 
 	// Create a self-signed certificate
-	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
+	derBytes, err := x509.CreateCertificate(std.Reader, &template, &template, &privateKey.PublicKey, privateKey)
 	if err != nil {
 		t.Fatalf("Failed to create certificate: %v", err)
 	}
@@ -540,7 +541,7 @@ func createTestCertificateValidSCTsForLTS(t *testing.T) (*x509.Certificate, cryp
 	// Create SCT data with a valid timestamp
 	timestamp := uint64(time.Now().Unix())
 	logID := make([]byte, 32)
-	_, err = rand.Read(logID)
+	_, err = std.Read(logID)
 	if err != nil {
 		t.Fatalf("Failed to generate log ID: %v", err)
 	}
@@ -567,7 +568,7 @@ func createTestCertificateValidSCTsForLTS(t *testing.T) (*x509.Certificate, cryp
 	hasher := hash.New()
 	hasher.Write(sctData)
 	hashed := hasher.Sum(nil)
-	signature, err := ecdsa.SignASN1(rand.Reader, privateKey, hashed)
+	signature, err := ecdsa.SignASN1(std.Reader, privateKey, hashed)
 	if err != nil {
 		t.Fatalf("Failed to generate signature: %v", err)
 	}
@@ -596,7 +597,7 @@ func createTestCertificateValidSCTsForLTS(t *testing.T) (*x509.Certificate, cryp
 	})
 
 	// Create a new certificate with the SCT extension
-	certWithSCT, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
+	certWithSCT, err := x509.CreateCertificate(std.Reader, &template, &template, &privateKey.PublicKey, privateKey)
 	if err != nil {
 		t.Fatalf("Failed to create certificate with SCT: %v", err)
 	}

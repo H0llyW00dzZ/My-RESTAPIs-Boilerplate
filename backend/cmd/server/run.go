@@ -16,6 +16,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	log "h0llyw00dz-template/backend/internal/logger"
+	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand"
 	handler "h0llyw00dz-template/backend/internal/server"
 	"h0llyw00dz-template/env"
 )
@@ -212,7 +213,7 @@ func TLSConfig(cert tls.Certificate, leafCA, subCA, rootCA *x509.Certificate, cl
 		GetCertificate: tlsHandler.GetClientInfo,
 		// Note: This safe for multiple goroutines each time it is called, ensuring that each goroutine gets its own independent reader
 		// The fixedReader itself does not maintain any mutable state, making it safe for concurrent use.
-		Rand: handler.RandTLS(),
+		Rand: rand.FixedSize32Bytes(),
 		// TODO: Handle "VerifyPeerCertificate" for Certificate Transparency.
 	}
 

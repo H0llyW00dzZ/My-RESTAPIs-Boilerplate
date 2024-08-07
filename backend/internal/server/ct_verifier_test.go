@@ -6,7 +6,7 @@
 package server_test
 
 import (
-	"crypto/rand"
+	std "crypto/rand"
 	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
@@ -15,6 +15,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid/stream"
+	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand"
 	"h0llyw00dz-template/backend/internal/server"
 	"math/big"
 	"testing"
@@ -84,7 +85,7 @@ func TestVerifyCertificateTransparencyInTLSConnection(t *testing.T) {
 			tls.CurveP384,
 			tls.CurveP521,
 		},
-		Rand: server.RandTLS(),
+		Rand: rand.FixedSize32Bytes(),
 		Certificates: []tls.Certificate{
 			{
 				Certificate: [][]byte{cert.Raw},
@@ -210,7 +211,7 @@ func TestInvalidSCT(t *testing.T) {
 	ctVerifier := new(server.CTVerifier)
 
 	// Generate a random serial number
-	serialNumber, err := rand.Int(rand.Reader, big.NewInt(1<<62))
+	serialNumber, err := std.Int(std.Reader, big.NewInt(1<<62))
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -242,7 +243,7 @@ func TestInvalidSCT(t *testing.T) {
 		}
 
 		// Generate a new RSA private key
-		privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+		privateKey, err := rsa.GenerateKey(std.Reader, 2048)
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}
@@ -260,7 +261,7 @@ func TestInvalidSCT(t *testing.T) {
 		}
 
 		// Create a self-signed certificate
-		certx, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
+		certx, err := x509.CreateCertificate(std.Reader, &template, &template, &privateKey.PublicKey, privateKey)
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}
@@ -298,7 +299,7 @@ func TestInvalidSCT(t *testing.T) {
 		}
 
 		// Generate a new RSA private key
-		privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+		privateKey, err := rsa.GenerateKey(std.Reader, 2048)
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}
@@ -316,7 +317,7 @@ func TestInvalidSCT(t *testing.T) {
 		}
 
 		// Create a self-signed certificate
-		certx, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
+		certx, err := x509.CreateCertificate(std.Reader, &template, &template, &privateKey.PublicKey, privateKey)
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}
