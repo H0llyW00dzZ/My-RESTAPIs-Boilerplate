@@ -78,6 +78,8 @@ func (r *fixedReader) Read(p []byte) (n int, err error) {
 //   - For curves with a bit size greater than 256 (e.g., P-384, P-521), it generates 48 random bytes.
 //
 // Note: This helper function is safe for use by multiple goroutines that call it simultaneously.
+// Also note that the P-521 curve might not be suitable for TLS or other applications because most internet
+// on average use curves ranging from P-256 to P-384.
 func FixedSizeECDSA(curve elliptic.Curve) io.Reader {
 	if curve.Params().BitSize <= 256 {
 		return FixedSize32Bytes()
