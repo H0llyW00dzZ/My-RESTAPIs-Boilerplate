@@ -8,6 +8,7 @@
 package rand
 
 import (
+	"crypto/elliptic"
 	"crypto/rand"
 	"io"
 )
@@ -65,4 +66,23 @@ func (r *fixedReader) Read(p []byte) (n int, err error) {
 	}
 
 	return rand.Read(p[:r.size])
+}
+
+// FixedSizeECDSA returns a custom [io.Reader] that provides a fixed-size random byte stream
+// suitable for generating ECDSA nonces. The returned reader generates a fixed number of random bytes
+// each time it is read from, based on the provided elliptic curve.
+// It uses the cryptographic random generator from the [crypto/rand] package to ensure secure randomness.
+//
+// The size of the random byte stream is determined by the curve:
+//   - For curves with a bit size less than or equal to 256 (e.g., P-256), it returns the FixedSize32Bytes reader.
+//   - For curves with a bit size greater than 256 (e.g., P-384, P-521), it generates 48 random bytes.
+//
+// Note: This helper function is safe for use by multiple goroutines that call it simultaneously.
+func FixedSizeECDSA(curve elliptic.Curve) io.Reader {
+	if curve.Params().BitSize <= 256 {
+		return FixedSize32Bytes()
+	}
+	return &fixedReader{
+		size: 48,
+	}
 }
