@@ -58,6 +58,7 @@ func (k *KeyIdentifier) secureRandom() io.Reader {
 //
 // Note: Testing this function is skipped due to the challenging of using an HSM in testing mode. However, it is recommended to use "signUUIDWithECDSA" instead.
 // Regarding the private key of ECDSA, it can be easily maintained while using "signUUIDWithECDSA", especially in a Kubernetes environment that already has an HSM connector.
+// Alternatively, you can implement your own connector. For example, I have previously implemented a TLS Connector that is used only for signing in this internal operation.
 func (k *KeyIdentifier) signUUIDWithHSM(uuid string) ([]byte, error) {
 	// Check if the hash function is set in the configuration
 	if k.config.Digest == nil {
