@@ -11,6 +11,9 @@ import (
 	"testing"
 )
 
+// Note: If this function is not safe for concurrent use, it would lead to race conditions or produce the same result
+// across multiple goroutines. This function is particularly useful in production environments where the system requires
+// multiple goroutines (e.g., when 10000 goroutines are needed, it provides 10000 readers, each with its own instance so it always welcome).
 func TestFixedSize32Bytes(t *testing.T) {
 	r := rand.FixedSize32Bytes()
 
@@ -41,6 +44,9 @@ func TestFixedSize32Bytes(t *testing.T) {
 	}
 }
 
+// Note: If this function is not safe for concurrent use, it would lead to race conditions or produce the same result
+// across multiple goroutines. This function is particularly useful in production environments where the system requires
+// multiple goroutines (e.g., when 10000 goroutines are needed, it provides 10000 readers, each with its own instance so it always welcome).
 func TestFixedReaderRead(t *testing.T) {
 	r := rand.FixedSize32Bytes()
 
@@ -87,6 +93,9 @@ func TestFixedReaderRead(t *testing.T) {
 	}
 }
 
+// Note: If this function is not safe for concurrent use, it would lead to race conditions or produce the same result
+// across multiple goroutines. This function is particularly useful in production environments where the system requires
+// multiple goroutines (e.g., when 10000 goroutines are needed, it provides 10000 readers, each with its own instance so it always welcome).
 func TestFixedSizeECDSA(t *testing.T) {
 	curves := []elliptic.Curve{
 		elliptic.P256(),
