@@ -8,6 +8,7 @@ package middleware
 import (
 	"h0llyw00dz-template/backend/internal/database"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid"
+	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/keyidentifier"
 	"h0llyw00dz-template/backend/pkg/restapis/server/health"
 	"strings"
 
@@ -51,6 +52,16 @@ type APIGroup struct {
 //	api: The Fiber router to register the routes on.
 //	db: The database service to be used by the API handlers.
 func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
+	// Note: This is just an example that can be integrated with other Fiber middleware.
+	// If needed to store it in storage, use a prefix for group keys and call "GetKeyFunc".
+	genReqID := keyidentifier.New(keyidentifier.Config{
+		Prefix: "",
+	})
+	// Generate Request ID
+	xRequestID := NewRequestIDMiddleware(
+		WithRequestIDHeaderContextKey("rest_apis_visitor_uuid"),
+		WithRequestIDGenerator(genReqID.GetKey),
+	)
 	// Example encrypt cookie
 	// Note: This is suitable with session middleware logic.
 	encryptcookie := NewEncryptedCookieMiddleware(
@@ -84,8 +95,12 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 	// In this root API group, it is possible to set the index root path `/` (e.g., to host the Swagger UI documentation).
 	// Also, note that this method won't conflict with another path that already has a handler (e.g., api.localhost:8080/v1/server/health/db).
 	rootGroup := APIGroup{
+		// When other Fiber middleware mechanisms are applied here, they will be applied across all REST API routes.
+		// For example, if the "encryptcookie" middleware is applied here, it will encrypt any cookies sent in the REST APIs.
+		// This is a tip to stack middleware mechanisms instead of applying them one by one.
 		Prefix:                    "/",
 		EncryptedCookieMiddleware: encryptcookie,
+		RequestID:                 xRequestID,
 		Routes:                    []APIRoute{},
 	}
 

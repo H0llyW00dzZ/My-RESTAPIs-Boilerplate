@@ -13,6 +13,7 @@ import (
 
 	"h0llyw00dz-template/backend/internal/database"
 	log "h0llyw00dz-template/backend/internal/logger"
+	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/keyidentifier"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
 	htmx "h0llyw00dz-template/frontend/htmx/error_page_handler"
 )
@@ -34,12 +35,18 @@ type (
 // RegisterRoutes sets up the API routing for the application.
 // It organizes routes into versioned groups for better API version management.
 func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Service) {
+	// Note: This is just an example that can be integrated with other Fiber middleware.
+	// If needed to store it in storage, use a prefix for group keys and call "GetKeyFunc".
+	genReqID := keyidentifier.New(keyidentifier.Config{
+		Prefix: "",
+	})
 	// Generate Request ID
 	//
 	// Note: This just example and "visitor_uuid" contextkey can be used for c.Locals
 	// Previously I've been done implement this X-Request-ID bound into hash from TLS 1.3 with Private Protocols Cryptography (not open source) not UUID.
 	xRequestID := NewRequestIDMiddleware(
 		WithRequestIDHeaderContextKey("visitor_uuid"),
+		WithRequestIDGenerator(genReqID.GetKey),
 	)
 
 	// Create a custom middleware to set the CSP header
