@@ -19,7 +19,7 @@ import (
 // relational databases that use queries and tables.
 // Also note that when you see logs in the redis/valkey or redis/valkey commander panel, "session_id_authorized:" will be categorized as a group,
 // and <uuid> will be the key to get the value.
-// Then To create multiple group-keys, similar to a binary tree (see https://en.wikipedia.org/wiki/Binary_tree), simply add another prefix tag. For example, "authorization:session_id_authorized:<uuid>".
+// Then To create multiple group-keys, similar to a binary tree (The Best Art of Programming) (see https://en.wikipedia.org/wiki/Binary_tree), simply add another prefix tag. For example, "authorization:session_id_authorized:<uuid>".
 type Config struct {
 	Prefix           string
 	PrivateKey       *ecdsa.PrivateKey
