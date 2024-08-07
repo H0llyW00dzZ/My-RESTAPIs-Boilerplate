@@ -1016,9 +1016,7 @@ func WithCSPValueGenerator(cspvalue func(string, map[string]string) string) func
 //   - A function that takes a [fiber.Ctx] as input and returns a boolean value indicating whether to
 //     skip the middleware for the given request based on the response content type.
 //
-// Note: This function is suitable for cache middleware; however, use it at your own risk. Due The custom key generator in Fiber's cache middleware
-// may not work properly, and it can lead to a security compromise where any path is used as a key (default fiber) when using Fiber's storage mechanism.
-// It is recommended to implement your own cache handler with Fiber's storage mechanism for better control and security.
+// Note: This function is suitable for cache middleware.
 func CustomNextContentType(contentTypes ...string) func(*fiber.Ctx) bool {
 	return func(c *fiber.Ctx) bool {
 		for _, contentType := range contentTypes {

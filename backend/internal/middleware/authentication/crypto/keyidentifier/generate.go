@@ -110,6 +110,7 @@ func (k *KeyIdentifier) GenerateCacheKey(c *fiber.Ctx) string {
 	// Convert the hash to a hexadecimal string
 	cacheKey := hex.EncodeToString(digest[:])
 
+	// No need to copy; this is already an immutable, built-in, secure cryptographic digest.
 	return k.config.Prefix + cacheKey
 }
 
