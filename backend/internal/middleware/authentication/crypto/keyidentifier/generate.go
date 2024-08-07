@@ -91,6 +91,7 @@ func (k *KeyIdentifier) GetKey() string {
 // Note: This is now suitable and secure to use with the Fiber cache middleware because it computes the SHA-256 hash of the key instead of using c.Patch().
 // For example, "frontend:44658f661a1a27cf94e51bf48947525e5dfcfb6f95050b52800300f2554b7f99_GET_body",
 // where 44658f661a1a27cf94e51bf48947525e5dfcfb6f95050b52800300f2554b7f99_GET_body is the actual key to get the value.
+// Previously, it was not secure because the key directly used c.Path(), which could leak sensitive information to the public, for example, in Redis/Valkey logs, commander panels, cloud.
 func (k *KeyIdentifier) GenerateCacheKey(c *fiber.Ctx) string {
 	// Get the request method
 	method := c.Method()
