@@ -11,6 +11,7 @@ import (
 	"h0llyw00dz-template/backend/internal/middleware/csp"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
 	"hash/fnv"
+	"strings"
 	"time"
 
 	validator "github.com/H0llyW00dzZ/FiberValidator"
@@ -994,5 +995,37 @@ func WithCSPValueGenerator(cspvalue func(string, map[string]string) string) func
 		config.CSPValueGenerator = func(randomness string, customValues map[string]string) string {
 			return cspvalue(randomness, customValues)
 		}
+	}
+}
+
+// CustomNextContentType is a helper function that creates a custom Next function for the fiber middleware.
+//
+// The returned Next function checks the content type of the response and determines whether to skip
+// the middleware based on the provided content types. If the response content type starts with any of the
+// specified content types, the Next function returns true, indicating that the middleware should be skipped.
+//
+// Example usage:
+//
+//	// Create a custom skipper function to skip the middleware for HTML responses
+//	htmlSkipper := CustomNextContentType(fiber.MIMETextHTMLCharsetUTF8)
+//
+// Parameters:
+//   - contentTypes: Variadic string parameters representing the content types to skip the middleware for.
+//
+// Returns:
+//   - A function that takes a [fiber.Ctx] as input and returns a boolean value indicating whether to
+//     skip the middleware for the given request based on the response content type.
+//
+// Note: This function is suitable for cache middleware; however, use it at your own risk. Due The custom key generator in Fiber's cache middleware
+// may not work properly, and it can lead to a security compromise where any path is used as a key (default fiber) when using Fiber's storage mechanism.
+// It is recommended to implement your own cache handler with Fiber's storage mechanism for better control and security.
+func CustomNextContentType(contentTypes ...string) func(*fiber.Ctx) bool {
+	return func(c *fiber.Ctx) bool {
+		for _, contentType := range contentTypes {
+			if strings.HasPrefix(string(c.Response().Header.ContentType()), contentType) {
+				return true
+			}
+		}
+		return false
 	}
 }
