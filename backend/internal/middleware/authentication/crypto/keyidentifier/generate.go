@@ -47,7 +47,9 @@ func (k *KeyIdentifier) GetKeyFunc() func(*fiber.Ctx) string {
 		key := k.config.Prefix + id
 
 		// Return the generated key
-		return key
+		// Note: This won't be affected anyway and is not supported by other Fiber middleware mechanisms that use storage + key generators
+		// because the way they are implemented is incorrect (e.g., Custom KeyGenerator does not work properly in the fiber cache middleware).
+		return utils.CopyString(key)
 	}
 }
 
@@ -62,5 +64,7 @@ func (k *KeyIdentifier) GetKey() string {
 	key := k.config.Prefix + id
 
 	// Return the generated key
-	return key
+	// Note: This won't be affected anyway and is not supported by other Fiber middleware mechanisms that use storage + key generators
+	// because the way they are implemented is incorrect (e.g., Custom KeyGenerator does not work properly in the fiber cache middleware).
+	return utils.CopyString(key)
 }
