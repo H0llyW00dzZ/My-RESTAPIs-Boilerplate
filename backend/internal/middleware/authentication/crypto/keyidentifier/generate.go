@@ -117,7 +117,10 @@ func (k *KeyIdentifier) GenerateCacheKey(c *fiber.Ctx) string {
 
 	// Compute the SHA-256 hash of the key
 	//
-	// Note: not possible use k.Config.Digest because this required no error
+	// Note: It's not possible to use k.Config.Digest because it requires no error.
+	// Also, note that this SHA-256 hash is secure and will never return the same value due to its design.
+	// For example, when the cache data expires and is cached same data again, a new unique hash will be generated.
+	// Basically, each operation has its own hash writer, ensuring independent and isolated digest.
 	digest := sha256.Sum256([]byte(key))
 
 	// Convert the hash to a hexadecimal string
