@@ -5,7 +5,7 @@
 
 // Note: The struct types defined here are partially copied from the htmx error handler and are subject to change due to the extensive struct building required for the front end.
 
-package htmxlogin
+package htmxauth
 
 import (
 	"github.com/gofiber/fiber/v2"

@@ -3,7 +3,7 @@
 // By accessing or using this software, you agree to be bound by the terms
 // of the License Agreement, which you can find at LICENSE files.
 
-package htmxlogin
+package htmxauth
 
 import (
 	htmx "h0llyw00dz-template/frontend/htmx/error_page_handler"
