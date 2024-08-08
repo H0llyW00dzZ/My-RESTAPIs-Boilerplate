@@ -97,7 +97,6 @@ func (k *KeyIdentifier) GetKey() string {
 //	app.Use(cache.New(cache.Config{
 //		KeyGenerator: cacheKeyGen.GenerateCacheKey,
 //		Storage: mystorage,
-//
 //	}))
 //
 // Note: This is now suitable and secure to use with the Fiber cache middleware because it computes the SHA-256 hash of the key instead of using c.Patch() (Default Fiber).
