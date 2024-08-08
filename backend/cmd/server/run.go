@@ -25,6 +25,10 @@ import (
 // by setting up the Fiber web server, configuring middleware, and registering routes.
 // It relies on environment variables to customize the application's behavior,
 // and it starts the server with graceful shutdown capabilities.
+//
+// Also, note that while the program is running and you can see the header "bound on host 0.0.0.0 and ...",
+// the IP address "0.0.0.0" is not susceptible to exploits, attacks, or any other vulnerabilities.
+// This is because "0.0.0.0" is my home. So be smart and refer to the source code and documentation to understand how it works you poggers.
 func main() {
 	appName, port, monitorPath, timeFormat, readTimeout, writeTimeout, shutdownTimeout := getEnvVariables()
 	app := setupFiber(appName, readTimeout, writeTimeout)
