@@ -86,8 +86,6 @@ func (k *KeyIdentifier) GetKey() string {
 //
 // Example usage:
 //
-//	cacheKey := k.GenerateCacheKey(c)
-//
 //	// Create a new KeyIdentifier instance
 //	cacheKeyGen := keyidentifier.New(keyidentifier.Config{
 //		Prefix: "frontend:",
