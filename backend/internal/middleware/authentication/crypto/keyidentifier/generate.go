@@ -89,13 +89,11 @@ func (k *KeyIdentifier) GetKey() string {
 //	cacheKey := k.GenerateCacheKey(c)
 //
 //	// Create a new KeyIdentifier instance
-//
 //	cacheKeyGen := keyidentifier.New(keyidentifier.Config{
 //		Prefix: "frontend:",
 //	})
 //
 //	// Use the cache middleware with the custom key generator
-//
 //	app.Use(cache.New(cache.Config{
 //		KeyGenerator: cacheKeyGen.GenerateCacheKey,
 //		Storage: mystorage,
