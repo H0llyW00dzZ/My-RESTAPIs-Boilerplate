@@ -104,6 +104,7 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 				fiber.MIMEApplicationJSONCharsetUTF8,
 			),
 		),
+		WithCacheHeader("X-Go-Frontend"),
 	)
 
 	// Recovery middleware setup
