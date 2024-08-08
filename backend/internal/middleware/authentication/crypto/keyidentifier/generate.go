@@ -86,12 +86,22 @@ func (k *KeyIdentifier) GetKey() string {
 //
 // Example usage:
 //
-//	cacheKey := k.GenerateCacheKey(c)
+//	// Create a new KeyIdentifier instance
+//	cacheKeyGen := keyidentifier.New(keyidentifier.Config{
+//		Prefix: "frontend:",
+//	})
+//
+//	// Use the cache middleware with the custom key generator
+//	app.Use(cache.New(cache.Config{
+//		KeyGenerator: cacheKeyGen.GenerateCacheKey,
+//		Storage: mystorage,
+//	}))
 //
 // Note: This is now suitable and secure to use with the Fiber cache middleware because it computes the SHA-256 hash of the key instead of using c.Patch() (Default Fiber).
 // For example, "frontend:44658f661a1a27cf94e51bf48947525e5dfcfb6f95050b52800300f2554b7f99_GET_body",
 // where 44658f661a1a27cf94e51bf48947525e5dfcfb6f95050b52800300f2554b7f99_GET_body is the actual key to get the value.
 // Previously, it was not secure because the key directly used c.Path(), which could leak sensitive information to the public, for example, in Redis/Valkey logs, commander panels, cloud.
+// Also note that this only works with the Fiber cache middleware and can enhance speed performance for HTTP/3 in load balancers.
 func (k *KeyIdentifier) GenerateCacheKey(c *fiber.Ctx) string {
 	// Get the request method
 	method := c.Method()
@@ -106,12 +116,14 @@ func (k *KeyIdentifier) GenerateCacheKey(c *fiber.Ctx) string {
 	key := fmt.Sprintf("%s:%s?%s", method, path, queryParams)
 
 	// Compute the SHA-256 hash of the key
+	//
+	// Note: not possible use k.Config.Digest because this required no error
 	digest := sha256.Sum256([]byte(key))
 
 	// Convert the hash to a hexadecimal string
 	cacheKey := hex.EncodeToString(digest[:])
 
-	// No need to copy; this is already an immutable, built-in, secure cryptographic digest.
+	// No need to copy; this is already an immutable, built-in, secure cryptographic hash.
 	return k.config.Prefix + cacheKey
 }
 
