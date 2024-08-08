@@ -7,6 +7,7 @@ package middleware
 
 import (
 	"runtime/debug"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -55,7 +56,7 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 	// Hosts
 	hosts := map[string]*Host{}
 	// Apply the combined middlewares
-	registerRouteConfigMiddleware(app)
+	registerRouteConfigMiddleware(app, db)
 	// API subdomain
 	api := fiber.New()
 	// Register the REST APIs Routes
@@ -77,12 +78,32 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 
 // registerRouteConfigMiddleware applies middleware configurations to the Fiber application.
 // It sets up the necessary middleware such as recovery, logging, and custom error handling for manipulating panics.
-func registerRouteConfigMiddleware(app *fiber.App) {
+func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 	// Favicon front end setup
 	// Note: this just an example
 	favicon := NewFaviconMiddleware(
 		WithFaviconFile("./frontend/public/assets/images/favicon.ico"),
 		WithFaviconURL("/favicon.ico"),
+	)
+	// Note: This is just an example. It should work with SHA-256 for the key, however it may not properly bind to a UUID.
+	cacheKeyGen := keyidentifier.New(keyidentifier.Config{
+		Prefix: "go_frontend:",
+	})
+	// Speed depends of database connection as well.
+	gopherstorage := db.FiberStorage()
+	cacheMiddleware := NewCacheMiddleware(
+		WithCacheStorage(gopherstorage),
+		WithCacheKeyGenerator(cacheKeyGen.GenerateCacheKey),
+		WithCacheExpiration(1*time.Hour),
+		WithCacheControl(true),
+		WithCacheNext(
+			CustomNextContentType(
+				fiber.MIMETextHTML,
+				fiber.MIMETextHTMLCharsetUTF8,
+				fiber.MIMEApplicationJSON,
+				fiber.MIMEApplicationJSONCharsetUTF8,
+			),
+		),
 	)
 
 	// Recovery middleware setup
@@ -99,7 +120,7 @@ func registerRouteConfigMiddleware(app *fiber.App) {
 	})
 
 	// Apply the recover middleware
-	app.Use(helper.ErrorHandler, recoverMiddleware, favicon)
+	app.Use(helper.ErrorHandler, cacheMiddleware, recoverMiddleware, favicon)
 }
 
 // DomainRouter is a middleware function that handles subdomain or domain routing.

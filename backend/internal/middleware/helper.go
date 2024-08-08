@@ -707,7 +707,6 @@ func WithSwaggerCacheAge(cacheAge int) func(*swagger.Config) {
 //
 // It supports the following middleware configurations:
 //
-//	*cache.Config: Sets the Next function for the cache middleware.
 //	*cors.Config: Sets the Next function for the CORS middleware.
 //	*csrf.Config: Sets the Next function for the CSRF middleware.
 //	*redirect.Config: Sets the Next function for the redirect middleware.
@@ -761,8 +760,6 @@ func WithSwaggerCacheAge(cacheAge int) func(*swagger.Config) {
 func WithNext(next func(c *fiber.Ctx) bool) any {
 	return func(config any) {
 		switch cfg := config.(type) {
-		case *cache.Config:
-			cfg.Next = next
 		case *cors.Config:
 			cfg.Next = next
 		case *csrf.Config:
@@ -1033,5 +1030,12 @@ func CustomNextContentType(contentTypes ...string) func(*fiber.Ctx) bool {
 func WithSessionIDGenerator(generator func() string) func(*session.Config) {
 	return func(config *session.Config) {
 		config.KeyGenerator = generator
+	}
+}
+
+// WithCacheNext is an option function for NewCacheMiddleware that sets the Next function to skip the cache middleware.
+func WithCacheNext(next func(*fiber.Ctx) bool) func(*cache.Config) {
+	return func(config *cache.Config) {
+		config.Next = next
 	}
 }
