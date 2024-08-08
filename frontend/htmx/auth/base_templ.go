@@ -9,7 +9,7 @@
 
 // of the License Agreement, which you can find at LICENSE files.
 
-package htmxlogin
+package htmxauth
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
