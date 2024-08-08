@@ -839,21 +839,13 @@ func WithIdempotencyLock(lock idempotency.Locker) func(*idempotency.Config) {
 	}
 }
 
-// WithRules is an option function that sets the rewrite or redirect rules for the Rewrite or Redirect middleware.
+// WithRewriteRules is an option function for the Rewrite middleware that sets the rewrite rules.
 //
-// It supports the following middleware configurations:
-//
-//	*rewrite.Config: Sets the rewrite rules for the Rewrite middleware.
-//	*redirect.Config: Sets the redirect rules for the Redirect middleware.
-//
-// The rules are defined as a map of string keys and values. For the Rewrite middleware, the keys represent the URL path
-// patterns to match, and the values represent the replacement paths. Captured values can be retrieved by index using the
-// $1, $2, etc. syntax. For the Redirect middleware, the keys represent the source paths, and the values represent the
-// destination paths.
+// The rewrite rules are defined as a map of string keys and values. The keys represent the URL path patterns to match,
+// and the values represent the replacement paths. Captured values can be retrieved by index using the $1, $2, etc. syntax.
 //
 // Example usage:
 //
-//	// Define the rewrite rules
 //	rewriteRules := map[string]string{
 //	    "/old":              "/new",
 //	    "/api/*":            "/$1",
@@ -861,10 +853,27 @@ func WithIdempotencyLock(lock idempotency.Locker) func(*idempotency.Config) {
 //	    "/users/*/orders/*": "/user/$1/order/$2",
 //	}
 //
-//	// Use the WithRules option function to set the rewrite rules for the Rewrite middleware
-//	rewriteMiddleware := NewRewriteMiddleware(WithRules(rewriteRules))
+//	rewriteMiddleware := NewRewriteMiddleware(WithRewriteRules(rewriteRules))
+func WithRewriteRules(rules map[string]string) func(*rewrite.Config) {
+	return func(config *rewrite.Config) {
+		config.Rules = rules
+	}
+}
+
+// WithRewriteNext is an option function for the Rewrite middleware that sets the Next function.
+func WithRewriteNext(next func(c *fiber.Ctx) bool) func(*rewrite.Config) {
+	return func(config *rewrite.Config) {
+		config.Next = next
+	}
+}
+
+// WithRedirectRules is an option function for the Redirect middleware that sets the redirect rules.
 //
-//	// Define the redirect rules
+// The redirect rules are defined as a map of string keys and values. The keys represent the source paths,
+// and the values represent the destination paths.
+//
+// Example usage:
+//
 //	redirectRules := map[string]string{
 //	    "/old":              "/new",
 //	    "/api/*":            "/$1",
@@ -872,25 +881,17 @@ func WithIdempotencyLock(lock idempotency.Locker) func(*idempotency.Config) {
 //	    "/users/*/orders/*": "/user/$1/order/$2",
 //	}
 //
-//	// Use the WithRules option function to set the redirect rules for the Redirect middleware
-//	redirectMiddleware := NewRedirectMiddleware(WithRules(redirectRules))
-//
-// Note:
-//   - If an unsupported middleware configuration is passed to WithRules, it will panic with an error message.
-//
-// TODO: Extract this into separate functions (high-order function smiliar Storage and other) for each middleware to avoid potential issues/bugs that may arise
-// from using an default instead of an actual rules map[string]string where it implemented (This issue smiliar Storage).
-func WithRules(rules map[string]string) any {
-	// Note: now, this reusable, get good get golang.
-	return func(config any) {
-		switch cfg := config.(type) {
-		case *rewrite.Config:
-			cfg.Rules = rules
-		case *redirect.Config:
-			cfg.Rules = rules
-		default:
-			panic(fmt.Sprintf("unsupported config type: %T", config))
-		}
+//	redirectMiddleware := NewRedirectMiddleware(WithRedirectRules(redirectRules))
+func WithRedirectRules(rules map[string]string) func(*redirect.Config) {
+	return func(config *redirect.Config) {
+		config.Rules = rules
+	}
+}
+
+// WithNextRedirect is an option function for the Redirect middleware that sets the Next function.
+func WithNextRedirect(next func(c *fiber.Ctx) bool) func(*redirect.Config) {
+	return func(config *redirect.Config) {
+		config.Next = next
 	}
 }
 
@@ -1025,5 +1026,12 @@ func CustomNextContentType(contentTypes ...string) func(*fiber.Ctx) bool {
 			}
 		}
 		return false
+	}
+}
+
+// WithSessionIDGenerator is an option function for NewSessionMiddleware that sets a custom generator function for the session ID.
+func WithSessionIDGenerator(generator func() string) func(*session.Config) {
+	return func(config *session.Config) {
+		config.KeyGenerator = generator
 	}
 }
