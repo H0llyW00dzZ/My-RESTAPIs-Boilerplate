@@ -78,6 +78,12 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 
 // registerRouteConfigMiddleware applies middleware configurations to the Fiber application.
 // It sets up the necessary middleware such as recovery, logging, and custom error handling for manipulating panics.
+//
+// Note: This is the root of the router configuration. When a Fiber middleware mechanism is applied here, it will be applied across both the frontend and the REST APIs.
+// If there is a need to split the middleware configuration, it must be applied separately to the frontend and the REST APIs.
+// If the root, frontend, and REST APIs configurations are still not enough, it can be implemented with own middleware configuration.
+// This can lead to a complex setup, similar to the best art of binary trees (see https://en.wikipedia.org/wiki/Binary_tree).
+// However, it's not actually complex; it's just the art of Go programming.
 func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 	// Favicon front end setup
 	// Note: this just an example
