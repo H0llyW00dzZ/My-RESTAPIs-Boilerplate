@@ -22,6 +22,7 @@ type FrontendRoute struct {
 	ETagMiddleware            fiber.Handler
 	FaviconMiddleware         fiber.Handler
 	EncryptedCookieMiddleware fiber.Handler
+	HTMX                      []fiber.Handler
 }
 
 // FrontendGroup represents a group of frontend routes under a common prefix.
@@ -34,6 +35,7 @@ type FrontendGroup struct {
 	ETagMiddleware            fiber.Handler
 	FaviconMiddleware         fiber.Handler
 	EncryptedCookieMiddleware fiber.Handler
+	HTMX                      []fiber.Handler
 }
 
 // registerStaticFrontendRoutes sets up the frontend routing for a given Fiber app.
