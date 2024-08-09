@@ -19,6 +19,9 @@
 #
 # Also, note that for the deployment/app/service related to this repository (REST API Boilerplate), don't forget to set HPA (Horizontal Pod Autoscaler) with CPU and Memory.
 # Start with a minimum of 1 pod. Additionally, while idle, the average memory usage of this repository (REST API Boilerplate) is between 10MB and 15MB, sometimes even under 10MB (the power of fiber zer0-allocation).
+#
+# Acknowledgement: Regarding autoscaler, due to Fiber's built-in zer0-allocation and the repository's reliance on network-related connections to MySQL and Redis/Valey (Most Important if possible considering 0ms then it would be epic),
+# VPA (Vertical Pod Autoscaler) is also accepted which is suitable as well (e.g, starter, small operation/request).
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
