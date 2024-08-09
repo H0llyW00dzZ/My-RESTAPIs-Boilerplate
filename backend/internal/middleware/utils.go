@@ -35,6 +35,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/fiber/v2/middleware/rewrite"
 	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/gofiber/fiber/v2/middleware/skip"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/google/uuid"
 )
@@ -753,4 +754,17 @@ func NewCSPHeaderGenerator(options ...any) fiber.Handler {
 
 	// Return the CSP header generator middleware.
 	return cspgenerator
+}
+
+// NewSkipMiddleware creates a new middleware handler that skips the wrapped handler
+// based on the provided exclude predicate function.
+//
+// The exclude predicate function takes a [*fiber.Ctx] as input and returns a boolean value.
+// If the exclude predicate returns true, the wrapped handler will be skipped, and the request
+// will be passed to the next middleware in the chain using [c.Next].
+//
+// If the exclude predicate returns false, the wrapped handler will be executed.
+func NewSkipMiddleware(handler fiber.Handler, exclude func(c *fiber.Ctx) bool) fiber.Handler {
+	// Use the [skip.New] function from the Fiber framework to create a new skip middleware.
+	return skip.New(handler, exclude)
 }
