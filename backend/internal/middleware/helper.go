@@ -1039,3 +1039,30 @@ func WithCacheNext(next func(*fiber.Ctx) bool) func(*cache.Config) {
 		config.Next = next
 	}
 }
+
+// CustomNextPathAvailable is a helper function that creates a custom Next function for the fiber middleware.
+//
+// The returned Next function checks if the requested path is available in the provided map of paths.
+// If the path is found in the map, the Next function returns false, indicating that the middleware should not be skipped.
+// Otherwise, it returns true, indicating that the middleware should be skipped.
+//
+// Example usage:
+//
+//	// Create a custom skipper function to skip the middleware for available paths
+//	pathSkipper := CustomNextPathAvailable(map[string]bool{
+//	    "v2/users": true,
+//	    "v2/products": true,
+//	})
+//
+// Parameters:
+//   - paths: A map of string keys representing the available paths, and bool values indicating their availability.
+//
+// Returns:
+//   - A function that takes a [*fiber.Ctx] as input and returns a boolean value indicating whether to
+//     skip the middleware for the given request based on the availability of the requested path.
+func CustomNextPathAvailable(paths map[string]bool) func(*fiber.Ctx) bool {
+	return func(c *fiber.Ctx) bool {
+		_, ok := paths[c.Path()]
+		return !ok
+	}
+}
