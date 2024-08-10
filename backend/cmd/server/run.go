@@ -9,7 +9,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/bytedance/sonic"
@@ -42,18 +41,18 @@ func main() {
 // to ensure the application has sensible defaults if environment variables are not set.
 func getEnvVariables() (appName, port, monitorPath, timeFormat string, readTimeout, writeTimeout, shutdownTimeout time.Duration) {
 	// Get the APP_NAME, PORT, and MONITOR_PATH from environment variables or use default values.
-	appName = getEnv(env.APPNAME, "Gopher")
-	port = getEnv(env.PORT, "8080")
-	monitorPath = getEnv(env.MONITORPATH, "/monitor")
+	appName = env.GetEnv(env.APPNAME, "Gopher")
+	port = env.GetEnv(env.PORT, "8080")
+	monitorPath = env.GetEnv(env.MONITORPATH, "/monitor")
 	// Get the TIME_FORMAT from environment variables or use default value
 	// Note: List Time Format Available: unix,default
-	timeFormat = getEnv(env.TIMEFORMAT, "unix")
+	timeFormat = env.GetEnv(env.TIMEFORMAT, "unix")
 
 	// Get the READ_TIMEOUT, WRITE_TIMEOUT, and SHUTDOWN_TIMEOUT from environment variables or use default values.
 	// Note: These default timeout values (5 seconds) are set to help prevent potential deadlocks/hangs.
-	readTimeoutStr := getEnv(env.READTIMEOUT, "5s")
-	writeTimeoutStr := getEnv(env.SHUTDOWNTIMEOUT, "5s")
-	shutdownTimeoutStr := getEnv(env.SHUTDOWNTIMEOUT, "5s")
+	readTimeoutStr := env.GetEnv(env.READTIMEOUT, "5s")
+	writeTimeoutStr := env.GetEnv(env.SHUTDOWNTIMEOUT, "5s")
+	shutdownTimeoutStr := env.GetEnv(env.SHUTDOWNTIMEOUT, "5s")
 
 	// Parse the timeout values into time.Duration
 	readTimeout, _ = time.ParseDuration(readTimeoutStr)
@@ -110,18 +109,6 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 	//
 	// Note: When running in Kubernetes, this is an easy configuration with cert-manager.io for environment mode (as currently implemented). It just uses a secret.
 	handler.StartServer(server, addr, monitorPath, shutdownTimeout, nil, nil)
-}
-
-// getEnv reads an environment variable and returns its value.
-// If the environment variable is not set, it returns a specified default value.
-// This function encapsulates the standard library's [os.LookupEnv] to provide defaults,
-// following the common Go idiom of "make the zero value useful".
-func getEnv(key, defaultValue string) string {
-	value, exists := os.LookupEnv(key)
-	if !exists {
-		return defaultValue
-	}
-	return value
 }
 
 // TLSConfig creates and configures a TLS configuration for the server.
