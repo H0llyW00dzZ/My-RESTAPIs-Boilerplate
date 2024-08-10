@@ -374,7 +374,8 @@ func initializeRedisStorage() (fiber.Storage, error) {
 		Password: redisPassword,
 		Database: redisDB,
 		PoolSize: maxConnections,
-		Reset:    false,
+		// TODO: When ENV (e.g, GO_APP=local) it will set to true.
+		Reset: false,
 	}
 
 	// Initialize and return the Redis storage using the provided configuration
