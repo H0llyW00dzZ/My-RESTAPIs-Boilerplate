@@ -6,6 +6,7 @@
 package middleware
 
 import (
+	"os"
 	"runtime/debug"
 	"time"
 
@@ -16,7 +17,14 @@ import (
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/keyidentifier"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
+	"h0llyw00dz-template/env"
 	htmx "h0llyw00dz-template/frontend/htmx/error_page_handler"
+
+	_ "github.com/joho/godotenv/autoload" // godot autoload env
+)
+
+var (
+	apiSubdomain = os.Getenv(env.APISUBDOMAIN) // set API_SUB_DOMAIN=api.localhost:8080 (depends of port available) for local development
 )
 
 // Note: This method works well Docs: https://github.com/gofiber/fiber/issues/750
@@ -65,7 +73,7 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 	// Similarly, for the frontend, specify a domain like `hosts["example.com"] = &Host{frontend}`.
 	// Additionally, instead of hard-coding the domain or subdomain,
 	// it is possible to integrate it with environment variables or other configurations (e.g, YAML).
-	hosts["api.localhost:8080"] = &Host{api}
+	hosts[apiSubdomain] = &Host{api}
 	// Register the Static Frontend Routes
 	registerStaticFrontendRoutes(app, appName, db)
 	// Apply the subdomain routing middleware
