@@ -104,10 +104,13 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 		WithCacheControl(true),
 		WithCacheNext(
 			CustomNextContentType(
+				// Note: Its important to disabling cache for this MIME
 				fiber.MIMETextHTML,
 				fiber.MIMETextHTMLCharsetUTF8,
 				fiber.MIMEApplicationJSON,
 				fiber.MIMEApplicationJSONCharsetUTF8,
+				helper.MIMEApplicationProblemJSON,
+				helper.MIMEApplicationProblemJSONCharsetUTF8,
 			),
 		),
 		WithCacheHeader("X-Go-Frontend"),
