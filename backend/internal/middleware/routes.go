@@ -147,7 +147,13 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 // Note: This is useful for large Go applications, especially when running in Kubernetes,
 // as it eliminates the need for multiple containers. It also supports integration with the Kubernetes ecosystem,
 // such as pointing to CNAME/NS or manually (if not using Kubernetes).
-// Also note that For TLS certificates, a wildcard/advanced certificate is required.
+// Also note that for TLS certificates, a wildcard/advanced certificate is required.
+//
+// Known Bugs:
+//   - Wildcard/advanced certificates are not supported/compatible on Heroku.
+//     Using a wildcard/advanced certificate on Heroku will cause an "SSL certificate error: There is conflicting information between the SSL connection, its certificate, and/or the included HTTP requests."
+//     If using a wildcard/advanced certificate, it is recommended to deploy the application in a cloud environment such as Kubernetes, where you can easily control the ingress controller.
+//     Also note that regarding known bugs, it is not caused by this repository; it is an issue with Heroku's router.
 //
 // TODO: Consider moving this middleware into a separate package for better maintainability. This might involve creating a new repository.
 func DomainRouter(hosts map[string]*Host) fiber.Handler {
