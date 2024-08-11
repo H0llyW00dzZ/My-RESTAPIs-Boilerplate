@@ -62,6 +62,9 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 	cspMiddleware := NewCSPHeaderGenerator()
 
 	// Hosts
+	// TODO: Reorganize this,
+	// When this is reorganized, it will create 3 Routers (3 domains = 1.Static Frontend, 2.Hostname, 3.REST APIs). For TLS (e.g., in Ingress), it requires a Wildcard certificate instead of issuing 3 separate certificates.
+	// The 3-router implementation is based on my previous work that has been done before. It offers a better design (all-in-one) and is easier to maintain, even with 500+ files.
 	hosts := map[string]*Host{}
 	// Apply the combined middlewares
 	registerRouteConfigMiddleware(app, db)
