@@ -1066,3 +1066,44 @@ func CustomNextPathAvailable(paths map[string]bool) func(*fiber.Ctx) bool {
 		return !ok
 	}
 }
+
+// CustomNextStack is a helper function that creates a custom Next stack function for the fiber middleware
+// by combining multiple custom Next functions based on their keys in the provided map.
+//
+// The returned Next function checks each custom Next function in the map and determines whether
+// to skip the middleware based on their combined result. If any of the custom Next functions
+// returns true, indicating that the middleware should be skipped, the combined Next function
+// returns true. Otherwise, it returns false.
+//
+// Example usage:
+//
+//	// Create custom Next functions
+//	pathSkipper := CustomNextPathAvailable(map[string]bool{
+//	    "/api/v1/users": true,
+//	    "/api/v1/products": true,
+//	})
+//	htmlSkipper := CustomNextContentType(fiber.MIMETextHTMLCharsetUTF8)
+//
+//	// Combine the custom Next stack functions
+//	customNextStack := CustomNextStack(map[string]func(*fiber.Ctx) bool{
+//	    "pathSkipper":  pathSkipper,
+//	    "htmlSkipper":  htmlSkipper,
+//	})
+//
+// Parameters:
+//   - nextFuncs: A map of string keys representing the names of the custom Next stack functions,
+//     and func(*fiber.Ctx) bool values representing the custom Next stack functions themselves.
+//
+// Returns:
+//   - A function that takes a [fiber.Ctx] as input and returns a boolean value indicating whether to
+//     skip the middleware for the given request based on the combined result of the custom Next stack functions.
+func CustomNextStack(nextFuncs map[string]func(*fiber.Ctx) bool) func(*fiber.Ctx) bool {
+	return func(c *fiber.Ctx) bool {
+		for _, nextFunc := range nextFuncs {
+			if nextFunc(c) {
+				return true
+			}
+		}
+		return false
+	}
+}
