@@ -7,11 +7,12 @@ package site
 
 templ (c Component) Footer() {
 	// Note: This a better one, for example
-	// Copyright © 2024 Gopher All rights reserved. | Request ID: 1d9ed3a6-5657-41d3-ae61-541fb4d6c57c
+	// Request ID: 1d9ed3a6-5657-41d3-ae61-541fb4d6c57c
+	// Copyright © 2024 Gopher All rights reserved.
 	// where both in middle
 	<footer class="bg-gray-200 text-gray-600 py-4 text-center mt-12 w-full dark:bg-gray-700 dark:text-gray-300">
 		<div class="container mx-auto flex justify-center items-center">
-			<div class="flex items-center">
+			<div class="flex flex-col items-center">
 				if c.Cfheader != "" {
 					@c.cfHeader()
 				} else if c.XRequestID != "" {
@@ -23,17 +24,19 @@ templ (c Component) Footer() {
 }
 
 templ (c Component) cfHeader() {
-	<span class="mx-auto">Copyright © { c.TimeYears } { c.AppName } All rights reserved.</span>
-	<span class="text-gray-500 text-sm ml-4 dark:text-gray-400">|</span>
-	<span class="text-gray-500 text-sm ml-2 dark:text-gray-400">
-		<span>Ray ID: { c.Cfheader }</span>
-	</span>
+	<div class="text-left">
+		<span class="text-gray-500 text-xs sm:text-sm dark:text-gray-400 block">
+			<span>Ray ID: { c.Cfheader }</span>
+		</span>
+		<span class="text-xs sm:text-sm">Copyright © { c.TimeYears } { c.AppName } All rights reserved.</span>
+	</div>
 }
 
 templ (c Component) xRequestIDHeader() {
-	<span class="mx-auto">Copyright © { c.TimeYears } { c.AppName } All rights reserved.</span>
-	<span class="text-gray-500 text-sm ml-4 dark:text-gray-400">|</span>
-	<span class="text-gray-500 text-sm ml-2 dark:text-gray-400">
-		<span>Request ID: { c.XRequestID }</span>
-	</span>
+	<div class="text-left">
+		<span class="text-gray-500 text-xs sm:text-sm dark:text-gray-400 block">
+			<span>Request ID: { c.XRequestID }</span>
+		</span>
+		<span class="text-xs sm:text-sm">Copyright © { c.TimeYears } { c.AppName } All rights reserved.</span>
+	</div>
 }
