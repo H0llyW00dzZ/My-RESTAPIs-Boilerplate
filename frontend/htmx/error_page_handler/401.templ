@@ -8,10 +8,10 @@ package htmx
 templ PageUnauthorize401(v viewData) {
 	@Base(v) {
 		<div class="container min-h-screen flex items-center justify-center dark:bg-gray-900">
-			<div class="bg-white dark:bg-gray-800 p-20 rounded-lg shadow-lg flex flex-col items-center text-center min-w-[1500px] min-h-[550px]">
+			<div class="bg-white dark:bg-gray-800 p-4 sm:p-8 md:p-12 lg:p-20 rounded-lg shadow-lg flex flex-col items-center text-center">
 				<div class="animate__animated animate__fadeIn mb-8 flex flex-col items-center">
 					<svg
-						class="info icon-large fa-sign-alt"
+						class="info icon-large fa-sign-alt w-20 h-20 sm:w-30 sm:h-30 md:w-40 md:h-40 lg:w-50 lg:h-50 text-red-500"
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 512 512"
 					>
@@ -19,19 +19,19 @@ templ PageUnauthorize401(v viewData) {
 							d="M272 112v51.6h-96c-26.5 0-48 21.5-48 48v88.6c0 26.5 21.5 48 48 48h96v51.6c0 42.6 51.7 64.2 81.9 33.9l144-143.9c18.7-18.7 18.7-49.1 0-67.9l-144-144C323.8 48 272 69.3 272 112zm192 144L320 400v-99.7H176v-88.6h144V112l144 144zM96 64h84c6.6 0 12 5.4 12 12v24c0 6.6-5.4 12-12 12H96c-26.5 0-48 21.5-48 48v192c0 26.5 21.5 48 48 48h84c6.6 0 12 5.4 12 12v24c0 6.6-5.4 12-12 12H96c-53 0-96-43-96-96V160c0-53 43-96 96-96z"
 						></path>
 					</svg>
-					<span class="text-8xl font-mono text-gray-800 dark:text-white mt-4">{ v.httpStatus }</span>
+					<span class="text-4xl sm:text-6xl md:text-8xl font-mono text-gray-800 dark:text-white mt-4">{ v.httpStatus }</span>
 				</div>
-				<h1 class="animate__animated animate__fadeIn text-4xl font-mono text-gray-800 dark:text-white mb-4 mt-8">
+				<h1 class="animate__animated animate__fadeIn text-2xl sm:text-3xl md:text-4xl font-mono text-gray-800 dark:text-white mb-4 mt-8">
 					Authentication required
 				</h1>
-				<p class="animate__animated animate__fadeIn text-gray-600 dark:text-gray-400 text-lg Roboto mb-8">
+				<p class="animate__animated animate__fadeIn text-gray-600 dark:text-gray-400 text-base sm:text-lg Roboto mb-8">
 					Oops! Something went wrong.
 					Authentication required to access this resource.
 					Please contact the administrator if you believe this is an error.
 				</p>
 				<button
 					type="button"
-					class="animate__animated animate__fadeIn line-block py-3 px-6 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold dark:bg-blue-600 dark:hover:bg-blue-700"
+					class="animate__animated animate__fadeIn line-block py-2 sm:py-3 px-4 sm:px-6 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold dark:bg-blue-600 dark:hover:bg-blue-700"
 					hx-get="/"
 					hx-swap="outerHTML"
 					hx-indicator="#spinner"
@@ -39,10 +39,10 @@ templ PageUnauthorize401(v viewData) {
 					Go back to the homepage
 				</button>
 				<div id="spinner" class="htmx-indicator fixed inset-0 z-50 flex items-center justify-center bg-gray-700 bg-opacity-50 hidden">
-					<div class="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center space-y-4">
+					<div class="bg-white p-4 sm:p-8 rounded-lg shadow-lg flex flex-col items-center space-y-4">
 						<svg
 							aria-hidden="true"
-							class="w-12 h-12 text-blue-600 animate-spin"
+							class="w-8 h-8 sm:w-12 sm:h-12 text-blue-600 animate-spin"
 							viewBox="0 0 100 101"
 							fill="none"
 							xmlns="http://www.w3.org/2000/svg"

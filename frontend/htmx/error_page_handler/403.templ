@@ -8,10 +8,10 @@ package htmx
 templ PageForbidden403(v viewData) {
 	@Base(v) {
 		<div class="container min-h-screen flex items-center justify-center dark:bg-gray-900">
-			<div class="bg-white dark:bg-gray-800 p-20 rounded-lg shadow-lg flex flex-col items-center text-center min-w-[1500px] min-h-[550px]">
+			<div class="bg-white dark:bg-gray-800 p-4 sm:p-8 md:p-12 lg:p-20 rounded-lg shadow-lg flex flex-col items-center text-center">
 				<div class="animate__animated animate__fadeIn mb-8 flex flex-col items-center">
 					<svg
-						class="error icon-large fa-times-circle w-50 h-50 text-red-500"
+						class="error icon-large fa-times-circle w-20 h-20 sm:w-30 sm:h-30 md:w-40 md:h-40 lg:w-50 lg:h-50 text-red-500"
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 512 512"
 					>
@@ -19,18 +19,18 @@ templ PageForbidden403(v viewData) {
 							d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm121.6 313.1c4.7 4.7 4.7 12.3 0 17L338 377.6c-4.7 4.7-12.3 4.7-17 0L256 312l-65.1 65.6c-4.7 4.7-12.3 4.7-17 0L134.4 338c-4.7-4.7-4.7-12.3 0-17l65.6-65-65.6-65.1c-4.7-4.7-4.7-12.3 0-17l39.6-39.6c4.7-4.7 12.3-4.7 17 0l65 65.7 65.1-65.6c4.7-4.7 12.3-4.7 17 0l39.6 39.6c4.7 4.7 4.7 12.3 0 17L312 256l65.6 65.1z"
 						></path>
 					</svg>
-					<span class="text-8xl font-mono text-gray-800 dark:text-white mt-4">{ v.httpStatus }</span>
+					<span class="text-4xl sm:text-6xl md:text-8xl font-mono text-gray-800 dark:text-white mt-4">{ v.httpStatus }</span>
 				</div>
-				<h1 class="animate__animated animate__fadeIn text-4xl font-mono text-gray-800 dark:text-white mb-4 mt-8">
+				<h1 class="animate__animated animate__fadeIn text-2xl sm:text-3xl md:text-4xl font-mono text-gray-800 dark:text-white mb-4 mt-8">
 					Forbidden Access
 				</h1>
-				<p class="animate__animated animate__fadeIn text-gray-600 dark:text-gray-400 text-lg Roboto mb-8">
+				<p class="animate__animated animate__fadeIn text-gray-600 dark:text-gray-400 text-base sm:text-lg Roboto mb-8">
 					You do not have permission to access this resource.
 					Please contact the administrator if you believe this is an error.
 				</p>
 				<button
 					type="button"
-					class="animate__animated animate__fadeIn line-block py-3 px-6 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold dark:bg-blue-600 dark:hover:bg-blue-700"
+					class="animate__animated animate__fadeIn line-block py-2 sm:py-3 px-4 sm:px-6 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold dark:bg-blue-600 dark:hover:bg-blue-700"
 					hx-get="/"
 					hx-swap="outerHTML"
 					hx-indicator="#spinner"
@@ -38,10 +38,10 @@ templ PageForbidden403(v viewData) {
 					Go back to the homepage
 				</button>
 				<div id="spinner" class="htmx-indicator fixed inset-0 z-50 flex items-center justify-center bg-gray-700 bg-opacity-50 hidden">
-					<div class="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center space-y-4">
+					<div class="bg-white p-4 sm:p-8 rounded-lg shadow-lg flex flex-col items-center space-y-4">
 						<svg
 							aria-hidden="true"
-							class="w-12 h-12 text-blue-600 animate-spin"
+							class="w-8 h-8 sm:w-12 sm:h-12 text-blue-600 animate-spin"
 							viewBox="0 0 100 101"
 							fill="none"
 							xmlns="http://www.w3.org/2000/svg"
