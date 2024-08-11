@@ -27,6 +27,7 @@ type APIRoute struct {
 	KeyAuth                   fiber.Handler
 	RequestID                 fiber.Handler
 	EncryptedCookieMiddleware fiber.Handler
+	CompressJSON              fiber.Handler
 }
 
 // APIGroup represents a group of API routes under a common prefix.
@@ -38,6 +39,7 @@ type APIGroup struct {
 	KeyAuth                   fiber.Handler
 	RequestID                 fiber.Handler
 	EncryptedCookieMiddleware fiber.Handler
+	CompressJSON              fiber.Handler
 }
 
 // registerRESTAPIsRoutes registers the REST API routes for the application.
@@ -203,6 +205,7 @@ func registerGroupMiddlewares(g fiber.Router, group APIGroup) {
 		group.KeyAuth,
 		group.RequestID,
 		group.EncryptedCookieMiddleware,
+		group.CompressJSON,
 	)
 }
 
