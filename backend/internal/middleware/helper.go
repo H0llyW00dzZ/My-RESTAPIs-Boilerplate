@@ -19,6 +19,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/cache"
+	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
@@ -1105,5 +1106,19 @@ func CustomNextStack(nextFuncs map[string]func(*fiber.Ctx) bool) func(*fiber.Ctx
 			}
 		}
 		return false
+	}
+}
+
+// WithCompressLevel is an option function for NewCompressMiddleware that sets the compression level.
+func WithCompressLevel(level compress.Level) func(*compress.Config) {
+	return func(config *compress.Config) {
+		config.Level = level
+	}
+}
+
+// WithCompressNext is an option function for NewCompressMiddleware that sets the Next function to skip the compression middleware.
+func WithCompressNext(next func(*fiber.Ctx) bool) func(*compress.Config) {
+	return func(config *compress.Config) {
+		config.Next = next
 	}
 }

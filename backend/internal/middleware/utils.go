@@ -20,6 +20,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/cache"
+	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
@@ -767,4 +768,28 @@ func NewCSPHeaderGenerator(options ...any) fiber.Handler {
 func NewSkipMiddleware(handler fiber.Handler, exclude func(c *fiber.Ctx) bool) fiber.Handler {
 	// Use the [skip.New] function from the Fiber framework to create a new skip middleware.
 	return skip.New(handler, exclude)
+}
+
+// NewCompressMiddleware creates a new compression middleware for the Fiber web framework.
+//
+// The compression middleware is used to compress the HTTP response body using the specified compression algorithm.
+// It helps to reduce the size of the response, resulting in faster transfer times and reduced bandwidth usage.
+//
+// Note: This is suitable for enhancing the load balancer's performance when using HTTP/3.
+func NewCompressMiddleware(options ...any) fiber.Handler {
+	// Create a new compression configuration with default values.
+	config := compress.Config{}
+
+	// Apply any additional options to the compression configuration.
+	for _, option := range options {
+		if optFunc, ok := option.(func(*compress.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create a new compression middleware with the configured options.
+	compressMiddleware := compress.New(config)
+
+	// Return the compression middleware.
+	return compressMiddleware
 }
