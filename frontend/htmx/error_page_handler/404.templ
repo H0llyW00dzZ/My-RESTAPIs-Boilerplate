@@ -8,10 +8,10 @@ package htmx
 templ PageNotFound404(v viewData) {
 	@Base(v) {
 		<div class="container min-h-screen flex items-center justify-center dark:bg-gray-900">
-			<div class="bg-white dark:bg-gray-800 p-20 rounded-lg shadow-lg flex flex-col items-center text-center min-w-[1500px] min-h-[550px]">
+			<div class="bg-white dark:bg-gray-800 p-4 sm:p-8 md:p-12 lg:p-20 rounded-lg shadow-lg flex flex-col items-center text-center">
 				<div class="animate__animated animate__fadeIn mb-8 flex flex-col items-center">
 					<svg
-						class="info icon-large fa-question-circle w-50 h-50 text-red-500"
+						class="info icon-large fa-question-circle w-20 h-20 sm:w-30 sm:h-30 md:w-40 md:h-40 lg:w-50 lg:h-50 text-red-500"
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 512 512"
 					>
@@ -19,18 +19,18 @@ templ PageNotFound404(v viewData) {
 							d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zM262.655 90c-54.497 0-89.255 22.957-116.549 63.758-3.536 5.286-2.353 12.415 2.715 16.258l34.699 26.31c5.205 3.947 12.621 3.008 16.665-2.122 17.864-22.658 30.113-35.797 57.303-35.797 20.429 0 45.698 13.148 45.698 32.958 0 14.976-12.363 22.667-32.534 33.976C247.128 238.528 216 254.941 216 296v4c0 6.627 5.373 12 12 12h56c6.627 0 12-5.373 12-12v-1.333c0-28.462 83.186-29.647 83.186-106.667 0-58.002-60.165-102-116.531-102zM256 338c-25.365 0-46 20.635-46 46 0 25.364 20.635 46 46 46s46-20.636 46-46c0-25.365-20.635-46-46-46z"
 						></path>
 					</svg>
-					<span class="text-8xl font-mono text-gray-800 dark:text-white mt-4">{ v.httpStatus }</span>
+					<span class="text-4xl sm:text-6xl md:text-8xl font-mono text-gray-800 dark:text-white mt-4">{ v.httpStatus }</span>
 				</div>
-				<h1 class="animate__animated animate__fadeIn text-4xl font-mono text-gray-800 dark:text-white mb-4 mt-8">
+				<h1 class="animate__animated animate__fadeIn text-2xl sm:text-3xl md:text-4xl font-mono text-gray-800 dark:text-white mb-4 mt-8">
 					Page Not Found
 				</h1>
-				<p class="animate__animated animate__fadeIn text-gray-600 dark:text-gray-400 text-lg Roboto mb-8">
+				<p class="animate__animated animate__fadeIn text-gray-600 dark:text-gray-400 text-base sm:text-lg Roboto mb-8">
 					Oops! We couldn't find the page you're looking for. It might
 					have been moved or deleted.
 				</p>
 				<button
 					type="button"
-					class="animate__animated animate__fadeIn line-block py-3 px-6 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold dark:bg-blue-600 dark:hover:bg-blue-700"
+					class="animate__animated animate__fadeIn line-block py-2 sm:py-3 px-4 sm:px-6 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold dark:bg-blue-600 dark:hover:bg-blue-700"
 					hx-get="/"
 					hx-swap="outerHTML"
 					hx-indicator="#spinner"
@@ -38,10 +38,10 @@ templ PageNotFound404(v viewData) {
 					Go back to the homepage
 				</button>
 				<div id="spinner" class="htmx-indicator fixed inset-0 z-50 flex items-center justify-center bg-gray-700 bg-opacity-50 hidden">
-					<div class="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center space-y-4">
+					<div class="bg-white p-4 sm:p-8 rounded-lg shadow-lg flex flex-col items-center space-y-4">
 						<svg
 							aria-hidden="true"
-							class="w-12 h-12 text-blue-600 animate-spin"
+							class="w-8 h-8 sm:w-12 sm:h-12 text-blue-600 animate-spin"
 							viewBox="0 0 100 101"
 							fill="none"
 							xmlns="http://www.w3.org/2000/svg"

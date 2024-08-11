@@ -8,10 +8,10 @@ package htmx
 templ PageServiceUnavailable(v viewData) {
 	@Base(v) {
 		<div class="container min-h-screen flex items-center justify-center dark:bg-gray-900">
-			<div class="bg-white dark:bg-gray-800 p-20 rounded-lg shadow-lg flex flex-col items-center text-center min-w-[1500px] min-h-[550px]">
+			<div class="bg-white dark:bg-gray-800 p-4 sm:p-8 md:p-12 lg:p-20 rounded-lg shadow-lg flex flex-col items-center text-center">
 				<div class="animate__animated animate__fadeIn mb-8 flex flex-col items-center">
 					<svg
-						class="warning icon-large fa-hard-hat w-50 h-50 text-red-500"
+						class="warning icon-large fa-hard-hat w-20 h-20 sm:w-30 sm:h-30 md:w-40 md:h-40 lg:w-50 lg:h-50 text-red-500"
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 512 512"
 					>
@@ -19,18 +19,18 @@ templ PageServiceUnavailable(v viewData) {
 							d="M480 288c0-80.25-49.28-148.92-119.19-177.62L320 192V80a16 16 0 0 0-16-16h-96a16 16 0 0 0-16 16v112l-40.81-81.62C81.28 139.08 32 207.75 32 288v64h448zm16 96H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h480a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"
 						></path>
 					</svg>
-					<span class="text-8xl font-mono text-gray-800 dark:text-white mt-4">{ v.httpStatus }</span>
+					<span class="text-4xl sm:text-6xl md:text-8xl font-mono text-gray-800 dark:text-white mt-4">{ v.httpStatus }</span>
 				</div>
-				<h1 class="animate__animated animate__fadeIn text-4xl font-mono text-gray-800 dark:text-white mb-4 mt-8">
+				<h1 class="animate__animated animate__fadeIn text-2xl sm:text-3xl md:text-4xl font-mono text-gray-800 dark:text-white mb-4 mt-8">
 					Service Unavailable
 				</h1>
-				<p class="animate__animated animate__fadeIn text-gray-600 dark:text-gray-400 text-lg Roboto mb-8">
+				<p class="animate__animated animate__fadeIn text-gray-600 dark:text-gray-400 text-base sm:text-lg Roboto mb-8">
 					Oops! Something went wrong.
 					We're temporarily down for maintenance. We'll be back up and running as soon as possible. Please check back later.
 				</p>
 				<button
 					type="button"
-					class="animate__animated animate__fadeIn line-block py-3 px-6 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold dark:bg-blue-600 dark:hover:bg-blue-700"
+					class="animate__animated animate__fadeIn line-block py-2 sm:py-3 px-4 sm:px-6 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold dark:bg-blue-600 dark:hover:bg-blue-700"
 					hx-get="/"
 					hx-swap="outerHTML"
 					hx-indicator="#spinner"
@@ -38,10 +38,10 @@ templ PageServiceUnavailable(v viewData) {
 					Go back to the homepage
 				</button>
 				<div id="spinner" class="htmx-indicator fixed inset-0 z-50 flex items-center justify-center bg-gray-700 bg-opacity-50 hidden">
-					<div class="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center space-y-4">
+					<div class="bg-white p-4 sm:p-8 rounded-lg shadow-lg flex flex-col items-center space-y-4">
 						<svg
 							aria-hidden="true"
-							class="w-12 h-12 text-blue-600 animate-spin"
+							class="w-8 h-8 sm:w-12 sm:h-12 text-blue-600 animate-spin"
 							viewBox="0 0 100 101"
 							fill="none"
 							xmlns="http://www.w3.org/2000/svg"
