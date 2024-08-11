@@ -150,7 +150,7 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 // Also note that for TLS certificates, a wildcard/advanced certificate is required.
 //
 // Known Bugs:
-//   - Wildcard/advanced certificates are not supported/compatible on Heroku.
+//   - Wildcard/advanced certificates (e.g, issued by digicert, sectigo, google trust service, private ca) are not supported/compatible on Heroku.
 //     Using a wildcard/advanced certificate on Heroku will cause an "SSL certificate error: There is conflicting information between the SSL connection, its certificate, and/or the included HTTP requests."
 //     If using a wildcard/advanced certificate, it is recommended to deploy the application in a cloud environment such as Kubernetes, where you can easily control the ingress controller (e.g, Implement own such as universe).
 //     Also note that regarding known bugs, it is not caused by this repository; it is an issue with Heroku's router.
