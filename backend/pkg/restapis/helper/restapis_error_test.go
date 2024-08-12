@@ -33,8 +33,8 @@ func TestSendErrorResponse_BadRequest(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != helper.MIMEApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -71,8 +71,8 @@ func TestSendErrorResponse_Unauthorized(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != helper.MIMEApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -109,8 +109,8 @@ func TestSendErrorResponse_Forbidden(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != helper.MIMEApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -147,8 +147,8 @@ func TestSendErrorResponse_NotFound(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != helper.MIMEApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -185,8 +185,8 @@ func TestSendErrorResponse_Conflict(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != helper.MIMEApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -223,8 +223,8 @@ func TestSendErrorResponse_BadGateway(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != helper.MIMEApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -261,8 +261,8 @@ func TestSendErrorResponse_InternalServerError(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != helper.MIMEApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -299,8 +299,8 @@ func TestSendErrorResponse_TooManyRequests(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != helper.MIMEApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -343,6 +343,44 @@ func TestErrorHandler(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
+	if contentType != helper.MIMEApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
+	}
+
+	var errorResponse helper.ErrorResponse
+	err = sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse)
+	if err != nil {
+		t.Fatalf("Failed to parse response body: %v", err)
+	}
+
+	expectedErrorCode := fiber.StatusInternalServerError
+	if errorResponse.Code != expectedErrorCode {
+		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.Code)
+	}
+
+	expectedErrorMessage := fiber.ErrInternalServerError.Message
+	if errorResponse.Error != expectedErrorMessage {
+		t.Errorf("Expected error message '%s', got '%s'", expectedErrorMessage, errorResponse.Error)
+	}
+}
+
+func TestSendErrorResponse_InternalServerError_NonASCII(t *testing.T) {
+	app := fiber.New()
+	app.Get("/gopher/test", func(c *fiber.Ctx) error {
+		return helper.SendErrorResponse(c, fiber.StatusInternalServerError, "Internal server error: ᬳᬦ᭄ᬢᬭ᭄ᬦᬮ᭄ ᬲᬸᬭ᭄ᬯᬺᬭ᭄") // Balinese script
+	})
+
+	req := httptest.NewRequest("GET", "/gopher/test", nil)
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	if resp.StatusCode != fiber.StatusInternalServerError {
+		t.Errorf("Expected status code %d, got %d", fiber.StatusInternalServerError, resp.StatusCode)
+	}
+
+	contentType := resp.Header.Get("Content-Type")
 	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
 		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
 	}
@@ -358,7 +396,7 @@ func TestErrorHandler(t *testing.T) {
 		t.Errorf("Expected error code %d, got %d", expectedErrorCode, errorResponse.Code)
 	}
 
-	expectedErrorMessage := fiber.ErrInternalServerError.Message
+	expectedErrorMessage := "Internal server error: ᬳᬦ᭄ᬢᬭ᭄ᬦᬮ᭄ ᬲᬸᬭ᭄ᬯᬺᬭ᭄"
 	if errorResponse.Error != expectedErrorMessage {
 		t.Errorf("Expected error message '%s', got '%s'", expectedErrorMessage, errorResponse.Error)
 	}
