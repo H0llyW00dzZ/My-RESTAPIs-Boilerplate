@@ -24,6 +24,7 @@ require (
 	github.com/prometheus/client_golang v1.19.1
 	github.com/redis/go-redis/v9 v9.6.1
 	github.com/valyala/bytebufferpool v1.0.0
+	github.com/valyala/fasthttp v1.55.0
 	golang.org/x/crypto v0.26.0
 )
 
@@ -90,7 +91,6 @@ require (
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/tinylib/msgp v1.2.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
-	github.com/valyala/fasthttp v1.55.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	go.mongodb.org/mongo-driver v1.16.0 // indirect
