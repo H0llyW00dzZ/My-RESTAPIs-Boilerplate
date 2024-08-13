@@ -130,6 +130,16 @@ sample#memory_quota=1024.00MB
 > [!NOTE]
 > The screenshots provided demonstrate a `Standard TLS 1.3` connection using the `Closed networks or intranets` method, which involves Cloudflare (`Frontend`) and Heroku (`Backend`). Without Cloudflare, any browser or tools like curl won't be able to access the backend server.
 
+
+## Frontend Performance
+
+- `Error Page` (`Include Wildcard Handler`)
+
+<img src="https://i.imgur.com/gbGM6bS.png" alt="error-page">
+
+> [!NOTE]
+> The screenshot provided demonstrates the performance of an `Error Page`, and it can easily be optimized to achieve all green metrics.
+
 ## Architecture
 
 Below is the architecture of this boilerplate and how it looks. I created this for REST APIs about volcano 🌋 monitoring used by the government (has been done before), so it can easily monitor volcanoes in the real world.
