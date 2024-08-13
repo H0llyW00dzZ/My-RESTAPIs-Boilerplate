@@ -171,7 +171,7 @@ func subHead() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/styles/images/apple-touch-icon.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/styles/images/favicon-32x32.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/styles/images/favicon-16x16.png\"><link rel=\"mask-icon\" href=\"/styles/images/safari-pinned-tab.svg\" color=\"#5bbad5\"><meta name=\"msapplication-TileColor\" content=\"#da532c\"><meta name=\"theme-color\" content=\"#2596BE\"><link rel=\"manifest\" href=\"/styles/images/site.webmanifest\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/styles/images/apple-touch-icon.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/styles/images/favicon-32x32.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/styles/images/favicon-16x16.png\"><link rel=\"mask-icon\" href=\"/styles/images/safari-pinned-tab.svg\" color=\"#5bbad5\"><meta name=\"msapplication-TileColor\" content=\"#da532c\"><meta name=\"theme-color\" content=\"#2596BE\"><meta name=\"description\" content=\"Witness the elegance and efficiency of web development with Go and HTMX. \r\n\t\t\tThis website, purely written in Go and powered by HTMX&#39;s dynamic interactions, \r\n\t\t\tshowcases how the combination of Go&#39;s simplicity and performance creates a seamless and engaging user experience.\"><link rel=\"manifest\" href=\"/styles/images/site.webmanifest\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
