@@ -38,7 +38,7 @@ func TestSendErrorResponse_BadRequest(t *testing.T) {
 	}
 
 	var errorResponse helper.ErrorResponse
-	if err := sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
+	if err := sonic.ConfigFastest.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
 		t.Fatalf("Failed to parse response body: %v", err)
 	}
 
@@ -75,7 +75,7 @@ func TestSendErrorResponse_Unauthorized(t *testing.T) {
 	}
 
 	var errorResponse helper.ErrorResponse
-	if err := sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
+	if err := sonic.ConfigFastest.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
 		t.Fatalf("Failed to parse response body: %v", err)
 	}
 
@@ -112,7 +112,7 @@ func TestSendErrorResponse_Forbidden(t *testing.T) {
 	}
 
 	var errorResponse helper.ErrorResponse
-	if err := sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
+	if err := sonic.ConfigFastest.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
 		t.Fatalf("Failed to parse response body: %v", err)
 	}
 
@@ -149,7 +149,7 @@ func TestSendErrorResponse_NotFound(t *testing.T) {
 	}
 
 	var errorResponse helper.ErrorResponse
-	if err := sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
+	if err := sonic.ConfigFastest.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
 		t.Fatalf("Failed to parse response body: %v", err)
 	}
 
@@ -186,7 +186,7 @@ func TestSendErrorResponse_Conflict(t *testing.T) {
 	}
 
 	var errorResponse helper.ErrorResponse
-	if err := sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
+	if err := sonic.ConfigFastest.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
 		t.Fatalf("Failed to parse response body: %v", err)
 	}
 
@@ -223,7 +223,7 @@ func TestSendErrorResponse_BadGateway(t *testing.T) {
 	}
 
 	var errorResponse helper.ErrorResponse
-	if err := sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
+	if err := sonic.ConfigFastest.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
 		t.Fatalf("Failed to parse response body: %v", err)
 	}
 
@@ -260,7 +260,7 @@ func TestSendErrorResponse_InternalServerError(t *testing.T) {
 	}
 
 	var errorResponse helper.ErrorResponse
-	if err := sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
+	if err := sonic.ConfigFastest.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
 		t.Fatalf("Failed to parse response body: %v", err)
 	}
 
@@ -297,7 +297,7 @@ func TestSendErrorResponse_TooManyRequests(t *testing.T) {
 	}
 
 	var errorResponse helper.ErrorResponse
-	if err := sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
+	if err := sonic.ConfigFastest.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
 		t.Fatalf("Failed to parse response body: %v", err)
 	}
 
@@ -340,7 +340,7 @@ func TestErrorHandler(t *testing.T) {
 	}
 
 	var errorResponse helper.ErrorResponse
-	if err := sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
+	if err := sonic.ConfigFastest.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
 		t.Fatalf("Failed to parse response body: %v", err)
 	}
 
@@ -377,7 +377,7 @@ func TestSendErrorResponse_InternalServerError_NonASCII(t *testing.T) {
 	}
 
 	var errorResponse helper.ErrorResponse
-	if err := sonic.ConfigDefault.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
+	if err := sonic.ConfigFastest.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
 		t.Fatalf("Failed to parse response body: %v", err)
 	}
 
