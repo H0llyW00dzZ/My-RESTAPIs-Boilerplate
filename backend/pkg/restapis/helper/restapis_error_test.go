@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
+	htmx "h0llyw00dz-template/frontend/htmx/error_page_handler"
 
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
@@ -316,7 +317,7 @@ func TestErrorHandler(t *testing.T) {
 	app := fiber.New()
 
 	// Register the ErrorHandler (for handling panic) & Recover middleware
-	app.Use(helper.ErrorHandler, recover.New())
+	app.Use(htmx.NewErrorHandler, recover.New())
 
 	// Create a test route that panics
 	app.Get("/gopher/test", func(c *fiber.Ctx) error {
