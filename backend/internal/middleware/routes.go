@@ -125,6 +125,10 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 		WithCacheStorage(gopherstorage),
 		WithCacheKeyGenerator(cacheKeyGen.GenerateCacheKey),
 		WithCacheExpiration(1*time.Hour),
+		// Note: It is recommended to set "WithCacheControl" to true. If "WithCacheControl" is false, it will use server-side caching (in this repo),
+		// which can waste memory resources because it stores everything on the server-side (in this repo) instead of the client-side.
+		// When "WithCacheControl" is set to true, it can be combined with eTag. Additionally, by setting up caching in this way,
+		// basically it creating own CDN (Content Delivery Network) solution.
 		WithCacheControl(true),
 		WithCacheNext(
 			CustomNextContentType(
