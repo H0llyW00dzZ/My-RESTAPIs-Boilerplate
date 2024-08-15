@@ -8,6 +8,7 @@
 package htmx
 
 import (
+	"h0llyw00dz-template/backend/pkg/mime"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
 
 	"github.com/a-h/templ"
@@ -147,8 +148,18 @@ func (v *viewData) renderAndSend(c *fiber.Ctx, statusCode int, component templ.C
 		return v.renderErrorPage(c, fiber.StatusInternalServerError, "Error rendering component: %v", err)
 	}
 
-	// Send the response
-	c.Set(fiber.HeaderContentType, fiber.MIMETextHTMLCharsetUTF8) // Suitable in HTTP/3 syncing with cloud load balancer
+	// Convert the byte buffer to a string.
+	renderedHTML := buf.String()
+
+	// Set the appropriate Content-Type header based on the presence of non-ASCII characters.
+	if !mime.IsASCII(renderedHTML) {
+		// If non-ASCII characters are present, use the MIME type with charset
+		c.Set(fiber.HeaderContentType, fiber.MIMETextHTMLCharsetUTF8)
+	} else {
+		// If the response body contains only ASCII characters, use the MIME type without charset
+		c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+	}
+
 	// Send the rendered HTML content as a response with the appropriate status code.
-	return c.Status(statusCode).SendString(buf.String())
+	return c.Status(statusCode).SendString(renderedHTML)
 }
