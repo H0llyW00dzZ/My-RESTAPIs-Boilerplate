@@ -1122,3 +1122,34 @@ func WithCompressNext(next func(*fiber.Ctx) bool) func(*compress.Config) {
 		config.Next = next
 	}
 }
+
+// CustomNextStatusCode is a helper function that creates a custom Next function for the fiber middleware.
+//
+// The returned Next function checks the HTTP status code of the response and determines whether to skip
+// the middleware based on the provided status codes. If the response status code matches any of the
+// specified status codes, the Next function returns true, indicating that the middleware should be skipped.
+//
+// Example usage:
+//
+//	// Create a custom skipper function to skip the middleware for 404 and 500 status codes
+//	redirectSkipper := CustomNextStatusCode(fiber.StatusMovedPermanently)
+//
+// Parameters:
+//   - statusCodes: Variadic int parameters representing the HTTP status codes to skip the middleware for.
+//
+// Returns:
+//   - A function that takes a [fiber.Ctx] as input and returns a boolean value indicating whether to
+//     skip the middleware for the given request based on the response status code.
+//
+// Note: This function is suitable for redirect or error handling middleware or middleware that should be skipped for certain status codes.
+func CustomNextStatusCode(statusCodes ...int) func(*fiber.Ctx) bool {
+	return func(c *fiber.Ctx) bool {
+		status := c.Response().StatusCode()
+		for _, code := range statusCodes {
+			if status == code {
+				return true
+			}
+		}
+		return false
+	}
+}

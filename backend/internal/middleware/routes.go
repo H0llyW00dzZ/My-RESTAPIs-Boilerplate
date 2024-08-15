@@ -121,6 +121,23 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 	})
 	// Speed depends of database connection as well.
 	gopherstorage := db.FiberStorage()
+	// stack Skipper
+	contentTypeSkip := CustomNextContentType(
+		// Note: Its important to disabling cache for this MIME
+		fiber.MIMETextHTML,
+		fiber.MIMETextHTMLCharsetUTF8,
+		fiber.MIMEApplicationJSON,
+		fiber.MIMEApplicationJSONCharsetUTF8,
+		mime.ApplicationProblemJSON,
+		mime.ApplicationProblemJSONCharsetUTF8,
+		mime.TextEventStream,
+		// this temporary due it only registered 2 router (currently)
+		fiber.MIMETextPlain,
+		fiber.MIMETextPlainCharsetUTF8,
+	)
+	statusCodeSkip := CustomNextStatusCode(
+		fiber.StatusMovedPermanently,
+	)
 	cacheMiddleware := NewCacheMiddleware(
 		WithCacheStorage(gopherstorage),
 		WithCacheKeyGenerator(cacheKeyGen.GenerateCacheKey),
@@ -131,16 +148,11 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 		// basically it creating own CDN (Content Delivery Network) solution.
 		WithCacheControl(true),
 		WithCacheNext(
-			CustomNextContentType(
-				// Note: Its important to disabling cache for this MIME
-				fiber.MIMETextHTML,
-				fiber.MIMETextHTMLCharsetUTF8,
-				fiber.MIMEApplicationJSON,
-				fiber.MIMEApplicationJSONCharsetUTF8,
-				mime.ApplicationProblemJSON,
-				mime.ApplicationProblemJSONCharsetUTF8,
-				mime.TextEventStream,
-			),
+			// Note: This actually work lmao.
+			CustomNextStack(map[string]func(*fiber.Ctx) bool{
+				"contentTypeSkip": contentTypeSkip,
+				"statusCodeSkip":  statusCodeSkip,
+			}),
 		),
 		WithCacheHeader("X-Go-Frontend"),
 	)
