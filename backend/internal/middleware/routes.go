@@ -155,6 +155,8 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 		WithCacheControl(true),
 		WithCacheNext(
 			// Note: This actually work lmao.
+			// Also, note that if it doesn't work, the browser would display a blank page
+			// because it hits the cache, not an unreachable cache. If the cache is unreachable, it will redirect that mean works.
 			CustomNextStack(map[string]func(*fiber.Ctx) bool{
 				"contentTypeSkip": contentTypeSkip,
 				"statusCodeSkip":  statusCodeSkip,
