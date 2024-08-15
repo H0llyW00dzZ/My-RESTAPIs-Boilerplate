@@ -5,22 +5,17 @@
 
 package helper
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"h0llyw00dz-template/backend/pkg/mime"
+
+	"github.com/gofiber/fiber/v2"
+)
 
 // ErrorResponse represents the structure of an error response.
 type ErrorResponse struct {
 	Code  int    `json:"code"`
 	Error string `json:"error"`
 }
-
-const (
-
-	// MIMEApplicationProblemJSON represents the MIME type for problem+json (RFC 7807).
-	MIMEApplicationProblemJSON = "application/problem+json"
-
-	// MIMEApplicationProblemJSONCharsetUTF8 represents the MIME type for problem+json with UTF-8 charset (RFC 7807 Enhancement).
-	MIMEApplicationProblemJSONCharsetUTF8 = "application/problem+json; charset=utf-8"
-)
 
 // SendErrorResponse sends an error response with the specified status code and error message.
 func SendErrorResponse(c *fiber.Ctx, statusCode int, errorMessage string) error {
@@ -30,14 +25,14 @@ func SendErrorResponse(c *fiber.Ctx, statusCode int, errorMessage string) error 
 		return c.Status(statusCode).JSON(ErrorResponse{
 			Code:  statusCode,
 			Error: errorMessage,
-		}, MIMEApplicationProblemJSONCharsetUTF8)
+		}, mime.ApplicationProblemJSONCharsetUTF8)
 	}
 
 	// If the response body contains only ASCII characters, use the MIME type without charset
 	return c.Status(statusCode).JSON(ErrorResponse{
 		Code:  statusCode,
 		Error: errorMessage,
-	}, MIMEApplicationProblemJSON)
+	}, mime.ApplicationProblemJSON)
 }
 
 // ErrorHandler is the error handling middleware that runs after other middleware.

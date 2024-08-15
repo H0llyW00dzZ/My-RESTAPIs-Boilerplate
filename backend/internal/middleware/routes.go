@@ -16,6 +16,7 @@ import (
 	"h0llyw00dz-template/backend/internal/database"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/keyidentifier"
+	"h0llyw00dz-template/backend/pkg/mime"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
 	"h0llyw00dz-template/env"
 	htmx "h0llyw00dz-template/frontend/htmx/error_page_handler"
@@ -132,8 +133,9 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 				fiber.MIMETextHTMLCharsetUTF8,
 				fiber.MIMEApplicationJSON,
 				fiber.MIMEApplicationJSONCharsetUTF8,
-				helper.MIMEApplicationProblemJSON,
-				helper.MIMEApplicationProblemJSONCharsetUTF8,
+				mime.ApplicationProblemJSON,
+				mime.ApplicationProblemJSONCharsetUTF8,
+				mime.TextEventStream,
 			),
 		),
 		WithCacheHeader("X-Go-Frontend"),

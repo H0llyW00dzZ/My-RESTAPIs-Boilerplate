@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"h0llyw00dz-template/backend/pkg/mime"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
 	htmx "h0llyw00dz-template/frontend/htmx/error_page_handler"
 
@@ -34,8 +35,8 @@ func TestSendErrorResponse_BadRequest(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSON {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
+	if contentType != mime.ApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", mime.ApplicationProblemJSON, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -71,8 +72,8 @@ func TestSendErrorResponse_Unauthorized(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSON {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
+	if contentType != mime.ApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", mime.ApplicationProblemJSON, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -108,8 +109,8 @@ func TestSendErrorResponse_Forbidden(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSON {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
+	if contentType != mime.ApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", mime.ApplicationProblemJSON, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -145,8 +146,8 @@ func TestSendErrorResponse_NotFound(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSON {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
+	if contentType != mime.ApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", mime.ApplicationProblemJSON, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -182,8 +183,8 @@ func TestSendErrorResponse_Conflict(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSON {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
+	if contentType != mime.ApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", mime.ApplicationProblemJSON, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -219,8 +220,8 @@ func TestSendErrorResponse_BadGateway(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSON {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
+	if contentType != mime.ApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", mime.ApplicationProblemJSON, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -256,8 +257,8 @@ func TestSendErrorResponse_InternalServerError(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSON {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
+	if contentType != mime.ApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", mime.ApplicationProblemJSON, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -293,8 +294,8 @@ func TestSendErrorResponse_TooManyRequests(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSON {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
+	if contentType != mime.ApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", mime.ApplicationProblemJSON, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -336,8 +337,8 @@ func TestErrorHandler(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSON {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSON, contentType)
+	if contentType != mime.ApplicationProblemJSON {
+		t.Errorf("Expected Content-Type '%s', got '%s'", mime.ApplicationProblemJSON, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
@@ -373,8 +374,8 @@ func TestSendErrorResponse_InternalServerError_NonASCII(t *testing.T) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != helper.MIMEApplicationProblemJSONCharsetUTF8 {
-		t.Errorf("Expected Content-Type '%s', got '%s'", helper.MIMEApplicationProblemJSONCharsetUTF8, contentType)
+	if contentType != mime.ApplicationProblemJSONCharsetUTF8 {
+		t.Errorf("Expected Content-Type '%s', got '%s'", mime.ApplicationProblemJSONCharsetUTF8, contentType)
 	}
 
 	var errorResponse helper.ErrorResponse
