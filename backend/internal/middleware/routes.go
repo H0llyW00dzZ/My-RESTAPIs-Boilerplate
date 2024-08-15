@@ -133,7 +133,7 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 		mime.TextEventStream,
 		// this temporary due it only registered 2 router (currently)
 		// when it 3 router or more it will become like this the demo:
-		// - https://btz.pm (frontend currently disabled so it will redirect to wildcard)
+		// - https://btz.pm (frontend currently disabled (due I don't have any idea for building front-end) so it will return to wildcard (see fiber.NewError in DomainRouter))
 		// - https://api-beta.btz.pm (rest apis)
 		fiber.MIMETextPlain,
 		fiber.MIMETextPlainCharsetUTF8,
