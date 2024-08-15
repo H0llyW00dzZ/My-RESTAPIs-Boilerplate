@@ -6,6 +6,7 @@
 package htmxauth
 
 import (
+	"h0llyw00dz-template/backend/pkg/mime"
 	htmx "h0llyw00dz-template/frontend/htmx/error_page_handler"
 
 	"github.com/a-h/templ"
@@ -32,9 +33,20 @@ func (vd *viewData) renderAndSend(c *fiber.Ctx, statusCode int, component templ.
 		return vd.renderErrorPage(c, err)
 	}
 
-	// Send the response
-	c.Set(fiber.HeaderContentType, fiber.MIMETextHTMLCharsetUTF8)
-	return c.Status(statusCode).SendString(buf.String())
+	// Convert the byte buffer to a string.
+	renderedHTML := buf.String()
+
+	// Set the appropriate Content-Type header based on the presence of non-ASCII characters.
+	if !mime.IsASCII(renderedHTML) {
+		// If non-ASCII characters are present, use the MIME type with charset
+		c.Set(fiber.HeaderContentType, fiber.MIMETextHTMLCharsetUTF8)
+	} else {
+		// If the response body contains only ASCII characters, use the MIME type without charset
+		c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+	}
+
+	// Send the rendered HTML content as a response with the appropriate status code.
+	return c.Status(statusCode).SendString(renderedHTML)
 }
 
 // renderErrorPage logs an error and renders a generic error page using the htmx.NewErrorHandler middleware.
