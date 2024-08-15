@@ -111,7 +111,7 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 	// This is one of the reasons why I like Go. For example, when I'm lazy to implement something from scratch,
 	// I can just use a package that is already stable then build on top of it using higher-order functions.
 	redirectMiddleware := NewRedirectMiddleware(
-		// Note: This is a tip for manipulating bot scanners that attempt to access sensitive directories like credentials or configs.
+		// Note: This is a tip for manipulating bot scanners (bad crawls) that attempt to access sensitive directories like credentials or configs.
 		// For example, if http://api.localhost:8080/v1/server/health/db is a registered endpoint, when a request is made to http://api.localhost:8080/v1/server/health/,
 		// it will be redirected to http://api.localhost:8080/.
 		WithRedirectRules(map[string]string{
