@@ -131,15 +131,18 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 		mime.ApplicationProblemJSON,
 		mime.ApplicationProblemJSONCharsetUTF8,
 		mime.TextEventStream,
-		// this temporary due it only registered 2 router (currently)
-		// when it 3 router or more it will become like this the demo:
-		// - https://btz.pm (frontend currently disabled (due I don't have any idea for building front-end) so it will return to wildcard (see fiber.NewError in DomainRouter))
-		// - https://api-beta.btz.pm (rest apis)
+		// This is temporary because it only registers 2 routers (currently).
+		// When there are 3 or more routers, it will be structured like this in the demo:
+		// - https://btz.pm (frontend currently disabled because I don't have any ideas for building the front-end, so it will return to the wildcard (see fiber.NewError in DomainRouter))
+		// - https://api-beta.btz.pm (REST APIs)
 		fiber.MIMETextPlain,
 		fiber.MIMETextPlainCharsetUTF8,
 	)
+	// Note: It's important to skip caching for redirect status codes, which can enhance security (e.g, for auth mechanism).
 	statusCodeSkip := CustomNextStatusCode(
 		fiber.StatusMovedPermanently,
+		fiber.StatusPermanentRedirect,
+		fiber.StatusTemporaryRedirect,
 	)
 	cacheMiddleware := NewCacheMiddleware(
 		WithCacheStorage(gopherstorage),
