@@ -20,7 +20,7 @@ type ErrorResponse struct {
 // SendErrorResponse sends an error response with the specified status code and error message.
 func SendErrorResponse(c *fiber.Ctx, statusCode int, errorMessage string) error {
 	// Check if the response body contains non-ASCII characters
-	if !isASCII(errorMessage) {
+	if !mime.IsASCII(errorMessage) {
 		// If non-ASCII characters are present, use the MIME type with charset
 		return c.Status(statusCode).JSON(ErrorResponse{
 			Code:  statusCode,
@@ -50,14 +50,4 @@ func ErrorHandler(c *fiber.Ctx) error {
 
 	// No errors, continue with the next middleware
 	return nil
-}
-
-// isASCII checks if a string contains only ASCII characters.
-func isASCII(s string) bool {
-	for _, c := range s {
-		if c > 127 {
-			return false
-		}
-	}
-	return true
 }
