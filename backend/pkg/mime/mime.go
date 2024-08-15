@@ -39,3 +39,13 @@ const (
 	// Note: This suitable for AI
 	TextEventStream = "text/event-stream"
 )
+
+const (
+	// ImageXIcon represents the MIME type for image/x-icon.
+	//
+	// Note: This MIME type is suitable for use with the CustomNextContentType option in the CompressMiddleware (brotli).
+	// The CompressMiddleware (brotli) is typically used for compressing JSON and TextEventStream responses (Excellent Performance especially in http/3).
+	// However, the "image/x-icon" MIME type can also be added to the CustomNextContentType option to enable
+	// compression for ICO files when using the CompressMiddleware (brotli).
+	ImageXIcon = "image/x-icon"
+)
