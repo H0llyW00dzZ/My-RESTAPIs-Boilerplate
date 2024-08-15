@@ -29,7 +29,7 @@ const (
 	//
 	// Example usage:
 	//
-	//	w.Header().Set("Content-Type", MIMETextEventStream)
+	//	w.Header().Set("Content-Type", mime.TextEventStream)
 	//	w.Write([]byte("event: update\ndata: {\"message\": \"Hello, world!\"}\n\n"))
 	//	w.Flush()
 	//
