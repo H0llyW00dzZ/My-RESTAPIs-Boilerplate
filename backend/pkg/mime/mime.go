@@ -36,7 +36,12 @@ const (
 	// See the Server-Sent Events specification for more details:
 	// https://html.spec.whatwg.org/multipage/server-sent-events.html
 	//
-	// Note: This suitable for AI
+	// Note: This MIME type is suitable for AI applications, such as chat systems.
+	// It's important to note that Server-Sent Events (SSE) is different from WebSocket.
+	// While WebSocket enables bidirectional communication and can be more complex to implement securely,
+	// SSE provides a simpler, unidirectional communication channel from the server to the client,
+	// making it a suitable choice for scenarios where real-time updates are needed without the
+	// additional complexity and potential security risks associated with WebSocket.
 	TextEventStream = "text/event-stream"
 )
 
