@@ -123,11 +123,15 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 	)
 
 	methods := []string{
+		fiber.MethodHead,
 		fiber.MethodGet,
 		fiber.MethodPost,
 		fiber.MethodPut,
 		fiber.MethodDelete,
 		fiber.MethodPatch,
+		fiber.MethodConnect,
+		fiber.MethodOptions,
+		fiber.MethodTrace,
 	}
 
 	for _, method := range methods {
