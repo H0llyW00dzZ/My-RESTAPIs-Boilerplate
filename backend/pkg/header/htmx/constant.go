@@ -50,7 +50,7 @@ const (
 	HXTrigger = "HX-Trigger"
 )
 
-//  HTMX Response Headers
+// HTMX Response Headers
 const (
 	// HXLocation represents the MIME type for the HX-Location response header.
 	//
