@@ -135,6 +135,9 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 		// When there are 3 or more routers, it will be structured like this in the demo:
 		// - TLSv1.3 & HTTP/3 (QUIC): https://btz.pm (frontend currently disabled because I don't have any ideas for building the front-end, so it will return to the wildcard (see fiber.NewError in DomainRouter))
 		// - TLSv1.3 & mTLSv1.3: https://api-beta.btz.pm (REST APIs)
+		//
+		// Also, note that the demo might be rare because having a single domain that can handle different protocols
+		// to do one thing and do it well in the same host and repository is uncommon; however, it is secure.
 		fiber.MIMETextPlain,
 		fiber.MIMETextPlainCharsetUTF8,
 	)
