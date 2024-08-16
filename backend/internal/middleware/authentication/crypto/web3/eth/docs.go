@@ -16,6 +16,7 @@
 //		URL         string
 //		ContextKey  any
 //		ErrorHandler func(c *fiber.Ctx, err error) error
+//		Next         func(*fiber.Ctx) bool
 //	}
 //
 // Configuration:
@@ -23,6 +24,10 @@
 //   - ContextKey: The key used to store the Ethereum client in the Fiber context. This key must be specified when creating the Config struct.
 //   - ErrorHandler: A custom error handler function to handle errors that occur during client creation.
 //     If not provided, it defaults to using htmx.NewStaticHandleVersionedAPIError.
+//   - Next: A function that determines whether to skip the middleware and proceed to the next middleware or route handler.
+//     It takes a Fiber context as input and returns a boolean value.
+//     If true, the middleware is skipped, and the next middleware or route handler is executed.
+//     If false, the middleware continues its execution.
 //
 // Retrieving the Ethereum Client:
 //
