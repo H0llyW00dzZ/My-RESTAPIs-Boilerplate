@@ -13,6 +13,7 @@ import (
 
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/csp"
+	"h0llyw00dz-template/backend/internal/middleware/restime"
 
 	validator "github.com/H0llyW00dzZ/FiberValidator"
 	"github.com/gofiber/contrib/swagger"
@@ -792,4 +793,23 @@ func NewCompressMiddleware(options ...any) fiber.Handler {
 
 	// Return the compression middleware.
 	return compressMiddleware
+}
+
+// NewResponseTime creates a new response time middleware with optional custom configuration options.
+func NewResponseTime(options ...any) fiber.Handler {
+	// Create a new response time configuration.
+	config := restime.Config{}
+
+	// Apply any additional options to the response time configuration.
+	for _, option := range options {
+		if optFunc, ok := option.(func(*restime.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create the response time middleware with the configured options.
+	restimeMiddleware := restime.New(config)
+
+	// Return the response time middleware.
+	return restimeMiddleware
 }
