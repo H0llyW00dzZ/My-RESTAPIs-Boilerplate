@@ -19,13 +19,19 @@ type Config struct {
 	URL          string
 	ContextKey   any
 	ErrorHandler func(c *fiber.Ctx, err error) error
+	Next         func(*fiber.Ctx) bool
 }
 
 // New is a custom Fiber middleware that configures the Ethereum client
 //
-// Note: It should be fine if gateway via cloudflare
+// Note: It should be fine if the gateway is via Cloudflare. This is how we test for excellent performance - by doing one thing and doing it well.
 func New(config Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		// Check if the request should be skipped
+		if config.Next != nil && config.Next(c) {
+			return c.Next()
+		}
+
 		// Create a new Ethereum client using the provided URL
 		client, err := ethclient.Dial(config.URL)
 		if err != nil {
