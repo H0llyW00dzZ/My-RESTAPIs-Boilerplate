@@ -22,6 +22,8 @@ type Config struct {
 }
 
 // New is a custom Fiber middleware that configures the Ethereum client
+//
+// Note: It should be fine if gateway via cloudflare
 func New(config Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Create a new Ethereum client using the provided URL
