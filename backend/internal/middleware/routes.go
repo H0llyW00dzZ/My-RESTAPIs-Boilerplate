@@ -141,7 +141,9 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 		fiber.MIMETextPlain,
 		fiber.MIMETextPlainCharsetUTF8,
 	)
-	// Note: It's important to skip caching for redirect status codes, which can enhance security (e.g, for auth mechanism).
+	// Note: It's important to skip caching for redirect status codes, which can enhance security (e.g., for auth mechanisms).
+	// If redirect status codes are cached, it can lead to security issues (e.g., new CVEs, exploits such as cache poisoning) because when redirect status codes are cached (hit),
+	// they store only the header with 0 content (the reason why it appears blank in the browser). This can lead to security issues, especially for auth mechanisms, due to the information stored in the header with 0 content.
 	statusCodeSkip := CustomNextStatusCode(
 		fiber.StatusMovedPermanently,
 		fiber.StatusPermanentRedirect,
