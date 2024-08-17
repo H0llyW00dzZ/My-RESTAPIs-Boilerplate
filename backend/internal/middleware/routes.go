@@ -140,6 +140,9 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 		// to do one thing and do it well in the same host and repository is uncommon; however, it is secure.
 		fiber.MIMETextPlain,
 		fiber.MIMETextPlainCharsetUTF8,
+		// Note: It's important to disable caching for this MIME type, which is particularly suitable when using Grafana,
+		// especially when playing HTMX MinesweeperX through Grafana plugins while monitoring.
+		mime.PrometheusMetrics,
 	)
 	// Note: It's important to skip caching for redirect status codes, which can enhance security (e.g., for auth mechanisms).
 	// If redirect status codes are cached, it can lead to security issues (e.g., new CVEs, exploits such as cache poisoning) because when redirect status codes are cached (hit),
