@@ -483,6 +483,8 @@ func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string)
 			// Note: This fixes a potential underflow issue that may occur in certain rare cases.
 			// The problem only occurs occasionally.
 			// Also, note that math.Max is used now because it might prevent warnings in other Go linters, such as the golangci-lint.
+			//
+			// TODO: Remove this due to its unpredictability, especially in Redis that has Autopilot and Kafka integration.
 			activeConns := uint64(math.Max(float64(poolStats.TotalConns-poolStats.IdleConns), 0))
 			stats["redis_active_connections"] = strconv.FormatUint(activeConns, 10)
 
@@ -522,10 +524,15 @@ func (s *service) evaluateRedisStats(redisInfo, stats map[string]string) map[str
 		stats["redis_message"] = MsgRedisHighConnectedClients
 	}
 
-	// Check for stale connections and append a warning if they exceed a minimum threshold
-	minStaleConnectionsThreshold := 500 // Adjust this value as needed
-	if int(poolStats.StaleConns) > minStaleConnectionsThreshold {
-		stats["redis_message"] = fmt.Sprintf(MsgRedisHasStaleConnections, poolStats.StaleConns)
+	// Check for stale connections and append a warning if they exceed a certain percentage threshold.
+	//
+	// Note: This approach is more dynamic instead of being explicitly static, which is suitable for Redis with Autopilot (managed database) and Kafka integration.
+	totalHitsConns := int(poolStats.Hits)
+	if totalHitsConns > 0 {
+		stalePercentage := float64(poolStats.StaleConns) / float64(totalHitsConns) * 100
+		if stalePercentage > 70 { // Adjust this threshold as needed
+			stats["redis_message"] = fmt.Sprintf(MsgRedisHasStaleConnections, poolStats.StaleConns, stalePercentage)
+		}
 	}
 
 	// Check if used memory is close to the maximum memory
