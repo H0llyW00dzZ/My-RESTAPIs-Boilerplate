@@ -526,7 +526,9 @@ func (s *service) evaluateRedisStats(redisInfo, stats map[string]string) map[str
 
 	// Check for stale connections and append a warning if they exceed a certain percentage threshold.
 	//
-	// Note: This approach is more dynamic instead of being explicitly static, which is suitable for Redis with Autopilot (managed database) and Kafka integration.
+	// Note: This approach is more dynamic instead of being explicitly static, which is suitable for Redis with Autopilot
+	// (an automated managed database for high performance (zer0 overhead) that is capable of handling 1 billion hits
+	// even with low resources (e.g., 1GB Redis). Also note that it is not a cluster or sentinel setup) and Kafka integration.
 	totalHitsConns := int(poolStats.Hits)
 	if totalHitsConns > 0 {
 		stalePercentage := float64(poolStats.StaleConns) / float64(totalHitsConns) * 100
