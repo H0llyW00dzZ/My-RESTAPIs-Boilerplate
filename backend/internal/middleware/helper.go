@@ -22,6 +22,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/csrf"
+	"github.com/gofiber/fiber/v2/middleware/earlydata"
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
@@ -1151,5 +1152,33 @@ func CustomNextStatusCode(statusCodes ...int) func(*fiber.Ctx) bool {
 			}
 		}
 		return false
+	}
+}
+
+// WithEarlyDataNext is an option function for NewEarlyData (Another QUIC) that sets the Next function.
+func WithEarlyDataNext(next func(c *fiber.Ctx) bool) func(*earlydata.Config) {
+	return func(config *earlydata.Config) {
+		config.Next = next
+	}
+}
+
+// WithIsEarlyData is an option function for NewEarlyData (Another QUIC) that sets the IsEarlyData function.
+func WithIsEarlyData(isEarlyData func(c *fiber.Ctx) bool) func(*earlydata.Config) {
+	return func(config *earlydata.Config) {
+		config.IsEarlyData = isEarlyData
+	}
+}
+
+// WithAllowEarlyData is an option function for NewEarlyData (Another QUIC) that sets the AllowEarlyData function.
+func WithAllowEarlyData(allowEarlyData func(c *fiber.Ctx) bool) func(*earlydata.Config) {
+	return func(config *earlydata.Config) {
+		config.AllowEarlyData = allowEarlyData
+	}
+}
+
+// WithEarlyDataError is an option function for NewEarlyData (Another QUIC) that sets the Error value.
+func WithEarlyDataError(err error) func(*earlydata.Config) {
+	return func(config *earlydata.Config) {
+		config.Error = err
 	}
 }
