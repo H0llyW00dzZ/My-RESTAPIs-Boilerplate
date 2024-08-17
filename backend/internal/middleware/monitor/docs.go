@@ -55,4 +55,16 @@
 //
 // The Prometheus middleware is self-contained and does not require any specific cloud environment setup. It can be used in
 // any environment where the Fiber application is deployed, making it highly portable and flexible.
+//
+// Security:
+//
+// While the Prometheus middleware is highly portable and flexible (unlike relying on any specific cloud environment,
+// for example, via localhost), allowing it to be used in any environment where the Fiber application is deployed,
+// it focuses on doing one thing and doing it well:
+// collecting and exposing metrics for Prometheus.
+//
+// To ensure security and isolation, the Prometheus middleware can be easily configured to use
+// TLS (Transport Layer Security) for encrypted communication. By enabling TLS, the middleware
+// can securely expose the metrics endpoint, preventing unauthorized access and protecting sensitive
+// information.
 package monitor
