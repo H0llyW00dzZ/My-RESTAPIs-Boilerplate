@@ -24,6 +24,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/csrf"
+	"github.com/gofiber/fiber/v2/middleware/earlydata"
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
@@ -812,4 +813,26 @@ func NewResponseTime(options ...any) fiber.Handler {
 
 	// Return the response time middleware.
 	return restimeMiddleware
+}
+
+// NewEarlyData (Another QUIC) creates a new early data middleware with optional custom configuration options.
+//
+// Note: Consider carefully when using an external load balancer/ingress (e.g., nginx) due to Fiber's built-in support for
+// Another QUIC, which is already safe and requires explicit TLSv1.3 for the external load balancer/ingress.
+func NewEarlyData(options ...any) fiber.Handler {
+	// Create a new early data configuration.
+	config := earlydata.Config{}
+
+	// Apply any additional options to the early data configuration.
+	for _, option := range options {
+		if optFunc, ok := option.(func(*earlydata.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create the early data middleware with the configured options.
+	earlyDataMiddleware := earlydata.New(config)
+
+	// Return the early data middleware.
+	return earlyDataMiddleware
 }
