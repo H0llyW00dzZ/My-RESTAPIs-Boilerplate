@@ -483,6 +483,8 @@ func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string)
 			// Note: This fixes a potential underflow issue that may occur in certain rare cases.
 			// The problem only occurs occasionally.
 			// Also, note that math.Max is used now because it might prevent warnings in other Go linters, such as the golangci-lint.
+			//
+			// TODO: Remove this due to its unpredictability, especially in Redis that has Autopilot and Kafka integration.
 			activeConns := uint64(math.Max(float64(poolStats.TotalConns-poolStats.IdleConns), 0))
 			stats["redis_active_connections"] = strconv.FormatUint(activeConns, 10)
 
