@@ -54,3 +54,21 @@ const (
 	// compression for ICO files when using the CompressMiddleware (brotli).
 	ImageXIcon = "image/x-icon"
 )
+
+const (
+	// PrometheusMetrics represents the MIME type for Prometheus metrics.
+	//
+	// It is used to indicate that the response body contains Prometheus-formatted metrics data.
+	// Prometheus is a popular open-source monitoring and alerting system that collects and stores
+	// metrics as time series data.
+	//
+	// The MIME type follows the format "text/plain; version=0.0.4; charset=utf-8; escaping=values":
+	// 	- "text/plain" indicates that the content is plain text.
+	// 	- "version=0.0.4" specifies the version of the Prometheus text format.
+	// 	- "charset=utf-8" indicates that the character encoding is UTF-8.
+	// 	- "escaping=values" specifies that the metric values are escaped according to Prometheus conventions.
+	//
+	// When exposing Prometheus metrics, the server should set the "Content-Type" header to this MIME type.
+	// Prometheus servers and clients use this MIME type to identify and parse the metrics data correctly.
+	PrometheusMetrics = "text/plain; version=0.0.4; charset=utf-8; escaping=values"
+)
