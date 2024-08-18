@@ -142,6 +142,7 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 		fiber.MIMETextPlainCharsetUTF8,
 		// Note: It's important to disable caching for this MIME type, which is particularly suitable when using Grafana,
 		// especially when playing HTMX MinesweeperX through Grafana plugins while monitoring.
+		// Also note that while caching is disabled for Prometheus, it will become real-time because the Prometheus MIME type basically streams to serve HTTP.
 		mime.PrometheusMetrics,
 	)
 	// Note: It's important to skip caching for redirect status codes, which can enhance security (e.g., for auth mechanisms).
