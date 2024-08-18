@@ -143,6 +143,14 @@ sample#memory_quota=1024.00MB
 > [!TIP]
 > Also note that when optimized to achieve all green metrics which is easily, especially in the SEO category, it can be beneficial for business logic purposes. (e.g, Search engines like `Google` and `Microsoft Bing` tend to favor websites with good performance metrics, which can lead to improved search rankings and increased visibility.)
 
+
+## Prometheus
+
+- `Latest Go Version`
+
+<img src="https://i.imgur.com/UySPjRn.png" alt="prometheus-portable">
+<img src="https://i.imgur.com/azGS0et.png" alt="prometheus-portable">
+
 ## Architecture
 
 Below is the architecture of this boilerplate and how it looks. I created this for REST APIs about volcano 🌋 monitoring used by the government (has been done before), so it can easily monitor volcanoes in the real world.
