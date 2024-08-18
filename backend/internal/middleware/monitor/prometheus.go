@@ -10,16 +10,41 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// PrometheusConfig represents the configuration options for the Prometheus middleware.
+// PrometheusConfig defines the config for the Prometheus middleware.
 type PrometheusConfig struct {
+	// ServiceName is the name of the service being monitored.
+	// If provided, it will be used as the prefix for the metrics.
+	// Optional. Default is an empty string.
 	ServiceName string
-	Namespace   string
-	Subsystem   string
-	Labels      map[string]string
-	SkipPaths   []string
+
+	// Namespace is the namespace for the Prometheus metrics.
+	// Optional. Default is "senior_golang".
+	Namespace string
+
+	// Subsystem is the subsystem for the Prometheus metrics.
+	// Optional. Default is an empty string.
+	Subsystem string
+
+	// Labels are additional labels to be added to the Prometheus metrics.
+	// Optional. Default is an empty map.
+	Labels map[string]string
+
+	// SkipPaths is a list of paths that should be skipped by the Prometheus middleware.
+	// Optional. Default is an empty slice.
+	SkipPaths []string
+
+	// MetricsPath is the path where the Prometheus metrics will be exposed.
+	// Optional. Default is "/metrics".
 	MetricsPath string
-	Next        func(c *fiber.Ctx) bool
-	CacheKey    string
+
+	// Next is a function that defines a custom logic for skipping the Prometheus middleware.
+	// The middleware will be skipped if this function returns true.
+	// Optional. Default is nil.
+	Next func(c *fiber.Ctx) bool
+
+	// CacheKey is the cache key used for caching the Prometheus metrics.
+	// Optional. Default is an empty string.
+	CacheKey string
 }
 
 // DefaultPrometheusConfig represents the default configuration options for the Prometheus middleware.
