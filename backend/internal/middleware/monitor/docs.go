@@ -21,6 +21,7 @@
 //   - SkipPaths ([]string): A list of paths to be skipped from being monitored by the Prometheus middleware.
 //   - MetricsPath (string): The path at which the Prometheus metrics will be exposed. Default is "/metrics".
 //   - Next (func(c *fiber.Ctx) bool): A custom function to determine whether the Prometheus middleware should be skipped for a particular request.
+//   - CacheKey (string): The cache key used for caching the Prometheus metrics. Default is an empty string.
 //
 // Default Configuration:
 //
@@ -43,15 +44,17 @@
 //	    Next: func(c *fiber.Ctx) bool {
 //	        return c.Path() == "/skip"
 //	    },
+//	    CacheKey: "my-cache-key",
 //	}
 //
 //	app.Use(monitor.NewPrometheus(prometheusConfig))
 //
 // In this example, the Prometheus middleware is configured with a custom service name, namespace, subsystem, labels,
-// skip paths, metrics path, and a custom Next function. The middleware will collect metrics for all requests except
+// skip paths, metrics path, a custom Next function, and a cache key. The middleware will collect metrics for all requests except
 // those with paths "/health", "/metrics", and "/skip".
 //
 // The collected metrics will be exposed at the "/my-metrics" endpoint and can be scraped by Prometheus for monitoring purposes.
+// The metrics will be cached using the specified cache key "my-cache-key".
 //
 // The Prometheus middleware is self-contained and does not require any specific cloud environment setup. It can be used in
 // any environment where the Fiber application is deployed, making it highly portable and flexible.
