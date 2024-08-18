@@ -9,6 +9,7 @@ import (
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/csp"
+	"h0llyw00dz-template/backend/internal/middleware/monitor"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
 	"hash/fnv"
 	"strings"
@@ -1180,5 +1181,47 @@ func WithAllowEarlyData(allowEarlyData func(c *fiber.Ctx) bool) func(*earlydata.
 func WithEarlyDataError(err error) func(*earlydata.Config) {
 	return func(config *earlydata.Config) {
 		config.Error = err
+	}
+}
+
+// WithPrometheusServiceName is an option function for NewPrometheus that sets the service name.
+func WithPrometheusServiceName(serviceName string) func(*monitor.PrometheusConfig) {
+	return func(config *monitor.PrometheusConfig) {
+		config.ServiceName = serviceName
+	}
+}
+
+// WithPrometheusNamespace is an option function for NewPrometheus that sets the namespace.
+func WithPrometheusNamespace(namespace string) func(*monitor.PrometheusConfig) {
+	return func(config *monitor.PrometheusConfig) {
+		config.Namespace = namespace
+	}
+}
+
+// WithPrometheusSubsystem is an option function for NewPrometheus that sets the subsystem.
+func WithPrometheusSubsystem(subsystem string) func(*monitor.PrometheusConfig) {
+	return func(config *monitor.PrometheusConfig) {
+		config.Subsystem = subsystem
+	}
+}
+
+// WithPrometheusLabels is an option function for NewPrometheus that sets the labels.
+func WithPrometheusLabels(labels map[string]string) func(*monitor.PrometheusConfig) {
+	return func(config *monitor.PrometheusConfig) {
+		config.Labels = labels
+	}
+}
+
+// WithPrometheusSkipPaths is an option function for NewPrometheus that sets the skip paths.
+func WithPrometheusSkipPaths(skipPaths []string) func(*monitor.PrometheusConfig) {
+	return func(config *monitor.PrometheusConfig) {
+		config.SkipPaths = skipPaths
+	}
+}
+
+// WithPrometheusMetricsPaths is an option function for NewPrometheus that sets the metrics path.
+func WithPrometheusMetricsPaths(paths string) func(*monitor.PrometheusConfig) {
+	return func(config *monitor.PrometheusConfig) {
+		config.MetricsPath = paths
 	}
 }
