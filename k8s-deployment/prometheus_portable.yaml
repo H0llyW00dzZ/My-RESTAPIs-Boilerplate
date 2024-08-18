@@ -1,0 +1,14 @@
+# REST API [Zer0-Downtime] Prometheus Portable Scrape configurations
+scrape_configs:
+  # "prometheus" job will query Prometheus itself to get its internal metrics.
+  # 🙈 Nothing to do here, you should let this configuration per default.
+  # External site scraping example
+  - job_name: "restapis" # change this
+    metrics_path: "/v1/server/metrics" # change this
+    scheme: "https" # better keep
+    static_configs:
+      - targets: ["example.com"] # change this
+    # Note: Once the authorization mechanism is implemented, enable this.
+    # authorization:
+    #   type: "Bearer"
+    #   credentials: ""
