@@ -10,6 +10,7 @@ import (
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/csp"
 	"h0llyw00dz-template/backend/internal/middleware/monitor"
+	"h0llyw00dz-template/backend/internal/middleware/restime"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
 	"hash/fnv"
 	"strings"
@@ -1223,5 +1224,26 @@ func WithPrometheusSkipPaths(skipPaths []string) func(*monitor.PrometheusConfig)
 func WithPrometheusMetricsPaths(paths string) func(*monitor.PrometheusConfig) {
 	return func(config *monitor.PrometheusConfig) {
 		config.MetricsPath = paths
+	}
+}
+
+// WithPrometheusMetricsNext is an option function for NewPrometheus that sets the next function.
+func WithPrometheusMetricsNext(next func(c *fiber.Ctx) bool) func(*monitor.PrometheusConfig) {
+	return func(config *monitor.PrometheusConfig) {
+		config.Next = next
+	}
+}
+
+// WithRestimeHeaderName is an option function for ResponseTime that sets the header name.
+func WithRestimeHeaderName(headerName string) func(*restime.Config) {
+	return func(config *restime.Config) {
+		config.HeaderName = headerName
+	}
+}
+
+// WithRestimeNext is an option function for ResponseTime that sets the next function.
+func WithRestimeNext(next func(c *fiber.Ctx) bool) func(*restime.Config) {
+	return func(config *restime.Config) {
+		config.Next = next
 	}
 }
