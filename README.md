@@ -148,6 +148,7 @@ sample#memory_quota=1024.00MB
 
 - `Latest Go Version`
 
+<img src="https://i.imgur.com/KeHzVn0.png" alt="prometheus-portable">
 <img src="https://i.imgur.com/UySPjRn.png" alt="prometheus-portable">
 <img src="https://i.imgur.com/azGS0et.png" alt="prometheus-portable">
 

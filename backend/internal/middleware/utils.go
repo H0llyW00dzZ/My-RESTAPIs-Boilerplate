@@ -13,6 +13,7 @@ import (
 
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/csp"
+	"h0llyw00dz-template/backend/internal/middleware/monitor"
 	"h0llyw00dz-template/backend/internal/middleware/restime"
 
 	validator "github.com/H0llyW00dzZ/FiberValidator"
@@ -835,4 +836,31 @@ func NewEarlyData(options ...any) fiber.Handler {
 
 	// Return the early data middleware.
 	return earlyDataMiddleware
+}
+
+// NewPrometheusMiddleware creates a new Prometheus middleware with optional custom configuration options.
+//
+// Note: While this Prometheus middleware is highly flexible and portable, it is easy to enhance security by adding an authentication mechanism.
+//
+// Recommended for authentication:
+//   - https://docs.gofiber.io/api/middleware/keyauth + Database
+//
+// Demo:
+//   - https://api-beta.btz.pm/v1/server/metrics (Authentication required)
+func NewPrometheusMiddleware(options ...any) fiber.Handler {
+	// Create a new Prometheus configuration.
+	config := monitor.PrometheusConfig{}
+
+	// Apply any additional options to the Prometheus configuration.
+	for _, option := range options {
+		if optFunc, ok := option.(func(*monitor.PrometheusConfig)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create the Prometheus middleware using the NewPrometheus function.
+	prometheusMiddleware := monitor.NewPrometheus(config)
+
+	// Return the Prometheus middleware.
+	return prometheusMiddleware
 }
