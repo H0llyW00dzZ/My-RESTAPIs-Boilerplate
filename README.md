@@ -149,8 +149,12 @@ sample#memory_quota=1024.00MB
 - `Latest Go Version`
 
 <img src="https://i.imgur.com/KeHzVn0.png" alt="prometheus-portable">
+<img src="https://i.imgur.com/U6o6x9U.png" alt="prometheus-portable">
 <img src="https://i.imgur.com/UySPjRn.png" alt="prometheus-portable">
 <img src="https://i.imgur.com/azGS0et.png" alt="prometheus-portable">
+
+> [!NOTE]
+> The `grafana` dashboard is not shareable due to it being bound to my security configurations for real-world monitoring in other production environments.
 
 ## Architecture
 
