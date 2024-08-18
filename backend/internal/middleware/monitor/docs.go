@@ -79,6 +79,10 @@
 //   - https://docs.gofiber.io/api/middleware/keyauth + Database (bound keys mechanism (e.g., Tokens, API Keys, or other keys built with cryptography)
 //     to a database instead of hardcoding them, allowing for easy key generation and management)
 //
+// Recommended for authentication (Advanced):
+//   - https://docs.gofiber.io/api/middleware/keyauth + HSM (bound keys mechanism (e.g., Tokens, API Keys, or other keys built with cryptography)
+//     to a HSM instead of hardcoding them, allowing for easy key generation and management)
+//
 // By implementing authentication, you can ensure that only authorized users or systems can access the Prometheus
 // metrics endpoint, enhancing the security of your application.
 package monitor
