@@ -19,6 +19,7 @@ type PrometheusConfig struct {
 	SkipPaths   []string
 	MetricsPath string
 	Next        func(c *fiber.Ctx) bool
+	CacheKey    string
 }
 
 // DefaultPrometheusConfig represents the default configuration options for the Prometheus middleware.
@@ -51,6 +52,10 @@ func NewPrometheus(config ...PrometheusConfig) fiber.Handler {
 
 	if len(cfg.SkipPaths) > 0 {
 		prometheus.SetSkipPaths(cfg.SkipPaths)
+	}
+
+	if cfg.CacheKey != "" {
+		prometheus.CustomCacheKey(cfg.CacheKey)
 	}
 
 	return func(c *fiber.Ctx) error {
