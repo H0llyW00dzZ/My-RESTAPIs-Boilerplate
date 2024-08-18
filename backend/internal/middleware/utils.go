@@ -843,7 +843,12 @@ func NewEarlyData(options ...any) fiber.Handler {
 // Note: While this Prometheus middleware is highly flexible and portable, it is easy to enhance security by adding an authentication mechanism.
 //
 // Recommended for authentication:
-//   - https://docs.gofiber.io/api/middleware/keyauth + Database
+//   - https://docs.gofiber.io/api/middleware/keyauth + Database (bound keys mechanism (e.g., Tokens, API Keys, or other keys built with cryptography)
+//     to a database instead of hardcoding them, allowing for easy key generation and management)
+//
+// Recommended for authentication (Advanced):
+//   - https://docs.gofiber.io/api/middleware/keyauth + HSM (bound keys mechanism (e.g., Tokens, API Keys, or other keys built with cryptography)
+//     to a HSM instead of hardcoding them, allowing for easy key generation and management)
 //
 // Demo:
 //   - https://api-beta.btz.pm/v1/server/metrics (Authentication required)

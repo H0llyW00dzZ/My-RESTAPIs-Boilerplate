@@ -70,4 +70,19 @@
 // TLS (Transport Layer Security) for encrypted communication. By enabling TLS, the middleware
 // can securely expose the metrics endpoint, preventing unauthorized access and protecting sensitive
 // information.
+//
+// Additionally, the Prometheus middleware can be enhanced with an authentication mechanism to restrict access
+// to the metrics endpoint. This can be achieved by implementing a custom authentication middleware or using
+// existing authentication libraries compatible with Fiber.
+//
+// Recommended for authentication:
+//   - https://docs.gofiber.io/api/middleware/keyauth + Database (bound keys mechanism (e.g., Tokens, API Keys, or other keys built with cryptography)
+//     to a database instead of hardcoding them, allowing for easy key generation and management)
+//
+// Recommended for authentication (Advanced):
+//   - https://docs.gofiber.io/api/middleware/keyauth + HSM (bound keys mechanism (e.g., Tokens, API Keys, or other keys built with cryptography)
+//     to a HSM instead of hardcoding them, allowing for easy key generation and management)
+//
+// By implementing authentication, you can ensure that only authorized users or systems can access the Prometheus
+// metrics endpoint, enhancing the security of your application.
 package monitor
