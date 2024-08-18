@@ -40,6 +40,7 @@ type APIGroup struct {
 	RequestID                 fiber.Handler
 	EncryptedCookieMiddleware fiber.Handler
 	CompressJSON              fiber.Handler
+	Prometheus                fiber.Handler
 }
 
 // registerRESTAPIsRoutes registers the REST API routes for the application.
@@ -225,6 +226,7 @@ func registerGroupMiddlewares(g fiber.Router, group APIGroup) {
 		group.RequestID,
 		group.EncryptedCookieMiddleware,
 		group.CompressJSON,
+		group.Prometheus,
 	)
 }
 
