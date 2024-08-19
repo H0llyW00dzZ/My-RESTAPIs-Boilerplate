@@ -89,6 +89,8 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 	)
 
 	//serverAPIs(v1, db, rateLimiterRESTAPIs)
+	// Note: To test the Prometheus middleware, make a request to any URL in http://api.localhost:8080/ (restAPIS Router),
+	// then visit http://api.localhost:8080/v1/server/metrics to see how it works.
 	newPrometheus := NewPrometheusMiddleware(
 		WithPrometheusServiceName("senior_golang"),
 		WithPrometheusNamespace("restapis"),
