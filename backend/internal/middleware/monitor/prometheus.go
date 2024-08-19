@@ -44,6 +44,8 @@ type PrometheusConfig struct {
 
 	// CacheKey is the cache key used for caching the Prometheus metrics.
 	// Optional. Default is an empty string.
+	//
+	// TODO: Enhance the Prometheus Portable middleware to support multiple headers for logging instead of a single header like "X-Cache".
 	CacheKey string
 }
 
