@@ -17,7 +17,6 @@ import (
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/keyidentifier"
 	"h0llyw00dz-template/backend/pkg/mime"
-	"h0llyw00dz-template/backend/pkg/restapis/helper"
 	"h0llyw00dz-template/env"
 	htmx "h0llyw00dz-template/frontend/htmx/error_page_handler"
 
@@ -25,7 +24,15 @@ import (
 )
 
 var (
-	apiSubdomain = os.Getenv(env.APISUBDOMAIN) // set API_SUB_DOMAIN=api.localhost:8080 (depends of port available) for local development
+	// apiSubdomain is the subdomain for the API endpoints.
+	// It is set using the API_SUB_DOMAIN environment variable.
+	// Example: set API_SUB_DOMAIN=api.localhost:8080 for local development.
+	apiSubdomain = os.Getenv(env.APISUBDOMAIN)
+
+	// frontendDomain is the domain for the frontend application.
+	// It is set using the DOMAIN environment variable.
+	// Example: set DOMAIN=localhost:8080 for local development.
+	frontendDomain = os.Getenv(env.DOMAIN)
 )
 
 // Note: This method works well Docs: https://github.com/gofiber/fiber/issues/750
@@ -44,60 +51,29 @@ type (
 
 // RegisterRoutes sets up the API routing for the application.
 // It organizes routes into versioned groups for better API version management.
+//
+// Note: There are now 3 routers: restapis, frontend, and wildcard handler (503).
+// They operate independently.
 func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Service) {
-	// Note: This is just an example that can be integrated with other Fiber middleware.
-	// If needed to store it in storage, use a prefix for group keys and call "GetKeyFunc".
-	genReqID := keyidentifier.New(keyidentifier.Config{
-		Prefix: "",
-	})
-	// Generate Request ID
-	//
-	// Note: This just example and "visitor_uuid" contextkey can be used for c.Locals
-	// Previously I've been done implement this X-Request-ID bound into hash from TLS 1.3 with Private Protocols Cryptography (not open source) not UUID.
-	xRequestID := NewRequestIDMiddleware(
-		WithRequestIDHeaderContextKey("visitor_uuid"),
-		WithRequestIDGenerator(genReqID.GetKey),
-	)
-
-	// Create a custom middleware to set the CSP header
-	cspMiddleware := NewCSPHeaderGenerator()
-
 	// Hosts
-	// TODO: Reorganize this.
-	// When this is reorganized, it will create 3 Routers (3 domains):
-	//   1. Static Frontend:
-	//      - HTMX
-	//      - TEMPL
-	//   2. Hostname:
-	//      - Root Middleware Handler: When applying the middleware mechanism from registerRouteConfigMiddleware,
-	//        it will be applied across the frontend and REST APIs.
-	//      - Wildcard StatusServiceUnavailable Handler:
-	//        Demo: https://api-beta.btz.pm speed might be slow at first due to the firewall implementation in Go that uses MySQL.
-	//   3. REST APIs:
-	//      - The Services
-	// For TLS (e.g., in Ingress), it requires a Wildcard certificate instead of issuing 3 separate certificates.
-	// The 3-router implementation is based on my previous work that has been done before.
-	// It offers a better design (all-in-one) and is easier to maintain, even with 500+ files.
 	hosts := map[string]*Host{}
+
+	// restAPIs subdomain
+	api := fiber.New()
+	registerRESTAPIsRoutes(api, db)
+	hosts[apiSubdomain] = &Host{api}
+
+	// Frontend domain
+	frontend := fiber.New()
+	registerStaticFrontendRoutes(frontend, appName, db)
+	hosts[frontendDomain] = &Host{frontend}
+
 	// Apply the combined middlewares
 	registerRouteConfigMiddleware(app, db)
-	// API subdomain
-	api := fiber.New()
-	// Register the REST APIs Routes
-	registerRESTAPIsRoutes(app, db)
-	// Note: This is just an example. In production, replace `api.localhost:8080` with a specific domain/subdomain, such as api.example.com.
-	// Similarly, for the frontend, specify a domain like `hosts["example.com"] = &Host{frontend}`.
-	// Additionally, instead of hard-coding the domain or subdomain,
-	// it is possible to integrate it with environment variables or other configurations (e.g, YAML).
-	hosts[apiSubdomain] = &Host{api}
-	// Register the Static Frontend Routes
-	registerStaticFrontendRoutes(app, appName, db)
-	// Apply the subdomain routing middleware
-	//
-	// Note: "htmx.NewErrorHandler" will apply to localhost:8080 by default.
-	// For "api.localhost:8080" to function correctly, REST API routes must be implemented.
-	// Additionally, define environment variables for "DOMAIN" and "API_SUB_DOMAIN" to enable multi-site support (up to 1 billion domains).
-	app.Use(xRequestID, cspMiddleware, htmx.NewErrorHandler, DomainRouter(hosts)) // When "htmx.NewErrorHandler" Applied, Generic Error (E.g, Crash/Panic will render "Internal Server Error" as JSON due It use recoverMiddleware)
+	registerRootRouter(app)
+
+	// Apply the subdomain & domain routing middleware
+	app.Use(DomainRouter(hosts))
 }
 
 // registerRouteConfigMiddleware applies middleware configurations to the Fiber application.
@@ -109,11 +85,14 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 // This can lead to a complex setup, similar to the best art of binary trees (see https://en.wikipedia.org/wiki/Binary_tree).
 // However, it's not actually complex; it's just the art of Go programming.
 func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
-	// Favicon front end setup
-	// Note: this just an example
-	favicon := NewFaviconMiddleware(
-		WithFaviconFile("./frontend/public/assets/images/favicon.ico"),
-		WithFaviconURL("/favicon.ico"),
+	// Note: This is just an example that can be integrated with other Fiber middleware.
+	// If needed to store it in storage, use a prefix for group keys and call "GetKeyFunc".
+	genReqID := keyidentifier.New(keyidentifier.Config{
+		Prefix: "",
+	})
+	xRequestID := NewRequestIDMiddleware(
+		WithRequestIDHeaderContextKey("visitor_uuid"),
+		WithRequestIDGenerator(genReqID.GetKey),
 	)
 	// Note: This is just an example. It should work with SHA-256 for the key, however it may not properly bind to a UUID.
 	cacheKeyGen := keyidentifier.New(keyidentifier.Config{
@@ -174,6 +153,9 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 		WithCacheHeader("X-Go-Frontend"),
 	)
 
+	// Create a custom middleware to set the CSP header
+	cspMiddleware := NewCSPHeaderGenerator()
+
 	// Recovery middleware setup
 	// TODO: Move this into the server package because it should be initialized as the root before other functions.
 	// This way, it can catch any panics, for example, catch any panic through the sub-package k8s/metrics.
@@ -187,8 +169,29 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 		},
 	})
 
+	etagMiddleware := NewETagMiddleware()
 	// Apply the recover middleware
-	app.Use(helper.ErrorHandler, cacheMiddleware, recoverMiddleware, favicon)
+	app.Use(xRequestID, etagMiddleware, cspMiddleware, cacheMiddleware, htmx.NewErrorHandler, recoverMiddleware)
+}
+
+// registerRootRouter sets up the root router for the application.
+// It registers static file serving and applies the favicon middleware.
+func registerRootRouter(app *fiber.App) {
+	// Register static file serving
+	app.Static("/styles/", "./frontend/public/assets", fiber.Static{
+		ByteRange: true,
+		Compress:  true,
+		// optional
+	})
+
+	// Favicon setup
+	// Note: This is just an example
+	favicon := NewFaviconMiddleware(
+		WithFaviconFile("./frontend/public/assets/images/favicon.ico"),
+		WithFaviconURL("/favicon.ico"),
+	)
+
+	app.Use(favicon)
 }
 
 // DomainRouter is a middleware function that handles subdomain or domain routing.
