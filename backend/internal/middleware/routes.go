@@ -57,20 +57,6 @@ var (
 	writeTimeout, _ = time.ParseDuration(writeTimeoutStr)
 )
 
-// Note: This method works well Docs: https://github.com/gofiber/fiber/issues/750
-// Also note that There is no limit to this feature. For example, you can add a billion domains or subdomains.
-// Another note: When running this in a container with Kubernetes, make sure to have a configuration for allow internal IPs (e.g., 10.0.0.0/24).
-// Because this method creates an additional internal IP for handling routes (e.g., 10.0.0.1 for REST APIs, then 10.0.0.2 for the frontend).
-type (
-	// Host represents a subdomain or domain host configuration.
-	// It contains a reference to a Fiber application instance.
-	Host struct {
-		// Fiber is a pointer to a Fiber application instance.
-		// It represents the Fiber app associated with the subdomain or domain host.
-		Fiber *fiber.App
-	}
-)
-
 // RegisterRoutes sets up the API routing for the application.
 // It organizes routes into versioned groups for better API version management.
 //
