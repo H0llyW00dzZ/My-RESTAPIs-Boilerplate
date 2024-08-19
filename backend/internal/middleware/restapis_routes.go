@@ -188,6 +188,9 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 	server.Get("/health/db", rateLimiterRESTAPIs, encryptcookie, healthz.DBHandler(db))
 	// This is for the Prometheus Handler. When an authentication mechanism is implemented, simply add the handler for the authentication mechanism here.
 	// For example: server.Get("/metrics", rateLimiterRESTAPIs, keyAuth)
+	//
+	// Demo:
+	//  - https://api-beta.btz.pm/v1/server/metrics (Authentication required)
 	server.Get("/metrics", rateLimiterRESTAPIs)
 
 	// Register server APIs routes
