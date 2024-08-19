@@ -7,6 +7,7 @@ package middleware
 
 import (
 	"h0llyw00dz-template/backend/internal/database"
+	htmx "h0llyw00dz-template/frontend/htmx/error_page_handler"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -52,6 +53,10 @@ func registerStaticFrontendRoutes(app *fiber.App, _ string, _ database.Service) 
 		// as caching is already handled by the middleware cache.
 		// CacheDuration: -1 * time.Microsecond, // Optional
 	})
+
+	// As there is currently no handler, it will return a 404 error.
+	// Example: http://localhost:8080/
+	app.Use(htmx.NewErrorHandler)
 }
 
 // registerFrontendGroup adds all routes from a FrontendGroup to a specific Fiber app.
