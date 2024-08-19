@@ -5,7 +5,9 @@
 
 package domain
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+)
 
 // Note: This method works well Docs: https://github.com/gofiber/fiber/issues/750
 // Also note that There is no limit to this feature. For example, you can add a billion domains or subdomains.
