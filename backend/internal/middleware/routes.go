@@ -74,7 +74,8 @@ type (
 // It organizes routes into versioned groups for better API version management.
 //
 // Note: There are now 3 routers: restapis, frontend, and wildcard handler (503).
-// They operate independently.
+// They operate independently. Also note that as the codebase grows, the routing structure
+// may become a binary tree (see https://en.wikipedia.org/wiki/Binary_tree), which is considered one of the best art in Go programming.
 func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Service) {
 	// Hosts
 	hosts := map[string]*Host{}
