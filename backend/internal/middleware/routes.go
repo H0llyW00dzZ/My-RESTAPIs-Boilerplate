@@ -60,7 +60,7 @@ var (
 // RegisterRoutes sets up the API routing for the application.
 // It organizes routes into versioned groups for better API version management.
 //
-// Note: There are now 3 routers: restapis, frontend, and wildcard handler (503).
+// Note: There are now 3 routers: restapis, frontend, and wildcard handler (503) (wildcard handler (503) known as root).
 // They operate independently. Also note that as the codebase grows, the routing structure
 // may become a binary tree (see https://en.wikipedia.org/wiki/Binary_tree), which is considered one of the best art in Go programming.
 func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Service) {
