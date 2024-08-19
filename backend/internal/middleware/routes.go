@@ -17,6 +17,7 @@ import (
 	"h0llyw00dz-template/backend/internal/database"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/keyidentifier"
+	"h0llyw00dz-template/backend/internal/middleware/router/domain"
 	"h0llyw00dz-template/backend/pkg/mime"
 	"h0llyw00dz-template/env"
 	htmx "h0llyw00dz-template/frontend/htmx/error_page_handler"
@@ -56,29 +57,15 @@ var (
 	writeTimeout, _ = time.ParseDuration(writeTimeoutStr)
 )
 
-// Note: This method works well Docs: https://github.com/gofiber/fiber/issues/750
-// Also note that There is no limit to this feature. For example, you can add a billion domains or subdomains.
-// Another note: When running this in a container with Kubernetes, make sure to have a configuration for allow internal IPs (e.g., 10.0.0.0/24).
-// Because this method creates an additional internal IP for handling routes (e.g., 10.0.0.1 for REST APIs, then 10.0.0.2 for the frontend).
-type (
-	// Host represents a subdomain or domain host configuration.
-	// It contains a reference to a Fiber application instance.
-	Host struct {
-		// Fiber is a pointer to a Fiber application instance.
-		// It represents the Fiber app associated with the subdomain or domain host.
-		Fiber *fiber.App
-	}
-)
-
 // RegisterRoutes sets up the API routing for the application.
 // It organizes routes into versioned groups for better API version management.
 //
-// Note: There are now 3 routers: restapis, frontend, and wildcard handler (503).
+// Note: There are now 3 routers: restapis, frontend, and wildcard handler (503) (wildcard handler (503) known as root).
 // They operate independently. Also note that as the codebase grows, the routing structure
 // may become a binary tree (see https://en.wikipedia.org/wiki/Binary_tree), which is considered one of the best art in Go programming.
 func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Service) {
 	// Hosts
-	hosts := map[string]*Host{}
+	hosts := map[string]*fiber.App{}
 
 	// restAPIs subdomain
 	api := fiber.New(fiber.Config{
@@ -109,7 +96,7 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 		ProxyHeader: "X-Forwarded-*",
 	})
 	registerRESTAPIsRoutes(api, db)
-	hosts[apiSubdomain] = &Host{api}
+	hosts[apiSubdomain] = api
 
 	// Frontend domain
 	frontend := fiber.New(fiber.Config{
@@ -140,14 +127,19 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 		ProxyHeader: "X-Forwarded-*",
 	})
 	registerStaticFrontendRoutes(frontend, appName, db)
-	hosts[frontendDomain] = &Host{frontend}
+	hosts[frontendDomain] = frontend
 
 	// Apply the combined middlewares
 	registerRouteConfigMiddleware(app, db)
 	registerRootRouter(app)
 
+	// Configure the DomainRouter middleware
+	domainRouter := domain.New(domain.Config{
+		Hosts: hosts,
+	})
+
 	// Apply the subdomain & domain routing middleware
-	app.Use(DomainRouter(hosts))
+	app.Use(domainRouter)
 }
 
 // registerRouteConfigMiddleware applies middleware configurations to the Fiber application.
@@ -266,34 +258,4 @@ func registerRootRouter(app *fiber.App) {
 	)
 
 	app.Use(favicon)
-}
-
-// DomainRouter is a middleware function that handles subdomain or domain routing.
-// It takes a map of subdomain or domain hosts and routes the request to the corresponding Fiber app.
-//
-// Note: This is useful for large Go applications, especially when running in Kubernetes,
-// as it eliminates the need for multiple containers. It also supports integration with the Kubernetes ecosystem,
-// such as pointing to CNAME/NS or manually (if not using Kubernetes).
-// Also note that for TLS certificates, a wildcard/advanced certificate is required.
-//
-// Known Bugs:
-//   - Wildcard/advanced certificates (e.g, issued by digicert, sectigo, google trust service, private ca) are not supported/compatible on Heroku.
-//     Using a wildcard/advanced certificate on Heroku will cause an "SSL certificate error: There is conflicting information between the SSL connection, its certificate, and/or the included HTTP requests."
-//     If using a wildcard/advanced certificate, it is recommended to deploy the application in a cloud environment such as Kubernetes, where you can easily control the ingress controller (e.g, Implement own such as universe).
-//     Also note that regarding known bugs, it is not caused by this repository; it is an issue with Heroku's router.
-//
-// TODO: Consider moving this middleware into a separate package for better maintainability. This might involve creating a new repository.
-func DomainRouter(hosts map[string]*Host) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		host := hosts[c.Hostname()]
-		if host == nil {
-			// Note: Returning a new error is a better approach instead of returning directly,
-			// as it allows the error to be handled by the caller somewhere else in the codebase,
-			// especially when the codebase grows larger.
-			return fiber.NewError(fiber.StatusServiceUnavailable)
-		}
-		// Use c.Context() to pass the underlying context to the host's Fiber app.
-		host.Fiber.Handler()(c.Context())
-		return nil
-	}
 }
