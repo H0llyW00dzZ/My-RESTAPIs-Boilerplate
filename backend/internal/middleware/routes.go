@@ -10,6 +10,7 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 
@@ -33,6 +34,26 @@ var (
 	// It is set using the DOMAIN environment variable.
 	// Example: set DOMAIN=localhost:8080 for local development.
 	frontendDomain = os.Getenv(env.DOMAIN)
+
+	// readTimeoutStr is the read timeout duration for the server.
+	// It is set using the READTIMEOUT environment variable.
+	// The value should be a valid duration string (e.g., "30s", "1m").
+	readTimeoutStr = os.Getenv(env.READTIMEOUT)
+
+	// writeTimeoutStr is the write timeout duration for the server.
+	// It is set using the WRITETIMEOUT environment variable.
+	// The value should be a valid duration string (e.g., "30s", "1m").
+	writeTimeoutStr = os.Getenv(env.WRITETIMEOUT)
+
+	// readTimeout is the parsed read timeout duration.
+	// It is obtained by parsing the readTimeoutStr using time.ParseDuration.
+	// If parsing fails, the default value of 0 is used.
+	readTimeout, _ = time.ParseDuration(readTimeoutStr)
+
+	// writeTimeout is the parsed write timeout duration.
+	// It is obtained by parsing the writeTimeoutStr using time.ParseDuration.
+	// If parsing fails, the default value of 0 is used.
+	writeTimeout, _ = time.ParseDuration(writeTimeoutStr)
 )
 
 // Note: This method works well Docs: https://github.com/gofiber/fiber/issues/750
@@ -59,12 +80,64 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 	hosts := map[string]*Host{}
 
 	// restAPIs subdomain
-	api := fiber.New()
+	api := fiber.New(fiber.Config{
+		ServerHeader: appName,
+		AppName:      appName,
+		// Note: Using the sonic JSON encoder/decoder provides better performance and is more memory-efficient
+		// since Fiber is designed for zero allocation memory usage.
+		JSONEncoder:      sonic.Marshal,
+		JSONDecoder:      sonic.Unmarshal,
+		CaseSensitive:    true,
+		StrictRouting:    true,
+		DisableKeepalive: false,
+		ReadTimeout:      readTimeout,
+		WriteTimeout:     writeTimeout,
+		// Note: It's important to set Prefork to false because if it's enabled and running in Kubernetes,
+		// it may get killed by an Out-of-Memory (OOM) error due to a conflict with the Horizontal Pod Autoscaler (HPA).
+		Prefork: false,
+		// Which is suitable for streaming AI Response.
+		StreamRequestBody: true,
+		// When running behind an ingress controller/proxy, disable "EnableIPValidation"
+		// because the ingress controller/proxy will forward the real IP anyway from the header, which is already valid.
+		EnableIPValidation:      false,
+		EnableTrustedProxyCheck: true,
+		// By default, it is set to 0.0.0.0/0 for local development; however, it can be bound to an ingress controller/proxy.
+		// This can be a private IP range (e.g., 10.0.0.0/8).
+		TrustedProxies: []string{"0.0.0.0/0"},
+		// Trust X-Forwarded-* headers; additionally, this can be customized if using an ingress controller/proxy, especially Ingress Nginx.
+		ProxyHeader: "X-Forwarded-*",
+	})
 	registerRESTAPIsRoutes(api, db)
 	hosts[apiSubdomain] = &Host{api}
 
 	// Frontend domain
-	frontend := fiber.New()
+	frontend := fiber.New(fiber.Config{
+		ServerHeader: appName,
+		AppName:      appName,
+		// Note: Using the sonic JSON encoder/decoder provides better performance and is more memory-efficient
+		// since Fiber is designed for zero allocation memory usage.
+		JSONEncoder:      sonic.Marshal,
+		JSONDecoder:      sonic.Unmarshal,
+		CaseSensitive:    true,
+		StrictRouting:    true,
+		DisableKeepalive: false,
+		ReadTimeout:      readTimeout,
+		WriteTimeout:     writeTimeout,
+		// Note: It's important to set Prefork to false because if it's enabled and running in Kubernetes,
+		// it may get killed by an Out-of-Memory (OOM) error due to a conflict with the Horizontal Pod Autoscaler (HPA).
+		Prefork: false,
+		// Which is suitable for streaming AI Response.
+		StreamRequestBody: true,
+		// When running behind an ingress controller/proxy, disable "EnableIPValidation"
+		// because the ingress controller/proxy will forward the real IP anyway from the header, which is already valid.
+		EnableIPValidation:      false,
+		EnableTrustedProxyCheck: true,
+		// By default, it is set to 0.0.0.0/0 for local development; however, it can be bound to an ingress controller/proxy.
+		// This can be a private IP range (e.g., 10.0.0.0/8).
+		TrustedProxies: []string{"0.0.0.0/0"},
+		// Trust X-Forwarded-* headers; additionally, this can be customized if using an ingress controller/proxy, especially Ingress Nginx.
+		ProxyHeader: "X-Forwarded-*",
+	})
 	registerStaticFrontendRoutes(frontend, appName, db)
 	hosts[frontendDomain] = &Host{frontend}
 
