@@ -46,6 +46,9 @@ type APIGroup struct {
 
 // APIConfig represents the configuration parameters for the API routes.
 // It contains the necessary dependencies and settings for registering and handling API routes.
+//
+// TODO: Refactor this struct (Currently unused) to follow the Single Responsibility Principle (SRP).
+// Consider splitting it into smaller, more focused structs or configurations.
 type APIConfig struct {
 	V1          fiber.Router
 	V2          fiber.Router
