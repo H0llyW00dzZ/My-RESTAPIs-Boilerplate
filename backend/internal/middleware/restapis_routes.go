@@ -9,7 +9,8 @@ import (
 	"h0llyw00dz-template/backend/internal/database"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/hybrid"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/keyidentifier"
-	"h0llyw00dz-template/backend/pkg/restapis/server/health"
+	healthz "h0llyw00dz-template/backend/pkg/restapis/server/health"
+	htmx "h0llyw00dz-template/frontend/htmx/error_page_handler"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -41,6 +42,19 @@ type APIGroup struct {
 	EncryptedCookieMiddleware fiber.Handler
 	CompressJSON              fiber.Handler
 	Prometheus                fiber.Handler
+}
+
+// APIConfig represents the configuration parameters for the API routes.
+// It contains the necessary dependencies and settings for registering and handling API routes.
+//
+// TODO: Refactor this struct (Currently unused) to follow the Single Responsibility Principle (SRP).
+// Consider splitting it into smaller, more focused structs or configurations.
+type APIConfig struct {
+	V1          fiber.Router
+	V2          fiber.Router
+	AppName     string
+	MonitorPath string
+	DB          database.Service
 }
 
 // registerRESTAPIsRoutes registers the REST API routes for the application.
@@ -77,6 +91,21 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 		}),
 	)
 
+	//serverAPIs(v1, db, rateLimiterRESTAPIs)
+	// Note: To test the Prometheus middleware, make a request to any URL in http://api.localhost:8080/ (restAPIS Router),
+	// then visit http://api.localhost:8080/v1/server/metrics to see how it works.
+	newPrometheus := NewPrometheusMiddleware(
+		WithPrometheusServiceName("senior_golang"),
+		WithPrometheusNamespace("restapis"),
+		WithPrometheusSubsystem("http"),
+		WithPrometheusLabels(map[string]string{
+			"environment": "production",
+		}),
+		WithPrometheusSkipPaths([]string{"/health", "/v1/server/metrics"}),
+		WithPrometheusCacheKey("X-Go-Frontend"),
+		WithPrometheusMetricsPaths("/v1/server/metrics"),
+	)
+
 	v1 := api.Group("/v1", func(c *fiber.Ctx) error { // '/v1/' prefix
 		c.Set("Version", "v1")
 		// Set Cookie for group "v1" only if it doesn't exist
@@ -91,6 +120,7 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 		}
 		return c.Next()
 	})
+	server := v1.Group("/server") // '/v1/server' prefix
 
 	// Create the root group and redirect middleware
 	// Note: This is a method similar to nginx/apache .htaccess, if you're familiar with it.
@@ -103,6 +133,7 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 		// This is a tip to stack middleware mechanisms instead of applying them one by one.
 		Prefix:                    "/",
 		EncryptedCookieMiddleware: encryptcookie,
+		Prometheus:                newPrometheus,
 		RequestID:                 xRequestID,
 		Routes:                    []APIRoute{},
 	}
@@ -119,6 +150,8 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 			"v1":                "/",
 			"v1/server/health":  "/",
 			"v1/server/health/": "/",
+			"v1/server":         "/",
+			"v1/server/":        "/",
 		}),
 		WithRedirectStatusCode(fiber.StatusMovedPermanently),
 	)
@@ -155,9 +188,17 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 		WithExpiration(maxExpirationRESTAPIsRateLimiter),
 		WithLimitReached(ratelimiterMsg(MsgRESTAPIsVisitorGotRateLimited)),
 	)
+	server.Get("/health/db", rateLimiterRESTAPIs, encryptcookie, healthz.DBHandler(db))
+	// This is for the Prometheus Handler. When an authentication mechanism is implemented, simply add the handler for the authentication mechanism here.
+	// For example: server.Get("/metrics", rateLimiterRESTAPIs, keyAuth)
+	//
+	// Demo:
+	//  - https://api-beta.btz.pm/v1/server/metrics (Authentication required)
+	server.Get("/metrics", rateLimiterRESTAPIs)
 
 	// Register server APIs routes
-	serverAPIs(v1, db, rateLimiterRESTAPIs)
+	// Custom error handling for versioned APIs
+	api.Use(htmx.NewErrorHandler)
 }
 
 // serverAPIs registers the server-related API routes.
@@ -172,6 +213,8 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 //	v1: The Fiber router to register the routes on (version 1 in this case).
 //	db: The database service to be used by the API handlers.
 //	rateLimiterRESTAPIs: The rate limiter middleware to be applied to the API routes.
+//
+// Note: This currently unused, might will removed it later.
 func serverAPIs(v1 fiber.Router, db database.Service, rateLimiterRESTAPIs fiber.Handler) {
 	// Define the API groups and routes
 	// Note: By refactoring like this, it allows for an unlimited number of handlers and easy maintainability,
@@ -187,7 +230,7 @@ func serverAPIs(v1 fiber.Router, db database.Service, rateLimiterRESTAPIs fiber.
 					Method: strings.Join([]string{
 						fiber.MethodGet,
 					}, ","),
-					Handler: health.DBHandler(db),
+					Handler: healthz.DBHandler(db),
 				},
 			},
 		},
