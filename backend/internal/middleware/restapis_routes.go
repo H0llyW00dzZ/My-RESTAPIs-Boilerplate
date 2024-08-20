@@ -104,7 +104,8 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 		WithPrometheusSkipPaths([]string{
 			"/health",
 			"/v1/server/metrics",
-			// Note: This should work because Prometheus can consume a lot of memory, which seems to be wrong with how it works & its implementation.
+			// Note: This should work because Prometheus can consume a lot of memory (it's surprising lmao since this repo is built on top of Fiber,
+			// which is a zero-allocation framework built on top of fasthttp), which seems to be an issue with how Prometheus works and its implementation.
 			// Ideally, the data should be stored in storage (e.g., disk) instead of memory. If this doesn't work, then use Next.
 			"/favicon.ico",
 		}),
