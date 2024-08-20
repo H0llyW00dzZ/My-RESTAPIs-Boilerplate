@@ -101,7 +101,13 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 		WithPrometheusLabels(map[string]string{
 			"environment": "production",
 		}),
-		WithPrometheusSkipPaths([]string{"/health", "/v1/server/metrics"}),
+		WithPrometheusSkipPaths([]string{
+			"/health",
+			"/v1/server/metrics",
+			// Note: This should work because Prometheus can consume a lot of memory, which seems to be wrong with how it works & its implementation.
+			// Ideally, the data should be stored in storage (e.g., disk) instead of memory. If this doesn't work, then use Next.
+			"/favicon.ico",
+		}),
 		WithPrometheusCacheKey("X-Go-Frontend"),
 		WithPrometheusMetricsPaths("/v1/server/metrics"),
 	)
