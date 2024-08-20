@@ -59,6 +59,47 @@
 // The Prometheus middleware is self-contained and does not require any specific cloud environment setup. It can be used in
 // any environment where the Fiber application is deployed, making it highly portable and flexible.
 //
+// Resource Usage:
+//
+// It's important to consider the resource usage of the Prometheus middleware, especially in terms of memory consumption.
+// Collecting and exposing metrics can potentially consume a significant amount of memory, depending on the number of requests
+// and the granularity of the metrics being collected. This is the reason why I rarely use other services
+// in Kubernetes environments (cloud ecosystem) (e.g., control plane/node) that can consume a significant amount of memory, as they are not commonly used
+// by the applications (this repo). Then When reviewing the bills, it becomes evident that these services, which are mostly unused by the apps (this repo),
+// contribute to the high expenses.
+//
+// The Prometheus middleware uses the Prometheus client library to collect and expose metrics. Each metric consumes memory to
+// store its value, labels, and other metadata. As the number of unique metric combinations increases, the memory usage can grow
+// accordingly.
+//
+// To mitigate excessive memory consumption, consider the following strategies:
+//
+//   - Use appropriate metric types: Choose the appropriate Prometheus metric types based on the requirements. For example, use
+//     Gauges for values that can go up and down, Counters for monotonically increasing values, and Histograms or Summaries for
+//     measuring distributions of values.
+//
+//   - Limit the cardinality of labels: Be cautious when adding labels to metrics, as each unique combination of label values
+//     creates a new time series, consuming additional memory. Avoid using high-cardinality labels or unbounded label values.
+//
+//   - Monitor and adjust scrape intervals: Configure appropriate scrape intervals for Prometheus to collect metrics from the
+//     application. Longer scrape intervals can help reduce the frequency of metric collection and conserve memory, but they may
+//     also impact the granularity of the collected data.
+//
+//   - Use Prometheus best practices: Follow Prometheus best practices for metric naming, labeling, and instrumentation to ensure
+//     efficient memory usage. Avoid creating excessive numbers of metrics or using overly complex metric names.
+//
+//   - Profile and optimize: Regularly profile the application's memory usage and identify any memory leaks or excessive memory
+//     consumption. Optimize the code and configurations to minimize memory overhead.
+//
+//   - Scale and distribute: If the memory usage becomes a bottleneck, consider scaling the application horizontally by distributing
+//     the workload across multiple instances. This can help spread the memory consumption across different nodes.
+//
+// By being mindful of the memory usage and applying appropriate strategies, the resource consumption of the Prometheus middleware
+// can be effectively managed while still benefiting from its powerful monitoring capabilities.
+// It's worth noting that in this repository, without the Prometheus middleware (i.e., the original version),
+// the average memory usage ranges from 10 MiB to 50 MiB. So, while there may be instances of bottlenecks or out-of-memory (OOM) issues,
+// they are not caused by this repository (better blame cloud ecosystem).
+//
 // Security:
 //
 // While the Prometheus middleware is highly portable and flexible (unlike relying on any specific cloud environment,
