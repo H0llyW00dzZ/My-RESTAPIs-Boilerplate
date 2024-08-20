@@ -1,0 +1,48 @@
+# Prometheus REST APIs [Zer0-Downtime] record rules.
+#
+# Note: This should optimize memory usage because Prometheus consumes a lot of memory when there are millions ~ billions of requests.
+# See https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/
+# 🙈 If you don't know what you are doing, don't do anything here :)
+
+groups:
+  - name: record.rules
+    rules:
+      - record: job:up:avg
+        expr: avg by (job) (up)
+        labels:
+          severity: page
+
+      - record: job:up:sum
+        expr: sum by (job) (up)
+        labels:
+          severity: page
+
+      - record: instance:up:avg
+        expr: avg by (instance) (up)
+        labels:
+          severity: page
+
+      - record: instance:up:sum
+        expr: sum by (instance) (up)
+        labels:
+          severity: page
+
+      - record: job:restapis_http_requests_total:rate5m # change the "restapis_http_requests_total"
+        expr: sum by (job) (rate(restapis_http_requests_total[5m]))
+        labels:
+          severity: page
+
+      - record: job:restapis_http_requests_total:rate1m # change the "restapis_http_requests_total"
+        expr: sum by (job) (rate(restapis_http_requests_total[1m]))
+        labels:
+          severity: page
+
+      - record: instance:restapis_http_requests_total:rate5m # change the "restapis_http_requests_total"
+        expr: sum by (instance) (rate(restapis_http_requests_total[5m]))
+        labels:
+          severity: page
+
+      - record: instance:restapis_http_requests_total:rate1m # change the "restapis_http_requests_total"
+        expr: sum by (instance) (rate(restapis_http_requests_total[1m]))
+        labels:
+          severity: page
