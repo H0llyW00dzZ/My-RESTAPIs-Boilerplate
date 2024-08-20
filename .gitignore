@@ -94,3 +94,13 @@ gts-RootCA.pem
 tailwind.css
 # Go CSS Generator (not available yet).
 tailwind.go
+
+# Cache Compression (gzip)
+#
+# Note: When using the Cache Middleware with the WithCacheControl option set to true and a Storage provider (e.g., Redis or Valkey),
+# the compressed files will be automatically stored in the specified Storage provider and sent to the client (browser).
+# The compressed files are not stored in the server's memory.
+#
+# However, if the WithCacheControl option is set to false, the compressed files will be stored in the server's memory.
+# In this case, it is recommended to implement a storage mechanism that stores the files on disk instead of memory to avoid excessive memory consumption.
+*.gz

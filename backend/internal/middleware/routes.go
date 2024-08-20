@@ -246,6 +246,7 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 func registerRootRouter(app *fiber.App) {
 	// Register static file serving
 	app.Static("/styles/", "./frontend/public/assets", fiber.Static{
+		// This "ByteRange" Enhance QUIC
 		ByteRange: true,
 		Compress:  true,
 		// optional
