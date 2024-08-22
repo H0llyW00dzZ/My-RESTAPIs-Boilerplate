@@ -2,7 +2,7 @@
 # Note: This suitable for fiber that in internal mode (e.g, private cluster, never exposed to service)
 apiVersion: v1
 data:
-  allow-snippet-annotations: "false"
+  allow-snippet-annotations: "true" # Enable snippet annotations
   hsts: "false" # for rest api this not really important, so disabled
   log-format-upstream:
     '[H0llyW00dzZ Network] $remote_addr - $remote_user [Cloudflare: Client IP: $http_cf_connecting_ip - Country: $http_cf_ipcountry] [Cloudflare Worker: $http_cf_worker] [$time_local] "$request" $status $body_bytes_sent
@@ -12,6 +12,11 @@ data:
   ssl-protocols: TLSv1.3
   use-upstream-server-addr: "true" # pretty useful for communication through internal mode (e.g, private cluster, never exposed to service)
   generate-request-id: "false" # disable default nginx request-id generation as it is already handled by the fiber framework
+  server-tokens: "false" # Disable the default Server header
+  server-snippet: |
+    more_set_headers "Server: H0llyW00dzZ Network";
+    more_set_headers "Via: H0llyW00dzZ Network";
+  enable-ocsp: "true" # Enable HIPAA (https://www.hhs.gov/hipaa/for-professionals/security/guidance/index.html) and NIST (https://csrc.nist.gov/glossary/term/online_certificate_status_protocol) Compliance Test
 kind: ConfigMap
 name: ingress-nginx-controller # this optional due it can be customized, basically it just reference before sailing
 namespace: ingress-nginx # this optional due it can be customized, basically it just reference before sailing
