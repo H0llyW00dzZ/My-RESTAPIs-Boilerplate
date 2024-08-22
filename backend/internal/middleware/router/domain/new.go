@@ -1,7 +1,7 @@
 // Copyright (c) 2024 H0llyW00dz All rights reserved.
 //
 // By accessing or using this software, you agree to be bound by the terms
-// of the License Agreement, which you can find at LICENSE files.
+// of the License Agreement, which you can find in the LICENSE files.
 
 package domain
 
@@ -17,10 +17,15 @@ import (
 // Also note that for TLS certificates, a wildcard/advanced certificate is required.
 //
 // Known Bugs:
-//   - Wildcard/advanced certificates (e.g, issued by digicert, sectigo, google trust service, private ca) are not supported/compatible on Heroku.
+//
+//   - Wildcard/advanced certificates (e.g., issued by DigiCert, Sectigo, Google Trust Services, or a private CA) are not supported/compatible on Heroku.
 //     Using a wildcard/advanced certificate on Heroku will cause an "SSL certificate error: There is conflicting information between the SSL connection, its certificate, and/or the included HTTP requests."
-//     If using a wildcard/advanced certificate, it is recommended to deploy the application in a cloud environment such as Kubernetes, where you can easily control the ingress controller (e.g, Implement own such as universe).
+//     If using a wildcard/advanced certificate, it is recommended to deploy the application in a cloud environment such as Kubernetes, where you can easily control the ingress controller (e.g., implement your own, such as Universe).
 //     Also note that regarding known bugs, it is not caused by this repository; it is an issue with Heroku's router.
+//
+// Example public wildcard CAs that can be used for an ingress or directly:
+//
+//   - https://crt.sh/?q=a8bc9093e1f4ba202fc769b8818b8a279a5f70c91bee458d29d6ad3c5ac5e88c
 func New(config Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		host := config.Hosts[c.Hostname()]
