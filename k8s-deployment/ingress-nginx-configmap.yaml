@@ -17,6 +17,7 @@ data:
     more_set_headers "Server: H0llyW00dzZ Network";
     more_set_headers "Via: H0llyW00dzZ Network";
   enable-ocsp: "true" # Enable HIPAA (https://www.hhs.gov/hipaa/for-professionals/security/guidance/index.html) and NIST (https://csrc.nist.gov/glossary/term/online_certificate_status_protocol) Compliance Test
+  proxy-buffering: "on" # which is suitable for handling AI
 kind: ConfigMap
 name: ingress-nginx-controller # this optional due it can be customized, basically it just reference before sailing
 namespace: ingress-nginx # this optional due it can be customized, basically it just reference before sailing
