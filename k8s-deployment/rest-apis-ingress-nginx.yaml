@@ -1,7 +1,7 @@
-# REST API Ingress Controller Configuration [Zer0 Downtime] by H0llyW00dzZ for external load balancer that running in K8S.
+# REST API Ingress Controller Configuration [Zer0 Downtime] by H0llyW00dzZ for an external load balancer running in K8S.
 #
 # Important: When using Private CAs, it's recommended to implement an external handler (e.g., Cloudflare).
-# Then the external handler should use Public CAs and trust the private CA roots from backend service.
+# The external handler should use Public CAs and trust the private CA roots from the backend service.
 #
 # For Cloudflare, refer to:
 #  - https://developers.cloudflare.com/ssl/edge-certificates/advanced-certificate-manager/
@@ -11,17 +11,22 @@
 # Example architecture:
 # Frontend (External Handler, e.g., Cloudflare) -> Backend (This Repo)
 #
-# Demo:
-#  - https://api-beta.btz.pm/ (This Repo, you can see the favicon and X-Connection-Hash (Priv8 Implementation), old site are down due SSL no configured)
+# For Public CAs, a Wildcard certificate is required instead of SNI.
 #
-# Once the frontend and backend are connected, management (e.g, traffic, security, etc) becomes easier through the frontend
-# (e.g, don't have to spend time for setup, maintenance traffic, other).
+# Example public wildcard CAs that can be used for this ingress:
+#  - https://crt.sh/?q=a8bc9093e1f4ba202fc769b8818b8a279a5f70c91bee458d29d6ad3c5ac5e88c
+#
+# Demo:
+#  - https://api-beta.btz.pm/ (This Repo, you can see the favicon and X-Connection-Hash (Priv8 Implementation), old site is down due to SSL not being configured)
+#
+# Once the frontend and backend are connected, management (e.g., traffic, security, etc.) becomes easier through the frontend
+# (e.g., no need to spend time on setup, traffic maintenance, and other tasks).
 #
 # Also, note that for the deployment/app/service related to this repository (REST API Boilerplate), don't forget to set HPA (Horizontal Pod Autoscaler) with CPU and Memory.
-# Start with a minimum of 1 pod. Additionally, while idle, the average memory usage of this repository (REST API Boilerplate) is between 10MB and 15MB, sometimes even under 10MB (the power of fiber zer0-allocation).
+# Start with a minimum of 1 pod. Additionally, while idle, the average memory usage of this repository (REST API Boilerplate) is between 10MB and 15MB, sometimes even under 10MB (the power of Fiber's zer0-allocation).
 #
-# Acknowledgement: Regarding autoscaler, due to Fiber's built-in zer0-allocation and the repository's reliance on network-related connections to MySQL and Redis/Valey (Most Important if possible considering 0ms then it would be epic),
-# VPA (Vertical Pod Autoscaler) is also accepted which is suitable as well (e.g, starter, small operation/request).
+# Acknowledgement: Regarding autoscaler, due to Fiber's built-in zer0-allocation and the repository's reliance on network-related connections to MySQL and Redis/Valey (most important, if possible, considering 0ms latency, which would be epic),
+# VPA (Vertical Pod Autoscaler) is also accepted and suitable as well (e.g., for starter or small operation/request scenarios).
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -36,31 +41,31 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
     nginx.ingress.kubernetes.io/http2: "false" # Enable / Disable HTTP/2 (Optional)
-    nginx.ingress.kubernetes.io/http3: "true" # Enable / Disable Enable HTTP/3 (Optional, However it recommended for HTMX Frontend)
-    # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS" # Use HTTPS for backend communication (Optional Recommended used priv8 CAs for this.)
+    nginx.ingress.kubernetes.io/http3: "true" # Enable / Disable HTTP/3 (Optional, However it is recommended for HTMX Frontend)
+    # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS" # Use HTTPS for backend communication (Optional, recommended to use priv8 CAs for this)
 spec:
   ingressClassName: nginx
   rules:
     - host: localhost # change this
       http:
         paths:
-          # Note: This important to enable "CaseSensitive" and "StrictRouting" true in fiber configuration (see cmd/server/run.go)
-          # then in middleware don't forget configure a "DomainRouter" in RegisterRoutes (see middleware/routes.go)
-          - path: /api/v1/ # change this for rest-apis route
+          # Note: It's important to enable "CaseSensitive" and "StrictRouting" as true in the Fiber configuration (see cmd/server/run.go)
+          # then in the middleware, don't forget to configure a "DomainRouter" in RegisterRoutes (see middleware/routes.go)
+          - path: /api/v1/ # change this for REST API routes
             pathType: Prefix
             backend:
               service:
                 name: rest-api-service # change this
                 port:
                   number: 8080 # change this
-          - path: / # change this for front-end route
+          - path: / # change this for front-end routes
             pathType: Prefix
             backend:
               service:
-                name: rest-api-service # change this for front-end route
+                name: rest-api-service # change this for front-end routes
                 port:
                   number: 80 # change this
-  # Note: TLS are required and it's optional regarding cert, since personally I am using Private CAs
+  # Note: TLS is required, and the certificate is optional since I am personally using Private CAs
   tls:
     - hosts:
         - localhost # change this
