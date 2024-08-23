@@ -4,7 +4,7 @@ go 1.23.0
 
 require (
 	github.com/H0llyW00dzZ/FiberValidator v0.5.2
-	github.com/a-h/templ v0.2.747
+	github.com/a-h/templ v0.2.771
 	github.com/ansrivas/fiberprometheus/v2 v2.7.0
 	github.com/bytedance/sonic v1.12.1
 	github.com/charmbracelet/bubbles v0.19.0
