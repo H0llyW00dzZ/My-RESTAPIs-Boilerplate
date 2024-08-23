@@ -19,5 +19,12 @@ data:
   enable-ocsp: "true" # Enable HIPAA (https://www.hhs.gov/hipaa/for-professionals/security/guidance/index.html) and NIST (https://csrc.nist.gov/glossary/term/online_certificate_status_protocol) Compliance Test
   proxy-buffering: "on" # which is suitable for handling AI
 kind: ConfigMap
-name: ingress-nginx-controller # this optional due it can be customized, basically it just reference before sailing
-namespace: ingress-nginx # this optional due it can be customized, basically it just reference before sailing
+# When this is applied, it will configure the ingress-nginx-controller for smooth sailing ⛵ ☸
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+  name: ingress-nginx-controller
+  namespace: ingress-nginx
