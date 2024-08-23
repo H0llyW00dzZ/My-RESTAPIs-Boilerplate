@@ -5,7 +5,7 @@ data:
   allow-snippet-annotations: "true" # Enable snippet annotations
   hsts: "false" # for rest api this not really important, so disabled
   log-format-upstream:
-    '[H0llyW00dzZ Network] $remote_addr - $remote_user [Cloudflare: Client IP: $http_cf_connecting_ip - Country: $http_cf_ipcountry] [Cloudflare Worker: $http_cf_worker] [$time_local] "$request" $status $body_bytes_sent
+    '[H0llyW00dzZ Network] [Operator: $namespace - $ingress_name - $service_name] $remote_addr - $remote_user [Cloudflare: Client IP: $http_cf_connecting_ip - Country: $http_cf_ipcountry] [Cloudflare Worker: $http_cf_worker] [$time_local] "$request" $status $body_bytes_sent
     "$http_referer" "$http_user_agent" $request_length $request_time [$proxy_upstream_name]
     [$proxy_alternative_upstream_name] $upstream_addr $upstream_response_length $upstream_response_time
     $upstream_status $req_id'
