@@ -36,12 +36,15 @@ metadata:
     # nginx.ingress.kubernetes.io/ssl-passthrough: "true"  # Removed
     nginx.ingress.kubernetes.io/ssl-certificate: "localhost-tls" # change this
     nginx.ingress.kubernetes.io/ssl-certificate-key: "localhost-tls" # change this
-    nginx.ingress.kubernetes.io/ssl-protocols: "TLSv1.3"
+    nginx.ingress.kubernetes.io/ssl-protocols: "TLSv1.3" # This should be work explicit TLSv1.3 for all cloud provider
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
-    nginx.ingress.kubernetes.io/http2: "false" # Enable / Disable HTTP/2 (Optional)
-    nginx.ingress.kubernetes.io/http3: "true" # Enable / Disable HTTP/3 (Optional, However it is recommended for HTMX Frontend)
+    # Note: Explicit Nginx Ingress HTTP/3 is currently disabled because the original/default Kubernetes Nginx Ingress won't work unless it already has the Nginx HTTP/3 experimental module.
+    # List of well-known cloud providers where HTTP/3 can work properly:
+    # - Google Cloud (GKE)
+    # nginx.ingress.kubernetes.io/http2: "false" # Enable / Disable HTTP/2 (Optional)
+    # nginx.ingress.kubernetes.io/http3: "true" # Enable / Disable HTTP/3 (Optional, However it is recommended for HTMX Frontend)
     # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS" # Use HTTPS for backend communication (Optional, recommended to use priv8 CAs for this)
 spec:
   ingressClassName: nginx
