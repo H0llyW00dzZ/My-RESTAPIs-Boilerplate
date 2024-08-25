@@ -15,7 +15,7 @@ data:
   server-tokens: "false" # Disable the default Server header
   enable-brotli: "true" # Enhance speed for CompressJSON, by default this false
   brotli-level: "6" # Perfectly balanced for resource (cpu, memory)
-  brotli-min-length: "40" # Same As Brotli Compress Fiber Framework
+  brotli-min-length: "200" # Same As Brotli Compress Fiber Framework
   server-snippet: |
     more_set_headers "Server: H0llyW00dzZ Network";
     more_set_headers "Via: H0llyW00dzZ Network";
