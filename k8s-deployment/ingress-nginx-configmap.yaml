@@ -13,6 +13,9 @@ data:
   use-upstream-server-addr: "true" # pretty useful for communication through internal mode (e.g, private cluster, never exposed to service)
   generate-request-id: "false" # disable default nginx request-id generation as it is already handled by the fiber framework
   server-tokens: "false" # Disable the default Server header
+  enable-brotli: "true" # Enhance speed for CompressJSON, by default this false
+  brotli-level: "6" # Perfectly balanced for resource (cpu, memory)
+  brotli-min-length: "200" # Same As Brotli Compress Fiber Framework
   server-snippet: |
     more_set_headers "Server: H0llyW00dzZ Network";
     more_set_headers "Via: H0llyW00dzZ Network";
