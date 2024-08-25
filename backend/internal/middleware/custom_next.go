@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
 )
 
 // CustomNextContentType is a helper function that creates a custom Next function for the fiber middleware.
@@ -133,6 +134,67 @@ func CustomNextStatusCode(statusCodes ...int) func(*fiber.Ctx) bool {
 		status := c.Response().StatusCode()
 		for _, code := range statusCodes {
 			if status == code {
+				return true
+			}
+		}
+		return false
+	}
+}
+
+// CustomNextHeader is a helper function that creates a custom Next function for the fiber middleware.
+//
+// The returned Next function checks the presence of a specific header in the request and determines
+// whether to skip the middleware based on the provided header keys. If any of the specified header keys
+// are found in the request headers, the Next function returns true, indicating that the middleware should be skipped.
+//
+// Example usage:
+//
+//	// Create a custom skipper function to skip the middleware if the "X-Cache" or "X-Proxy" headers are present
+//	cacheSkipper := CustomNextHeader("X-Cache", "X-Proxy")
+//
+// Parameters:
+//   - headerKeys: Variadic string parameters representing the header keys to check for in the request headers.
+//
+// Returns:
+//   - A function that takes a *fiber.Ctx as input and returns a boolean value indicating whether to
+//     skip the middleware for the given request based on the presence of any of the specified header keys.
+func CustomNextHeader(headerKeys ...string) func(*fiber.Ctx) bool {
+	return func(c *fiber.Ctx) bool {
+		for _, headerKey := range headerKeys {
+			// TODO: Remove utils.CopyString ? as it is only used for references and not for storing values
+			if utils.CopyString(c.Get(headerKey)) != "" {
+				return true
+			}
+		}
+		return false
+	}
+}
+
+// CustomNextHostName is a helper function that creates a custom Next function for the fiber middleware.
+//
+// The returned Next function checks the hostname of the request and determines whether to skip
+// the middleware based on the provided hostnames. If the request hostname matches any of the
+// specified hostnames, the Next function returns true, indicating that the middleware should be skipped.
+//
+// Example usage:
+//
+//	// Create a custom skipper function to skip the middleware for "example.com" and "www.example.com"
+//	hostSkipper := CustomNextHostName("example.com", "www.example.com")
+//
+// Parameters:
+//   - hostnames: Variadic string parameters representing the hostnames to skip the middleware for.
+//
+// Returns:
+//   - A function that takes a [fiber.Ctx] as input and returns a boolean value indicating whether to
+//     skip the middleware for the given request based on the request hostname.
+//
+// Note: This function is suitable for middleware that should be skipped for specific hostnames or domains.
+func CustomNextHostName(hostnames ...string) func(*fiber.Ctx) bool {
+	return func(c *fiber.Ctx) bool {
+		// TODO: Remove utils.CopyString ? as it is only used for references and not for storing values
+		currentHostname := utils.CopyString(c.Hostname())
+		for _, hostname := range hostnames {
+			if currentHostname == hostname {
 				return true
 			}
 		}
