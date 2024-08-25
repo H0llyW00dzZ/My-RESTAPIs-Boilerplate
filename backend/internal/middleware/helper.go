@@ -175,44 +175,17 @@ func WithKeyLookup(keyLookup string) func(*keyauth.Config) {
 	}
 }
 
-// WithContextKey is an option function that sets the context key for storing and retrieving data in the request context.
-//
-// It supports the following middleware configurations:
-//
-//	*keyauth.Config: Sets the context key for the Key Auth middleware.
-//	*csp.Config: Sets the context key for the CSP Header Generator middleware.
-//
-// The context key is a string value that is used to store and retrieve data in the request context.
-// It should be a unique and descriptive key to avoid conflicts with other middleware or application data.
-//
-// Example usage:
-//
-//	// Use the WithContextKey option function to set the context key for the Key Auth middleware
-//	keyAuthMiddleware := NewKeyAuthMiddleware(WithContextKey("keyauth-data"))
-//
-//	// Use the WithContextKey option function to set the context key for the CSP Header Generator middleware
-//	cspHeaderGeneratorMiddleware := NewCSPHeaderGenerator(WithContextKey("csp-data"))
-//
-//	// In the middleware handler or application code, you can access the data using the context key
-//	func handler(c *fiber.Ctx) error {
-//	    keyAuthData := c.Locals(keyAuthContextKey)
-//	    cspData := c.Locals(cspContextKey)
-//	    // ...
-//	}
-//
-// Note:
-//   - If an unsupported middleware configuration is passed to WithContextKey, it will panic with an error message.
-//   - Additional context key functionality for other middlewares will be added based on future requirements.
-func WithContextKey(contextKey string) any {
-	return func(config any) {
-		switch cfg := config.(type) {
-		case *keyauth.Config:
-			cfg.ContextKey = contextKey
-		case *csp.Config:
-			cfg.ContextKey = contextKey
-		default:
-			panic(fmt.Sprintf("unsupported config type: %T", config))
-		}
+// WithKeyAuthContextKey is an option function for NewKeyAuthMiddleware that sets the context key for the Key Auth middleware.
+func WithKeyAuthContextKey(contextKey any) func(*keyauth.Config) {
+	return func(config *keyauth.Config) {
+		config.ContextKey = contextKey
+	}
+}
+
+// WithCSPContextKey is an option function for NewCSPHeaderGenerator that sets the context key for the CSP Header Generator middleware.
+func WithCSPContextKey(contextKey any) func(*csp.Config) {
+	return func(config *csp.Config) {
+		config.ContextKey = contextKey
 	}
 }
 
@@ -707,80 +680,52 @@ func WithSwaggerCacheAge(cacheAge int) func(*swagger.Config) {
 	}
 }
 
-// WithNext is an option function that sets the Next function to skip the middleware when returned true.
-//
-// It supports the following middleware configurations:
-//
-//	*cors.Config: Sets the Next function for the CORS middleware.
-//	*csrf.Config: Sets the Next function for the CSRF middleware.
-//	*redirect.Config: Sets the Next function for the redirect middleware.
-//	*swagger.Config: Sets the Next function for the Swagger middleware.
-//	*validator.Config: Sets the Next function for the Validator middleware.
-//	*healthcheck.Config: Sets the Next function for the HealthZ Check middleware.
-//	*csp.Config: Sets the Next function for the CSP Header Generator middleware.
-//
-// The Next function takes a [fiber.Ctx] as a parameter and returns a boolean value.
-// If the Next function returns true, the middleware will be skipped for the current request.
-//
-// Example usage:
-//
-//	// Define a custom Next function
-//	func customNext(c *fiber.Ctx) bool {
-//	    // Custom logic to determine whether to skip the middleware
-//	    // Return true to skip the middleware, false otherwise
-//	    return c.Path() == "/skip"
-//	}
-//
-//	// Use the WithNext option function to set the Next function for the cache middleware
-//	cacheMiddleware := NewCacheMiddleware(WithNext(customNext))
-//
-//	// Use the WithNext option function to set the Next function for the CORS middleware
-//	corsMiddleware := NewCORSMiddleware(WithNext(customNext))
-//
-//	// Use the WithNext option function to set the Next function for the CSRF middleware
-//	csrfMiddleware := NewCSRFMiddleware(WithNext(customNext))
-//
-//	// Use the WithNext option function to set the Next function for the redirect middleware
-//	redirectMiddleware := NewRedirectMiddleware(WithNext(customNext))
-//
-//	// Use the WithNext option function to set the Next function for the Swagger middleware
-//	swaggerMiddleware := NewSwaggerMiddleware(WithNext(customNext))
-//
-//	// Use the WithNext option function to set the Next function for the Validator middleware
-//	validatorMiddleware := NewValidatorMiddleware(WithNext(customNext))
-//
-//	// Use the WithNext option function to set the Next function for the HealthZ Check middleware
-//	healthzcheckMiddleware := NewHealthZCheck(WithNext(customNext))
-//
-//	// Use the WithNext option function to set the Next function for the CSP Header Generator
-//	cspHeaderGeneratorMiddleware := NewCSPHeaderGenerator(WithNext(customNext))
-//
-// Note:
-//   - If an unsupported middleware configuration is passed to WithNext, it will panic with an error message.
-//   - Additional "Next" functionality for other middlewares will be added based on future requirements.
-//
-// TODO: Extract this into separate functions (high-order function smiliar Storage and other) for each middleware to avoid potential issues/bugs that may arise
-// from using an default instead of an actual next func(c *fiber.Ctx) where it implemented (This issue smiliar Storage).
-func WithNext(next func(c *fiber.Ctx) bool) any {
-	return func(config any) {
-		switch cfg := config.(type) {
-		case *cors.Config:
-			cfg.Next = next
-		case *csrf.Config:
-			cfg.Next = next
-		case *redirect.Config:
-			cfg.Next = next
-		case *swagger.Config:
-			cfg.Next = next
-		case *validator.Config:
-			cfg.Next = next
-		case *healthcheck.Config:
-			cfg.Next = next
-		case *csp.Config:
-			cfg.Next = next
-		default:
-			panic(fmt.Sprintf("unsupported config type: %T", config))
-		}
+// WithCORSNext is an option function for NewCORSMiddleware that sets the Next function to skip the CORS middleware.
+func WithCORSNext(next func(*fiber.Ctx) bool) func(*cors.Config) {
+	return func(config *cors.Config) {
+		config.Next = next
+	}
+}
+
+// WithCSRFNext is an option function for NewCSRFMiddleware that sets the Next function to skip the CSRF middleware.
+func WithCSRFNext(next func(*fiber.Ctx) bool) func(*csrf.Config) {
+	return func(config *csrf.Config) {
+		config.Next = next
+	}
+}
+
+// WithRedirectNext is an option function for NewRedirectMiddleware that sets the Next function to skip the redirect middleware.
+func WithRedirectNext(next func(*fiber.Ctx) bool) func(*redirect.Config) {
+	return func(config *redirect.Config) {
+		config.Next = next
+	}
+}
+
+// WithSwaggerNext is an option function for NewSwaggerMiddleware that sets the Next function to skip the Swagger middleware.
+func WithSwaggerNext(next func(*fiber.Ctx) bool) func(*swagger.Config) {
+	return func(config *swagger.Config) {
+		config.Next = next
+	}
+}
+
+// WithValidatorNext is an option function for NewValidatorMiddleware that sets the Next function to skip the Validator middleware.
+func WithValidatorNext(next func(*fiber.Ctx) bool) func(*validator.Config) {
+	return func(config *validator.Config) {
+		config.Next = next
+	}
+}
+
+// WithHealthCheckNext is an option function for NewHealthZCheck that sets the Next function to skip the HealthZ Check middleware.
+func WithHealthCheckNext(next func(*fiber.Ctx) bool) func(*healthcheck.Config) {
+	return func(config *healthcheck.Config) {
+		config.Next = next
+	}
+}
+
+// WithCSPNext is an option function for NewCSPHeaderGenerator that sets the Next function to skip the CSP Header Generator middleware.
+func WithCSPNext(next func(*fiber.Ctx) bool) func(*csp.Config) {
+	return func(config *csp.Config) {
+		config.Next = next
 	}
 }
 
