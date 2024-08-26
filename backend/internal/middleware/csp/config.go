@@ -77,6 +77,8 @@ func defaultCSPValueGenerator(randomness string, customValues map[string]string)
 }
 
 // getClientIP retrieves the client IP address from the specified header or the remote address.
+//
+// TODO: Handle multiple IPs for other ingress/routers (e.g., X-Real-IP: 127.0.0.1, 127.0.0.2)
 func getClientIP(c *fiber.Ctx, ipHeader string) string {
 	clientIP := c.Get(ipHeader)
 	if clientIP == "" {
