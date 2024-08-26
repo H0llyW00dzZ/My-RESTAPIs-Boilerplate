@@ -21,4 +21,7 @@
 //	senior-golang-worker-775b64c9b5-mkc5k   170m         54Mi
 //	senior-golang-worker-775b64c9b5-pk9gz   175m         47Mi
 //	senior-golang-worker-775b64c9b5-zrcsh   129m         48Mi
+//
+// Also note that for more efficiency, as this worker mostly consumes CPU, it is recommended to use AMD CPUs (get good get AMD) for the server specification,
+// as they perform better than Intel CPUs for this use case.
 package worker
