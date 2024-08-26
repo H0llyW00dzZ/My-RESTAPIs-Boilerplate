@@ -133,7 +133,6 @@ func (v *viewData) renderAndSend(c *fiber.Ctx, statusCode int, component templ.C
 	// it is intended for low-level operations where the efficiency of using a string builder is not significant.
 	//
 	// Get a buffer from the pool for efficient string building.
-
 	buf := gc.BufferPool.Get()
 
 	// Use defer to guarantee buffer cleanup (reset and return to the pool)
