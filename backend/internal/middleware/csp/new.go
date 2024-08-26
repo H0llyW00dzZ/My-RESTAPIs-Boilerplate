@@ -24,13 +24,7 @@ func New(config ...Config) fiber.Handler {
 			return c.Next()
 		}
 
-		clientIP := c.Get(log.CloudflareConnectingIPHeader)
-		if clientIP == "" {
-			clientIP = c.Get("X-Real-IP")
-			if clientIP == "" {
-				clientIP = c.IP()
-			}
-		}
+		clientIP := getClientIP(c, cfg.IPHeader)
 
 		cloudflareRayID := c.Get(log.CloudflareRayIDHeader)
 		if cloudflareRayID != "" {
