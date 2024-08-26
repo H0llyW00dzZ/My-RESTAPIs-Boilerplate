@@ -156,7 +156,7 @@ func CustomNextStatusCode(statusCodes ...int) func(*fiber.Ctx) bool {
 //   - headerKeys: Variadic string parameters representing the header keys to check for in the request headers.
 //
 // Returns:
-//   - A function that takes a *fiber.Ctx as input and returns a boolean value indicating whether to
+//   - A function that takes a [fiber.Ctx] as input and returns a boolean value indicating whether to
 //     skip the middleware for the given request based on the presence of any of the specified header keys.
 func CustomNextHeader(headerKeys ...string) func(*fiber.Ctx) bool {
 	return func(c *fiber.Ctx) bool {
