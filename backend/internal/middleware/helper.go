@@ -944,6 +944,13 @@ func WithCSPValueGenerator(cspvalue func(string, map[string]string) string) func
 	}
 }
 
+// WithCSPIPHeader is an option function that sets the header name used to retrieve the client IP address for the CSP middleware.
+func WithCSPIPHeader(ipHeader string) func(*csp.Config) {
+	return func(config *csp.Config) {
+		config.IPHeader = ipHeader
+	}
+}
+
 // WithSessionIDGenerator is an option function for NewSessionMiddleware that sets a custom generator function for the session ID.
 func WithSessionIDGenerator(generator func() string) func(*session.Config) {
 	return func(config *session.Config) {
