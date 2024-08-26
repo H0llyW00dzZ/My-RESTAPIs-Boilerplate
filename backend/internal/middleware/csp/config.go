@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
 )
 
 // Config represents the configuration options for the CSP middleware.
@@ -39,6 +40,12 @@ type Config struct {
 	//
 	// Optional. Default: A default CSP value generator function provided by the CSP middleware.
 	CSPValueGenerator func(string, map[string]string) string
+
+	// IPHeader is the header name used to retrieve the client IP address.
+	// If not provided, it will use the default "X-Real-IP" header.
+	//
+	// Optional. Default: "X-Real-IP"
+	IPHeader string
 }
 
 // DefaultConfig returns the default configuration for the CSP middleware.
@@ -48,10 +55,11 @@ func DefaultConfig() Config {
 		ContextKey:          "csp_random",
 		Next:                nil,
 		CSPValueGenerator:   defaultCSPValueGenerator,
+		IPHeader:            "X-Real-IP",
 	}
 }
 
-// defaultRandomnessGenerator generates randomness using SHA256 of the client IP.
+// defaultRandomnessGenerator generates randomness using SHA256 (digest) of the client IP.
 func defaultRandomnessGenerator(clientIP string) string {
 	hash := sha256.Sum256([]byte(clientIP))
 	return hex.EncodeToString(hash[:])
@@ -66,4 +74,25 @@ func defaultCSPValueGenerator(randomness string, customValues map[string]string)
 	cspBuilder.WriteString(fmt.Sprintf("script-src 'nonce-%s'", randomness))
 
 	return cspBuilder.String()
+}
+
+// getClientIP retrieves the client IP address from the specified header or the remote address.
+func getClientIP(c *fiber.Ctx, ipHeader string) string {
+	clientIP := c.Get(ipHeader)
+	if clientIP == "" {
+		clientIP = c.IP()
+	}
+
+	// Check if the IP address is a valid IPv4 address
+	if utils.IsIPv4(clientIP) {
+		return clientIP
+	}
+
+	// Check if the IP address is a valid IPv6 address
+	if utils.IsIPv6(clientIP) {
+		return clientIP
+	}
+
+	// If the IP address is not valid, return an empty string
+	return ""
 }
