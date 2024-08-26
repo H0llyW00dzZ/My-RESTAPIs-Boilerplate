@@ -8,12 +8,12 @@
 package htmx
 
 import (
+	"h0llyw00dz-template/backend/pkg/gc"
 	"h0llyw00dz-template/backend/pkg/mime"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
 
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
-	bpool "github.com/valyala/bytebufferpool"
 )
 
 // views represents the data that will be passed to the view template.
@@ -133,13 +133,14 @@ func (v *viewData) renderAndSend(c *fiber.Ctx, statusCode int, component templ.C
 	// it is intended for low-level operations where the efficiency of using a string builder is not significant.
 	//
 	// Get a buffer from the pool for efficient string building.
-	buf := bpool.Get()
+
+	buf := gc.BufferPool.Get()
 
 	// Use defer to guarantee buffer cleanup (reset and return to the pool)
 	// even if an error occurs during rendering.
 	defer func() {
-		buf.Reset()    // Reset the buffer to prevent data leaks.
-		bpool.Put(buf) // Return the buffer to the pool for reuse.
+		buf.Reset()            // Reset the buffer to prevent data leaks.
+		gc.BufferPool.Put(buf) // Return the buffer to the pool for reuse.
 	}()
 
 	// Render the HTMX component into the byte buffer.
