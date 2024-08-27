@@ -9,10 +9,12 @@ import (
 	log "h0llyw00dz-template/backend/internal/logger"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
 )
 
 // New creates a new instance of the CSP middleware with the provided configuration.
 func New(config ...Config) fiber.Handler {
+	// Set default config
 	cfg := DefaultConfig()
 	if len(config) > 0 {
 		cfg = config[0]
@@ -24,21 +26,34 @@ func New(config ...Config) fiber.Handler {
 			return c.Next()
 		}
 
-		clientIP := getClientIP(c, cfg.IPHeader)
+		// Get client IP address
+		clientIPs := getClientIP(c, cfg.IPHeader)
 
-		cloudflareRayID := c.Get(log.CloudflareRayIDHeader)
+		// Check if Cloudflare is detected
+		// TODO: Remove utils.CopyString ?
+		cloudflareRayID := utils.CopyString(c.Get(log.CloudflareRayIDHeader))
 		if cloudflareRayID != "" {
-			clientIP += " - Cloudflare detected - Ray ID: " + cloudflareRayID
+			for i, clientIP := range clientIPs {
+				clientIPs[i] = clientIP + " - Cloudflare detected - Ray ID: " + cloudflareRayID
+			}
 		}
-		countryCode := c.Get(log.CloudflareIPCountryHeader)
+
+		// Get country code from request header
+		// TODO: Remove utils.CopyString ?
+		countryCode := utils.CopyString(c.Get(log.CloudflareIPCountryHeader))
 		if countryCode != "" {
-			clientIP += ", Country: " + countryCode
+			for i, clientIP := range clientIPs {
+				clientIPs[i] = clientIP + ", Country: " + countryCode
+			}
 		}
 
 		// Generate the randomness using the configured generator
-		randomness := cfg.RandomnessGenerator(clientIP)
+		var randomness string
+		if len(clientIPs) > 0 {
+			randomness = cfg.RandomnessGenerator(clientIPs[0])
+		}
 
-		// Set the randomness in the context using the configured context key
+		// Store randomness in context
 		c.Locals(cfg.ContextKey, randomness)
 
 		// Create a map to store custom values for the CSP header
@@ -50,9 +65,11 @@ func New(config ...Config) fiber.Handler {
 		// When using base64 encoding, consider storing the base64 encoded in c.Locals first or somewhere (e.g, database). Avoid fetching the value from
 		// the header and then putting it in the render or direct in the render, as the format will be different due to sanitization.
 		cspValue := cfg.CSPValueGenerator(randomness, customValues)
+
+		// Set CSP header
 		c.Set("Content-Security-Policy", cspValue)
 
-		// Continue to the next middleware/route handler
+		// Continue to next middleware
 		return c.Next()
 	}
 }

@@ -77,33 +77,42 @@ func defaultCSPValueGenerator(randomness string, customValues map[string]string)
 }
 
 // getClientIP retrieves the client IP address from the specified header or the remote address.
-func getClientIP(c *fiber.Ctx, ipHeader string) string {
+//
+// It handles cases where the header contains multiple IP addresses separated by commas.
+func getClientIP(c *fiber.Ctx, ipHeader string) []string {
 	// TODO: Remove utils.CopyString ?
 	clientIP := utils.CopyString(c.Get(ipHeader))
 	if clientIP == "" {
-		clientIP = c.IP()
+		return []string{c.IP()}
 	}
+
+	var validIPs []string
 
 	// Split the header value by comma to get multiple IP addresses
 	ipList := strings.Split(clientIP, ",")
 
-	// Iterate over the IP addresses and return the first valid one
+	// Iterate over the IP addresses and store the valid ones
 	for _, ip := range ipList {
 		ip = strings.TrimSpace(ip) // Trim leading/trailing whitespace
 
 		// Check if the IP address is a valid IPv4 address
 		if utils.IsIPv4(ip) {
-			return ip
+			validIPs = append(validIPs, ip)
+			continue
 		}
 
 		// Check if the IP address is a valid IPv6 address
 		if utils.IsIPv6(ip) {
-			return ip
+			validIPs = append(validIPs, ip)
 		}
 	}
 
 	// If the IP address is not valid, return [c.IP] anyway to prevent Header Spoofing.
 	// This will use the Private IP or Real Client IP Address, which could be random (depending on the server configuration),
 	// making it difficult to guess for bypass or any potential vulnerable purposes.
-	return c.IP()
+	if len(validIPs) == 0 {
+		return []string{c.IP()}
+	}
+
+	return validIPs
 }
