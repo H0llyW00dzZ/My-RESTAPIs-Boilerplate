@@ -79,6 +79,9 @@ func defaultCSPValueGenerator(randomness string, customValues map[string]string)
 // getClientIP retrieves the client IP address from the specified header or the remote address.
 //
 // It handles cases where the header contains multiple IP addresses separated by commas.
+//
+// Important: Real Client IP Address must be at first one, other it remote ip address server,
+// if the real client ip address not in the first one then other router/ingress are wrong implementation (bad practices) regarding best practices
 func getClientIP(c *fiber.Ctx, ipHeader string) []string {
 	// TODO: Remove utils.CopyString ?
 	clientIP := utils.CopyString(c.Get(ipHeader))
