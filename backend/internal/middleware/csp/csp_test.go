@@ -80,4 +80,27 @@ func TestCSPMiddleware(t *testing.T) {
 	if responseBody["custom_csp_key"] != "custom_randomness" {
 		t.Errorf("Unexpected custom context key value: %v", responseBody["custom_csp_key"])
 	}
+
+	// Test case 3: Multiple IP addresses
+	app.Use(csp.New())
+
+	app.Get("/multiple-ips", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"message": "Multiple IPs",
+		})
+	})
+
+	req = httptest.NewRequest("GET", "/multiple-ips", nil)
+	req.Header.Set("X-Real-IP", "192.168.0.1, 192.168.0.2, 192.168.0.3")
+	resp, err = app.Test(req)
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+	expectedCSP = "script-src 'nonce-37d7a80604871e579850a658c7add2ae7557d0c6abcc9b31ecddc4424207eba3'"
+	if resp.Header.Get("Content-Security-Policy") != expectedCSP {
+		t.Errorf("Unexpected Content-Security-Policy header value: %s", resp.Header.Get("Content-Security-Policy"))
+	}
+	if resp.Header.Get("Content-Security-Policy") == "" {
+		t.Error("Content-Security-Policy header is empty")
+	}
 }
