@@ -96,6 +96,8 @@ func getClientIP(c *fiber.Ctx, ipHeader string) string {
 		return clientIP
 	}
 
-	// If the IP address is not valid, return an empty string
-	return ""
+	// If the IP address is not valid, return [c.IP] anyway to prevent Header Spoofing.
+	// This will use the Private IP or Real Client IP Address, which could be random (depending on the server configuration),
+	// making it difficult to guess for bypass or any potential vulnerable purposes.
+	return c.IP()
 }
