@@ -1,5 +1,5 @@
 # This Docker boilerplate has no shell access, mostly because this repository does not rely on the operating system,
-# only on the resources of the machine server such as CPU, memory, network and disk.
+# only on the resources of the machine server such as CPU, memory, network, and disk.
 #
 # Use the official Golang image to create a build artifact.
 # This is a multi-stage build. This stage is named 'builder'.
@@ -33,12 +33,15 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /restapis ./backe
 # https://docs.docker.com/develop/develop-images/multistage-build/
 FROM alpine:latest
 
-# Install ca-certificates in case you need to make calls to HTTPS endpoints.
+# Install the ca-certificates alpine package in case you need to make calls to HTTPS endpoints.
 # The scratch image is the most minimal image in Docker. This image is only 5MB and has no shell.
 # If you need to debug within the container, you might want to use a different base image.
+#
+# Also, note that while this original Dockerfile boilerplate is free from maintaining the image because it's zero-vulnerable (for example, no CVEs when scanning),
+# the only thing to focus on is writing the code for this repository.
 RUN apk --no-cache add ca-certificates
 
-# Which is safe-way
+# This is a safe way
 WORKDIR /root/
 
 # Copy the pre-built binary file from the previous stage.
@@ -51,7 +54,7 @@ COPY --from=builder /restapis .
 
 
 # Expose port 8080 to the outside world.
-# This can be modified
+# This can be modified.
 EXPOSE 8080
 
 # Command to run the executable.
