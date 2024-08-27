@@ -80,8 +80,8 @@ func defaultCSPValueGenerator(randomness string, customValues map[string]string)
 //
 // It handles cases where the header contains multiple IP addresses separated by commas.
 //
-// Important: Real Client IP Address must be at first one, other it remote ip address server,
-// if the real client ip address not in the first one then other router/ingress are wrong implementation (bad practices) regarding best practices
+// Important: The real client IP address must be the first one in the list. Other IP addresses in the list are typically from proxies or load balancers.
+// If the real client IP address is not the first one, it indicates that other routers/ingresses are not following best practices (bad practices) for IP address forwarding.
 func getClientIP(c *fiber.Ctx, ipHeader string) []string {
 	// TODO: Remove utils.CopyString ?
 	clientIP := utils.CopyString(c.Get(ipHeader))
