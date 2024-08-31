@@ -73,6 +73,6 @@
 // Also note that for more efficiency, as this worker mostly consumes CPU, it is recommended to use AMD CPUs (get good get AMD) for the server specification,
 // as they perform better than Intel CPUs for this use case.
 //
-// Important: While using this worker, do not use Prometheus middleware or any metrics that are directly bound to this repository,
+// Important: While using this worker, do not use Prometheus middleware or any metrics (e.g, Heroku Go Metrics, other) that are directly bound to this repository,
 // because it can lead to excessive memory consumption (possibly memory leaks) due to the improper implementation of metrics (wrong implementation regarding metrics).
 package worker
