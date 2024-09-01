@@ -241,15 +241,19 @@ func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
 	// Even attempting to set it to unlimited will inevitably lead to a bottleneck, regardless of server specs (e.g., even on a high-spec or baremetal server).
 	// So, it's best to maintain the current configuration since Redis will handle this aspect.
 	db.SetConnMaxLifetime(0) // Connections are not closed due to being idle too long.
-	db.SetMaxIdleConns(50)   // Maximum number of connections in the idle connection pool.
-	db.SetMaxOpenConns(50)   // Maximum number of open connections to the database.
+	// Note: This is highly scalable when running on Kubernetes, especially with Fiber, which is the best choice with HPA (Horizontal Pod Autoscaling)
+	// due to its built-in zer0-allocation and can be dynamic resource usage (e.g., CPU, Memory).
+	// The values for "SetMaxIdleConns" and "SetMaxOpenConns" depend on the number of Pods.
+	// For example, if the maximum number of replicas in HPA is set to 99999, then "SetMaxIdleConns" and "SetMaxOpenConns" should also be set to 99999.
+	// Don't forget to set the maximum connections in the MySQL container to 99999 as well.
+	db.SetMaxIdleConns(50) // Maximum number of connections in the idle connection pool.
+	db.SetMaxOpenConns(50) // Maximum number of open connections to the database.
 
 	err = db.Ping()
 	if err != nil {
 		return nil, err
 	}
 	db.SetConnMaxIdleTime(time.Minute * 3)
-	db.SetMaxOpenConns(50)
 	return db, nil
 }
 
