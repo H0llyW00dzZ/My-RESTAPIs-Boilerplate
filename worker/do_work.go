@@ -141,8 +141,10 @@ func (wp *Pool[T]) Start() {
 	// Note: this used std logger, due it not possible import internal package in the backend to outside (not allowed).
 	log.Print("Worker pool started.")
 	go func() {
-		defer atomic.StoreUint32(&wp.isRunning, 0)
-		defer log.Print("Worker pool exiting.")
+		defer func() {
+			atomic.StoreUint32(&wp.isRunning, 0)
+			log.Print("Worker pool exiting.")
+		}()
 
 		// Use the WaitGroup to wait for workers to start
 		wp.wg.Add(wp.numWorkers)

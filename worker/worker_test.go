@@ -31,6 +31,10 @@ func (j *MockJob[T]) Execute(ctx context.Context) (T, error) {
 	return j.result, j.err
 }
 
+const (
+	defaultSleepTime = 1 * time.Second
+)
+
 func TestPool_Submit(t *testing.T) {
 	pool := worker.NewDoWork[string]()
 
@@ -124,7 +128,7 @@ func TestPool_WorkerLoop(t *testing.T) {
 	pool.Stop()
 
 	// Wait for the worker loop to exit (this might be necessary depending on your test setup)
-	time.Sleep(worker.DefaultWorkerSleepTime)
+	time.Sleep(defaultSleepTime)
 }
 
 func TestPool_StartStopLoopZ(t *testing.T) {
@@ -133,7 +137,7 @@ func TestPool_StartStopLoopZ(t *testing.T) {
 		worker.WithJobChannelOptions(worker.WithChanBuffer[worker.Job[string]](1)),
 		worker.WithResultChannelOptions(worker.WithChanBuffer[string](1)),
 		worker.WithErrorChannelOptions[string](worker.WithChanBuffer[error](1)),
-		worker.WithIdleCheckInterval[string](worker.DefaultWorkerSleepTime),
+		worker.WithIdleCheckInterval[string](defaultSleepTime),
 	)
 
 	// Register a test job that takes some time to execute
@@ -159,7 +163,7 @@ func TestPool_StartStopLoopZ(t *testing.T) {
 	pool.Stop()
 
 	// Wait for the worker loop to exit.
-	time.Sleep(worker.DefaultWorkerSleepTime)
+	time.Sleep(defaultSleepTime)
 
 	// Verify that the pool is stopped
 	if pool.IsRunning() {
