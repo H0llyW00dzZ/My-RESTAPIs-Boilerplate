@@ -240,7 +240,7 @@ func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
 	// Note: Implementing statistics similar to those in Redis isn't feasible due to connection limitations.
 	// Even attempting to set it to unlimited will inevitably lead to a bottleneck, regardless of server specs (e.g., even on a high-spec or baremetal server).
 	// So, it's best to maintain the current configuration since Redis will handle this aspect.
-	db.SetConnMaxLifetime(0) // Connections are not closed due to being idle too long.
+	db.SetConnMaxIdleTime(time.Minute * 3) // Connections are not closed due to being idle too long.
 	// Note: This is highly scalable when running on Kubernetes, especially with Fiber, which is the best choice with HPA (Horizontal Pod Autoscaling)
 	// due to its built-in zer0-allocation and can be dynamic resource usage (e.g., CPU, Memory).
 	// The values for "SetMaxIdleConns" and "SetMaxOpenConns" depend on the number of Pods.
@@ -253,7 +253,6 @@ func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	db.SetConnMaxIdleTime(time.Minute * 3)
 	return db, nil
 }
 
