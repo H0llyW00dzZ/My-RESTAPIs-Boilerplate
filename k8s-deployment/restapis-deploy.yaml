@@ -166,6 +166,9 @@ spec:
       port: 80
       targetPort: 8080
 ---
+# Note: This HPA is designed for microservices that consume vCPU.
+# This boilerplate was primarily consumes vCPU (combined with a worker) and bandwidth to handle high traffic (e.g., network load)
+# because Fiber is built with zer0-allocation memory.
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
