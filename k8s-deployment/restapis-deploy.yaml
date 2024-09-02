@@ -1,0 +1,191 @@
+# REST APIs Deployment [Zer0 Downtime] by H0llyW00dzZ for an microservices k8s.
+#
+# Note: most env here are bound into secrets, so for generate secrets especially if the k8s has "HSM" use bash script "create_k8s_secret.sh"
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: restapis
+  namespace: restapis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: restapis
+  template:
+    metadata:
+      labels:
+        app: restapis
+    spec:
+      containers:
+        - name: restapis
+          image: <IMAGE_HERE> # Put Image related to this repository here
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          env:
+            - name: PORT
+              valueFrom:
+                secretKeyRef:
+                  key: PORT
+                  name: restapis-env
+            - name: APP_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: APP_NAME
+                  name: restapis-env
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: DB_HOST
+                  name: restapis-env
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: DB_PORT
+                  name: restapis-env
+            - name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: DB_DATABASE
+                  name: restapis-env
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: DB_USERNAME
+                  name: restapis-env
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: DB_PASSWORD
+                  name: restapis-env
+            - name: DB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: DB_ROOT_PASSWORD
+                  name: restapis-env
+            - name: MONITOR_PATH
+              valueFrom:
+                secretKeyRef:
+                  key: MONITOR_PATH
+                  name: restapis-env
+            - name: RDB_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  key: RDB_ADDRESS
+                  name: restapis-env
+            - name: RDB_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: RDB_PORT
+                  name: restapis-env
+            - name: RDB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: RDB_PASSWORD
+                  name: restapis-env
+            - name: RDB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: RDB_DATABASE
+                  name: restapis-env
+            - name: TIME_FORMAT
+              valueFrom:
+                secretKeyRef:
+                  key: TIME_FORMAT
+                  name: restapis-env
+            - name: WRITE_TIMEOUT
+              valueFrom:
+                secretKeyRef:
+                  key: WRITE_TIMEOUT
+                  name: restapis-env
+            - name: READ_TIMEOUT
+              valueFrom:
+                secretKeyRef:
+                  key: READ_TIMEOUT
+                  name: restapis-env
+            - name: SHUTDOWN_TIMEOUT
+              valueFrom:
+                secretKeyRef:
+                  key: SHUTDOWN_TIMEOUT
+                  name: restapis-env
+            - name: RDB_POOL_TIMEOUT
+              valueFrom:
+                secretKeyRef:
+                  key: RDB_POOL_TIMEOUT
+                  name: restapis-env
+            - name: REDIS_MAXCONN_IDLE_TIME
+              valueFrom:
+                secretKeyRef:
+                  key: REDIS_MAXCONN_IDLE_TIME
+                  name: restapis-env
+            - name: REDIS_MAXCONN_LIFE_TIME
+              valueFrom:
+                secretKeyRef:
+                  key: REDIS_MAXCONN_LIFE_TIME
+                  name: restapis-env
+            - name: DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  key: DOMAIN
+                  name: restapis-env
+            - name: API_SUB_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  key: API_SUB_DOMAIN
+                  name: restapis-env
+            - name: MYSQL_TLS_CERT
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_TLS_CERT
+                  name: restapis-env
+            - name: REDIS_CERTS_TLS
+              valueFrom:
+                secretKeyRef:
+                  key: REDIS_CERTS_TLS
+                  name: restapis-env
+---
+# Note: When using nginx-ingress for expose service it's better keep like this
+apiVersion: v1
+kind: Service
+metadata:
+  name: restapis-api-service
+  namespace: restapis
+spec:
+  selector:
+    app: restapis
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: restapis-hpa
+  namespace: restapis
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: restapis
+  minReplicas: 1
+  maxReplicas: 50
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 50
