@@ -195,8 +195,10 @@ var (
 // so that it will initialize before the "func main()" runs. This is because the connection will be
 // shared across the entire codebase (sharing is caring), even if the codebase grows to billions of lines of Go code (e.g, Senior Golang).
 //
-// TODO: Implement a background task to automatically backup the database using a fully encrypted mechanism provided by the "opengpg" utility,
-// instead of manually using "mysqldump".
+// TODO: Implement a background task to automatically backup the database using a fully encrypted mechanism
+// provided by the "opengpg" utility. Instead of manually using "mysqldump", store the backups (archived) in a cloud
+// storage service. This task should run periodically without relying on cron jobs, as Go supports goroutines
+// and scheduling mechanisms.
 func New() Service {
 	if dbInstance != nil {
 		return dbInstance
