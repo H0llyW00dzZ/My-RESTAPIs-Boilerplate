@@ -18,15 +18,15 @@ COPY go.mod go.sum ./
 # Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed.
 RUN go mod download
 
-# Copy the source code.
+# Copy the backend source code.
 
 
-# Additionally, copy the frontend assets
+# Additionally, copy the frontend source code (e.g., root tailwind.config.js, /frontend/public/magic_embedded.go, htmx templ).
 
 
 # Build the application.
 #
-# Note: This design might want experimental C + Go, so "-installsuffix cgo" won't work anyway due to CGO_ENABLED=0. If CGO_ENABLED=1, it would work.
+# Note: This design might require experimental C + Go, so "-installsuffix cgo" won't work anyway due to CGO_ENABLED=0. If CGO_ENABLED=1, it would work.
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /restapis ./backend/cmd/server/run.go
 
 # Use a Docker multi-stage build to create a lean production image.
@@ -47,10 +47,13 @@ WORKDIR /root/
 # Copy the pre-built binary file from the previous stage.
 COPY --from=builder /restapis .
 
-# Copy the docs directory (which contains the openapi.json file) to the image.
+# Note: This is where the magic embedding (see /frontend/public/magic_embedded.go) takes place after the builder stage source code is done.
+#
+# Copy the docs directory (e.g., contains the openapi.json file) to the image.
 
-
-# Copy the frontend assets to the image.
+# Note: This is where the magic embedding (see /frontend/public/magic_embedded.go) takes place after the builder stage source code is done.
+#
+# Copy the frontend assets (e.g., js, css, other static files such as png, jpeg) to the image.
 
 
 # Expose port 8080 to the outside world.
