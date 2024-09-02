@@ -64,11 +64,12 @@ spec:
                 secretKeyRef:
                   key: DB_PASSWORD
                   name: restapis-env
-            - name: DB_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: DB_ROOT_PASSWORD
-                  name: restapis-env
+            # This optional.
+            # - name: DB_ROOT_PASSWORD
+            #   valueFrom:
+            #     secretKeyRef:
+            #       key: DB_ROOT_PASSWORD
+            #       name: restapis-env
             - name: MONITOR_PATH
               valueFrom:
                 secretKeyRef:
@@ -154,7 +155,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: restapis-api-service
+  name: restapis-service
   namespace: restapis
 spec:
   selector:
