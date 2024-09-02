@@ -28,6 +28,7 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "500m"
+          tty: true # Enable TTY for bubble tea
           env:
             - name: PORT
               valueFrom:
