@@ -54,3 +54,6 @@ eval "$kubectl_cmd"
 # 1. Run the script: ./create_k8s_secret.sh
 # 2. Enter the secret file name when prompted (e.g., worker-secret.txt)
 # 3. Enter the desired Kubernetes secret name when prompted (e.g., my-worker-secrets)
+
+# --- Supported/Compatible ---
+# This script should be compatible with any Bash/Shell environment on any operating system. As personal primary use, I am using Git Bash on Windows.
