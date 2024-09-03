@@ -1,5 +1,11 @@
 # REST APIs Deployment [Zer0 Downtime] by H0llyW00dzZ for an microservices k8s.
-#
+---
+# Note: This will automatically create the namespace if it doesn't exist. If the namespace already exists, it won't be affected.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: restapis
+---
 # Note: most env here are bound into secrets, so for generate secrets especially if the k8s has "HSM" use bash script "create_k8s_secret.sh"
 apiVersion: apps/v1
 kind: Deployment
