@@ -173,8 +173,12 @@ spec:
       targetPort: 8080
 ---
 # Note: This HPA is designed for microservices that consume vCPU.
-# This boilerplate was primarily consumes vCPU (combined with a worker) and bandwidth to handle high traffic (e.g., network load)
-# because Fiber is built with zer0-allocation memory.
+# This boilerplate primarily consumes vCPU (combined with a worker) and bandwidth to handle high traffic (e.g., network load)
+# because Fiber is built with zero-allocation memory.
+#
+# TIPS: While running on Kubernetes without auto-pilots, due to HPA, it's suitable to install the Cluster Autoscaler (CA) from https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler.
+# To save costs on any cloud provider, use a small spec server (e.g., 2 vCPU, 4GB RAM), then set the maximum number of nodes to 4 or 2, starting from 1.
+# Also note that this deployment template is so smooth for sailing ⛵ ☸ at high scalability, especially with nginx-ingress and 100% zer0-downtime.
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
