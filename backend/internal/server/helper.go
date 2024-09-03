@@ -122,6 +122,10 @@ func (s *FiberServer) MakeHTTPRequest(req *http.Request) (*http.Response, error)
 	tlsConfig := &tls.Config{
 		MinVersion: tls.VersionTLS13,
 		MaxVersion: tls.VersionTLS13,
+		// Enable HTTP/2 & HTTP/1.1 support
+		// Note: This is a tips TLS Protocol for HTTP
+		// TODO: Add HTTP/3 support (not adding it right now as most of the internet is using HTTP/2 and HTTP/1.1)
+		NextProtos: []string{"h2", "http/1.1"},
 		CurvePreferences: []tls.CurveID{
 			tls.X25519,
 			tls.CurveP256,
