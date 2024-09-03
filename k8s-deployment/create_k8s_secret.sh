@@ -13,11 +13,28 @@
 # Known Bugs (Bash bug): The following value format will cause issues: "key=value-value-value:value%!@value(value:value)/value?tls=value" it won't work       
 #                        also note that it cannot be fixed with regular expressions due it bash problem (even it's possible, it just too complex), It might work-wells in unix-shellz.
 
+echo "
+    _  __     _                          _            
+   | |/ /    | |                        | |           
+   | ' /_   _| |__   ___ _ __ _ __   ___| |_ ___  ___ 
+   |  <| | | | '_ \ / _ \ '__| '_ \ / _ \ __/ _ \/ __|
+   | . \ |_| | |_) |  __/ |  | | | |  __/ ||  __/\__ \\
+   |_|\_\__,_|_.__/ \___|_|  |_| |_|\___|\__\___||___/
+                                       
+                                    Secrets Tools by H0llyW00dz
+"
+
 # --- Configuration ---
-ENV_FILE="worker-secret.txt" # Your secret file in "key=value" format (e.g, .env).
-SECRET_NAME="my-worker-secrets"  # Name for the Kubernetes secret
+read -p "Enter the secret file name: " ENV_FILE
+read -p "Enter the Kubernetes secret name: " SECRET_NAME
 
 # --- Script Logic ---
+
+# Check if the secret file exists
+if [ ! -f "$ENV_FILE" ]; then
+  echo "Secret file '$ENV_FILE' does not exist. Please provide a valid file."
+  exit 1
+fi
 
 # Create the base kubectl command
 kubectl_cmd="kubectl create secret generic $SECRET_NAME"
@@ -34,7 +51,6 @@ done < "$ENV_FILE"
 eval "$kubectl_cmd"
 
 # --- Usage Example ---
-# 1. Ensure your 'worker-secret.txt' file exists with content like:
-#     DB_PASSWORD=your_db_password
-#     API_KEY=your_api_key
-# 2. Run the script: ./create_k8s_secret.sh 
+# 1. Run the script: ./create_k8s_secret.sh
+# 2. Enter the secret file name when prompted (e.g., worker-secret.txt)
+# 3. Enter the desired Kubernetes secret name when prompted (e.g., my-worker-secrets)
