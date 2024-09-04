@@ -28,8 +28,11 @@ spec:
           # Note: The securityContext section with runAsNonRoot: true might be optional, as the original application (this repository)
           # does not require running with root privileges or rely on root privileges for the operating system or container.
           # It primarily relies on system resources such as vCPU, RAM, Network, and disk space not operating system or container. Thus, this deployment template is secure by default.
-          securityContext:
-            runAsNonRoot: true
+          #
+          # Note: This setting has been disabled due to issues causing container errors when enabled.
+          # whoever enabled it should review the source code (how is it secure) of this repository and fix the underlying problem if it's possible otherwise then disabled.
+          # securityContext:
+          #   runAsNonRoot: true
           ports:
             - containerPort: 8080
           resources:
