@@ -26,8 +26,8 @@ spec:
         - name: restapis
           image: <IMAGE_HERE> # Put Image related to this repository here
           # Note: The securityContext section with runAsNonRoot: true might be optional, as the original application (this repository)
-          # does not require running with root privileges or rely on root privileges for the operating system.
-          # It primarily relies on system resources such as vCPU, RAM, and disk space not operating system. Thus, this deployment template is secure by default.
+          # does not require running with root privileges or rely on root privileges for the operating system or container.
+          # It primarily relies on system resources such as vCPU, RAM, and disk space not operating system or container. Thus, this deployment template is secure by default.
           securityContext:
             runAsNonRoot: true
           ports:
