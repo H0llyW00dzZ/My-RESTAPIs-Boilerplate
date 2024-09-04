@@ -27,6 +27,12 @@ echo "
 # --- Configuration ---
 read -p "Enter the secret file name: " ENV_FILE
 read -p "Enter the Kubernetes secret name: " SECRET_NAME
+read -p "Enter the Kubernetes namespace (default: default): " NAMESPACE
+
+# Set default namespace if not provided
+if [ -z "$NAMESPACE" ]; then
+  NAMESPACE="default"
+fi
 
 # --- Script Logic ---
 
@@ -37,7 +43,7 @@ if [ ! -f "$ENV_FILE" ]; then
 fi
 
 # Create the base kubectl command
-kubectl_cmd="kubectl create secret generic $SECRET_NAME"
+kubectl_cmd="kubectl create secret generic $SECRET_NAME -n $NAMESPACE"
 
 # Process the secret file
 while IFS='=' read -r key value; do
@@ -54,6 +60,7 @@ eval "$kubectl_cmd"
 # 1. Run the script: ./create_k8s_secret.sh
 # 2. Enter the secret file name when prompted (e.g., worker-secret.txt)
 # 3. Enter the desired Kubernetes secret name when prompted (e.g., my-worker-secrets)
+# 4. Enter the Kubernetes namespace when prompted (e.g., my-namespace) or leave it empty to use the default namespace
 
 # --- Supported/Compatible ---
 # This script should be compatible with any Bash/Shell environment on any operating system. As personal primary use, I am using Git Bash on Windows.
