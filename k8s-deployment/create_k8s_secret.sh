@@ -13,7 +13,7 @@
 # Known Bugs (Bash bug): The following value format will cause issues: "key=value-value-value:value%!@value(value:value)/value?tls=value" it won't work       
 #                        also note that it cannot be fixed with regular expressions due it bash problem (even it's possible, it just too complex), It might work-wells in unix-shellz.
 
-echo "
+echo "$(tput setaf 4)
     _  __     _                          _            
    | |/ /    | |                        | |           
    | ' /_   _| |__   ___ _ __ _ __   ___| |_ ___  ___ 
@@ -21,7 +21,10 @@ echo "
    | . \ |_| | |_) |  __/ |  | | | |  __/ ||  __/\__ \\
    |_|\_\__,_|_.__/ \___|_|  |_| |_|\___|\__\___||___/
                                        
-                                    Secrets Tools by H0llyW00dz
+              $(tput sgr0) A Secret Tools Generator by H0llyW00dz
+
+$(tput setaf 3)  Note: The format must be like 'key=value' in the secret file (e.g., .env). Run it where kubectl is installed.
+        When your Kubernetes cluster has an HSM, it will be encrypted as well.$(tput sgr0)
 "
 
 # --- Configuration ---
@@ -38,7 +41,7 @@ fi
 
 # Check if the secret file exists
 if [ ! -f "$ENV_FILE" ]; then
-  echo "Secret file '$ENV_FILE' does not exist. Please provide a valid file."
+  echo "$(tput setaf 1)Secret file '$ENV_FILE' does not exist. Please provide a valid file.$(tput sgr0)"
   exit 1
 fi
 
@@ -63,4 +66,4 @@ eval "$kubectl_cmd"
 # 4. Enter the Kubernetes namespace when prompted (e.g., my-namespace) or leave it empty to use the default namespace
 
 # --- Supported/Compatible ---
-# This script should be compatible with any Bash/Shell environment on any operating system. As personal primary use, I am using Git Bash on Windows.
+# This script should be compatible with any Bash/Shell environment on any operating system. As my primary personal use, I am using Git Bash on Windows.
