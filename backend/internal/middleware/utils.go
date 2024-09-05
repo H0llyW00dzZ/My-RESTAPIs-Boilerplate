@@ -851,7 +851,9 @@ func NewEarlyData(options ...any) fiber.Handler {
 //     to a HSM instead of hardcoding them, allowing for easy key generation and management)
 //
 // Demo:
-//   - https://api-beta.btz.pm/v1/server/metrics (Authentication required)
+//   - The currently unavailable service was stopped, as I was lazy to continue due to it being hosted on Heroku.
+//     The latency was unstable (always high) for handling two databases (Redis and MySQL), and memory leaks always occurred
+//     because Heroku stores metrics in memory (actually the same as this Prometheus Middleware), unlike on Kubernetes.
 func NewPrometheusMiddleware(options ...any) fiber.Handler {
 	// Create a new Prometheus configuration.
 	config := monitor.PrometheusConfig{}
