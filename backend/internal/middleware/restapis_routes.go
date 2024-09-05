@@ -200,7 +200,9 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 	// For example: server.Get("/metrics", rateLimiterRESTAPIs, keyAuth)
 	//
 	// Demo:
-	//  - https://api-beta.btz.pm/v1/server/metrics (Authentication required)
+	//  - The currently unavailable service was stopped, as I was lazy to continue due to it being hosted on Heroku.
+	//    The latency was unstable (always high) for handling two databases (Redis and MySQL), and memory leaks always occurred
+	//    because Heroku stores metrics in memory (actually the same as this Prometheus Middleware), unlike on Kubernetes.
 	server.Get("/metrics", rateLimiterRESTAPIs)
 
 	// Register server APIs routes
