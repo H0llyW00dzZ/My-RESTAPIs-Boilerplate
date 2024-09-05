@@ -24,7 +24,9 @@ echo "$(tput setaf 4)
               $(tput sgr0) A Secret Tools Generator by H0llyW00dz
 
 $(tput setaf 3)  Note: The format must be like 'key=value' in the secret file (e.g., .env). Run it where kubectl is installed.
-        When your Kubernetes cluster has an HSM, it will be encrypted as well.$(tput sgr0)
+        When your Kubernetes cluster has an HSM, it will be encrypted as well. Also note that regarding capabilities,
+        it can handle up to 1K+++ more 'key=value' lines, depending on the requirements, instead of doing it manually.
+        So, get good at bash scripting.$(tput sgr0)
 "
 
 # --- Configuration ---
