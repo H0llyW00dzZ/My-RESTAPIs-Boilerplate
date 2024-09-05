@@ -7,7 +7,7 @@
 # Note: This is a boilerplate for Docker regarding this repository.
 # Also, note that the "# Copy the source code." or other "# Copy ..." comments need to be written specifically for your use case,
 # for example, copying a directory of the source code for building a container.
-FROM golang:1.23.0 AS builder
+FROM golang:1.23.1 AS builder
 
 # Set the working directory outside $GOPATH to enable the support for modules.
 WORKDIR /app
