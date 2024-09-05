@@ -13,7 +13,7 @@
 # Known Bugs (Bash bug): The following value format will cause issues: "key=value-value-value:value%!@value(value:value)/value?tls=value" it won't work       
 #                        also note that it cannot be fixed with regular expressions due it bash problem (even it's possible, it just too complex), It might work-wells in unix-shellz.
 
-echo "$(tput setaf 6)
+echo "$(tput setaf 4)
     _  __     _                          _            
    | |/ /    | |                        | |           
    | ' /_   _| |__   ___ _ __ _ __   ___| |_ ___  ___ 
