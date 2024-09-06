@@ -94,7 +94,7 @@ func NewDoWork[T any](opts ...NewDoWorkOption[T]) *Pool[T] {
 
 // Stop gracefully shuts down the worker pool
 func (wp *Pool[T]) Stop() {
-	if atomic.CompareAndSwapUint32(&wp.isRunning, 1, 0) {
+	if wp.atomicStop() {
 		wp.mu.Lock()
 		defer wp.mu.Unlock()
 		log.Print("Shutting down worker pool...")
@@ -107,7 +107,7 @@ func (wp *Pool[T]) Stop() {
 
 // Submit a job to the worker pool
 func (wp *Pool[T]) Submit(c *fiber.Ctx, jobName string) (T, error) {
-	if atomic.LoadUint32(&wp.isRunning) == 0 {
+	if !wp.IsRunning() {
 		wp.Start()
 	}
 
@@ -135,7 +135,7 @@ func (wp *Pool[T]) Submit(c *fiber.Ctx, jobName string) (T, error) {
 
 // Start a job to the worker pool
 func (wp *Pool[T]) Start() {
-	if !atomic.CompareAndSwapUint32(&wp.isRunning, 0, 1) {
+	if !wp.atomicStart() {
 		return
 	}
 	// Note: this used std logger, due it not possible import internal package in the backend to outside (not allowed).
@@ -190,7 +190,7 @@ func (wp *Pool[T]) Start() {
 		for {
 			select { // Check for idleness every second if use default or configured
 			case <-idleTicker.C:
-				if atomic.LoadInt32(&wp.activeJobs) == 0 {
+				if !wp.IsRunning() {
 					wp.Stop()
 					return // Exit the loop when the pool is stopped
 				}
@@ -239,4 +239,20 @@ func (wp *Pool[T]) applyChanOption(ch any, opt any) {
 	default:
 		panic(fmt.Sprintf("unsupported channel option type: %T", opt))
 	}
+}
+
+// atomicStart atomically sets the isRunning flag to 1 if it is currently 0.
+// It returns true if the operation was successful (i.e., isRunning was 0 and is now 1),
+// indicating that the worker pool has started running.
+// It returns false if the worker pool is already running (i.e., isRunning was already 1).
+func (wp *Pool[T]) atomicStart() bool {
+	return atomic.CompareAndSwapUint32(&wp.isRunning, 0, 1)
+}
+
+// atomicStop atomically sets the isRunning flag to 0 if it is currently 1.
+// It returns true if the operation was successful (i.e., isRunning was 1 and is now 0),
+// indicating that the worker pool has stopped running.
+// It returns false if the worker pool is already stopped (i.e., isRunning was already 0).
+func (wp *Pool[T]) atomicStop() bool {
+	return atomic.CompareAndSwapUint32(&wp.isRunning, 1, 0)
 }
