@@ -75,4 +75,11 @@
 //
 // Important: While using this worker, do not use Prometheus middleware or any metrics (e.g, Heroku Go Metrics, other) that are directly bound to this repository,
 // because it can lead to excessive memory consumption (possibly memory leaks) due to the improper implementation of metrics (wrong implementation regarding metrics).
+//
+// For example, here's how excessive memory consumption (possibly memory leaks) works in Go:
+//   - When the GC (Garbage Collector) becomes overloaded (overhead), it will take a lot of time to free memory resources.
+//
+// For example, here's how metrics can be wrongly implemented:
+//   - Metrics should not be stored in memory and then wait for collection, because when waiting for collection, the garbage collector will become overhead as goroutines hold the metrics
+//     that must be collected by an external process, caller, or whatever it is.
 package worker
