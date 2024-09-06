@@ -457,7 +457,7 @@ func (m model) View() string {
 	// Note: This looks better now.
 	// TODO: Handle initialization failure scenarios, such as connection timeouts, since this initialization is only connecting to the database.
 	if m.done {
-		return fmt.Sprintf("\r   ✓ Database initialization completed   \n\n")
+		return fmt.Sprintf("\r   ✓ Database initialization completed   \n")
 	}
 	return fmt.Sprintf("\r\n   %s Initializing database%s   %s Progress%s", styledDotSpinner, styledPointsSpinner, styledMeterSpinner, styledPointsSpinner)
 }
