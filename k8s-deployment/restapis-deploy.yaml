@@ -184,6 +184,11 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 8080
+  # Note: The timeoutSeconds can be customized, which is a good choice for QoS: Burstable pods that handle concurrency and maintain session affinity
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
 ---
 # Note: This HPA is designed for microservices that consume vCPU.
 # This boilerplate primarily consumes vCPU (combined with a worker) and bandwidth to handle high traffic (e.g., network load)
