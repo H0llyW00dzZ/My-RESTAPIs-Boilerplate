@@ -160,10 +160,10 @@ spec:
                 secretKeyRef:
                   key: API_SUB_DOMAIN
                   name: restapis-env
-            - name: MYSQL_TLS_CERT
+            - name: MYSQL_CERTS_TLS
               valueFrom:
                 secretKeyRef:
-                  key: MYSQL_TLS_CERT
+                  key: MYSQL_CERTS_TLS
                   name: restapis-env
             - name: REDIS_CERTS_TLS
               valueFrom:
