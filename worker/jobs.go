@@ -49,7 +49,7 @@ type Job[T any] interface {
 //
 // Note: The new design is more flexible (unlike previous design) and eliminates the need for explicit mutex locks/unlocks when implementing the [Execute] function.
 // This is because the use of channels and atomic operations in the worker pool ensures that data is accessed and modified safely without the risk of data races.
-// Also note that, in the example "Execute the job," it's possible to spawn additional goroutines for a more idiomatic Go approach,
+// Also note that, in the example "Execute the job" it's possible to spawn additional goroutines for a more idiomatic Go approach,
 // allowing them to communicate with each other while performing some work.
 //
 // In general, it's important to remember the following principles when working with shared memory and concurrency in Go:
