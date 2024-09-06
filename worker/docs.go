@@ -22,7 +22,7 @@
 //	senior-golang-worker-775b64c9b5-pk9gz   175m         47Mi
 //	senior-golang-worker-775b64c9b5-zrcsh   129m         48Mi
 //
-// Handling GraphQL With Fiber Framework + Anti Memory Leaks/Wasted:
+// Handling GraphQL With Fiber Framework + Anti Memory Leaks/Wasted (e.g., GC (Garbage Collector) Overhead caused by memory):
 //
 //	NAME                     CPU(cores)   MEMORY(bytes)
 //	senior-golang-worker-59d75b6884-2s4d7   145m         21Mi
@@ -69,6 +69,38 @@
 //	  Normal  SuccessfulRescale  16m    horizontal-pod-autoscaler  New size: 17; reason: All metrics below target
 //	  Normal  SuccessfulRescale  9m51s  horizontal-pod-autoscaler  New size: 15; reason: All metrics below target
 //	  Normal  SuccessfulRescale  20s    horizontal-pod-autoscaler  New size: 13; reason: All metrics below target
+//
+// HPA Only vCPU (Stable) With QoS: Burstable + Anti Memory Leaks/Wasted (e.g., GC (Garbage Collector) Overhead caused by memory),
+// handling billions of requests concurrently for long-running processes:
+//
+//	Name:                                                  senior-golang-worker-hpa
+//	Namespace:                                             senior-golang
+//	Labels:                                                <none>
+//	Annotations:                                           <none>
+//	CreationTimestamp:                                     Sun, 01 Sep 2024 02:40:18 +0700
+//	Reference:                                             Deployment/senior-golang-worker
+//	Metrics:                                               ( current / target )
+//	  resource cpu on pods  (as a percentage of request):  67% (167m) / 80%
+//	Min replicas:                                          1
+//	Max replicas:                                          50
+//	Deployment pods:                                       12 current / 12 desired
+//	Conditions:
+//	  Type            Status  Reason               Message
+//	  ----            ------  ------               -------
+//	  AbleToScale     True    ScaleDownStabilized  recent recommendations were higher than current one, applying the highest recent recommendation
+//	  ScalingActive   True    ValidMetricFound     the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)
+//	  ScalingLimited  False   DesiredWithinRange   the desired count is within the acceptable range
+//	Events:
+//	  Type    Reason             Age                   From                       Message
+//	  ----    ------             ----                  ----                       -------
+//	  Normal  SuccessfulRescale  56m (x59 over 5d)     horizontal-pod-autoscaler  New size: 11; reason: All metrics below target
+//	  Normal  SuccessfulRescale  49m (x19 over 3d3h)   horizontal-pod-autoscaler  New size: 15; reason: cpu resource utilization (percentage of request) above target
+//	  Normal  SuccessfulRescale  49m (x11 over 2d14h)  horizontal-pod-autoscaler  New size: 17; reason: cpu resource utilization (percentage of request) above target
+//	  Normal  SuccessfulRescale  44m (x13 over 2d14h)  horizontal-pod-autoscaler  New size: 15; reason: All metrics below target
+//	  Normal  SuccessfulRescale  41m (x36 over 3d3h)   horizontal-pod-autoscaler  New size: 13; reason: All metrics below target
+//	  Normal  SuccessfulRescale  36m (x56 over 5d)     horizontal-pod-autoscaler  New size: 10; reason: All metrics below target
+//	  Normal  SuccessfulRescale  29m (x31 over 4d1h)   horizontal-pod-autoscaler  New size: 14; reason: cpu resource utilization (percentage of request) above target
+//	  Normal  SuccessfulRescale  24m (x53 over 5d)     horizontal-pod-autoscaler  New size: 12; reason: All metrics below target
 //
 // Also note that for more efficiency, as this worker mostly consumes CPU, it is recommended to use AMD CPUs (get good get AMD) for the server specification,
 // as they perform better than Intel CPUs for this use case.
