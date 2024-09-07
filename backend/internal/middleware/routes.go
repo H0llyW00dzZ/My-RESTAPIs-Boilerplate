@@ -93,7 +93,7 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 		// This can be a private IP range (e.g., 10.0.0.0/8).
 		TrustedProxies: []string{"0.0.0.0/0"},
 		// Trust X-Forwarded-For headers; additionally, this can be customized if using an ingress controller/proxy, especially Ingress Nginx.
-		ProxyHeader: "X-Forwarded-For", // Fix where * (wildcard header) doesn't work in some kubernetes ingress eco-system
+		ProxyHeader: fiber.HeaderXForwardedFor, // Fix where * (wildcard header) doesn't work in some kubernetes ingress eco-system
 	})
 	registerRESTAPIsRoutes(api, db)
 	hosts[apiSubdomain] = api
@@ -124,7 +124,7 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 		// This can be a private IP range (e.g., 10.0.0.0/8).
 		TrustedProxies: []string{"0.0.0.0/0"},
 		// Trust X-Forwarded-For headers; additionally, this can be customized if using an ingress controller/proxy, especially Ingress Nginx.
-		ProxyHeader: "X-Forwarded-For", // Fix where * (wildcard header) doesn't work in some kubernetes ingress eco-system
+		ProxyHeader: fiber.HeaderXForwardedFor, // Fix where * (wildcard header) doesn't work in some kubernetes ingress eco-system
 	})
 	registerStaticFrontendRoutes(frontend, appName, db)
 	hosts[frontendDomain] = frontend
