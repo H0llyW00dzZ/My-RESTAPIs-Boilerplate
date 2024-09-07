@@ -90,8 +90,8 @@ func setupFiber(appName string, readTimeout, writeTimeout time.Duration) *fiber.
 		// By default, it is set to 0.0.0.0/0 for local development; however, it can be bound to an ingress controller/proxy.
 		// This can be a private IP range (e.g., 10.0.0.0/8).
 		TrustedProxies: []string{"0.0.0.0/0"},
-		// Trust X-Forwarded-* headers; additionally, this can be customized if using an ingress controller/proxy, especially Ingress Nginx.
-		ProxyHeader: "X-Forwarded-*",
+		// Trust X-Forwarded-For headers; additionally, this can be customized if using an ingress controller/proxy, especially Ingress Nginx.
+		ProxyHeader: "X-Forwarded-For", // Fix where * (wildcard header) doesn't work in some kubernetes ingress eco-system
 	})
 }
 
