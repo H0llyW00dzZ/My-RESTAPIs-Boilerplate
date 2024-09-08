@@ -181,9 +181,22 @@ spec:
   selector:
     app: restapis
   ports:
-    - protocol: TCP
+    - name: http
       port: 80
+      protocol: TCP
       targetPort: 8080
+    # Note: This is optional which is already safe/secure by Ingress-Nginx (example),
+    # unless one knows how to set it up (e.g., set up the hostname bound to *.example.com, example.com),
+    # and a wildcard certificate is required as it's recommended
+    #
+    # Example public wildcard CAs that can be used for an ingress or directly:
+    # - https://crt.sh/?q=a8bc9093e1f4ba202fc769b8818b8a279a5f70c91bee458d29d6ad3c5ac5e88c
+    #
+    #
+    # - name: https
+    #   port: 443
+    #   protocol: TCP
+    #   targetPort: 8080
   # Note: The timeoutSeconds can be customized, which is a good choice for QoS: Burstable pods that handle concurrency and maintain session affinity
   sessionAffinity: ClientIP
   sessionAffinityConfig:
