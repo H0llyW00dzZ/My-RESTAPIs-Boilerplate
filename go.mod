@@ -7,7 +7,7 @@ require (
 	github.com/a-h/templ v0.2.771
 	github.com/ansrivas/fiberprometheus/v2 v2.7.0
 	github.com/bytedance/sonic v1.12.2
-	github.com/charmbracelet/bubbles v0.19.0
+	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.1.0
 	github.com/charmbracelet/lipgloss v0.13.0
 	github.com/ethereum/go-ethereum v1.14.8
