@@ -203,7 +203,19 @@ frontend/
 
 ## Git Mirror (Auto Synced)
 
-- ![gitea](https://git.b0zal.io/assets/img/logo.svg) [My REST APIs Boilerplate](https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate) - Server Location: Japan - Tokyo
+### Server Location: Japan - Tokyo
+
+> [!NOTE]
+> <p align="center">
+>   <img src="https://kubernetes.io/images/kubernetes.png" alt="fully-managed-and-isolated-by-k8s" width="80">
+> </p>
+>
+> **Server Management and Isolation by Kubernetes:**
+> - `Storage` is secure, fully encrypted (`end-to-end`), and designed for flexibility, suitable for `automated attach/detach` processes within a `cluster`.
+> - `Networking utilizes` a `network load balancer` controlled by `Ingress Nginx`, optimizing latency across `Southeast Asia`.
+
+- ![gitea](https://git.b0zal.io/assets/img/logo.svg) [My REST APIs Boilerplate](https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate)
+
 
 ## License
 
