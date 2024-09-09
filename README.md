@@ -201,6 +201,10 @@ frontend/
 `-- package.json (dependencies and scripts)
 ```
 
+## Git Mirror (Auto Synced)
+
+- ![gitea](https://git.b0zal.io/assets/img/logo.svg) [My REST APIs Boilerplate](https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate) - Server Location: Japan - Tokyo
+
 ## License
 
 This project is dual-licensed under the BSD 3-Clause License and the MIT License - see the [LICENSE](LICENSE) file for details.
