@@ -213,8 +213,8 @@ frontend/
 > </p>
 >
 > **Server Management and Isolation by Kubernetes:**
-> - `Storage` is secure, fully encrypted (`end-to-end`), and designed for flexibility, suitable for `automated attach/detach` processes within a `cluster`.
-> - `Networking utilizes` a `network load balancer` controlled by `Ingress Nginx`, optimizing latency across `Southeast Asia`.
+> - The `Storage` is secure and fully encrypted (`end-to-end`), designed with flexibility in mind. It is suitable for `automated attach/detach` processes within a `cluster`.
+> - The `Network` utilizes a `network load balancer` controlled by `Ingress Nginx`, optimizing latency for the `APAC` region, ensuring smooth sailing ⛵ ☸.
 
 ## License
 
