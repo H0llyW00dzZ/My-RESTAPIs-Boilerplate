@@ -17,8 +17,8 @@ require (
 	github.com/gofiber/storage/cloudflarekv v0.1.1
 	github.com/gofiber/storage/redis/v3 v3.1.2
 	github.com/google/uuid v1.6.0
-	github.com/hashicorp/vault/api v1.14.0
-	github.com/hashicorp/vault/api/auth/approle v0.7.0
+	github.com/hashicorp/vault/api v1.15.0
+	github.com/hashicorp/vault/api/auth/approle v0.8.0
 	github.com/heroku/x v0.2.6
 	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-colorable v0.1.13
@@ -39,7 +39,7 @@ require (
 	github.com/bits-and-blooms/bitset v1.13.0 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.3.4 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
-	github.com/cenkalti/backoff/v3 v3.2.2 // indirect
+	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/charmbracelet/x/ansi v0.2.3 // indirect
 	github.com/charmbracelet/x/term v0.2.0 // indirect
