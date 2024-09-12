@@ -205,7 +205,12 @@ frontend/
 
 ### Server Location: Singapore (Stable and very low latency for `Southeast Asian Regions`, ranging from `10ms ~ 50ms`)
 
-- ![gitea](https://git.b0zal.io/assets/img/logo.svg) [My REST APIs Boilerplate](https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate)
+- ![gitea](https://git.b0zal.io/assets/img/logo.svg) [My REST APIs Boilerplate](https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate.git)
+
+#### 💻 >_ Shell:
+```sh
+git clone https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate.git
+```
 
 > [!NOTE]
 > <p align="center">
@@ -215,6 +220,7 @@ frontend/
 > **Server Management and Isolation by Kubernetes:**
 > - The `Storage` is secure and fully encrypted (`end-to-end`), designed with flexibility in mind. It is suitable for `automated attach/detach` processes within a `cluster`.
 > - The `Network` utilizes a `network load balancer` controlled by `Ingress Nginx`, optimizing latency for the `APAC` region, ensuring smooth sailing ⛵ ☸.
+> - The `Git SSH` should work as it uses the `TCP Service Nginx`.
 
 ## License
 
