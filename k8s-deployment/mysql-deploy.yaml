@@ -88,6 +88,12 @@ spec:
       volumes:
         # Note: This can be used with public CAs, for example, a certificate that can be used with a load balancer + MySQL:
         # - https://crt.sh/?q=a8bc9093e1f4ba202fc769b8818b8a279a5f70c91bee458d29d6ad3c5ac5e88c
+        #
+        # Also note that the MySQL/Database package in the Golang standard library is secure and safe when connecting
+        # to this MySQL deployment, even in the case of a Man-in-the-Middle (MitM) attack. When you bind a CA certificate
+        # (e.g., the ECC.crt, not a leaf CA) in the MySQL/Database package for TLS, the TLS implementation in the MySQL/Database package of the Golang standard
+        # library will first verify the certificate. If everything is good (valid), it will proceed with the connection. Also This design
+        # supports both private CAs (enterprise, government level) and public CAs that can be used for TLS connections in the MySQL/Database package of the Golang standard library.
         - name: mysql-ssl
           secret:
             secretName: mysql-ssl
