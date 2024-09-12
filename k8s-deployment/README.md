@@ -17,3 +17,9 @@ This section covers the deployment of Redis Insight.
 This section covers the deployment of the REST API boilerplate application.
 
 - [Documentation for REST APIs](RESTAPIs.md)
+
+### MySQL
+
+This section covers the deployment of the MySQL database service.
+
+[Documentation for MySQL](MySQL.md)
