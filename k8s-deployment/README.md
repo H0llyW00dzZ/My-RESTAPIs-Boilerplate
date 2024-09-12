@@ -22,4 +22,4 @@ This section covers the deployment of the REST API boilerplate application.
 
 This section covers the deployment of the MySQL database service.
 
-[Documentation for MySQL](MySQL.md)
+- [Documentation for MySQL](MySQL.md)
