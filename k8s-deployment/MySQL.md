@@ -37,11 +37,11 @@ To deploy the MySQL service using the provided K8s deployment files, follow thes
 
    Update the `mysql-storage.yaml` file with your desired storage configuration (e.g., size, storage class).
 
-   > [!NOTE]
-   > When storage is fully encrypted with the flexibility to be attached/detached by the cluster and is bound to the deployment along with VPA, 
-   > the MySQL data in the pods will be safe and secure from loss when pods are restarting (e.g., restarting 9999999 times) or other events occur. This is because all MySQL data is bound to the disk.
-   > Also note that it is not recommended to deploy MySQL along with HPA while using storage that is fully encrypted with the flexibility to be attached/detached.
-   > This is because the pods will remain in a pending state due to storage limitations, as typically only one pod can access the storage at a time. Even if the storage supports multiple pods (sharing), it is usually limited to a few pods (e.g., 5 pods).
+> [!NOTE]
+> When storage is fully encrypted with the flexibility to be attached/detached by the cluster and is bound to the deployment along with VPA, 
+> the MySQL data in the pods will be safe and secure from loss when pods are restarting (e.g., restarting 9999999 times) or other events occur. This is because all MySQL data is bound to the disk.
+> Also note that it is not recommended to deploy MySQL along with HPA while using storage that is fully encrypted with the flexibility to be attached/detached.
+> This is because the pods will remain in a pending state due to storage limitations, as typically only one pod can access the storage at a time. Even if the storage supports multiple pods (sharing), it is usually limited to a few pods (e.g., 5 pods).
 
 4. Apply the deployment file to your Kubernetes cluster:
 
