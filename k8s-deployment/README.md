@@ -12,7 +12,7 @@ This section covers the deployment of Redis Insight.
 
 - [Documentation for Redis Insight](REDIS.md)
 
-### REST APIs
+### REST APIs (This Repository)
 
 This section covers the deployment of the REST API boilerplate application.
 
