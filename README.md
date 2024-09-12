@@ -203,7 +203,7 @@ frontend/
 
 ## Git Mirror (Auto Synced)
 
-### Server Location: Japan - Tokyo
+### Server Location: Singapore (Stable and very low latency for `Southeast Asian Regions`, ranging from `10ms ~ 50ms`)
 
 - ![gitea](https://git.b0zal.io/assets/img/logo.svg) [My REST APIs Boilerplate](https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate)
 
