@@ -1,7 +1,7 @@
 # K8s Deployment for REST API Boilerplate
 
 <p align="center">
-   <img src="https://kubernetes.io/images/kubernetes.png" alt="fully-managed-and-isolated-by-k8s" width="80">
+   <img src="https://kubernetes.io/images/kubernetes.png" alt="sailing-with-k8s" width="80">
 </p>
 
 ## List Documentation
