@@ -18,7 +18,7 @@ Before deploying the MySQL service, ensure that you have the following:
 
 To deploy the MySQL service using the provided K8s deployment files, follow these steps:
 
-1. Update the `mysql-deployment.yaml` file with your desired configuration, such as the MySQL image, resource limits, and environment variables.
+1. Update the `mysql-deploy.yaml` file with your desired configuration, such as the MySQL image, resource limits, and environment variables.
 
 2. Create the necessary secrets for the deployment:
 
@@ -40,7 +40,7 @@ To deploy the MySQL service using the provided K8s deployment files, follow thes
 4. Apply the deployment file to your Kubernetes cluster:
 
    ```bash
-   kubectl apply -f mysql-deployment.yaml
+   kubectl apply -f mysql-deploy.yaml
    ```
 
    This command will create the necessary namespace, ConfigMap, deployment, service, and VPA for the MySQL service.
