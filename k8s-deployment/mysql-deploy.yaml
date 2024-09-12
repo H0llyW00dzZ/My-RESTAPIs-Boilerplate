@@ -1,0 +1,143 @@
+# MySQL Deployment [Zero Downtime] by H0llyW00dzZ for a microservices Kubernetes cluster.
+#
+# Note: This will automatically create the namespace if it doesn't exist. If the namespace already exists, it won't be affected.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: database
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config # Change this to a descriptive name for the MySQL
+  namespace: database # Change this to the namespace where the MySQL deployment is located
+data:
+  # Note: This can be customized, and you can also replace the data directory (see "datadir=/gopher/mysql/data")
+  mysql-args.conf: |
+    [mysqld]
+    ssl-cert=/etc/mysql/tls/certificate.cer
+    ssl-key=/etc/mysql/tls/server-key.pem
+    ssl-ca=/etc/mysql/tls/ECC.crt
+    require_secure_transport=ON
+    tls-version=TLSv1.3
+    pid-file=/var/run/mysqld/mysqld.pid
+    max_connections=1000
+    wait_timeout=600
+    interactive_timeout=600
+    max_connections=1000
+    max_connect_errors=1000
+    datadir=/gopher/mysql/data
+    bind-address=*
+    character-set-server=UTF8
+    slow_query_log=0
+    long_query_time=10.0
+    explicit_defaults_for_timestamp
+    authentication_policy='* ,,'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql # Change this to a descriptive name for the MySQL
+  namespace: database # Change this to the namespace where the MySQL deployment is located
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: <IMAGE_HERE> # Put mysql image here for example "mysql:8.0"
+          args:
+            - --defaults-file=/etc/mysql/config/mysql-args.conf
+            # Note: This is optional.
+            # - --skip-mysqlx
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-root-pass
+                  key: password
+          ports:
+            - name: mysql
+              containerPort: 3306
+          resources:
+            limits:
+              cpu: 500m
+              memory: 812Mi
+            requests:
+              cpu: 250m
+              memory: 656Mi
+          volumeMounts:
+            - name: mysql-ssl
+              mountPath: /etc/mysql/tls
+            - name: mysql-persistent-storage
+              mountPath: /var/run/mysqld
+            - name: mysql-config
+              mountPath: /etc/mysql/config
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+            - name: mysql-persistent-storage
+              mountPath: /database/mysql
+      volumes:
+        # Note: This can be used with public CAs, for example, a certificate that can be used with a load balancer + MySQL:
+        # - https://crt.sh/?q=a8bc9093e1f4ba202fc769b8818b8a279a5f70c91bee458d29d6ad3c5ac5e88c
+        - name: mysql-ssl
+          secret:
+            secretName: mysql-ssl
+        # Note: You have to request storage. It is recommended to use SSD storage + fully encrypted,
+        # built-in flexibility which can be attached/detached by the cluster for this.
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: mysql-storage
+        - name: mysql-config
+          configMap:
+            name: mysql-config
+---
+# Note: For MySQL, it's better to use a standalone load balancer and then bind it to a hostname.
+# For example, a load balancer in GKE uses an IP, while a load balancer in EKS (AWS) uses a CNAME.
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: database
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  selector:
+    app: mysql
+---
+# Important: When deploying MySQL in Kubernetes, it's recommended to use VPA (Vertical Pod Autoscaler) instead of HPA (Horizontal Pod Autoscaler).
+# MySQL is primarily bound by memory and disk resources, so if using Kubernetes with manual or retain PersistentVolumes, HPA can be used.
+# However, if manual or retain PersistentVolumes are not allowed (e.g., due to an existing driver or other restrictions), then VPA is the recommended approach.
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: mysql-vpa # Change this to a descriptive name for the MySQL
+  namespace: database # Change this to the namespace where the MySQL deployment is located
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mysql
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+      - containerName: "mysql"
+        minAllowed:
+          cpu: 100m
+          memory: 100Mi
+        maxAllowed:
+          cpu: 2
+          memory: 2Gi
+        controlledResources: ["cpu", "memory"]
