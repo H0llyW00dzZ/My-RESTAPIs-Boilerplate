@@ -14,6 +14,10 @@ Before deploying the application, ensure that you have the following:
 - `kubectl` command-line tool installed and configured to communicate with your cluster
 - A container image for the REST API application
 
+> [!NOTE]
+> Since this deployment supports `100% HPA`, which is suitable for handling billions of requests/workers (combine with worker package) `concurrently and efficiently`, it is recommended not to bind it with any `storage`.
+> This is because HPA is not `100% compatible` if the deployment has `storage attached due to its limitations`, unless you build your own `storage mechanism` that can be shared among multiple pods (e.g., `capable of up to 1K Pods or more`) while this deployment handles billions of requests/workers `concurrently and efficiently`.
+
 ## Deployment
 
 To deploy the REST API boilerplate application using the provided K8s deployment files, follow these steps:
