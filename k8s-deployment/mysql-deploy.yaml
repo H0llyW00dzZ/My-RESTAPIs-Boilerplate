@@ -13,6 +13,7 @@ metadata:
   namespace: database # Change this to the namespace where the MySQL deployment is located
 data:
   # Note: This can be customized, and you can also replace the data directory (see "datadir=/gopher/mysql/data", "/gopher/mysql/data/general.log", "/gopher/mysql/data/slow.log")
+  # Also, the SQL Logger is not stored in ephemeral storage; it is stored in a PVC (Persistent Volume Claim) for security and safety from compromise
   mysql-args.conf: |
     [mysqld]
     ssl-cert=/etc/mysql/tls/certificate.cer
