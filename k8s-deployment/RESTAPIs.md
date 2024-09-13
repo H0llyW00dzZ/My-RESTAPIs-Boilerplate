@@ -15,8 +15,8 @@ Before deploying the application, ensure that you have the following:
 - A container image for the REST API application
 
 > [!NOTE]
-> Since this deployment supports `100% HPA`, which is suitable for handling billions of requests/workers (combine with worker package) `concurrently and efficiently`, it is recommended not to bind it with any `storage`.
-> This is because HPA is not `100% compatible` if the deployment has `storage attached due to its limitations`, unless you build your own `storage mechanism` that can be shared among multiple pods (e.g., `capable of up to 1K Pods or more`) while this deployment handles billions of requests/workers `concurrently and efficiently`.
+> Since this deployment supports `100% HPA`, which is suitable for handling billions of requests/workers (combined with worker package) `concurrently and efficiently`, it is recommended not to attach it with any `storage` to this deployment.
+> This is because HPA is not `100% compatible` if the deployment has `storage attached due to its limitations`, unless you build your own `storage mechanism` that can be shared among multiple pods (e.g., `capable of up to 1K Pods or more that consider supports 100% HPA`) while this deployment handles billions of requests/workers `concurrently and efficiently`.
 
 ## Deployment
 
