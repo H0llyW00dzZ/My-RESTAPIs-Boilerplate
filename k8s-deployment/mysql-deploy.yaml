@@ -115,8 +115,11 @@ spec:
           configMap:
             name: mysql-config
 ---
-# Note: For MySQL, it's better to use a standalone load balancer and then bind it to a hostname.
-# For example, a load balancer in GKE uses an IP, while a load balancer in EKS (AWS) uses a CNAME.
+# Note: For MySQL, it's better to use a standalone load balancer and then bind it to a hostname/domain.
+# For example, a load balancer in GKE uses an IP address, while a load balancer in EKS (AWS) uses a CNAME.
+# Then it can be exposed directly by binding the IP address or CNAME to the hostname/domain (e.g., database.example.com) for external & internal access.
+# It will also retrieve the real client IP address. However, for the pods, it will retrieve the private IP address (depending on how your cluster is do one thing do it well) because "proxy_protocol_networks=*" is enabled in the ConfigMap.
+# Therefore, there's no need to bind the service to an ingress-nginx using a TCP service.
 apiVersion: v1
 kind: Service
 metadata:
