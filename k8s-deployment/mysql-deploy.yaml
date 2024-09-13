@@ -33,7 +33,6 @@ data:
     long_query_time=10.0
     explicit_defaults_for_timestamp
     authentication_policy='* ,,'
-    proxy_protocol_networks=*
 ---
 apiVersion: apps/v1
 kind: Deployment
