@@ -24,11 +24,10 @@ data:
     max_connections=1000
     wait_timeout=600
     interactive_timeout=600
-    max_connections=1000
     max_connect_errors=1000
     datadir=/gopher/mysql/data
     bind-address=*
-    character-set-server=UTF8
+    character-set-server=UTF8MB4
     slow_query_log=0
     long_query_time=10.0
     explicit_defaults_for_timestamp
