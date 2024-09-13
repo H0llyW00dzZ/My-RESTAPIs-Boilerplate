@@ -92,8 +92,16 @@ spec:
         # Also note that the MySQL/Database package in the Golang standard library is secure and safe when connecting
         # to this MySQL deployment, even in the case of a Man-in-the-Middle (MitM) attack. When you bind a CA certificate
         # (e.g., the ECC.crt, not a leaf CA) in the MySQL/Database package for TLS, the TLS implementation in the MySQL/Database package of the Golang standard
-        # library will first verify the certificate. If everything is good (valid), it will proceed with the connection. Also This design
+        # library will first verify the certificate. If everything is valid, it will proceed with the connection. This design
         # supports both private CAs (enterprise, government level) and public CAs that can be used for TLS connections in the MySQL/Database package of the Golang standard library.
+        #
+        # Additionally, this list includes MySQL drivers that are bound with the sql/database package of the Golang standard library:
+        #
+        # - https://github.com/go-sql-driver/mysql (Easily set up TLS for MySQL and can be used with private CAs for enterprise/government level)
+        # - https://docs.gofiber.io/storage/mysql/ (Easily set up TLS for MySQL and can be used with private CAs for enterprise/government level)
+        #
+        # For other drivers, especially those that use a connection parameter (e.g., Gorm), it's a bit challenging to set up a TLS connection.
+        # So, for other drivers that use a connection parameter (e.g., Gorm), unlike the "go-sql-driver" or "mysql storage fiber" package, it's recommended to use public CAs and then set the prepared statement in the parameter or verify the CA.
         - name: mysql-ssl
           secret:
             secretName: mysql-ssl
