@@ -12,8 +12,9 @@ metadata:
   name: mysql-config # Change this to a descriptive name for the MySQL
   namespace: database # Change this to the namespace where the MySQL deployment is located
 data:
-  # Note: This can be customized, and you can also replace the data directory (see "datadir=/gopher/mysql/data", "/gopher/mysql/data/general.log", "/gopher/mysql/data/slow.log")
-  # Also, the MySQL Logger is not stored in ephemeral storage; it is stored in a PVC (Persistent Volume Claim) for security and safety from compromise
+  # Note: This can be customized, and you can also replace the data directory (see "datadir=/gopher/mysql/data", "/gopher/mysql/data/general.log",
+  # "/gopher/mysql/data/slow.log", /gopher/mysql/error.log) Also, the MySQL Logger is not stored in ephemeral storage; it is stored in a PVC (Persistent Volume Claim)
+  # for security and safety from compromise.
   mysql-args.conf: |
     [mysqld]
     ssl-cert=/etc/mysql/tls/certificate.cer
@@ -36,7 +37,7 @@ data:
     long_query_time=10.0
     explicit_defaults_for_timestamp
     authentication_policy='* ,,'
-    log_error=/var/log/mysql/error.log
+    log_error=/gopher/mysql/error.log
 ---
 apiVersion: apps/v1
 kind: Deployment
