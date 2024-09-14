@@ -16,7 +16,7 @@ selector:
 spec:
   resourcePolicy:
     containerPolicies:
-      - containerName: <IMAGE_HERE> # Put the MySQL image here, for example, "mysql:8.0"
+      - containerName: <CONTAINER_NAME> # Put the MySQL container name here, for example, "mysql"
         percentageIncrease:
           value: 50
   durationPolicy:
