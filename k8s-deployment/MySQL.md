@@ -29,6 +29,26 @@ To deploy the MySQL service using the provided K8s deployment files, follow thes
 
    Replace `your-mysql-root-password` with your desired MySQL root password, and `path/to/your/certificate.cer`, `path/to/your/server-key.pem`, and `path/to/your/ECC.crt` with the paths to your SSL certificate files.
 
+> [!NOTE]
+> The example below shows how `SSL/TLS` is correctly set up and can be used through `any load balancer mechanism` (Recommended: `standalone load balancer`). This deployment is designed to be `dedicated` and `less noisy from neighbors`:
+
+```bash
+2024-09-13 15:52:16+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.4.2-1.el9 started.
+2024-09-13 15:52:23+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2024-09-13 15:52:24+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.4.2-1.el9 started.
+2024-09-13T15:52:27.782101Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+2024-09-13T15:52:29.412565Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.4.2) starting as process 1
+2024-09-13T15:52:29.497857Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2024-09-13T15:52:33.304158Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2024-09-13T15:52:33.543091Z 1 [System] [MY-011090] [Server] Data dictionary upgrading from version '80023' to '80300'.
+2024-09-13T15:52:37.728885Z 1 [System] [MY-013413] [Server] Data dictionary upgrade from version '80023' to '80300' completed.
+2024-09-13T15:52:52.425982Z 4 [System] [MY-013381] [Server] Server upgrade from '80039' to '80402' started.
+2024-09-13T15:53:39.191347Z 4 [System] [MY-013381] [Server] Server upgrade from '80039' to '80402' completed.
+2024-09-13T15:53:40.114222Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2024-09-13T15:53:40.288248Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.4.2'  socket: '/var/lib/mysql/mysql.sock'  port: 3306  MySQL Community Server - GPL.
+```
+To connect to the MySQL server, you can use the domain name `database.example.com`.
+
 3. Create a persistent volume claim for MySQL storage:
 
    ```bash
