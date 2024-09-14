@@ -1,0 +1,25 @@
+# MySQL Startup CPU Boost for a microservices Kubernetes cluster.
+#
+# Install the component before applying https://github.com/google/kube-startup-cpu-boost, then modify the "containerName"
+#
+# Note: This works well. However, for Golang binaries, this is not really affected much since Golang binaries are already faster.
+apiVersion: autoscaling.x-k8s.io/v1alpha1
+kind: StartupCPUBoost
+metadata:
+  name: mysql-boost-001
+  namespace: database
+selector:
+  matchExpressions:
+    - key: app.kubernetes.io/name
+      operator: In
+      values: ["mysql"]
+spec:
+  resourcePolicy:
+    containerPolicies:
+      - containerName: <IMAGE_HERE> # Put the MySQL image here, for example, "mysql:8.0"
+        percentageIncrease:
+          value: 50
+  durationPolicy:
+    podCondition:
+      type: Ready
+      status: "True"
