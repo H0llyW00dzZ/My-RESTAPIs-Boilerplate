@@ -94,6 +94,14 @@ kubectl get vpa -n database
 kubectl get deployment -n database
 ```
 
+> [!NOTE]
+> This example shows how `Vertical Pod Autoscaler (VPA)` works properly when the deployment has `PVC/Storage` attached:
+```bash
+$ kubectl get vpa -n database
+NAME        MODE   CPU    MEM         PROVIDED   AGE
+mysql-vpa   Auto   100m   874512384   True       3d13h
+```
+
 Adjust the VPA configuration in the `mysql-deploy.yaml` file to suit your application's scaling requirements.
 
 ## Customization
