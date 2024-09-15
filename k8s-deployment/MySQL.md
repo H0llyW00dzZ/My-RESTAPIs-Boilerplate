@@ -49,6 +49,12 @@ To deploy the MySQL service using the provided K8s deployment files, follow thes
 ```
 To connect to the MySQL server, you can use the domain name `database.example.com`.
 
+#### Tested Connection on MySQL Workbench which works well and securely through a load balancer (as I am personally using a standalone load balancer that I made own):
+
+<p align="center">
+<img src="https://i.imgur.com/HKxXgjp.png" alt="tls-1-3-secure" width="500">
+</p>
+
 3. Create a persistent volume claim for MySQL storage:
 
    ```bash
