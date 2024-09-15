@@ -36,8 +36,9 @@ spec:
           #
           # Note: This should be work, and it wont causing container error.
           securityContext:
-          capabilities:
-            drop: ["NET_RAW"]
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["NET_RAW"]
           ports:
             - containerPort: 8080
           resources:

@@ -73,6 +73,10 @@ spec:
           ports:
             - name: mysql
               containerPort: 3306
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["NET_RAW"]
           resources:
             limits:
               cpu: 500m
