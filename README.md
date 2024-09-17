@@ -156,7 +156,7 @@ sample#memory_quota=1024.00MB
 > [!NOTE]
 > The `grafana` dashboard is not shareable due to it being bound to my security configurations for real-world monitoring in other production environments.
 
-## Architecture
+## Architecture (Tree)
 
 Below is the architecture of this boilerplate and how it looks. I created this for REST APIs about volcano 🌋 monitoring used by the government (has been done before), so it can easily monitor volcanoes in the real world.
 
@@ -200,6 +200,272 @@ frontend/
 |-- next.config.js (Next.js configuration)
 `-- package.json (dependencies and scripts)
 ```
+
+#### Current Boilerplate Tree:
+
+```
+├── Dockerfile
+├── LICENSE
+├── README.md
+├── SECURITY.md
+├── backend
+│   ├── cmd
+│   │   └── server
+│   │       ├── run.go
+│   │       └── run_heroku.go
+│   ├── internal
+│   │   ├── database
+│   │   │   ├── auth.go
+│   │   │   ├── cloudflare-kv
+│   │   │   │   └── setup.go
+│   │   │   ├── constant.go
+│   │   │   ├── helper.go
+│   │   │   ├── mysql_redis.go
+│   │   │   ├── setup.go
+│   │   │   └── tls.go
+│   │   ├── logger
+│   │   │   ├── constant.go
+│   │   │   └── logger.go
+│   │   ├── middleware
+│   │   │   ├── authentication
+│   │   │   │   ├── crypto
+│   │   │   │   │   ├── bcrypt
+│   │   │   │   │   │   ├── bcrypt.go
+│   │   │   │   │   │   ├── bcrypt_test.go
+│   │   │   │   │   │   ├── compare_password.go
+│   │   │   │   │   │   ├── docs.go
+│   │   │   │   │   │   └── hash_password.go
+│   │   │   │   │   ├── cipher.go
+│   │   │   │   │   ├── crypto.go
+│   │   │   │   │   ├── crypto_test.go
+│   │   │   │   │   ├── deadcode.go
+│   │   │   │   │   ├── decrypt.go
+│   │   │   │   │   ├── encrypt.go
+│   │   │   │   │   ├── gopherpocket
+│   │   │   │   │   │   └── keyrotation
+│   │   │   │   │   │       ├── docs.go
+│   │   │   │   │   │       ├── gopherkey.go
+│   │   │   │   │   │       └── gopherkey_test.go
+│   │   │   │   │   ├── helper.go
+│   │   │   │   │   ├── hybrid
+│   │   │   │   │   │   ├── decryptcookie.go
+│   │   │   │   │   │   ├── encryptcookie.go
+│   │   │   │   │   │   ├── hybrid.go
+│   │   │   │   │   │   ├── hybrid_stream.go
+│   │   │   │   │   │   ├── hybrid_test.go
+│   │   │   │   │   │   └── stream
+│   │   │   │   │   │       ├── benchmark_test.go
+│   │   │   │   │   │       ├── chunk.go
+│   │   │   │   │   │       ├── decrypt_stream.go
+│   │   │   │   │   │       ├── digest.go
+│   │   │   │   │   │       ├── docs.go
+│   │   │   │   │   │       ├── encrypt_stream.go
+│   │   │   │   │   │       ├── new_stream.go
+│   │   │   │   │   │       ├── nonce.go
+│   │   │   │   │   │       └── stream_test.go
+│   │   │   │   │   ├── keyidentifier
+│   │   │   │   │   │   ├── docs.go
+│   │   │   │   │   │   ├── ecdsa_sign.go
+│   │   │   │   │   │   ├── generate.go
+│   │   │   │   │   │   ├── keyidentifier_test.go
+│   │   │   │   │   │   └── new.go
+│   │   │   │   │   ├── rand
+│   │   │   │   │   │   ├── fixed_size.go
+│   │   │   │   │   │   └── rand_test.go
+│   │   │   │   │   ├── vault
+│   │   │   │   │   │   ├── new.go
+│   │   │   │   │   │   └── transit.go
+│   │   │   │   │   └── web3
+│   │   │   │   │       └── eth
+│   │   │   │   │           ├── docs.go
+│   │   │   │   │           └── new.go
+│   │   │   │   ├── helper
+│   │   │   │   │   ├── constant.go
+│   │   │   │   │   └── keyauth.go
+│   │   │   │   └── keyauth
+│   │   │   │       ├── constant.go
+│   │   │   │       ├── error.go
+│   │   │   │       ├── success.go
+│   │   │   │       └── validator.go
+│   │   │   ├── constant.go
+│   │   │   ├── csp
+│   │   │   │   ├── config.go
+│   │   │   │   ├── csp_test.go
+│   │   │   │   └── new.go
+│   │   │   ├── custom_next.go
+│   │   │   ├── filesystem
+│   │   │   │   └── crypto
+│   │   │   │       └── signature
+│   │   │   │           ├── hmac_sign.go
+│   │   │   │           ├── hmac_test.go
+│   │   │   │           └── hmac_verify.go
+│   │   │   ├── frontend_routes.go
+│   │   │   ├── helper.go
+│   │   │   ├── monitor
+│   │   │   │   ├── docs.go
+│   │   │   │   └── prometheus.go
+│   │   │   ├── restapis_routes.go
+│   │   │   ├── restime
+│   │   │   │   ├── config.go
+│   │   │   │   └── new.go
+│   │   │   ├── router
+│   │   │   │   └── domain
+│   │   │   │       ├── config.go
+│   │   │   │       └── new.go
+│   │   │   ├── routes.go
+│   │   │   ├── storage.go
+│   │   │   └── utils.go
+│   │   ├── server
+│   │   │   ├── boringtls.go
+│   │   │   ├── boringtls_cert.go
+│   │   │   ├── boringtls_cert_test.go
+│   │   │   ├── boringtls_test.go
+│   │   │   ├── constant.go
+│   │   │   ├── ct_verifier.go
+│   │   │   ├── ct_verifier_test.go
+│   │   │   ├── helper.go
+│   │   │   ├── helper_tls_test.go
+│   │   │   ├── k8s
+│   │   │   │   ├── docs.go
+│   │   │   │   └── metrics
+│   │   │   │       └── prometheus.go
+│   │   │   ├── mount_routes.go
+│   │   │   ├── register_routes.go
+│   │   │   └── startup_async.go
+│   │   └── translate
+│   │       └── language.go
+│   └── pkg
+│       ├── gc
+│       │   ├── docs.go
+│       │   ├── reduce_http_client_overhead.go
+│       │   └── reduce_overhead.go
+│       ├── header
+│       │   └── htmx
+│       │       ├── constant.go
+│       │       └── docs.go
+│       ├── mime
+│       │   ├── ascii.go
+│       │   ├── docs.go
+│       │   └── mime.go
+│       └── restapis
+│           ├── helper
+│           │   ├── auth
+│           │   │   ├── apikey.go
+│           │   │   └── constant.go
+│           │   ├── generate_apikey.go
+│           │   ├── generate_apikey_test.go
+│           │   ├── json
+│           │   │   └── sonic
+│           │   │       ├── config.go
+│           │   │       └── docs.go
+│           │   ├── numeric.go
+│           │   ├── numeric_test.go
+│           │   ├── restapis_error.go
+│           │   └── restapis_error_test.go
+│           └── server
+│               └── health
+│                   ├── cache.go
+│                   ├── constant.go
+│                   ├── db.go
+│                   ├── helper.go
+│                   ├── mysql.go
+│                   └── redis.go
+├── env
+│   ├── docs.go
+│   ├── env.go
+│   └── getenv.go
+├── frontend
+│   ├── htmx
+│   │   ├── error_page_handler
+│   │   │   ├── 400.templ
+│   │   │   ├── 400_templ.go
+│   │   │   ├── 401.templ
+│   │   │   ├── 401_templ.go
+│   │   │   ├── 403.templ
+│   │   │   ├── 403_templ.go
+│   │   │   ├── 404.templ
+│   │   │   ├── 404_templ.go
+│   │   │   ├── 500.templ
+│   │   │   ├── 500_templ.go
+│   │   │   ├── 503.templ
+│   │   │   ├── 503_templ.go
+│   │   │   ├── base.templ
+│   │   │   ├── base_templ.go
+│   │   │   ├── page_handler.go
+│   │   │   ├── render_frontend.go
+│   │   │   └── static_handler.go
+│   │   ├── public
+│   │   │   └── assets
+│   │   │       └── css
+│   │   │           └── base-tailwind.css
+│   │   └── site
+│   │       ├── footer.templ
+│   │       ├── footer_templ.go
+│   │       ├── head.templ
+│   │       ├── head_templ.go
+│   │       ├── header.templ
+│   │       ├── header_templ.go
+│   │       ├── script.templ
+│   │       └── script_templ.go
+│   └── public
+│       ├── assets
+│       │   ├── css
+│       │   │   ├── base-tailwind.css
+│       │   │   └── raw.css
+│       │   ├── images
+│       │   │   ├── android-chrome-192x192.png
+│       │   │   ├── android-chrome-512x512.png
+│       │   │   ├── apple-touch-icon.png
+│       │   │   ├── browserconfig.xml
+│       │   │   ├── favicon-16x16.png
+│       │   │   ├── favicon-32x32.png
+│       │   │   ├── favicon.ico
+│       │   │   ├── http_error_codes
+│       │   │   │   ├── 403-Forbidden.png
+│       │   │   │   ├── 404-NotFound.png
+│       │   │   │   ├── 500-InternalServerError.png
+│       │   │   │   └── 503-ServiceUnavailable.png
+│       │   │   ├── logo
+│       │   │   │   └── gopher-run.png
+│       │   │   ├── mstile-150x150.png
+│       │   │   ├── safari-pinned-tab.svg
+│       │   │   └── site.webmanifest
+│       │   └── js
+│       │       ├── htmx.indicator.min.js
+│       │       ├── htmx.min.js
+│       │       └── tailwind.min.dark.js
+│       └── magic_embedded.go
+├── go.mod
+├── go.sum
+├── k8s-deployment
+│   ├── MySQL.md
+│   ├── README.md
+│   ├── REDIS.md
+│   ├── RESTAPIs.md
+│   ├── create_k8s_secret.sh
+│   ├── ingress-nginx-configmap.yaml
+│   ├── mysql-deploy-cpu-boost.yaml
+│   ├── mysql-deploy.yaml
+│   ├── prometheus_portable.yaml
+│   ├── prometheus_portable_rules_record.yaml
+│   ├── redis-insight.yaml
+│   ├── restapis-deploy.yaml
+│   └── restapis-ingress.yaml
+├── tailwind.config.js
+├── translate.json
+└── worker
+    ├── config.go
+    ├── do_work.go
+    ├── docs.go
+    ├── jobs.go
+    └── worker_test.go
+
+63 directories, 192 files
+```
+
+> [!NOTE]
+> The `Current Boilerplate Tree` is designed as a `modular framework`, and it is easily maintainable even if it reaches 1K files. Personally, I've been maintaining over 1k files as well
+> from this boilerplate, and it runs smoothly on Kubernetes (K8s) ⛵ ☸.
 
 ## Git Mirror (Auto Synced)
 
