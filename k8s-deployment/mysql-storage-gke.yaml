@@ -1,0 +1,18 @@
+# MySQL Storage for MySQL Deployment [Zero Downtime] by H0llyW00dzZ for a microservices Kubernetes cluster.
+#
+# Note: You don't have to create a storage class for automated encryption at rest/full encryption on GKE Cluster, as it is already automatically encrypted.
+# It is also easily maintainable for data analysis, etc., by creating snapshots or clones and then binding them to other nodes, pods, or VMs.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-storage
+  namespace: database
+spec:
+  accessModes:
+    # Note: This is suitable for VPA "ReadWriteOnce".
+    - ReadWriteOnce
+  storageClassName: premium-rwo # Note: This is SSD, which can be faster for storing all MySQL data.
+  resources:
+    requests:
+      # Note: This can be customized based on the storage requirements needed for storing all MySQL data.
+      storage: 100Gi
