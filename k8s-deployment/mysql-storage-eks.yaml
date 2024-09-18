@@ -1,0 +1,36 @@
+# MySQL Storage for MySQL Deployment [Zero Downtime] by H0llyW00dzZ for a microservices Kubernetes cluster.
+#
+# Note: In AWS EKS, to achieve storage flexibility with the ability to attach/detach and enable automated encryption at rest/full encryption,
+# you need to create a storage class first. This is unlike GKE, where you don't have to manually create a storage class for automated encryption
+# at rest/full encryption because it is already automatically encrypted at rest/fully encrypted on GKE.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    storageclass.beta.kubernetes.io/is-default-class: "false"
+  labels:
+    k8s-addon: storage-aws.addons.k8s.io
+  # Note: This can be customized based on the storage requirements needed for storing all MySQL data.
+  # For example, if using gp3, then specify gp3.
+  name: gp2-encrypted
+parameters:
+  encrypted: "true"
+  # Note: This can be customized based on the storage requirements needed for storing all MySQL data.
+  # For example, if using gp3, then specify gp3.
+  type: gp2
+provisioner: kubernetes.io/aws-ebs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-storage
+  namespace: database
+spec:
+  accessModes:
+    # Note: This is suitable for VPA "ReadWriteOnce".
+    - ReadWriteOnce
+  storageClassName: gp2-encrypted
+  resources:
+    requests:
+      # Note: This can be customized based on the storage requirements needed for storing all MySQL data.
+      storage: 100Gi
