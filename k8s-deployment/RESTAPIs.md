@@ -67,6 +67,48 @@ kubectl get hpa -n restapis
 kubectl get deployment -n restapis
 ```
 
+> [!NOTE]
+> This example shows how `Horizontal Pod Autoscaler (HPA)` works properly, handling billions of requests/workers (combined with the worker package) `concurrently and efficiently`:
+
+- Events:
+
+```
+12m         Normal   SuccessfulRescale   horizontalpodautoscaler/senior-golang-worker-hpa   New size: 14; reason: cpu resource utilization (percentage of request) below target
+58m         Normal   SuccessfulRescale   horizontalpodautoscaler/senior-golang-worker-hpa   New size: 17; reason: cpu resource utilization (percentage of request) above target
+12m         Normal   ScalingReplicaSet   deployment/senior-golang-worker                    Scaled down replica set senior-golang-worker-84bcb968 to 14 from 17
+58m         Normal   ScalingReplicaSet   deployment/senior-golang-worker                    Scaled up replica set senior-golang-worker-84bcb968 to 17 from 14
+```
+
+- Describe HPA:
+
+```
+Name:                                                  senior-golang-worker-hpa
+Namespace:                                             senior-golang-worker
+Labels:                                                <none>
+Annotations:                                           <none>
+CreationTimestamp:                                     Wed, 11 Sep 2024 19:44:05 +0700
+Reference:                                             Deployment/senior-golang-worker
+Metrics:                                               ( current / target )
+  resource cpu on pods  (as a percentage of request):  76% (268m) / 80%
+Min replicas:                                          1
+Max replicas:                                          30
+Deployment pods:                                       14 current / 14 desired
+Conditions:
+  Type            Status  Reason              Message
+  ----            ------  ------              -------
+  AbleToScale     True    ReadyForNewScale    recommended size matches current size
+  ScalingActive   True    ValidMetricFound    the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)
+  ScalingLimited  False   DesiredWithinRange  the desired count is within the acceptable range
+Events:
+  Type    Reason             Age                   From                       Message
+  ----    ------             ----                  ----                       -------
+  Normal  SuccessfulRescale  60m (x5 over 34h)     horizontal-pod-autoscaler  New size: 17; reason: cpu resource utilization (percentage of request) above target
+  Normal  SuccessfulRescale  14m (x12 over 2d23h)  horizontal-pod-autoscaler  New size: 14; reason: cpu resource utilization (percentage of request) below target
+```
+
+> [!NOTE]
+> It's important to note that `Horizontal Pod Autoscaler (HPA)` can be used with various types of software and applications, including `websites` and `game servers`, as long as they are deployed as pods in a Kubernetes cluster. The choice between `HPA` and `Vertical Pod Autoscaler (VPA)` depends on the specific requirements and characteristics of the workload. For example, for a `game server` like [Counter-Strike 2](https://www.counter-strike.net/cs2), the stability and performance may depend on factors such as server hardware, network infrastructure, and configuration, rather than solely on the use of `HPA` or `VPA`. Based on personal experience hosting a [Counter-Strike 2](https://www.counter-strike.net/cs2) `game server`, it was found to be more stable than the official servers provided by `Steam` or `Faceit`.
+
 Adjust the HPA configuration in the `restapis-deploy.yaml` file to suit your application's scaling requirements.
 
 ## Customization
