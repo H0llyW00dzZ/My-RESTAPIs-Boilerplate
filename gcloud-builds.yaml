@@ -1,0 +1,15 @@
+# Google Cloud remote build for this repository to a private Artifact Registry that can be used directly in GKE
+#
+# Usage:
+# - Replace "<YOUR_REPO>/<IMAGE_NAME>:<TAG_VERSION>"
+# Then enter the following command in the terminal where your gcloud-cli is installed: "gcloud builds submit --config gcloud-builds.yaml ."
+#
+# Note: Make sure your gcloud-cli, through your account permissions, has permission for these remote builds.
+#
+# List of permissions that need to be granted:
+# - https://cloud.google.com/artifact-registry
+# - https://cloud.google.com/build
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "<YOUR_REPO>/<IMAGE_NAME>:<TAG_VERSION>", "."]
+images: ["<YOUR_REPO>/<IMAGE_NAME>:<TAG_VERSION>"]
