@@ -1,4 +1,4 @@
-# Google Cloud remote build for this repository to a private Artifact Registry that can be used directly in GKE
+# Google Cloud remote build for this repository to a private or public Artifact Registry that can be used directly in GKE
 #
 # Usage:
 # - Replace "<YOUR_REPO>/<IMAGE_NAME>:<TAG_VERSION>"
