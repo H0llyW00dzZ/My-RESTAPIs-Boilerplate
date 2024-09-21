@@ -81,3 +81,6 @@ tailwind.go
 # However, if the WithCacheControl option is set to false, the compressed files will be stored in the server's memory.
 # In this case, it is recommended to implement a storage mechanism that stores the files on disk instead of memory to avoid excessive memory consumption.
 *.gz
+
+# GCloud Builds
+gcloud-builds.yaml
