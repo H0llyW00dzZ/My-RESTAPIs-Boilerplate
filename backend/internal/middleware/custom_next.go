@@ -206,6 +206,8 @@ func CustomNextHostName(hostnames ...string) func(*fiber.Ctx) bool {
 }
 
 // CustomKeyGenerator generates a custom cache key based on the request and logs the visitor activity.
+//
+// TODO: Improve this.
 func CustomKeyGenerator(c *fiber.Ctx) string {
 	// Get client's IP and User-Agent
 	clientIP := c.IP()
