@@ -51,7 +51,10 @@ spec:
     matchLabels:
       app: mysql
   strategy:
-    type: Recreate
+    # Note: This will use the default RollingUpdateStrategy for maxUnavailable and maxSurge
+    # without explicitly specifying them, which is suitable for Auto Pilot, unlike traditional
+    # cluster management where they must be explicitly defined.
+    type: RollingUpdate
   template:
     metadata:
       labels:
