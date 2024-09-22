@@ -6,6 +6,7 @@
 package middleware
 
 import (
+	"crypto/tls"
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/csp"
@@ -32,11 +33,13 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/idempotency"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/gofiber/fiber/v2/middleware/proxy"
 	"github.com/gofiber/fiber/v2/middleware/redirect"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/fiber/v2/middleware/rewrite"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/google/uuid"
+	"github.com/valyala/fasthttp"
 )
 
 // generateGoogleUUIDFromIP generates a deterministic UUID based on the provided IP address.
@@ -1074,5 +1077,68 @@ func WithRestimeHeaderName(headerName string) func(*restime.Config) {
 func WithRestimeNext(next func(c *fiber.Ctx) bool) func(*restime.Config) {
 	return func(config *restime.Config) {
 		config.Next = next
+	}
+}
+
+// WithProxyingNext is an option function for NewProxying that sets the next function.
+func WithProxyingNext(next func(c *fiber.Ctx) bool) func(*proxy.Config) {
+	return func(config *proxy.Config) {
+		config.Next = next
+	}
+}
+
+// WithProxyingServers is an option function for NewProxying that sets the list of servers.
+func WithProxyingServers(servers []string) func(*proxy.Config) {
+	return func(config *proxy.Config) {
+		config.Servers = servers
+	}
+}
+
+// WithProxyingModifyRequest is an option function for NewProxying that sets the request modifier function.
+func WithProxyingModifyRequest(modifyRequest fiber.Handler) func(*proxy.Config) {
+	return func(config *proxy.Config) {
+		config.ModifyRequest = modifyRequest
+	}
+}
+
+// WithProxyingModifyResponse is an option function for NewProxying that sets the response modifier function.
+func WithProxyingModifyResponse(modifyResponse fiber.Handler) func(*proxy.Config) {
+	return func(config *proxy.Config) {
+		config.ModifyResponse = modifyResponse
+	}
+}
+
+// WithProxyingTimeout is an option function for NewProxying that sets the timeout duration.
+func WithProxyingTimeout(timeout time.Duration) func(*proxy.Config) {
+	return func(config *proxy.Config) {
+		config.Timeout = timeout
+	}
+}
+
+// WithProxyingReadBufferSize is an option function for NewProxying that sets the read buffer size.
+func WithProxyingReadBufferSize(size int) func(*proxy.Config) {
+	return func(config *proxy.Config) {
+		config.ReadBufferSize = size
+	}
+}
+
+// WithProxyingWriteBufferSize is an option function for NewProxying that sets the write buffer size.
+func WithProxyingWriteBufferSize(size int) func(*proxy.Config) {
+	return func(config *proxy.Config) {
+		config.WriteBufferSize = size
+	}
+}
+
+// WithProxyingTLSConfig is an option function for NewProxying that sets the TLS configuration.
+func WithProxyingTLSConfig(tlsConfig *tls.Config) func(*proxy.Config) {
+	return func(config *proxy.Config) {
+		config.TlsConfig = tlsConfig
+	}
+}
+
+// WithProxyingClient is an option function for NewProxying that sets the custom client.
+func WithProxyingClient(client *fasthttp.LBClient) func(*proxy.Config) {
+	return func(config *proxy.Config) {
+		config.Client = client
 	}
 }

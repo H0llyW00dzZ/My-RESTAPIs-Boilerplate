@@ -33,6 +33,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
+	"github.com/gofiber/fiber/v2/middleware/proxy"
 	"github.com/gofiber/fiber/v2/middleware/redirect"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/fiber/v2/middleware/rewrite"
@@ -829,4 +830,26 @@ func NewPrometheusMiddleware(options ...any) fiber.Handler {
 
 	// Return the Prometheus middleware.
 	return prometheusMiddleware
+}
+
+// NewProxying creates a new proxy middleware with optional custom configuration options.
+//
+// The proxy middleware forwards incoming requests to a specified backend server (e.g., a neighboring microservice)
+// or load balancer (e.g., a Kubernetes Ingress such as nginx to ensure always smooth sailing ⛵ ☸).
+// It supports various options to customize the behavior of the proxy, such as modifying headers, handling errors,
+// and configuring timeouts.
+//
+// Note: Additionally, it is possible to implement own ingress mechanism on Fiber for Kubernetes by using this proxy mechanism provided by Fiber.
+func NewProxying(options ...any) fiber.Handler {
+	config := proxy.Config{}
+
+	for _, option := range options {
+		if optFunc, ok := option.(func(*proxy.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	proxyingMiddleware := proxy.New(config)
+
+	return proxyingMiddleware
 }
