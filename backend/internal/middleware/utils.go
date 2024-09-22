@@ -6,9 +6,7 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
 	log "h0llyw00dz-template/backend/internal/logger"
@@ -40,8 +38,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/rewrite"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/fiber/v2/middleware/skip"
-	"github.com/gofiber/fiber/v2/utils"
-	"github.com/google/uuid"
 )
 
 // NewCacheMiddleware creates a new cache middleware with optional custom configuration options.
@@ -291,43 +287,6 @@ func NewSignatureMiddleware() fiber.Handler {
 
 		// Continue to the next middleware or handler
 		return c.Next()
-	}
-}
-
-// CustomKeyGenerator generates a custom cache key based on the request and logs the visitor activity.
-func CustomKeyGenerator(c *fiber.Ctx) string {
-	// Get client's IP and User-Agent
-	clientIP := c.IP()
-	userAgent := c.Get(fiber.HeaderUserAgent)
-
-	// Create a string to hash
-	toHash := fmt.Sprintf("%s-%s", clientIP, userAgent)
-
-	// Create a fnv hash and write our string to it
-	signature := hashForSignature(toHash)
-
-	// Generate a UUID based on the hash
-	signatureUUID := uuid.NewSHA1(uuid.NameSpaceOID, []byte(signature))
-
-	// Log visitor activity with the signature for the frontend
-	// Note: Rename "generated" to "initiated" because This cache is used for fiber storage operations (e.g., get, set, delete, reset, close).
-	log.LogVisitorf("Frontend cache initiated for visitor activity: IP [%s], User-Agent [%s], Signature [%s], UUID [%s]", clientIP, userAgent, signature, signatureUUID.String())
-
-	// Generate a custom cache key with the hashed signature and UUID for fiber storage operations (e.g., get, set, delete, reset, close).
-	return fmt.Sprintf(utils.CopyString("cache_front_end:%s:%s:%s"), signature, signatureUUID.String(), c.Path())
-}
-
-// CustomCacheSkipper is a function that determines whether to skip caching for a given request path.
-// It returns true if the request path starts with any of the specified prefixes.
-func CustomCacheSkipper(prefixes ...string) func(*fiber.Ctx) bool {
-	// Note: This safely integrates with the context (e.g., fiber ctx or std library ctx).
-	return func(c *fiber.Ctx) bool {
-		for _, prefix := range prefixes {
-			if strings.HasPrefix(c.Path(), prefix) {
-				return true
-			}
-		}
-		return false
 	}
 }
 
