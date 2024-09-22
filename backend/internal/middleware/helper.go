@@ -1137,6 +1137,9 @@ func WithProxyingTLSConfig(tlsConfig *tls.Config) func(*proxy.Config) {
 }
 
 // WithProxyingClient is an option function for NewProxying that sets the custom client.
+//
+// TODO: Implement a sub-helper configuration for this, as it is possible to implement an ingress mechanism through a load balancer,
+// which can be useful for bare metal or creating an own network gateway in a cloud provider such as GKE.
 func WithProxyingClient(client *fasthttp.LBClient) func(*proxy.Config) {
 	return func(config *proxy.Config) {
 		config.Client = client
