@@ -834,8 +834,9 @@ func NewPrometheusMiddleware(options ...any) fiber.Handler {
 
 // NewProxying creates a new proxy middleware with optional custom configuration options.
 //
-// The proxy middleware forwards incoming requests to a specified backend server (e.g., a neighboring microservice)
-// or load balancer (e.g., a Kubernetes Ingress such as nginx to ensure always smooth sailing ⛵ ☸).
+// The proxy middleware forwards incoming requests to a specified backend server (e.g., a neighboring microservice).
+// For example, let's say these are boats/ships named blackpearl (⛵) managed by Kubernetes (☸), and you are the captain.
+// As the captain, you can sail multiple boats/ships named blackpearl (⛵) x 999999 pods.
 // It supports various options to customize the behavior of the proxy, such as modifying headers, handling errors,
 // and configuring timeouts.
 //
