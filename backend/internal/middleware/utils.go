@@ -849,7 +849,8 @@ func NewProxying(options ...any) fiber.Handler {
 		}
 	}
 
-	proxyingMiddleware := proxy.New(config)
+	// Note: Using either "Proxy.New" or "Proxy.Balancer" doesn't matter because "Proxy.New" it returns "Balancer" Poggers.
+	proxyingMiddleware := proxy.Balancer(config)
 
 	return proxyingMiddleware
 }
