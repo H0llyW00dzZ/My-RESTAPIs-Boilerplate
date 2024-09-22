@@ -1130,6 +1130,11 @@ func WithProxyingWriteBufferSize(size int) func(*proxy.Config) {
 }
 
 // WithProxyingTLSConfig is an option function for NewProxying that sets the TLS configuration.
+//
+// Note: For private CAs/public CAs, it is recommended to use a certificate with X509v3 Extended Key Usage
+// for TLS Web Server Authentication and TLS Web Client Authentication. To make it faster,
+// use ECC (Elliptic Curve Cryptography) instead of RSA, as it can save bandwidth costs.
+// If bandwidth is free because this proxying is only used for internal mode, then RSA can be used.
 func WithProxyingTLSConfig(tlsConfig *tls.Config) func(*proxy.Config) {
 	return func(config *proxy.Config) {
 		config.TlsConfig = tlsConfig
