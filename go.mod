@@ -6,7 +6,7 @@ require (
 	github.com/H0llyW00dzZ/FiberValidator v0.5.2
 	github.com/a-h/templ v0.2.778
 	github.com/ansrivas/fiberprometheus/v2 v2.7.0
-	github.com/bytedance/sonic v1.12.2
+	github.com/bytedance/sonic v1.12.3
 	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.1.1
 	github.com/charmbracelet/lipgloss v0.13.0
