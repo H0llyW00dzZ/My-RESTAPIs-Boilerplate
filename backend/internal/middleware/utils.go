@@ -841,6 +841,9 @@ func NewPrometheusMiddleware(options ...any) fiber.Handler {
 // and configuring timeouts.
 //
 // Note: Additionally, it is possible to implement own ingress mechanism on Fiber for Kubernetes by using this proxy mechanism provided by Fiber.
+// Also note that for better performance, this proxying can forward requests to a specified backend server that works with any backend language (e.g., Apache, PHP).
+// Make sure to split the implementation by creating another Go application for this. So basically, there will be 2 Go applications in 1 repository: one for REST APIs and another for this proxying.
+// This is because Go allows leveraging codebases.
 func NewProxying(options ...any) fiber.Handler {
 	config := proxy.Config{}
 
