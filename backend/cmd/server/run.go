@@ -117,6 +117,7 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 
 	var tlsConfig *tls.Config
 	if tlsCertFile != "" && tlsKeyFile != "" {
+		// Note: Fiber uses ECC is significantly faster compared to Nginx uses ECC, which struggles to handle a billion concurrent requests.
 		cert, err := tls.LoadX509KeyPair(tlsCertFile, tlsKeyFile)
 		if err != nil {
 			log.LogError(err)
