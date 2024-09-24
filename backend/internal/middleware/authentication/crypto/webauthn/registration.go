@@ -11,7 +11,7 @@ import (
 )
 
 // BeginRegistration initiates the WebAuthn registration process.
-// It takes a webauthn.User and optional webauthn.RegistrationOption as input.
+// It takes a [webauthn.User] and optional [webauthn.RegistrationOption] as input.
 // It returns a [protocol.CredentialCreation], [webauthn.SessionData], and an error.
 // The returned session data must be stored securely and passed to the [FinishRegistration] function.
 func BeginRegistration(user webauthn.User, opts ...webauthn.RegistrationOption) (*protocol.CredentialCreation, *webauthn.SessionData, error) {
