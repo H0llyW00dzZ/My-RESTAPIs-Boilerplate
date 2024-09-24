@@ -17,19 +17,23 @@ import (
 )
 
 // TODO: Implement another load balancer, as the current implementation of this Balancer should be sufficient
-// even for Kubernetes Ingress, or use it as a Kubernetes Ingress (replace a nginx hahaha) for smooth sailing ⛵ ☸
+// even for Kubernetes Ingress, or use it as a Kubernetes Ingress (replace an Nginx, hahaha) for smooth sailing ⛵ ☸
+// Also note that this is just a test. Due to the hybrid technique and atomics used in this load balancer mechanism,
+// it can be used to improve region (region-based routing) depending on the client as well. For example, if a client is from Indonesia,
+// it can forward the request to an Indonesian server or another server. On the other hand, it can also improve
+// security mechanisms such as firewalls, authentication mechanisms, etc.
 func TestNewProxying(t *testing.T) {
 	// Create a test server that will act as the backend server
 	backendServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Assert the custom header in the proxied request
 		customHeader := r.Header.Get("X-Custom-Header")
-		expectedHeader := "custom-value"
+		expectedHeader := "ahoy"
 		if customHeader != expectedHeader {
 			t.Errorf("Expected custom header '%s', got '%s'", expectedHeader, customHeader)
 		}
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Backend server response"))
+		w.Write([]byte("yo ho ho ⛵ ☸"))
 	}))
 	defer backendServer.Close()
 
@@ -41,7 +45,7 @@ func TestNewProxying(t *testing.T) {
 		middleware.WithProxyingServers([]string{backendServer.URL}),
 		middleware.WithProxyingTimeout(5*time.Second),
 		middleware.WithProxyingModifyRequest(func(c *fiber.Ctx) error {
-			c.Request().Header.Set("X-Custom-Header", "custom-value")
+			c.Request().Header.Set("X-Custom-Header", "ahoy")
 			return nil
 		}),
 	)
@@ -69,7 +73,7 @@ func TestNewProxying(t *testing.T) {
 	defer resp.Body.Close()
 
 	// Assert the response body
-	expectedBody := "Backend server response"
+	expectedBody := "yo ho ho ⛵ ☸"
 	if string(body) != expectedBody {
 		t.Errorf("Expected response body '%s', got '%s'", expectedBody, string(body))
 	}
