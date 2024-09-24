@@ -37,4 +37,7 @@
 //
 // For more information about WebAuthn and its usage, refer to the GitHub repository at
 // github.com/go-webauthn/webauthn and the WebAuthn specification at https://www.w3.org/TR/webauthn-2/.
+//
+// Also note that WebAuthn can be risky if the data registered on the device gets compromised,
+// potentially leading to malware or remote access trojan (RAT) attacks.
 package webauthn
