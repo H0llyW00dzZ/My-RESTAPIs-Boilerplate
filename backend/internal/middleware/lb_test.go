@@ -16,7 +16,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// TODO: Implement another load balancer, as the current implementation of this Balancer should be sufficient even for Kubernetes Ingress ⛵ ☸
+// TODO: Implement another load balancer, as the current implementation of this Balancer should be sufficient
+// even for Kubernetes Ingress, or use it as a Kubernetes Ingress (replace a nginx hahaha) for smooth sailing ⛵ ☸
 func TestNewProxying(t *testing.T) {
 	// Create a test server that will act as the backend server
 	backendServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
