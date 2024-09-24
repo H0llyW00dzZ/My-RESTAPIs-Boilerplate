@@ -9,6 +9,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/bytedance/sonic"
@@ -108,16 +109,34 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 	// Create a new instance of FiberServer
 	server := handler.NewFiberServer(app, appName, monitorPath)
 
+	// Load TLS certificate and key from environment variables or command-line arguments
+	//
+	// TODO: ACME Implementations ?
+	tlsCertFile := env.GetEnv(env.SERVERCERTTLS, "")
+	tlsKeyFile := env.GetEnv(env.SERVERKEYTLS, "")
+
+	var tlsConfig *tls.Config
+	if tlsCertFile != "" && tlsKeyFile != "" {
+		// Note: Fiber uses ECC is significantly faster compared to Nginx uses ECC, which struggles to handle a billion concurrent requests.
+		cert, err := tls.LoadX509KeyPair(tlsCertFile, tlsKeyFile)
+		if err != nil {
+			log.LogError(err)
+			os.Exit(1)
+		}
+
+		tlsConfig = &tls.Config{
+			Certificates: []tls.Certificate{cert},
+		}
+	}
+
 	// Start the server with graceful shutdown and monitor
-	//
-	// TODO: Implement environment mode. For example, when the environment is set to "dev" or "local",
-	// it will switch to "Listen (Non HTTPS)". Otherwise, it will force a change from Listen to ListenTLS
-	// for public access that can be accessed by a browser. For the Go application itself (only accessed by the Go application, which is pretty useful for authentication), it will switch
-	// to a combination of Listener and StreamListener (automatically and transparently encrypting and decrypting,
-	// similar to Certificate Transparency my Boring TLS Certificate) to use TLS 1.3 protocols.
-	//
-	// Note: When running in Kubernetes, this is an easy configuration with cert-manager.io for environment mode (as currently implemented). It just uses a secret.
-	handler.StartServer(server, addr, monitorPath, shutdownTimeout, nil, nil)
+	if tlsConfig != nil {
+		// Start the server with TLS
+		handler.StartServer(server, addr, monitorPath, shutdownTimeout, tlsConfig, nil)
+	} else {
+		// Start the server without TLS
+		handler.StartServer(server, addr, monitorPath, shutdownTimeout, nil, nil)
+	}
 }
 
 // TLSConfig creates and configures a TLS configuration for the server.
