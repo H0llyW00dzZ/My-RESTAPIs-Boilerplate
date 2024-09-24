@@ -13,7 +13,7 @@
 //
 // To use this package, follow these steps:
 //
-// 1. Initialize the WebAuthn client by calling the Init function with a valid configuration.
+//  1. Initialize the WebAuthn client by calling the Init function with a valid configuration.
 //
 //  2. Begin the registration process by calling the BeginRegistration function, passing the user
 //     and any additional registration options. This function returns a CredentialCreation instance,
@@ -38,6 +38,6 @@
 // For more information about WebAuthn and its usage, refer to the GitHub repository at
 // github.com/go-webauthn/webauthn and the WebAuthn specification at https://www.w3.org/TR/webauthn-2/.
 //
-// Also note that WebAuthn can be risky if the data registered on the device gets compromised,
-// potentially leading to malware or remote access trojan (RAT) attacks.
+// Also note that WebAuthn can be risky if the data registered on the device (e.g. client/user device) gets compromised,
+// for example got pwned by malware or remote access trojan (RAT) attacks.
 package webauthn
