@@ -50,10 +50,12 @@ const (
 	// Best Practice: Use Private CAs, and ensure that the leaf CA adds the IP into the SANs (Subject Alternative Names).
 	// This can be easily achieved by implementing a tool like PKIX for CSR generation in Go, instead of using Public CAs (e.g., Trusted CAs).
 	// Then it can be easily bound to the network infrastructure (e.g., load balancers, etc.).
-	MYSQLCERTTLS  = "MYSQL_CERTS_TLS" // Base64-encoded root CA / subs CA certificates for establishing secure connections MySQL database (required).
-	REDISCERTTLS  = "REDIS_CERTS_TLS" // Base64-encoded root CA / subs CA certificates for establishing secure connections Redis database (required).
-	SERVERCERTTLS = "TLS_CERT_FILE"   // Base64-encoded
-	SERVERKEYTLS  = "TLS_KEY_FILE"    // Base64-encoded
+	MYSQLCERTTLS = "MYSQL_CERTS_TLS" // Base64-encoded root CA / subs CA certificates for establishing secure connections MySQL database (required).
+	REDISCERTTLS = "REDIS_CERTS_TLS" // Base64-encoded root CA / subs CA certificates for establishing secure connections Redis database (required).
+	// Note: This Path & File Name TLS secrets are supported and securely managed by Kubernetes as long as the certificate issued implementation is correct.
+	// If the implementation is incorrect, this ship ⛵ BlackPearl, will be shrinking.
+	SERVERCERTTLS = "TLS_CERT_FILE"
+	SERVERKEYTLS  = "TLS_KEY_FILE"
 )
 
 // Site Middleware Configuration (Optional since it boilerplate and must rewrite a "DomainRouter" in RegisterRoutes (see backend/internal/middleware/routes.go))
