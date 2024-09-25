@@ -7,7 +7,6 @@ package main
 
 import (
 	"crypto/tls"
-	"crypto/x509"
 	"fmt"
 	"os"
 	"time"
@@ -16,7 +15,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	log "h0llyw00dz-template/backend/internal/logger"
-	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand"
 	handler "h0llyw00dz-template/backend/internal/server"
 	"h0llyw00dz-template/env"
 )
@@ -137,132 +135,4 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 		// Start the server without TLS
 		handler.StartServer(server, addr, monitorPath, shutdownTimeout, nil, nil)
 	}
-}
-
-// TLSConfig creates and configures a TLS configuration for the server.
-// It sets the minimum TLS version to TLS 1.3 and defines preferred curve preferences.
-// It also uses the [fiber.GetClientInfo] function from the [fiber.TLSHandler] to get client information.
-//
-// Example Usage in startupserver:
-//
-//	 // Note: myCert, myCertKey load from environment, if it's running on Kubernetes it would be easy for secret and secure
-//	gopherCert, err := tls.LoadX509KeyPair(myCert, myCertKey)
-//	if err != nil {
-//		// handle error
-//	}
-//	gopherTLSConfig := TLSConfig(gopherCert, nil) // clientCert nil
-//	handler.StartServer(server, addr, monitorPath, shutdownTimeout, gopherTLSConfig, nil) // Boring TLS 1.3 nil due it's my own protocol and currently unavailable.
-//
-// Example ListenMutualTLS Usage in startupserver:
-//
-//	 // Note: myCert, myCertKey, clientCertFile load from environment, if it's running on Kubernetes it would be easy for secret and secure
-//	gopherCertPool, err := tls.LoadX509KeyPair(myCert, myCertKey)
-//	if err != nil {
-//		// handle error
-//	}
-//
-//	// Load client CA certificate (optional)
-//	var clientCertPool *x509.CertPool
-//	clientCertBytes, err := os.ReadFile(clientCertFile)
-//
-//	if err == nil {
-//	    clientCertPool = x509.NewCertPool()
-//	    clientCertPool.AppendCertsFromPEM(clientCertBytes)
-//	}
-//
-//	gopherTLSConfig := TLSConfig(gopherCertPool, clientCertPool)
-//	handler.StartServer(server, addr, monitorPath, shutdownTimeout, gopherTLSConfig, nil) // Boring TLS 1.3 nil due it's my own protocol and currently unavailable.
-//
-// Note: This design is well-written and idiomatic, unlike designs that spliting functions (e.g., those related to TLS like "ListenTLS" "ListenMutualTLS" or whatever it is).
-func TLSConfig(cert tls.Certificate, leafCA, subCA, rootCA *x509.Certificate, clientCertPool *x509.CertPool) *tls.Config {
-	tlsHandler := &fiber.TLSHandler{}
-	// Note: Go's standard TLS 1.3 implementation does not allow direct configuration of cipher suites.
-	// This means that while one can specify cipher suites in Go code, the implementation will prioritize the use of
-	// AES-based ciphers like TLS_AES_128_GCM_SHA256 or TLS_AES_256_GCM_SHA384 (both bad common cipher, not even allowed to use ChaCha20 especially XChaCha20 which more secure),
-	// which may be slower than ChaCha20 which is faster on some platforms.
-	//
-	// However, the actual cipher suite used in a TLS connection is determined by the client's preferences and capabilities.
-	// When the client's preference is set to prioritize ChaCha20-based cipher suites like TLS_CHACHA20_POLY1305_SHA256,
-	// and the server supports it, they will negotiate and agree to use that cipher suite for the encrypted communication.
-	//
-	// Example (Tested on Firefox Browser, which allows customization of cipher suites for TLS 1.3):
-	// Network Tool: Wireshark Interface -> Link-Layer Header BSD Loopback
-	//
-	//  TLSv1.3 Record Layer: Handshake Protocol: Client Hello (SNI=localhost) (Client Browser)
-	//  Cipher Suites (9 suites)
-	//  Cipher Suite: TLS_CHACHA20_POLY1305_SHA256 (0x1303)
-	//  Cipher Suite: TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256 (0xcca9)
-	//  Cipher Suite: TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256 (0xcca8)
-	//  Cipher Suite: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 (0xc02b)
-	//  Cipher Suite: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (0xc02f)
-	//  Cipher Suite: TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 (0xc02c)
-	//  Cipher Suite: TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (0xc030)
-	//  Cipher Suite: TLS_RSA_WITH_AES_128_GCM_SHA256 (0x009c)
-	//  Cipher Suite: TLS_RSA_WITH_AES_256_GCM_SHA384 (0x009d)
-	//
-	// TLSv1.3 Record Layer: Handshake Protocol: Server Hello (This Repo)
-	// Cipher Suite: TLS_CHACHA20_POLY1305_SHA256 (0x1303)
-	// TLSv1.3 Record Layer: Change Cipher Spec Protocol: Change Cipher Spec
-	//
-	// In this example, the client (Firefox Browser) sends a Client Hello message with its supported cipher suites, prioritizing
-	// TLS_CHACHA20_POLY1305_SHA256. The server responds with a Server Hello message, agreeing to use
-	// TLS_CHACHA20_POLY1305_SHA256 based on the client's preferences.
-	//
-	// Acknowledgment:
-	// ChaCha20 is known for its excellent performance, particularly on mobile devices and low-end processors.
-	// By using ChaCha20, clients can potentially achieve better encryption and decryption speeds compared to
-	// using AES-based ciphers, resulting in improved overall performance.
-	tlsConfig := &tls.Config{
-		// Note: This Explicitly setting the maximum and minimum TLS versions can improve the negotiation process.
-		MaxVersion: tls.VersionTLS13, // Explicit
-		MinVersion: tls.VersionTLS13,
-		// Note: CurvePreferences works well when set, for example, with "tls.X25519" as the first preference.
-		// However, when setting CipherSuites for TLS 1.3 or PreferServerCipherSuites (which is not actually deprecated),
-		// it won't work properly if CipherSuites or PreferServerCipherSuites are specified because Go's standard TLS 1.3 implementation
-		// does not allow direct configuration of cipher suites, even for the client side (e.g., http client in Go).
-		// It's better to keep it like this, as it will depend on the client's preferences. For example,
-		// when TLS_CHACHA20_POLY1305_SHA256 is set as the top/first preference, the server will choose "TLS_CHACHA20_POLY1305_SHA256" based on the client's preference.
-		CurvePreferences: []tls.CurveID{
-			tls.X25519,
-			tls.CurveP256,
-			tls.CurveP384,
-			tls.CurveP521,
-		},
-		Certificates:   []tls.Certificate{cert},
-		GetCertificate: tlsHandler.GetClientInfo,
-		// Note: This safe for multiple goroutines each time it is called, ensuring that each goroutine gets its own independent reader
-		// The fixedReader itself does not maintain any mutable state, making it safe for concurrent use.
-		Rand: rand.FixedSize32Bytes(),
-		// TODO: Handle "VerifyPeerCertificate" for Certificate Transparency.
-	}
-
-	// Create a certificate pool (basically CA chains) for the CA certificates
-	// Note: A correct implementation:
-	// leafCA (first), subCA (second), rootCA (third)
-	//
-	// Bad Practice:
-	// Using cat command for append it.
-	caCertPool := x509.NewCertPool()
-	if leafCA != nil {
-		caCertPool.AddCert(leafCA)
-	}
-	if subCA != nil {
-		caCertPool.AddCert(subCA)
-	}
-	if rootCA != nil {
-		caCertPool.AddCert(rootCA)
-	}
-
-	// Set the RootCAs field in the TLS config
-	tlsConfig.RootCAs = caCertPool
-
-	// Only enable client auth if clientCertPool is not nil
-	// TODO: Handle "GetClientCertificate" that might need.
-	// Note: This different, it for mTLS, unlike "caCertPool" that for HTTPS
-	if clientCertPool != nil {
-		tlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
-		tlsConfig.ClientCAs = clientCertPool
-	}
-
-	return tlsConfig
 }
