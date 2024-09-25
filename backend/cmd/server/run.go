@@ -97,6 +97,13 @@ func setupFiber(appName string, readTimeout, writeTimeout time.Duration) *fiber.
 // startServer configures and starts the Fiber web server.
 // It initializes logging, determines the server address, and calls the server start function
 // with graceful shutdown handling.
+//
+// Note: Now that it supports HTTPS/TLS, it can be easily integrated with Kubernetes.
+// For guidance on setting up HTTPS/TLS on Kubernetes, refer to:
+//
+// - https://kubernetes.io/docs/reference/kubectl/generated/kubectl_create/kubectl_create_secret_tls/
+//
+// Also, note that startServer facilitates easy integration with HTTPS/TLS and supports ACME via cert-manager.io for Kubernetes.
 func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, shutdownTimeout time.Duration) {
 	// Initialize the logger with the AppName from the environment variable
 	log.InitializeLogger(app.Config().AppName, timeFormat)
