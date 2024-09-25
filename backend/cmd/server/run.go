@@ -129,6 +129,9 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 			os.Exit(1)
 		}
 
+		// Note: For ECC the OCSP, it's optional if explicitly set to TLSv1.3 and used in internal mode.
+		// However, if it's used externally and allows TLSv1.2, then OCSP should be configured, provided that
+		// there is knowledge on how to set it up.
 		tlsConfig = &tls.Config{
 			Certificates: []tls.Certificate{cert},
 		}
