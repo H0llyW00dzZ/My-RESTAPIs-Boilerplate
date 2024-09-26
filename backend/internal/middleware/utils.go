@@ -866,10 +866,7 @@ func NewProxying(options ...any) fiber.Handler {
 // It provides visibility into the incoming requests and helps with debugging and monitoring.
 func NewLogger(options ...any) fiber.Handler {
 	// Create a new logger middleware configuration.
-	config := logger.Config{
-		// Set the default log format.
-		Format: "[${time}] ${status} - ${latency} ${method} ${path}\n",
-	}
+	config := logger.Config{}
 
 	// Apply any additional options to the Logger configuration.
 	for _, option := range options {
