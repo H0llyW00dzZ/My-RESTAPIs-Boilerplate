@@ -1204,6 +1204,10 @@ func WithLoggerTimeInterval(timeInterval time.Duration) func(*logger.Config) {
 }
 
 // WithLoggerOutput is an option function for NewLogger that sets the output writer for logs.
+//
+// Note: To support Horizontal Pod Autoscaling (HPA), consider not explicitly setting the [io.Writer] to a file (e.g., fiber.logs) stored on disk.
+// If the deployment attaches a PersistentVolumeClaim (PVC) or PersistentVolume (PV) externally, which can be automatically attached/detached by the Kubernetes cluster,
+// it has limitations regarding pods.
 func WithLoggerOutput(output io.Writer) func(*logger.Config) {
 	return func(config *logger.Config) {
 		config.Output = output
