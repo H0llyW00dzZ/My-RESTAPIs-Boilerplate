@@ -147,8 +147,10 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 	if tlsConfig != nil {
 		// Start the server with TLS
 		handler.StartServer(server, addr, monitorPath, shutdownTimeout, tlsConfig, nil)
+		log.LogInfo("HTTPS/TLS is configured; all incoming traffic will be encrypted.")
 	} else {
 		// Start the server without TLS
 		handler.StartServer(server, addr, monitorPath, shutdownTimeout, nil, nil)
+		log.LogInfo("HTTPS/TLS not configured; the server will start without encryption.")
 	}
 }
