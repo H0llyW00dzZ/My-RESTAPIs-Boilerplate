@@ -144,6 +144,9 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 	}
 
 	// Start the server with graceful shutdown and monitor
+	//
+	// TODO: Enhance the logger because it does not immediately show the cause when starting in a separate goroutine.
+	// However, this enhancement is not a priority at the moment.
 	if tlsConfig != nil {
 		// Start the server with TLS
 		handler.StartServer(server, addr, monitorPath, shutdownTimeout, tlsConfig, nil)
