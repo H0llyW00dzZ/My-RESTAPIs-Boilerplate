@@ -14,6 +14,7 @@ import (
 	"h0llyw00dz-template/backend/internal/middleware/restime"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
 	"hash/fnv"
+	"io"
 	"time"
 
 	validator "github.com/H0llyW00dzZ/FiberValidator"
@@ -33,6 +34,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/idempotency"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/proxy"
 	"github.com/gofiber/fiber/v2/middleware/redirect"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
@@ -1149,5 +1151,72 @@ func WithProxyingTLSConfig(tlsConfig *tls.Config) func(*proxy.Config) {
 func WithProxyingClient(client *fasthttp.LBClient) func(*proxy.Config) {
 	return func(config *proxy.Config) {
 		config.Client = client
+	}
+}
+
+// WithLoggerNext is an option function for NewLogger that sets the Next function to skip the Logger middleware.
+func WithLoggerNext(next func(*fiber.Ctx) bool) func(*logger.Config) {
+	return func(config *logger.Config) {
+		config.Next = next
+	}
+}
+
+// WithLoggerDone is an option function for NewLogger that sets the Done function to be called after the log string is written.
+func WithLoggerDone(done func(*fiber.Ctx, []byte)) func(*logger.Config) {
+	return func(config *logger.Config) {
+		config.Done = done
+	}
+}
+
+// WithLoggerCustomTags is an option function for NewLogger that sets the custom tag functions.
+func WithLoggerCustomTags(customTags map[string]logger.LogFunc) func(*logger.Config) {
+	return func(config *logger.Config) {
+		config.CustomTags = customTags
+	}
+}
+
+// WithLoggerFormat is an option function for NewLogger that sets the logging format.
+func WithLoggerFormat(format string) func(*logger.Config) {
+	return func(config *logger.Config) {
+		config.Format = format
+	}
+}
+
+// WithLoggerTimeFormat is an option function for NewLogger that sets the time format.
+func WithLoggerTimeFormat(timeFormat string) func(*logger.Config) {
+	return func(config *logger.Config) {
+		config.TimeFormat = timeFormat
+	}
+}
+
+// WithLoggerTimeZone is an option function for NewLogger that sets the time zone.
+func WithLoggerTimeZone(timeZone string) func(*logger.Config) {
+	return func(config *logger.Config) {
+		config.TimeZone = timeZone
+	}
+}
+
+// WithLoggerTimeInterval is an option function for NewLogger that sets the time interval for updating the timestamp.
+func WithLoggerTimeInterval(timeInterval time.Duration) func(*logger.Config) {
+	return func(config *logger.Config) {
+		config.TimeInterval = timeInterval
+	}
+}
+
+// WithLoggerOutput is an option function for NewLogger that sets the output writer for logs.
+//
+// Note: To support Horizontal Pod Autoscaling (HPA), consider not explicitly setting the [io.Writer] to a file (e.g., fiber.logs) stored on disk.
+// If the deployment attaches a PersistentVolumeClaim (PVC) or PersistentVolume (PV) externally, which can be automatically attached/detached by the Kubernetes cluster,
+// it has limitations regarding pods.
+func WithLoggerOutput(output io.Writer) func(*logger.Config) {
+	return func(config *logger.Config) {
+		config.Output = output
+	}
+}
+
+// WithLoggerDisableColors is an option function for NewLogger that disables colorized log output.
+func WithLoggerDisableColors(disableColors bool) func(*logger.Config) {
+	return func(config *logger.Config) {
+		config.DisableColors = disableColors
 	}
 }
