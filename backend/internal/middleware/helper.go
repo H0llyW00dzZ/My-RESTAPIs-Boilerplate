@@ -1208,6 +1208,27 @@ func WithLoggerTimeInterval(timeInterval time.Duration) func(*logger.Config) {
 // Note: To support Horizontal Pod Autoscaling (HPA), consider not explicitly setting the [io.Writer] to a file (e.g., fiber.logs) stored on disk.
 // If the deployment attaches a PersistentVolumeClaim (PVC) or PersistentVolume (PV) externally, which can be automatically attached/detached by the Kubernetes cluster,
 // it has limitations regarding pods.
+//
+// For example, not explicitly setting the [io.Writer] to a file results in stable behavior with HPA:
+//
+//	b0zal@Linux:~$ kubectl top pods
+//	NAME                    CPU(cores)   MEMORY(bytes)
+//	senior-golang-worker-fd4c78699-2d7zf   243m         41Mi
+//	senior-golang-worker-fd4c78699-2p258   237m         23Mi
+//	senior-golang-worker-fd4c78699-47jl9   244m         23Mi
+//	senior-golang-worker-fd4c78699-4q7jp   251m         28Mi
+//	senior-golang-worker-fd4c78699-7lr92   249m         24Mi
+//	senior-golang-worker-fd4c78699-dhzmg   241m         23Mi
+//	senior-golang-worker-fd4c78699-ktq52   272m         60Mi
+//	senior-golang-worker-fd4c78699-mwdb6   238m         40Mi
+//	senior-golang-worker-fd4c78699-p5nwk   240m         23Mi
+//	senior-golang-worker-fd4c78699-qdb66   241m         28Mi
+//	senior-golang-worker-fd4c78699-r548m   285m         57Mi
+//	senior-golang-worker-fd4c78699-t2k75   241m         55Mi
+//	senior-golang-worker-fd4c78699-wn8xl   244m         24Mi
+//	senior-golang-worker-fd4c78699-zgw82   247m         29Mi
+//
+// You can see that the memory usage of each pod is different because it is spreading across multiple instances.
 func WithLoggerOutput(output io.Writer) func(*logger.Config) {
 	return func(config *logger.Config) {
 		config.Output = output
