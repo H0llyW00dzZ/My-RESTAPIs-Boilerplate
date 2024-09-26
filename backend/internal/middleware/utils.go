@@ -32,6 +32,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/idempotency"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
 	"github.com/gofiber/fiber/v2/middleware/proxy"
 	"github.com/gofiber/fiber/v2/middleware/redirect"
@@ -857,4 +858,29 @@ func NewProxying(options ...any) fiber.Handler {
 	proxyingMiddleware := proxy.Balancer(config)
 
 	return proxyingMiddleware
+}
+
+// NewLogger creates a new Logger middleware for the Fiber web framework.
+//
+// The Logger middleware is used to log HTTP request and response details.
+// It provides visibility into the incoming requests and helps with debugging and monitoring.
+func NewLogger(options ...any) fiber.Handler {
+	// Create a new logger middleware configuration.
+	config := logger.Config{
+		// Set the default log format.
+		Format: "[${time}] ${status} - ${latency} ${method} ${path}\n",
+	}
+
+	// Apply any additional options to the Logger configuration.
+	for _, option := range options {
+		if optFunc, ok := option.(func(*logger.Config)); ok {
+			optFunc(&config)
+		}
+	}
+
+	// Create the logger middleware with the configured options.
+	loggerMiddleware := logger.New(config)
+
+	// Return the logger middleware.
+	return loggerMiddleware
 }
