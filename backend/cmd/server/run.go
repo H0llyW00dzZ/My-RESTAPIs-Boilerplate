@@ -136,6 +136,8 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 		// For an example of OCSP stapling and TLSv1.2 configuration that follows best practices for securing websites, see:
 		//
 		// - https://www.immuniweb.com/ssl/git.b0zal.io/KRIX2G2F/
+		// - https://decoder.link/sslchecker/git.b0zal.io/443
+		// - https://decoder.link/sslchecker/b0zal.io/443
 		tlsConfig = &tls.Config{
 			Certificates: []tls.Certificate{cert},
 		}
