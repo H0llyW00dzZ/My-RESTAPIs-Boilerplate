@@ -12,6 +12,7 @@ import (
 
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 
 	"h0llyw00dz-template/backend/internal/database"
@@ -233,8 +234,18 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 	})
 
 	etagMiddleware := NewETagMiddleware()
+	httpLogg := NewLogger(
+		// Register the custom tag functions
+		WithLoggerCustomTags(map[string]logger.LogFunc{
+			"appName":  appNameTag,
+			"unixTime": unixTimeTag,
+			"hostName": hostNameTag,
+		}),
+		WithLoggerFormat(loggerFormat),
+		WithLoggerTimeFormat(loggerFormatTime),
+	)
 	// Apply the recover middleware
-	app.Use(xRequestID, etagMiddleware, cspMiddleware, cacheMiddleware, htmx.NewErrorHandler, recoverMiddleware)
+	app.Use(httpLogg, xRequestID, etagMiddleware, cspMiddleware, cacheMiddleware, htmx.NewErrorHandler, recoverMiddleware)
 }
 
 // registerRootRouter sets up the root router for the application.
