@@ -63,8 +63,10 @@ func CustomNextContentType(contentTypes ...string) func(*fiber.Ctx) bool {
 //   - paths: A map of string keys representing the paths and bool values indicating whether to skip the middleware for each path.
 //
 // Returns:
-//   - A function that takes a *fiber.Ctx as input and returns a boolean value indicating whether to
+//   - A function that takes a [fiber.Ctx] as input and returns a boolean value indicating whether to
 //     skip the middleware for the given request based on the availability of the current path in the provided map.
+//
+// Also note that if "/api/v1/users" doesn't work then "api/v1/users".
 func CustomNextPathAvailable(paths map[string]bool) func(*fiber.Ctx) bool {
 	return func(c *fiber.Ctx) bool {
 		if skip, ok := paths[c.Path()]; ok && skip {
