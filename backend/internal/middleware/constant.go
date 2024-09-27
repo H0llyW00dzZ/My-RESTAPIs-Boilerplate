@@ -27,3 +27,8 @@ const (
 	// towards the rate limit. After this duration, the request count for each client is reset.
 	maxExpirationRESTAPIsRateLimiter = 1 * time.Minute
 )
+
+const (
+	loggerFormat     = "${time} [${blue}${appName}${reset}] [${green}INFO${reset}] | [${protocol} - ${hostName} - ${status}] | ${latency} - ${unixTime} | [${ip} - ${locals:visitor_uuid}] | ${method} | ${path} | ${error}\n"
+	loggerFormatTime = "2006/01/02 15:04:05"
+)

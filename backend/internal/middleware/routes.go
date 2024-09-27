@@ -12,6 +12,7 @@ import (
 
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 
 	"h0llyw00dz-template/backend/internal/database"
@@ -84,10 +85,8 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 		// it may get killed by an Out-of-Memory (OOM) error due to a conflict with the Horizontal Pod Autoscaler (HPA).
 		Prefork: false,
 		// Which is suitable for streaming AI Response.
-		StreamRequestBody: true,
-		// When running behind an ingress controller/proxy, disable "EnableIPValidation"
-		// because the ingress controller/proxy will forward the real IP anyway from the header, which is already valid.
-		EnableIPValidation:      false,
+		StreamRequestBody:       true,
+		EnableIPValidation:      true,
 		EnableTrustedProxyCheck: true,
 		// By default, it is set to 0.0.0.0/0 for local development; however, it can be bound to an ingress controller/proxy.
 		// This can be a private IP range (e.g., 10.0.0.0/8).
@@ -115,10 +114,8 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 		// it may get killed by an Out-of-Memory (OOM) error due to a conflict with the Horizontal Pod Autoscaler (HPA).
 		Prefork: false,
 		// Which is suitable for streaming AI Response.
-		StreamRequestBody: true,
-		// When running behind an ingress controller/proxy, disable "EnableIPValidation"
-		// because the ingress controller/proxy will forward the real IP anyway from the header, which is already valid.
-		EnableIPValidation:      false,
+		StreamRequestBody:       true,
+		EnableIPValidation:      true,
 		EnableTrustedProxyCheck: true,
 		// By default, it is set to 0.0.0.0/0 for local development; however, it can be bound to an ingress controller/proxy.
 		// This can be a private IP range (e.g., 10.0.0.0/8).
@@ -237,8 +234,18 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 	})
 
 	etagMiddleware := NewETagMiddleware()
+	httpLogg := NewLogger(
+		// Register the custom tag functions
+		WithLoggerCustomTags(map[string]logger.LogFunc{
+			"appName":  appNameTag,
+			"unixTime": unixTimeTag,
+			"hostName": hostNameTag,
+		}),
+		WithLoggerFormat(loggerFormat),
+		WithLoggerTimeFormat(loggerFormatTime),
+	)
 	// Apply the recover middleware
-	app.Use(xRequestID, etagMiddleware, cspMiddleware, cacheMiddleware, htmx.NewErrorHandler, recoverMiddleware)
+	app.Use(httpLogg, xRequestID, etagMiddleware, cspMiddleware, cacheMiddleware, htmx.NewErrorHandler, recoverMiddleware)
 }
 
 // registerRootRouter sets up the root router for the application.

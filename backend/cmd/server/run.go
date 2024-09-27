@@ -81,10 +81,8 @@ func setupFiber(appName string, readTimeout, writeTimeout time.Duration) *fiber.
 		// it may get killed by an Out-of-Memory (OOM) error due to a conflict with the Horizontal Pod Autoscaler (HPA).
 		Prefork: false,
 		// Which is suitable for streaming AI Response.
-		StreamRequestBody: true,
-		// When running behind an ingress controller/proxy, disable "EnableIPValidation"
-		// because the ingress controller/proxy will forward the real IP anyway from the header, which is already valid.
-		EnableIPValidation:      false,
+		StreamRequestBody:       true,
+		EnableIPValidation:      true,
 		EnableTrustedProxyCheck: true,
 		// By default, it is set to 0.0.0.0/0 for local development; however, it can be bound to an ingress controller/proxy.
 		// This can be a private IP range (e.g., 10.0.0.0/8).
@@ -147,16 +145,11 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 	}
 
 	// Start the server with graceful shutdown and monitor
-	//
-	// TODO: Enhance the logger because it does not immediately show the cause when starting in a separate goroutine.
-	// However, this enhancement is not a priority at the moment.
 	if tlsConfig != nil {
 		// Start the server with TLS
 		handler.StartServer(server, addr, monitorPath, shutdownTimeout, tlsConfig, nil)
-		log.LogInfo("HTTPS/TLS is configured; all incoming traffic will be encrypted.")
 	} else {
 		// Start the server without TLS
 		handler.StartServer(server, addr, monitorPath, shutdownTimeout, nil, nil)
-		log.LogInfo("HTTPS/TLS not configured; the server will start without encryption.")
 	}
 }
