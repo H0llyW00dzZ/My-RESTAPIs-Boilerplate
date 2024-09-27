@@ -47,28 +47,32 @@ func CustomNextContentType(contentTypes ...string) func(*fiber.Ctx) bool {
 
 // CustomNextPathAvailable is a helper function that creates a custom Next function for the fiber middleware.
 //
-// The returned Next function checks if the requested path is available in the provided map of paths.
-// If the path is found in the map, the Next function returns false, indicating that the middleware should not be skipped.
-// Otherwise, it returns true, indicating that the middleware should be skipped.
+// The returned Next function checks if the current request path is available in the provided map of paths.
+// If the current path is found in the map and its corresponding value is true, the Next function returns true,
+// indicating that the middleware should be skipped.
 //
 // Example usage:
 //
-//	// Create a custom skipper function to skip the middleware for available paths
+//	// Create a custom skipper function to skip the middleware for specific paths
 //	pathSkipper := CustomNextPathAvailable(map[string]bool{
-//	    "v2/users": true,
-//	    "v2/products": true,
+//	    "/api/v1/users": true,
+//	    "/api/v1/products": true,
 //	})
 //
 // Parameters:
-//   - paths: A map of string keys representing the available paths, and bool values indicating their availability.
+//   - paths: A map of string keys representing the paths and bool values indicating whether to skip the middleware for each path.
 //
 // Returns:
-//   - A function that takes a [*fiber.Ctx] as input and returns a boolean value indicating whether to
-//     skip the middleware for the given request based on the availability of the requested path.
+//   - A function that takes a [fiber.Ctx] as input and returns a boolean value indicating whether to
+//     skip the middleware for the given request based on the availability of the current path in the provided map.
+//
+// Also note that if "/api/v1/users" doesn't work then "api/v1/users".
 func CustomNextPathAvailable(paths map[string]bool) func(*fiber.Ctx) bool {
 	return func(c *fiber.Ctx) bool {
-		_, ok := paths[c.Path()]
-		return !ok
+		if skip, ok := paths[c.Path()]; ok && skip {
+			return true
+		}
+		return false
 	}
 }
 
