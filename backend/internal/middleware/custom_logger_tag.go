@@ -13,9 +13,10 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/utils"
 )
 
-// appNameTag is a fiber custom logger tag function that retrieves the name of the application.
+// appNameTag is a fiber logger custom tag function that retrieves the name of the application.
 //
 // Note: Ignore the warning about unused parameters. Once it is bound to [WithLoggerCustomTags], the warning will disappear from the IDE.
 func appNameTag(output logger.Buffer, c *fiber.Ctx, data *logger.Data, extraParam string) (int, error) {
@@ -23,10 +24,18 @@ func appNameTag(output logger.Buffer, c *fiber.Ctx, data *logger.Data, extraPara
 	return output.WriteString(appName)
 }
 
-// unixTimeTag is a fiber custom logger tag function that returns the current Unix timestamp.
+// unixTimeTag is a fiber logger custom tag function that returns the current Unix timestamp.
 //
 // Note: Ignore the warning about unused parameters. Once it is bound to [WithLoggerCustomTags], the warning will disappear from the IDE.
 func unixTimeTag(output logger.Buffer, c *fiber.Ctx, data *logger.Data, extraParam string) (int, error) {
 	unixTime := strconv.FormatInt(time.Now().Unix(), 10)
 	return output.WriteString(unixTime)
+}
+
+// hostNameTag is a fiber logger custom tag function that returns the current Hostname.
+//
+// Note: Ignore the warning about unused parameters. Once it is bound to [WithLoggerCustomTags], the warning will disappear from the IDE.
+func hostNameTag(output logger.Buffer, c *fiber.Ctx, data *logger.Data, extraParam string) (int, error) {
+	hostName := utils.CopyString(c.Hostname())
+	return output.WriteString(hostName)
 }
