@@ -1229,6 +1229,8 @@ func WithLoggerTimeInterval(timeInterval time.Duration) func(*logger.Config) {
 //	senior-golang-worker-fd4c78699-zgw82   247m         29Mi
 //
 // You can see that the memory usage of each pod is different because it is spreading across multiple instances.
+// Also, it won't get OOM (Out of Memory) errors and be killed by the cluster, because it has built-in atomics
+// and a fast garbage collector for recycling free memory.
 func WithLoggerOutput(output io.Writer) func(*logger.Config) {
 	return func(config *logger.Config) {
 		config.Output = output
