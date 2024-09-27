@@ -104,6 +104,9 @@ func setupFiber(appName string, readTimeout, writeTimeout time.Duration) *fiber.
 // - https://kubernetes.io/docs/reference/kubectl/generated/kubectl_create/kubectl_create_secret_tls/
 //
 // Also, note that startServer facilitates easy integration with HTTPS/TLS and supports ACME via cert-manager.io for Kubernetes.
+// When running outside of Kubernetes (e.g., without an ingress), the PORT must be explicitly set to 443 for access via browser or other clients, as the default port is 8080.
+// Make sure the certificate is correctly configured as well (e.g., the certificate chain, which is easy to handle in Go for chaining certificates).
+// If the certificate is valid and properly configured, the server will run; otherwise, it won't run.
 func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, shutdownTimeout time.Duration) {
 	// Initialize the logger with the AppName from the environment variable
 	log.InitializeLogger(app.Config().AppName, timeFormat)
