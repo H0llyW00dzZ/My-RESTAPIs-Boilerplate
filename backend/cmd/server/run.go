@@ -101,6 +101,14 @@ func setupFiber(appName string, readTimeout, writeTimeout time.Duration) *fiber.
 //
 // - https://kubernetes.io/docs/reference/kubectl/generated/kubectl_create/kubectl_create_secret_tls/
 //
+// For example, the following certificate can be used:
+//
+// - https://crt.sh/?q=d5b8a29e3eaf7413ee925dbb2ee9c9f9b6a73880fe0444704baaf71c1aa7feb3
+//
+// Note: The example certificate uses ECC (Elliptic Curve Cryptography), which is stable for internal mode and
+// multiple clusters with many pods. It also helps alleviate the struggles that NGINX Ingress faces when handling
+// a large number of concurrent requests, and it provides efficient bandwidth usage that saves cost.
+//
 // Also, note that startServer facilitates easy integration with HTTPS/TLS and supports ACME via cert-manager.io for Kubernetes.
 // When running outside of Kubernetes (e.g., without an ingress), the PORT must be explicitly set to 443 for access via browser or other clients, as the default port is 8080.
 // Make sure the certificate is correctly configured as well (e.g., the certificate chain, which is easy to handle in Go for chaining certificates).
