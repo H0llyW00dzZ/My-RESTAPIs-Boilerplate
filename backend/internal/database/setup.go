@@ -108,7 +108,15 @@ type MySQLConfig struct {
 //
 // TODO: Improve this dynamically based on available resources by implementing a helper function that can be suitable in a cloud environment,
 // such as auto-pilot Kubernetes, to enhance [Zer0 Downtime].
+//
+// Note: Currently unused, might be removed later.
 var maxConnections = 2 * runtime.NumCPU()
+
+// Use the default Fiber configuration for improved efficiency and latency when used with HPA (Horizontal Pod Autoscaling) and the worker.
+// Also Ensure that HTTPS/TLS is configured and set the BACKEND protocol to HTTPS along with the annotation nginx.ingress.kubernetes.io/ssl-passthrough: "true".
+// This is because NGINX Ingress struggles to handle a large number of concurrent requests, including ECC (Elliptic Curve Cryptography), when performing HTTPS/TLS termination.
+// So Let Fiber handle the HTTPS/TLS termination, as NGINX is better suited for handling TCP/UDP services.
+var defaultFiberMaxConnections = redisStorage.ConfigDefault.PoolSize
 
 // InitializeRedisClient initializes and returns a new Redis client.
 func (config *RedisClientConfig) InitializeRedisClient() (*redis.Client, error) {
@@ -335,7 +343,7 @@ func parseRedisConfig() (*RedisClientConfig, error) {
 		Password:              redisPassword,
 		Database:              redisDB,
 		PoolTimeout:           poolTimeout,
-		PoolSize:              maxConnections,
+		PoolSize:              defaultFiberMaxConnections,
 		ContextTimeoutEnabled: true,
 		ConnMaxIdleTime:       redisConnMaxIdleTime,
 		ConnMaxLifetime:       redisConnMaxLifetime,
@@ -376,7 +384,7 @@ func initializeRedisStorage() (fiber.Storage, error) {
 		Port:     redisPortInt,
 		Password: redisPassword,
 		Database: redisDB,
-		PoolSize: maxConnections,
+		PoolSize: defaultFiberMaxConnections,
 		// TODO: When ENV (e.g, GO_APP=local) it will set to true.
 		Reset: false,
 	}
