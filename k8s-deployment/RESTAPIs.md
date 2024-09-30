@@ -15,7 +15,7 @@ Before deploying the application, ensure that you have the following:
 - A container image for the REST API application
 
 > [!NOTE]
-> Since this deployment supports `100% HPA`, which is suitable for handling billions of requests/workers (combined with worker package) `concurrently and efficiently`, it is recommended not to attach it with any `storage (PVC, PV)` to this deployment.
+> Since this deployment supports `100% HPA`, which is suitable for handling billions of requests/workers (combined with [worker package](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker)) `concurrently and efficiently`, it is recommended not to attach it with any `storage (PVC, PV)` to this deployment.
 > This is because HPA is not `100% compatible` if the deployment has `storage (PVC, PV) attached due to its limitations`, unless you build your own `storage mechanism` that can be shared among multiple pods (e.g., `capable of up to 1K Pods or more that consider supports 100% HPA`) while this deployment handles billions of requests/workers `concurrently and efficiently`.
 
 ## Deployment
@@ -68,7 +68,7 @@ kubectl get deployment -n restapis
 ```
 
 > [!NOTE]
-> This example shows how `Horizontal Pod Autoscaler (HPA)` works properly, handling billions of requests/workers (combined with the worker package) `concurrently and efficiently`:
+> This example shows how `Horizontal Pod Autoscaler (HPA)` works properly, handling billions of requests/workers (combined with the [worker package](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker)) `concurrently and efficiently`:
 
 - Events:
 
@@ -106,7 +106,7 @@ Events:
   Normal  SuccessfulRescale  14m (x12 over 2d23h)  horizontal-pod-autoscaler  New size: 14; reason: cpu resource utilization (percentage of request) below target
 ```
 
-- Watching HPA (Stable for long-running processes in combination with [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker)):
+- Watching HPA (Stable for long-running (Smooth Sailing ⛵ ☸) processes in combination with [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker)):
 
 ```
 b0zal@Linux:~$ kubectl get hpa --watch
