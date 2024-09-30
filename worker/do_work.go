@@ -31,6 +31,7 @@ type Pool[T any] struct {
 	// Store registered job functions
 	//
 	// Note: this optional it can bound to other instead of [fiber.Ctx] (e.g, database for streaming html hahaha).
+	// TODO: Improve this for more flexibility to allow other types instead of currently only supporting "func(*fiber.Ctx)"
 	registeredJobs map[string]func(*fiber.Ctx) Job[T]
 
 	// Channel options
