@@ -117,6 +117,9 @@
 //
 // # Compatibility:
 //
-// Due to this worker being designed similar to a semaphore, it is recommended to use it in Kubernetes batch/job services as it can be useful for the cluster
-// (e.g., implementing its own self-healing mechanism, maintaining databases, fully managed by the goroutines).
+//   - Due to this worker being designed similar to a semaphore, it is recommended to use it in Kubernetes batch/job services as it can be useful for the cluster
+//     (e.g., implementing its own self-healing mechanism, maintaining databases, fully managed by the goroutines).
+//
+//   - While using this worker, do not use a mutex again in functions that will be executed/managed by goroutines, because it can degrade the performance (making it slower).
+//     Instead, use channels for communication.
 package worker
