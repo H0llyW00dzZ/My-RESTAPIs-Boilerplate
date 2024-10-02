@@ -7,8 +7,6 @@ package worker
 
 import (
 	"context"
-
-	"github.com/gofiber/fiber/v2"
 )
 
 // Job represents a unit of work for the worker pool.
@@ -57,7 +55,7 @@ type Job[T any] interface {
 //     This means using channels or other synchronization primitives to communicate and exchange data between goroutines, rather than directly accessing shared memory locations.
 //   - Use atomic operations to modify shared data safely. Atomic operations guarantee that each access to the shared data is atomic, meaning that the value of the data is always consistent.
 //   - Use synchronization primitives such as mutexes or channels to control access to shared resources and prevent data races.
-func (wp *Pool[T]) RegisterJob(name string, jobFunc func(*fiber.Ctx) Job[T]) {
+func (wp *Pool[T]) RegisterJob(name string, jobFunc any) {
 	wp.mu.Lock()
 	defer wp.mu.Unlock()
 	wp.registeredJobs[name] = jobFunc
