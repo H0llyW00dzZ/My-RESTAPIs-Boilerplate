@@ -122,4 +122,10 @@
 //
 //   - While using this worker, do not use a mutex again in functions that will be executed/managed by goroutines, because it can degrade the performance (making it slower).
 //     Instead, use channels for communication.
+//
+// # Boost The Worker:
+//
+//   - Since this worker is concurrent, it is possible to boost the worker (goroutines). For example, if you are only using this worker for handling Fiber requests concurrently (e.g., from a http client),
+//     you should also set the concurrency level in the Fiber configuration accordingly (e.g., "512 * 1024"). This can make both the worker and Fiber faster, as concurrency
+//     should be handled by concurrency.
 package worker
