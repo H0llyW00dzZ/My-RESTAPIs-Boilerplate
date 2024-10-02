@@ -20,7 +20,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/vault/api v1.15.0
 	github.com/hashicorp/vault/api/auth/approle v0.8.0
-	github.com/heroku/x v0.2.6
+	github.com/heroku/x v0.2.7
 	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-colorable v0.1.13
 	github.com/prometheus/client_golang v1.20.4
