@@ -9,11 +9,10 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"reflect"
 	"sync"
 	"sync/atomic"
 	"time"
-
-	"github.com/gofiber/fiber/v2"
 )
 
 // Pool manages a pool of goroutines for work.
@@ -31,9 +30,7 @@ type Pool[T any] struct {
 	// Store registered job functions
 	//
 	// Note: this optional it can bound to other instead of [fiber.Ctx] (e.g, database for streaming html hahaha).
-	//
-	// TODO: Improve this for more flexibility to allow other types instead of currently only supporting "func(*fiber.Ctx)"
-	registeredJobs map[string]func(*fiber.Ctx) Job[T]
+	registeredJobs map[string]any
 
 	// Channel options
 	jobChannelOpts    []ChanOption[Job[T]]
@@ -74,7 +71,7 @@ func NewDoWork[T any](opts ...NewDoWorkOption[T]) *Pool[T] {
 		activeJobs:     0,
 		isRunning:      0,
 		mu:             sync.Mutex{},
-		registeredJobs: make(map[string]func(*fiber.Ctx) Job[T]),
+		registeredJobs: make(map[string]any),
 
 		// Initialize channels with default options
 		jobs:              make(chan Job[T], NumWorkers),
@@ -108,7 +105,7 @@ func (wp *Pool[T]) Stop() {
 }
 
 // Submit a job to the worker pool
-func (wp *Pool[T]) Submit(c *fiber.Ctx, jobName string) (T, error) {
+func (wp *Pool[T]) Submit(p any, jobName string) (T, error) {
 	if !wp.IsRunning() {
 		wp.Start()
 	}
@@ -125,7 +122,33 @@ func (wp *Pool[T]) Submit(c *fiber.Ctx, jobName string) (T, error) {
 	atomic.AddInt32(&wp.activeJobs, 1)        // Increment job counter
 	defer atomic.AddInt32(&wp.activeJobs, -1) // Decrement on function exit
 
-	job := jobFunc(c)
+	// Reflect on the job function to get its type and create a new instance
+	jobFuncType := reflect.TypeOf(jobFunc)
+	jobFuncValue := reflect.ValueOf(jobFunc)
+
+	// Create a slice to hold the arguments for the job function
+	args := make([]reflect.Value, jobFuncType.NumIn())
+
+	// Set the parameter value as the first argument if it's not nil
+	if p != nil {
+		// Note: To make it work, the parameter must be passed as an interface, and it works well when passed to the generic Job interface (in jobs.go).
+		// See https://go.dev/blog/laws-of-reflection for more information.
+		args[0] = reflect.ValueOf(p)
+	} else {
+		// If the parameter is nil, create a zero value of the expected type (this is only for mock testing because reflection will crash/not work when setting a nil value)
+		paramType := jobFuncType.In(0)
+		args[0] = reflect.Zero(paramType)
+	}
+
+	// Call the job function with the arguments
+	resultValues := jobFuncValue.Call(args)
+
+	// Get the Job instance from the result values
+	job, ok := resultValues[0].Interface().(Job[T])
+	if !ok {
+		var zero T
+		return zero, fmt.Errorf("invalid job function return type")
+	}
 	wp.jobs <- job
 	select {
 	case result := <-wp.results:
