@@ -132,10 +132,13 @@ func (wp *Pool[T]) Submit(p any, jobName string) (T, error) {
 	// Set the parameter value as the first argument if it's not nil
 	if p != nil {
 		// Note: To make it work, the parameter must be passed as an interface, and it works well when passed to the generic Job interface (in jobs.go).
+		// Also note that this enhancement only makes it flexible and allows other types. For the fiber ctx func, it should work well.
 		// See https://go.dev/blog/laws-of-reflection for more information.
 		args[0] = reflect.ValueOf(p)
 	} else {
-		// If the parameter is nil, create a zero value of the expected type (this is only for mock testing because reflection will crash/not work when setting a nil value)
+		// If the parameter is nil, create a zero value of the expected type.
+		// Note: This is only for mock testing because reflection will crash or not work when setting a nil value.
+		// Do not set a nil value in production.
 		paramType := jobFuncType.In(0)
 		args[0] = reflect.Zero(paramType)
 	}
