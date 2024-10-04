@@ -1,5 +1,8 @@
 # REST APIs Deployment [Zer0 Downtime] by H0llyW00dzZ for an microservices k8s.
 #
+# Important: While this deployment is "Stateless" and 100% stable with HPA and CA (Autopilot),
+# don't switch to "Stateful" unless you are using Fiber's in-memory storage (see https://docs.gofiber.io/storage/memory_v2.x.x/memory/).
+#
 # Note: This will automatically create the namespace if it doesn't exist. If the namespace already exists, it won't be affected.
 apiVersion: v1
 kind: Namespace
@@ -44,7 +47,8 @@ spec:
           resources:
             requests:
               memory: "256Mi"
-              cpu: "250m"
+              # This is suitable for Cluster Autoscaler (Auto Pilot) and GKE Autopilot that use nodes with low average specs (e.g., 4 vCPU, 2 vCPU)
+              cpu: "350m"
             limits:
               memory: "512Mi"
               cpu: "500m"
@@ -235,6 +239,7 @@ spec:
         target:
           type: Utilization
           averageUtilization: 80
+    # TODO: Remove this because Fiber has built-in zero-allocation?
     - type: Resource
       resource:
         name: memory
