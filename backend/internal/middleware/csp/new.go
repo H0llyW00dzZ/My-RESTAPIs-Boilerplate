@@ -7,9 +7,9 @@ package csp
 
 import (
 	log "h0llyw00dz-template/backend/internal/logger"
+	"unique"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/utils"
 )
 
 // New creates a new instance of the CSP middleware with the provided configuration.
@@ -30,20 +30,18 @@ func New(config ...Config) fiber.Handler {
 		clientIPs := getClientIP(c, cfg.IPHeader)
 
 		// Check if Cloudflare is detected
-		// TODO: Remove utils.CopyString ?
-		cloudflareRayID := utils.CopyString(c.Get(log.CloudflareRayIDHeader))
-		if cloudflareRayID != "" {
+		cloudflareRayIDHandle := unique.Make(c.Get(log.CloudflareRayIDHeader))
+		if cloudflareRayIDHandle.Value() != "" {
 			for i, clientIP := range clientIPs {
-				clientIPs[i] = clientIP + " - Cloudflare detected - Ray ID: " + cloudflareRayID
+				clientIPs[i] = clientIP + " - Cloudflare detected - Ray ID: " + cloudflareRayIDHandle.Value()
 			}
 		}
 
 		// Get country code from request header
-		// TODO: Remove utils.CopyString ?
-		countryCode := utils.CopyString(c.Get(log.CloudflareIPCountryHeader))
-		if countryCode != "" {
+		countryCodeHandle := unique.Make(c.Get(log.CloudflareIPCountryHeader))
+		if countryCodeHandle.Value() != "" {
 			for i, clientIP := range clientIPs {
-				clientIPs[i] = clientIP + ", Country: " + countryCode
+				clientIPs[i] = clientIP + ", Country: " + countryCodeHandle.Value()
 			}
 		}
 
