@@ -53,7 +53,7 @@ spec:
               # For example, when the CPU reaches 350m or 500m due to concurrency (e.g., the goroutine workers), the HPA replica count will be around 4 or more.
               # If the replica count reaches 5 or higher, it will cause pending pods, and the Cluster Autoscaler (Autopilot) or GKE Autopilot will attach another node until there are no pending pods.
               # Later, each node (e.g., 5 nodes) will have a CPU under 80%.
-              # Also note that this example demonstrates how to handle unpredictable and dynamic resource usage, as it is difficult to predict resource usage accurately, even if you are a genius.
+              # Also note that this example demonstrates how to handle unpredictable and dynamic cpu resource usage, as it is difficult to predict resource usage accurately, even if you are a genius.
               cpu: "350m"
             limits:
               memory: "512Mi"
