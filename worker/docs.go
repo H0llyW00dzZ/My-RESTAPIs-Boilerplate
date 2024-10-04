@@ -121,7 +121,8 @@
 //     (e.g., implementing its own self-healing mechanism, maintaining databases, fully managed by the goroutines).
 //
 //   - While using this worker, do not use a mutex again in functions that will be executed/managed by goroutines, because it can degrade the performance (making it slower).
-//     Instead, use channels for communication.
+//     Instead, use channels for communication. Additionally, to ensure avoiding data races (as mutexes can degrade performance), use the "unique" package (a new package) by copying from the original value. It is safe.
+//     However, while using "unique", resource memory usage will be dynamic (unpredictable, e.g., 70MiB then scaling down to 40MiB), and it is suitable for HPA due to its spreading across every pod.
 //
 // # Boost The Worker:
 //
