@@ -2,6 +2,8 @@
 #
 # Important: While this deployment is "Stateless" and 100% stable with HPA and CA (Autopilot),
 # don't switch to "Stateful" unless you are using Fiber's in-memory storage (see https://docs.gofiber.io/storage/memory_v2.x.x/memory/).
+# Also note that when switching the deployment from Stateless -> Stateful, you can't leverage k8s power (e.g., Autopilot, cluster updates, etc.),
+# and when using Fiber's in-memory storage, consider using VPA instead of HPA.
 #
 # Note: This will automatically create the namespace if it doesn't exist. If the namespace already exists, it won't be affected.
 apiVersion: v1
