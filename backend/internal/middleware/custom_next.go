@@ -9,6 +9,7 @@ import (
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"strings"
+	"unique"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
@@ -168,9 +169,13 @@ func CustomNextStatusCode(statusCodes ...int) func(*fiber.Ctx) bool {
 func CustomNextHeader(headerKeys ...string) func(*fiber.Ctx) bool {
 	return func(c *fiber.Ctx) bool {
 		for _, headerKey := range headerKeys {
-			// TODO: Remove utils.CopyString ? as it is only used for references and not for storing values
-			if utils.CopyString(c.Get(headerKey)) != "" {
-				return true
+			headerValue := c.Get(headerKey)
+			if headerValue != "" {
+				// Note: This is just a test of a new package introduced in Go 1.23.
+				handle := unique.Make(headerValue)
+				if handle.Value() != "" {
+					return true
+				}
 			}
 		}
 		return false
@@ -197,11 +202,17 @@ func CustomNextHeader(headerKeys ...string) func(*fiber.Ctx) bool {
 //
 // Note: This function is suitable for middleware that should be skipped for specific hostnames or domains.
 func CustomNextHostName(hostnames ...string) func(*fiber.Ctx) bool {
+	// Note: This is just a test of a new package introduced in Go 1.23.
+	for _, hostname := range hostnames {
+		uniqueHostnames = append(uniqueHostnames, unique.Make(hostname))
+	}
+
 	return func(c *fiber.Ctx) bool {
-		// TODO: Remove utils.CopyString ? as it is only used for references and not for storing values
-		currentHostname := utils.CopyString(c.Hostname())
-		for _, hostname := range hostnames {
-			if currentHostname == hostname {
+		currentHostname := c.Hostname()
+		currentHandle := unique.Make(currentHostname)
+
+		for _, uniqueHostname := range uniqueHostnames {
+			if currentHandle == uniqueHostname {
 				return true
 			}
 		}
