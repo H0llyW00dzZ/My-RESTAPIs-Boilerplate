@@ -245,10 +245,10 @@ spec:
         target:
           type: Utilization
           averageUtilization: 80
-    # TODO: Remove this because Fiber has built-in zero-allocation?
+    # Now both can grow dynamically, highly stable for extreme scalability
     - type: Resource
       resource:
         name: memory
         target:
           type: Utilization
-          averageUtilization: 50
+          averageUtilization: 80
