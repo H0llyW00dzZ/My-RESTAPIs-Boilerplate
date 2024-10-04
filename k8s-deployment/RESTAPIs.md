@@ -145,6 +145,18 @@ Adjust the HPA configuration in the `restapis-deploy.yaml` file to suit your app
 
 The provided deployment files are designed to be customizable. You can modify the resource limits, environment variables, and other configurations according to your application's needs. Additionally, you can adjust the Ingress configuration to match your desired routing rules and TLS settings.
 
+## Tips
+
+Here are some tips to boost/improve the network performance. These are well-known in GKE because most important components are already built-in, and you only need to enable them:
+
+- GKE:
+
+Enable [Dataplane V2 Observability](https://docs.cilium.io/en/stable/internals/hubble/)
+
+> [!NOTE]
+> It can also improve the security mechanism if you have a deep understanding of networking.
+> Other cloud providers might be added later, as I don't have experience with them. Additionally, the K8s ecosystem is large, not small.
+
 ## Cleanup
 
 To remove the deployed resources from your Kubernetes cluster, run the following commands:
