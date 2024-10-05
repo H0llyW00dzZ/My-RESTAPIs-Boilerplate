@@ -9,8 +9,8 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"h0llyw00dz-template/backend/pkg/gc"
 	"strings"
-	"unique"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
@@ -77,12 +77,6 @@ func defaultCSPValueGenerator(randomness string, customValues map[string]string)
 	return cspBuilder.String()
 }
 
-// uniqueMake is a global variable that holds a function to generate a unique handle for the client IP address.
-// It takes a [fiber.Ctx] as input and returns a function that, when called, returns the unique handle value.
-var uniqueMake = func(c *fiber.Ctx) func() string {
-	return unique.Make(c.Get(DefaultConfig().IPHeader)).Value
-}
-
 // getClientIP retrieves the client IP address from the specified header or the remote address.
 //
 // It handles cases where the header contains multiple IP addresses separated by commas.
@@ -90,15 +84,16 @@ var uniqueMake = func(c *fiber.Ctx) func() string {
 // Important: The real client IP address must be the first one in the list. Other IP addresses in the list are typically from proxies or load balancers.
 // If the real client IP address is not the first one, it indicates that other routers/ingresses are not following best practices (bad practices) for IP address forwarding.
 func getClientIP(c *fiber.Ctx) []string {
-	clientIP := uniqueMake(c)
-	if clientIP() == "" {
+	uniqueMake := gc.UniqueMakeFiberCTX(c)
+	clientIP := uniqueMake(c.Get(DefaultConfig().IPHeader)).(string)
+	if clientIP == "" {
 		return []string{c.IP()}
 	}
 
 	var validIPs []string
 
 	// Split the header value by comma to get multiple IP addresses
-	ipList := strings.Split(clientIP(), ",")
+	ipList := strings.Split(clientIP, ",")
 
 	// Iterate over the IP addresses and store the valid ones
 	for _, ip := range ipList {
