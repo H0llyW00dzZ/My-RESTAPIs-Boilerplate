@@ -7,7 +7,6 @@ package csp
 
 import (
 	log "h0llyw00dz-template/backend/internal/logger"
-	"unique"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
@@ -28,7 +27,7 @@ func New(config ...Config) fiber.Handler {
 		}
 
 		// Get client IP address
-		clientIPs := getClientIP(c, cfg.IPHeader)
+		clientIPs := getClientIP(c)
 
 		// Check if Cloudflare is detected
 		// this already unique
@@ -40,10 +39,11 @@ func New(config ...Config) fiber.Handler {
 		}
 
 		// Get country code from request header
-		countryCodeHandle := unique.Make(c.Get(log.CloudflareIPCountryHeader))
-		if countryCodeHandle.Value() != "" {
+		// this already unique
+		countryCodeHandle := utils.CopyString(c.Get(log.CloudflareIPCountryHeader))
+		if countryCodeHandle != "" {
 			for i, clientIP := range clientIPs {
-				clientIPs[i] = clientIP + ", Country: " + countryCodeHandle.Value()
+				clientIPs[i] = clientIP + ", Country: " + countryCodeHandle
 			}
 		}
 
