@@ -84,8 +84,9 @@ func defaultCSPValueGenerator(randomness string, customValues map[string]string)
 // Important: The real client IP address must be the first one in the list. Other IP addresses in the list are typically from proxies or load balancers.
 // If the real client IP address is not the first one, it indicates that other routers/ingresses are not following best practices (bad practices) for IP address forwarding.
 func getClientIP(c *fiber.Ctx) []string {
-	uniqueMake := gc.UniqueMakeFiberCTX(c)
-	clientIP := uniqueMake(c.Get(DefaultConfig().IPHeader)).(string)
+	uniqueMake := gc.UniqueMakeTFiberCTX(c)
+	clientIPHandle := uniqueMake(c.Get(DefaultConfig().IPHeader))
+	clientIP := clientIPHandle.Value().(string)
 	if clientIP == "" {
 		return []string{c.IP()}
 	}
