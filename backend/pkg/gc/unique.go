@@ -12,9 +12,9 @@ import (
 )
 
 // UniqueMakeFiberCTX is a global variable that holds a function to generate a unique handle for any value.
-// It takes a *fiber.Ctx and a value of any type as input and returns a function that, when called, returns the unique handle value.
+// It takes a [fiber.Ctx] and a value of any type as input and returns a function that, when called, returns the unique handle value.
 //
-// The unique handle is generated using the unique.Make function, which creates a globally unique identity
+// The unique handle is generated using the [unique.Make] function, which creates a globally unique identity
 // for the provided value.
 //
 // The returned function, when called, retrieves the actual value of the unique handle using the Value method.
@@ -29,7 +29,7 @@ var UniqueMakeFiberCTX = func(c *fiber.Ctx) func(value any) any {
 // UniqueMake is a global variable that holds a function to generate a unique handle for any value.
 // It takes a value of any type as input and returns a function that, when called, returns the unique handle value.
 //
-// The unique handle is generated using the unique.Make function, which creates a globally unique identity
+// The unique handle is generated using the [unique.Make] function, which creates a globally unique identity
 // for the provided value.
 //
 // The returned function, when called, retrieves the actual value of the unique handle using the Value method.
