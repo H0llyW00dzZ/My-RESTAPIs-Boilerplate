@@ -54,6 +54,10 @@ var UniqueMake = func(value any) func() any {
 // The comparison of two handles is trivial and typically much more efficient than comparing the values used to create them.
 //
 // This allows for efficient and consistent retrieval of unique handles for any comparable value throughout the code.
+//
+// Note: This is suitable for horizontal pod autoscaling (HPA) due to its dynamic resource usage.
+// As the CPU usage grows, the memory usage is spread across every pod, just like waterfall.
+// This allows for efficient scaling and resource utilization in a distributed environment.
 var UniqueMakeT = func(value any) func() unique.Handle[any] {
 	return func() unique.Handle[any] {
 		return unique.Make(value)
@@ -73,6 +77,10 @@ var UniqueMakeT = func(value any) func() unique.Handle[any] {
 // The comparison of two handles is trivial and typically much more efficient than comparing the values used to create them.
 //
 // This allows for efficient and consistent retrieval of unique handles for any comparable value throughout the code within a Fiber context.
+//
+// Note: This is suitable for horizontal pod autoscaling (HPA) due to its dynamic resource usage.
+// As the CPU usage grows, the memory usage is spread across every pod, just like waterfall.
+// This allows for efficient scaling and resource utilization in a distributed environment.
 var UniqueMakeTFiberCTX = func(c *fiber.Ctx) func(value any) unique.Handle[any] {
 	return func(value any) unique.Handle[any] {
 		return unique.Make(value)
