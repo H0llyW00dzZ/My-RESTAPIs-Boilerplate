@@ -40,3 +40,41 @@ var UniqueMake = func(value any) func() any {
 		return unique.Make(value).Value()
 	}
 }
+
+// UniqueMakeT is a global variable that holds a function to generate a unique handle for any comparable value.
+// It takes a value of any comparable type as input and returns a function that, when called, returns the unique handle.
+//
+// The unique handle is generated using the [unique.Make] function, which creates a globally unique identity
+// for the provided value. The handle is of type [unique.Handle[T]], where T is the type of the input value.
+//
+// The returned function, when called, retrieves the actual value of the unique handle using the Value method.
+// The Value method returns a shallow copy of the original value that produced the handle.
+//
+// Two handles compare equal exactly if the two values used to create the handles would have also compared equal.
+// The comparison of two handles is trivial and typically much more efficient than comparing the values used to create them.
+//
+// This allows for efficient and consistent retrieval of unique handles for any comparable value throughout the code.
+var UniqueMakeT = func(value any) func() unique.Handle[any] {
+	return func() unique.Handle[any] {
+		return unique.Make(value)
+	}
+}
+
+// UniqueMakeTFiberCTX is a global variable that holds a function to generate a unique handle for any comparable value within a Fiber context.
+// It takes a [fiber.Ctx] and a value of any comparable type as input and returns a function that, when called, returns the unique handle.
+//
+// The unique handle is generated using the [unique.Make] function, which creates a globally unique identity
+// for the provided value. The handle is of type [unique.Handle[T]], where T is the type of the input value.
+//
+// The returned function, when called, retrieves the actual value of the unique handle using the Value method.
+// The Value method returns a shallow copy of the original value that produced the handle.
+//
+// Two handles compare equal exactly if the two values used to create the handles would have also compared equal.
+// The comparison of two handles is trivial and typically much more efficient than comparing the values used to create them.
+//
+// This allows for efficient and consistent retrieval of unique handles for any comparable value throughout the code within a Fiber context.
+var UniqueMakeTFiberCTX = func(c *fiber.Ctx) func(value any) unique.Handle[any] {
+	return func(value any) unique.Handle[any] {
+		return unique.Make(value)
+	}
+}
