@@ -10,6 +10,7 @@ import (
 	"unique"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
 )
 
 // New creates a new instance of the CSP middleware with the provided configuration.
@@ -30,10 +31,11 @@ func New(config ...Config) fiber.Handler {
 		clientIPs := getClientIP(c, cfg.IPHeader)
 
 		// Check if Cloudflare is detected
-		cloudflareRayIDHandle := unique.Make(c.Get(log.CloudflareRayIDHeader))
-		if cloudflareRayIDHandle.Value() != "" {
+		// this already unique
+		cloudflareRayIDHandle := utils.CopyString(c.Get(log.CloudflareRayIDHeader))
+		if cloudflareRayIDHandle != "" {
 			for i, clientIP := range clientIPs {
-				clientIPs[i] = clientIP + " - Cloudflare detected - Ray ID: " + cloudflareRayIDHandle.Value()
+				clientIPs[i] = clientIP + " - Cloudflare detected - Ray ID: " + cloudflareRayIDHandle
 			}
 		}
 
@@ -65,7 +67,7 @@ func New(config ...Config) fiber.Handler {
 		cspValue := cfg.CSPValueGenerator(randomness, customValues)
 
 		// Set CSP header
-		c.Set("Content-Security-Policy", cspValue)
+		c.Set(fiber.HeaderContentSecurityPolicy, cspValue)
 
 		// Continue to next middleware
 		return c.Next()
