@@ -120,8 +120,10 @@
 //   - Due to this worker being designed similar to a semaphore, it is recommended to use it in Kubernetes batch/job services as it can be useful for the cluster
 //     (e.g., implementing its own self-healing mechanism, maintaining databases, fully managed by the goroutines).
 //
-//   - While using this worker, do not use a mutex again in functions that will be executed/managed by goroutines, because it can degrade the performance (making it slower).
-//     Instead, use channels for communication.
+//   - While using this worker, avoid using mutexes in functions that will be executed/managed by goroutines, as it can degrade performance and make the code slower.
+//     Instead, use channels for communication between goroutines. Additionally, consider using immutable data structures that can be safely shared across 1000000 goroutines.
+//     One option is to use the package "github.com/gofiber/utils/v2" which provides immutable data types.
+//     By default, this worker is safe from race conditions because it uses channels for communication and synchronization.
 //
 // # Boost The Worker:
 //
