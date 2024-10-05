@@ -8,6 +8,7 @@ package middleware
 import (
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
+	"h0llyw00dz-template/backend/pkg/gc"
 	"strings"
 	"unique"
 
@@ -168,12 +169,12 @@ func CustomNextStatusCode(statusCodes ...int) func(*fiber.Ctx) bool {
 //     skip the middleware for the given request based on the presence of any of the specified header keys.
 func CustomNextHeader(headerKeys ...string) func(*fiber.Ctx) bool {
 	return func(c *fiber.Ctx) bool {
+		uniqueMakeT := gc.UniqueMakeTFiberCTX(c)
 		for _, headerKey := range headerKeys {
 			headerValue := c.Get(headerKey)
 			if headerValue != "" {
-				// Note: This is just a test of a new package introduced in Go 1.23.
-				handle := unique.Make(headerValue)
-				if handle.Value() != "" {
+				handle := uniqueMakeT(headerValue)
+				if handle.Value().(string) != "" {
 					return true
 				}
 			}
