@@ -63,11 +63,9 @@ func New(config ...Config) fiber.Handler {
 		// When using base64 encoding, consider storing the base64 encoded in c.Locals first or somewhere (e.g, database). Avoid fetching the value from
 		// the header and then putting it in the render or direct in the render, as the format will be different due to sanitization.
 		cspValue := cfg.CSPValueGenerator(randomness, customValues)
-		copyCSPValue := unique.Make(cspValue)
 
-		// Set CSP
-		// Now this immutable forever
-		c.Set("Content-Security-Policy", copyCSPValue.Value())
+		// Set CSP header
+		c.Set("Content-Security-Policy", cspValue)
 
 		// Continue to next middleware
 		return c.Next()
