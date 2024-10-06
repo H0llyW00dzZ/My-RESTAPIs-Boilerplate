@@ -58,6 +58,9 @@ var UniqueMake = func(value any) func() any {
 // Note: This is suitable for horizontal pod autoscaling (HPA) due to its dynamic resource usage.
 // As the CPU usage grows, the memory usage is spread across every pod, just like waterfall.
 // This allows for efficient scaling and resource utilization in a distributed environment.
+// It's also worth noting that due to its dynamic resource usage, it won't cause garbage collection (GC) overhead because of memory allocation.
+// The unique handles are immutable, and since this is a new package, it has a built-in GC mechanism.
+// For example, once you call [unique.Make], the GC will recycle the memory soon when it's no longer needed.
 var UniqueMakeT = func(value any) func() unique.Handle[any] {
 	return func() unique.Handle[any] {
 		return unique.Make(value)
@@ -81,6 +84,9 @@ var UniqueMakeT = func(value any) func() unique.Handle[any] {
 // Note: This is suitable for horizontal pod autoscaling (HPA) due to its dynamic resource usage.
 // As the CPU usage grows, the memory usage is spread across every pod, just like waterfall.
 // This allows for efficient scaling and resource utilization in a distributed environment.
+// It's also worth noting that due to its dynamic resource usage, it won't cause garbage collection (GC) overhead because of memory allocation.
+// The unique handles are immutable, and since this is a new package, it has a built-in GC mechanism.
+// For example, once you call [unique.Make], the GC will recycle the memory soon when it's no longer needed.
 var UniqueMakeTFiberCTX = func(c *fiber.Ctx) func(value any) unique.Handle[any] {
 	return func(value any) unique.Handle[any] {
 		return unique.Make(value)
