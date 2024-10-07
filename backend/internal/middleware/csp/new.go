@@ -27,7 +27,8 @@ func New(config ...Config) fiber.Handler {
 		}
 
 		// Get client IP address
-		clientIPs := getClientIP(c)
+		headerValue := cfg.IPHeader
+		clientIPs := getClientIP(c, headerValue)
 
 		// Check if Cloudflare is detected
 		// this already unique
