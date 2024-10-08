@@ -29,23 +29,29 @@ func New(config ...Config) fiber.Handler {
 		// Get client IP address
 		clientIPs := getClientIP(c, cfg.IPHeader)
 
+		// Initialize a slice to hold client IPs with additional information
+		var clientIPsWithInfo []string
+
 		// Check if Cloudflare is detected
 		// this already unique
 		cloudflareRayIDHandle := utils.CopyString(c.Get(log.CloudflareRayIDHeader))
-		if cloudflareRayIDHandle != "" {
-			for i, clientIP := range clientIPs {
-				clientIPs[i] = clientIP + " - Cloudflare detected - Ray ID: " + cloudflareRayIDHandle
-			}
-		}
-
 		// Get country code from request header
 		// this already unique
 		countryCodeHandle := utils.CopyString(c.Get(log.CloudflareIPCountryHeader))
-		if countryCodeHandle != "" {
-			for i, clientIP := range clientIPs {
-				clientIPs[i] = clientIP + ", Country: " + countryCodeHandle
+
+		for _, ip := range clientIPs {
+			if cloudflareRayIDHandle != "" {
+				ip += " - Cloudflare detected - Ray ID: " + cloudflareRayIDHandle
 			}
+
+			if countryCodeHandle != "" {
+				ip += ", Country: " + countryCodeHandle
+			}
+
+			clientIPsWithInfo = append(clientIPsWithInfo, ip)
 		}
+
+		clientIPs = clientIPsWithInfo
 
 		// Generate the randomness using the configured generator
 		var randomness string

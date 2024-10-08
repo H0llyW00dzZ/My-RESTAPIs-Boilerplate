@@ -86,8 +86,10 @@ func defaultCSPValueGenerator(randomness string, customValues map[string]string)
 func getClientIP(c *fiber.Ctx, headerValue string) []string {
 	uniqueMake := gc.UniqueMakeTFiberCTX(c)
 	clientIPHandle := uniqueMake(c.Get(headerValue))
-	clientIP := clientIPHandle.Value().(string)
-	if clientIP == "" {
+	// Note: The use of "ok" in this example is optional. It can be omitted, but doing so may lead to more complex code with multiple explicit if statements.
+	// This is generally not considered good practice in Go, especially when writing functions that contain many nested if statements.
+	clientIP, ok := clientIPHandle.Value().(string)
+	if !ok || clientIP == "" {
 		return []string{c.IP()}
 	}
 
