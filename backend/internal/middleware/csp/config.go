@@ -109,6 +109,10 @@ func getClientIP(c *fiber.Ctx, headerValue string) []string {
 		}
 
 		// Check if the IP address is a valid IPv6 address
+		//
+		// TODO: Consider removing this check for IPv6,
+		// as it may complicate the process of including multiple IPv6 addresses in the HTTP header.
+		// Is it feasible to handle many IPv6 addresses?
 		if utils.IsIPv6(ip) {
 			validIPs = append(validIPs, ip)
 		}
