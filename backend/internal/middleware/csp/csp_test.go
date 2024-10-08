@@ -103,4 +103,32 @@ func TestCSPMiddleware(t *testing.T) {
 	if resp.Header.Get("Content-Security-Policy") == "" {
 		t.Error("Content-Security-Policy header is empty")
 	}
+
+	// Test case 4: Invalid IP address provided
+	app.Use(csp.New())
+
+	app.Get("/invalid-ip", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"message": "Invalid IP provided",
+		})
+	})
+
+	req = httptest.NewRequest("GET", "/invalid-ip", nil)
+	req.Header.Set("X-Real-IP", "invalid-ip-address")
+	resp, err = app.Test(req)
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	// Check if the CSP header is set correctly or remains empty as expected
+	if resp.Header.Get("Content-Security-Policy") == "" {
+		t.Error("Content-Security-Policy header is empty as expected for invalid IP")
+	} else {
+		// Note: This test may yield different results on different machines. However, on my laptop,
+		// the default local IP for testing is "19e36255972107d42b8cecb77ef5622e842e8a50778a6ed8dd1ce94732daca9e", which corresponds to 0.0.0.0.
+		expectedCSP := "script-src 'nonce-19e36255972107d42b8cecb77ef5622e842e8a50778a6ed8dd1ce94732daca9e'"
+		if resp.Header.Get("Content-Security-Policy") != expectedCSP {
+			t.Errorf("Unexpected Content-Security-Policy header value: %s", resp.Header.Get("Content-Security-Policy"))
+		}
+	}
 }
