@@ -3,6 +3,14 @@
 #
 # Important: Ensure that this repository is configured for HTTPS/TLS, allowing Ingress NGINX to pass HTTPS/TLS to the service.
 # This is because terminating HTTPS/TLS at the Ingress NGINX and then forwarding it as HTTP to the service can slow down concurrency, even in the latest version of Ingress NGINX.
+#
+# For example, "slow down concurrency" refers to the struggle to handle a large number of concurrent requests.
+#
+# When Ingress NGINX terminates HTTPS/TLS and then forwards it to the service using HTTP for many concurrent requests (e.g., from a Go client),
+# it can impact the performance of the ingress itself and other ingresses, making it slower.
+# This can also affect the service and other services (e.g., waiting for NGINX).
+#
+# Since this repository is focused on high/extreme performance, it is suitable for handling many concurrent requests while allowing Ingress NGINX to pass HTTPS/TLS to the service (this repository).
 apiVersion: v1
 data:
   # Note: Enabling snippet annotations will not introduce any security vulnerabilities, particularly for auto-pilot, 
