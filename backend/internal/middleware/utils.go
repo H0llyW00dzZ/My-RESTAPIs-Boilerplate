@@ -394,6 +394,15 @@ func NewRedirectMiddleware(options ...any) fiber.Handler {
 // it is recommended to use a database that can handle high connections,
 // for example, Redis is recommended because it can handle 10K++ connections,
 // which is perfect for pooling without bottlenecks, and it's essentially unlimited connection.
+//
+// Additionally, any session mechanism can be combined with an authentication mechanism.
+// In the Fiber framework, it supports Horizontal Pod Autoscaler (HPA) as long as sessions are not stored directly in memory, such as in memory storage (see https://docs.gofiber.io/storage/memory_v2.x.x/memory/).
+//
+// Also note that while the Fiber framework is fully compatible with Horizontal Pod Autoscaler (HPA), keep in mind that resource memory usage and CPU must be dynamic.
+// For example, when CPU usage increases, it may scale up to 5 pods, each with varying resource usage rather than all being static (the same).
+// If all of them are static (e.g., memory usage) and do not grow, it may not be fully stable with HPA.
+//
+// TODO: Split this function (for original & custom), as it implements a custom session mechanism.
 func NewSessionMiddleware(options ...any) fiber.Handler {
 	// Create a new session middleware configuration.
 	config := session.Config{}
