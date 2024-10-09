@@ -2,7 +2,7 @@
 # Note: This is suitable for Fiber running in internal mode (e.g., private cluster, never exposed to the service).
 #
 # Important: Ensure that this repository is configured for HTTPS/TLS, allowing Ingress NGINX to pass HTTPS/TLS to the service.
-# This is because terminating HTTPS/TLS at the Ingress NGINX and then forwarding it as HTTP to the service can slow down concurrency.
+# This is because terminating HTTPS/TLS at the Ingress NGINX and then forwarding it as HTTP to the service can slow down concurrency, even in the latest version of Ingress NGINX.
 apiVersion: v1
 data:
   # Note: Enabling snippet annotations will not introduce any security vulnerabilities, particularly for auto-pilot, 
