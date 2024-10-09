@@ -6,7 +6,7 @@
 apiVersion: v1
 data:
   # Note: Enabling snippet annotations will not introduce any security vulnerabilities, particularly for auto-pilot, 
-  # as they are only used for the server header. This differs from "traditional cluster management," where configurations 
+  # as they are only used for the server header. This differs from "traditional cluster management" where configurations 
   # must be set individually for each instance.
   allow-snippet-annotations: "true" # Enable snippet annotations
   hsts: "false" # For REST API, this is not very important, so it is disabled
