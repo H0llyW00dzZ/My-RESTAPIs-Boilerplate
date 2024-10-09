@@ -1,26 +1,29 @@
-# REST API Ingress Controller Configuration [Zer0 Downtime].
-# Note: This suitable for fiber that in internal mode (e.g, private cluster, never exposed to service)
+# REST API Ingress Controller Configuration [Zero Downtime].
+# Note: This is suitable for Fiber running in internal mode (e.g., private cluster, never exposed to the service).
+#
+# Important: Ensure that this repository is configured for HTTPS/TLS, allowing Ingress NGINX to pass HTTPS/TLS to the service.
+# This is because terminating HTTPS/TLS at the Ingress NGINX and then forwarding it as HTTP to the service can slow down concurrency, even in the latest version of Ingress NGINX.
 apiVersion: v1
 data:
+  # Note: Enabling snippet annotations will not introduce any security vulnerabilities, particularly for auto-pilot, 
+  # as they are only used for the server header. This differs from "traditional cluster management" where configurations 
+  # must be set individually for each instance.
   allow-snippet-annotations: "true" # Enable snippet annotations
-  hsts: "false" # for rest api this not really important, so disabled
-  log-format-upstream:
-    '[H0llyW00dzZ Network] [Operator: $namespace - $ingress_name - $service_name] $remote_addr - $remote_user [Cloudflare: Client IP: $http_cf_connecting_ip - Country: $http_cf_ipcountry] [Cloudflare Worker: $http_cf_worker] [$time_local] "$request" $status $body_bytes_sent
-    "$http_referer" "$http_user_agent" $request_length $request_time [$proxy_upstream_name]
-    [$proxy_alternative_upstream_name] $upstream_addr $upstream_response_length $upstream_response_time
-    $upstream_status $req_id'
-  ssl-protocols: TLSv1.3
-  use-upstream-server-addr: "true" # pretty useful for communication through internal mode (e.g, private cluster, never exposed to service)
-  generate-request-id: "false" # disable default nginx request-id generation as it is already handled by the fiber framework
+  hsts: "false" # For REST API, this is not very important, so it is disabled
+  log-format-upstream: '[H0llyW00dzZ Network] [Operator: $namespace - $ingress_name - $service_name] $remote_addr - $remote_user [Cloudflare: Client IP: $http_cf_connecting_ip - Country: $http_cf_ipcountry] [Cloudflare Worker: $http_cf_worker] [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" $request_length $request_time [$proxy_upstream_name] [$proxy_alternative_upstream_name] $upstream_addr $upstream_response_length $upstream_response_time $upstream_status $req_id'
+  ssl-protocols: TLSv1.3 # This may be optional if using ECC instead of RSA, which can handle both TLS 1.3 and TLS 1.2.
+  use-upstream-server-addr: "true" # Useful for communication in internal mode (e.g., private cluster, never exposed to the service)
+  generate-request-id: "false" # Disable default NGINX request ID generation as it is already handled by the Fiber framework
   server-tokens: "false" # Disable the default Server header
-  enable-brotli: "true" # Enhance speed for CompressJSON, by default this false
-  brotli-level: "6" # Perfectly balanced for resource (cpu, memory)
-  brotli-min-length: "200" # Same As Brotli Compress Fiber Framework
+  enable-brotli: "true" # Enhance speed for CompressJSON; by default, this is false
+  brotli-level: "6" # Perfectly balanced for resource usage (CPU, memory)
+  brotli-min-length: "200" # Same as Brotli Compress in Fiber Framework
   server-snippet: |
     more_set_headers "Server: H0llyW00dzZ Network";
     more_set_headers "Via: H0llyW00dzZ Network";
-  enable-ocsp: "true" # Enable HIPAA (https://www.hhs.gov/hipaa/for-professionals/security/guidance/index.html) and NIST (https://csrc.nist.gov/glossary/term/online_certificate_status_protocol) Compliance Test
-  proxy-buffering: "on" # which is suitable for handling AI
+  # This requires disabling ssl-protocols: TLSv1.3 to allow handling of both TLS 1.3 and TLS 1.2 for OCSP.
+  enable-ocsp: "true" # Enable HIPAA (https://www.hhs.gov/hipaa/for-professionals/security/guidance/index.html) and NIST (https://csrc.nist.gov/glossary/term/online_certificate_status_protocol) compliance testing
+  proxy-buffering: "on" # Suitable for handling AI
 kind: ConfigMap
 # When this is applied, it will configure the ingress-nginx-controller for smooth sailing ⛵ ☸
 metadata:
