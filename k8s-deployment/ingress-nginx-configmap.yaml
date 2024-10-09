@@ -1,5 +1,5 @@
 # REST API Ingress Controller Configuration [Zero Downtime].
-# Note: This is suitable for Fiber running in internal mode (e.g., private cluster, never exposed to the service).
+# Note: This configuration is suitable for Fiber running in internal mode (e.g., private cluster, not exposed to public services, in a public cluster, or in auto-pilot mode, which is recommended to avoid overhead from configurations typical of traditional cluster management).
 #
 # Important: Ensure that this repository is configured for HTTPS/TLS, allowing Ingress NGINX to pass HTTPS/TLS to the service.
 # This is because terminating HTTPS/TLS at the Ingress NGINX and then forwarding it as HTTP to the service can slow down concurrency, even in the latest version of Ingress NGINX.
@@ -17,7 +17,7 @@ data:
   # as they are only used for the server header. This differs from "traditional cluster management" where configurations 
   # must be set individually for each instance.
   allow-snippet-annotations: "true" # Enable snippet annotations
-  hsts: "false" # For REST API, this is not very important, so it is disabled
+  hsts: "true" # This Enabled now because it can support multiple sites, not just REST APIs.
   log-format-upstream: '[H0llyW00dzZ Network] [Operator: $namespace - $ingress_name - $service_name] $remote_addr - $remote_user [Cloudflare: Client IP: $http_cf_connecting_ip - Country: $http_cf_ipcountry] [Cloudflare Worker: $http_cf_worker] [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" $request_length $request_time [$proxy_upstream_name] [$proxy_alternative_upstream_name] $upstream_addr $upstream_response_length $upstream_response_time $upstream_status $req_id'
   ssl-protocols: TLSv1.3 # This may be optional if using ECC instead of RSA, which can handle both TLS 1.3 and TLS 1.2.
   use-upstream-server-addr: "true" # Useful for communication in internal mode (e.g., private cluster, never exposed to the service)
