@@ -147,6 +147,10 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 		// - https://www.immuniweb.com/ssl/git.b0zal.io/KRIX2G2F/
 		// - https://decoder.link/sslchecker/git.b0zal.io/443
 		// - https://decoder.link/sslchecker/b0zal.io/443
+		//
+		// Additionally, note that if "enable-ocsp" is set to true in the Ingress Nginx ConfigMap, OCSP Stapling remains optional.
+		// This is because when Nginx passes requests to HTTPS/TLS related to this service without terminating it,
+		// as long as the certificate is the same for both Ingress and this service, OCSP Stapling can still be utilized.
 		tlsConfig = &tls.Config{
 			Certificates: []tls.Certificate{cert},
 		}
