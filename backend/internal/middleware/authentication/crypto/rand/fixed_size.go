@@ -80,11 +80,37 @@ func (r *fixedReader) Read(p []byte) (n int, err error) {
 // Note: This helper function is safe for use by multiple goroutines that call it simultaneously.
 // Also note that the P-521 curve might not be suitable for TLS or other applications because most internet
 // on average use curves ranging from P-256 to P-384.
+//
+// Deprecated: Use FixedSizeECC instead.
 func FixedSizeECDSA(curve elliptic.Curve) io.Reader {
 	if curve.Params().BitSize <= 256 {
 		return FixedSize32Bytes()
 	}
 	return &fixedReader{
 		size: 48,
+	}
+}
+
+// FixedSizeECC returns an [io.Reader] that provides a fixed-size random byte stream,
+// suitable for generating nonces for elliptic curve cryptography (ECC). It can be used
+// for both ECDSA and ECDH operations. The size of the random byte stream is determined
+// by the elliptic curve's bit size, ensuring that the number of random bytes is sufficient
+// for secure cryptographic operations.
+//
+// The function calculates the byte size needed for the given curve by rounding up the bit size
+// to the nearest byte boundary. This ensures that even if the bit size is not a multiple of 8,
+// the byte size will be sufficient.
+//
+// Example byte sizes for common curves:
+//   - P-256: Bit size is 256. Byte size is (256 + 7) / 8 = 32 bytes.
+//   - P-384: Bit size is 384. Byte size is (384 + 7) / 8 = 48 bytes.
+//   - P-521: Bit size is 521. Byte size is (521 + 7) / 8 = 66 bytes.
+//
+// Note: This function is safe for use by multiple goroutines simultaneously.
+func FixedSizeECC(curve elliptic.Curve) io.Reader {
+	bitSize := curve.Params().BitSize
+	byteSize := (bitSize + 7) / 8
+	return &fixedReader{
+		size: byteSize,
 	}
 }

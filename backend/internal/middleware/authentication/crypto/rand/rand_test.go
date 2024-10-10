@@ -139,3 +139,44 @@ func TestFixedSizeECDSA(t *testing.T) {
 		}
 	}
 }
+
+func TestFixedSizeECC(t *testing.T) {
+	curves := []struct {
+		curve        elliptic.Curve
+		expectedSize int
+	}{
+		{elliptic.P256(), 32},
+		{elliptic.P384(), 48},
+		{elliptic.P521(), 66},
+	}
+
+	for _, c := range curves {
+		r := rand.FixedSizeECC(c.curve)
+
+		// Test reading from the reader
+		buf := make([]byte, c.expectedSize)
+		n, err := r.Read(buf)
+
+		// Check the number of bytes read
+		if n != c.expectedSize {
+			t.Errorf("Expected to read %d bytes for curve %s, but read %d bytes", c.expectedSize, c.curve.Params().Name, n)
+		}
+
+		// Check for any errors
+		if err != nil {
+			t.Errorf("Unexpected error for curve %s: %v", c.curve.Params().Name, err)
+		}
+
+		// Test reading again to ensure it generates new random bytes
+		buf2 := make([]byte, c.expectedSize)
+		_, err = r.Read(buf2)
+		if err != nil {
+			t.Errorf("Unexpected error for curve %s: %v", c.curve.Params().Name, err)
+		}
+
+		// Check that the two reads generate different random bytes
+		if string(buf) == string(buf2) {
+			t.Errorf("Expected different random bytes on subsequent reads for curve %s", c.curve.Params().Name)
+		}
+	}
+}
