@@ -111,6 +111,7 @@ func FixedSizeECC(curve elliptic.Curve) io.Reader {
 	// This effectively Go (performs integer division) rounds down, ensuring the correct number of bytes.
 	//
 	// Playground: https://go.dev/play/p/JVgeuT_VbVi
+	//
 	// Note: This may differ from calculator results, which include decimals.
 	// Avoid using a calculator for this calculation, as it can be confusing.
 	bitSize := curve.Params().BitSize
