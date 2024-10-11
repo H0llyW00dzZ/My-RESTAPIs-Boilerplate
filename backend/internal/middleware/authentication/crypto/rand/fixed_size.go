@@ -134,8 +134,9 @@ func FixedSizeECC(curve elliptic.Curve) io.Reader {
 //   - For a 2048-bit RSA key, the byte size is 2048 / 8 = 256 bytes.
 //
 // Note: This function is safe for use by multiple goroutines simultaneously.
-// Additionally, consider using ECC instead of RSA, as RSA keys are larger and can
-// consume more bandwidth, especially in HTTPS/TLS scenarios, compared to ECC.
+// Consider using ECC instead of RSA, as RSA keys are larger and can consume more
+// bandwidth, especially in HTTPS/TLS scenarios. For similar security levels, ECC
+// (e.g., P-256) is more efficient than RSA with a 3072-bit modulus.
 func FixedSizeRSA(modulusBits int) io.Reader {
 	// Calculate the byte size needed for the RSA modulus.
 	byteSize := modulusBits / 8
