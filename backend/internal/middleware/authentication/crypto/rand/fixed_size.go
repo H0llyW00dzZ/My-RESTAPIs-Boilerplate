@@ -108,7 +108,7 @@ func FixedSizeECDSA(curve elliptic.Curve) io.Reader {
 //
 // Note: This function is safe for use by multiple goroutines simultaneously.
 func FixedSizeECC(curve elliptic.Curve) io.Reader {
-	// This effectively Go (performs integer division) rounds down, ensuring the correct number of bytes.
+	// This effectively Go (performs integer division) rounds up, ensuring the correct number of bytes.
 	//
 	// Playground: https://go.dev/play/p/JVgeuT_VbVi
 	//
