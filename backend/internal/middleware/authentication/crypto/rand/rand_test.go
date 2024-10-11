@@ -181,3 +181,46 @@ func TestFixedSizeECC(t *testing.T) {
 		}
 	}
 }
+
+// TestFixedSizeRSA tests the FixedSizeRSA function to ensure it generates the correct number of random bytes.
+func TestFixedSizeRSA(t *testing.T) {
+	modulusSizes := []struct {
+		modulusBits  int
+		expectedSize int
+	}{
+		{1024, 128},
+		{2048, 256},
+		{3072, 384},
+		{4096, 512},
+	}
+
+	for _, ms := range modulusSizes {
+		r := rand.FixedSizeRSA(ms.modulusBits)
+
+		// Test reading from the reader
+		buf := make([]byte, ms.expectedSize)
+		n, err := r.Read(buf)
+
+		// Check the number of bytes read
+		if n != ms.expectedSize {
+			t.Errorf("Expected to read %d bytes for modulus %d bits, but read %d bytes", ms.expectedSize, ms.modulusBits, n)
+		}
+
+		// Check for any errors
+		if err != nil {
+			t.Errorf("Unexpected error for modulus %d bits: %v", ms.modulusBits, err)
+		}
+
+		// Test reading again to ensure it generates new random bytes
+		buf2 := make([]byte, ms.expectedSize)
+		_, err = r.Read(buf2)
+		if err != nil {
+			t.Errorf("Unexpected error for modulus %d bits: %v", ms.modulusBits, err)
+		}
+
+		// Check that the two reads generate different random bytes
+		if string(buf) == string(buf2) {
+			t.Errorf("Expected different random bytes on subsequent reads for modulus %d bits", ms.modulusBits)
+		}
+	}
+}
