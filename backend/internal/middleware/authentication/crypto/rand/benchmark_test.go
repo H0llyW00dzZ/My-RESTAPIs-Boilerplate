@@ -72,3 +72,27 @@ func BenchmarkFixedSizeECDSA(b *testing.B) {
 		})
 	}
 }
+
+// Note: The result remains the same with zero memory allocation.
+func BenchmarkFixedSizeECC(b *testing.B) {
+	curves := []elliptic.Curve{
+		elliptic.P256(),
+		elliptic.P384(),
+		elliptic.P521(),
+	}
+
+	for _, curve := range curves {
+		b.Run(curve.Params().Name, func(b *testing.B) {
+			reader := rand.FixedSizeECC(curve)
+			byteSize := (curve.Params().BitSize + 7) / 8
+			buf := make([]byte, byteSize)
+
+			b.ResetTimer() // Reset the timer to exclude setup time
+			for i := 0; i < b.N; i++ {
+				if _, err := reader.Read(buf); err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
+	}
+}
