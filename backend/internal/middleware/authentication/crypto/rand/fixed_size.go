@@ -122,3 +122,24 @@ func FixedSizeECC(curve elliptic.Curve) io.Reader {
 		size: byteSize,
 	}
 }
+
+// FixedSizeRSA returns an [io.Reader] that provides a fixed-size random byte stream,
+// suitable for generating nonces or blinding values for RSA operations. The size of
+// the random byte stream is determined by the RSA modulus size in bytes.
+//
+// This function ensures that the number of random bytes is sufficient for secure
+// cryptographic operations with RSA keys.
+//
+// Example usage:
+//   - For a 2048-bit RSA key, the byte size is 2048 / 8 = 256 bytes.
+//
+// Note: This function is safe for use by multiple goroutines simultaneously.
+// Additionally, consider using ECC instead of RSA, as RSA keys are larger and can
+// consume more bandwidth, especially in HTTPS/TLS scenarios, compared to ECC.
+func FixedSizeRSA(modulusBits int) io.Reader {
+	// Calculate the byte size needed for the RSA modulus.
+	byteSize := modulusBits / 8
+	return &fixedReader{
+		size: byteSize,
+	}
+}
