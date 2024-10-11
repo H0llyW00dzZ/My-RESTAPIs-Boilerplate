@@ -73,9 +73,21 @@ func BenchmarkFixedSizeECDSA(b *testing.B) {
 	}
 }
 
-// Note: The result remains the same with zero memory allocation.
+// Result:
+//
+//	goos: windows
+//	goarch: amd64
+//	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
+//	cpu: Intel(R) Core(TM) i9-10980HK CPU @ 2.40GHz
+//	BenchmarkFixedSizeECC/P-224-16         	 5035641	       244.4 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECC/P-256-16         	 4856640	       241.6 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECC/P-384-16         	 4361732	       288.9 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECC/P-521-16         	 3676401	       346.8 ns/op	       0 B/op	       0 allocs/op
+//
+// Note: These results are without overclocking. If overclocked (e.g., fully overclocked), performance may increase significantly (e.g., the op).
 func BenchmarkFixedSizeECC(b *testing.B) {
 	curves := []elliptic.Curve{
+		elliptic.P224(),
 		elliptic.P256(),
 		elliptic.P384(),
 		elliptic.P521(),

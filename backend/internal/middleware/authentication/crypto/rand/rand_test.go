@@ -145,6 +145,7 @@ func TestFixedSizeECC(t *testing.T) {
 		curve        elliptic.Curve
 		expectedSize int
 	}{
+		{elliptic.P224(), 28},
 		{elliptic.P256(), 32},
 		{elliptic.P384(), 48},
 		{elliptic.P521(), 66},

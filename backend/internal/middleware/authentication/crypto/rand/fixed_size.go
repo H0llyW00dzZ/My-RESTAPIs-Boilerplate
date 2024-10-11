@@ -102,18 +102,20 @@ func FixedSizeECDSA(curve elliptic.Curve) io.Reader {
 // the byte size will be sufficient.
 //
 // Example byte sizes for common curves:
+//   - P-224: Bit size is 224. Byte size is (224 + 7) / 8 = 28 bytes.
 //   - P-256: Bit size is 256. Byte size is (256 + 7) / 8 = 32 bytes.
 //   - P-384: Bit size is 384. Byte size is (384 + 7) / 8 = 48 bytes.
 //   - P-521: Bit size is 521. Byte size is (521 + 7) / 8 = 66 bytes.
 //
 // Note: This function is safe for use by multiple goroutines simultaneously.
 func FixedSizeECC(curve elliptic.Curve) io.Reader {
-	// This effectively Go (performs integer division) rounds up, ensuring the correct number of bytes.
+	// This effectively Go rounds up (performs integer division), ensuring the correct number of bytes.
 	//
-	// Playground: https://go.dev/play/p/JVgeuT_VbVi
+	// Playground: https://go.dev/play/p/6oPu30iYILF
 	//
 	// Note: This may differ from calculator results, which include decimals.
-	// Avoid using a calculator for this calculation, as it can be confusing.
+	// Avoid using a calculator for this calculation, as it can be confusing;
+	// this approach ensures the correct number of bytes for cryptographic purposes.
 	bitSize := curve.Params().BitSize
 	byteSize := (bitSize + 7) / 8
 	return &fixedReader{
