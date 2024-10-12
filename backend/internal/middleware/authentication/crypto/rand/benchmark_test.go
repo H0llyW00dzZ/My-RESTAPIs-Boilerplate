@@ -73,7 +73,7 @@ func BenchmarkFixedSizeECDSA(b *testing.B) {
 	}
 }
 
-// Result:
+// Results from the default Go benchmark test (around 10s):
 //
 //	goos: windows
 //	goarch: amd64
@@ -85,6 +85,20 @@ func BenchmarkFixedSizeECDSA(b *testing.B) {
 //	BenchmarkFixedSizeECC/P-521-16         	 3676401	       346.8 ns/op	       0 B/op	       0 allocs/op
 //
 // Note: These results are without overclocking. If overclocked (e.g., fully overclocked), performance may increase significantly (e.g., the op).
+//
+// Results in a semi-overclocked state (3 GHz) for a 30s benchmark:
+//
+//	goos: windows
+//	goarch: amd64
+//	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
+//	cpu: Intel(R) Core(TM) i9-10980HK CPU @ 2.40GHz
+//	BenchmarkFixedSizeECC/P-224-16          140615835              251.1 ns/op
+//	BenchmarkFixedSizeECC/P-256-16          139366987              246.5 ns/op
+//	BenchmarkFixedSizeECC/P-384-16          129598723              273.7 ns/op
+//	BenchmarkFixedSizeECC/P-521-16          100000000              325.4 ns/op
+//
+// Note: The "semi-overclocked state" is not fully overclocked to 5 GHz because it requires detaching the laptop battery
+// to use direct power and implementing additional cooling mechanisms for overclocking.
 func BenchmarkFixedSizeECC(b *testing.B) {
 	curves := []elliptic.Curve{
 		elliptic.P224(),
