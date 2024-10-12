@@ -99,6 +99,9 @@ func BenchmarkFixedSizeECDSA(b *testing.B) {
 //
 // Note: The "semi-overclocked state" is not fully overclocked to 5 GHz because it requires detaching the laptop battery
 // to use direct power and implementing additional cooling mechanisms for overclocking.
+// It is also worth noting that "Intel(R) Core(TM) i9-10980HK CPU @ 2.40GHz" refers to the CPU name, not its running speed.
+// Furthermore, the "Intel(R) Core(TM) i9-10980HK" is excellent for concurrency and parallelism in Go for laptop.
+// When compared to other CPUs, such as those from Apple, it still performs exceptionally well (win).
 func BenchmarkFixedSizeECC(b *testing.B) {
 	curves := []elliptic.Curve{
 		elliptic.P224(),
