@@ -136,7 +136,9 @@ func FixedSizeECC(curve elliptic.Curve) io.Reader {
 // Note: This function is safe for use by multiple goroutines simultaneously.
 // Consider using ECC instead of RSA, as RSA keys are larger and can consume more
 // bandwidth, especially in HTTPS/TLS scenarios. For similar security levels, ECC
-// (e.g., P-256) is more efficient than RSA with a 3072-bit modulus.
+// (e.g., P-256) is more efficient than RSA with a 3072-bit modulus. Essentially,
+// ECC P-256 offers similar security to RSA with a 3072-bit modulus, while ECC P-224
+// is comparable to RSA with a 2048-bit modulus, which is commonly used in HTTPS/TLS.
 func FixedSizeRSA(modulusBits int) io.Reader {
 	// Calculate the byte size needed for the RSA modulus.
 	byteSize := modulusBits / 8
