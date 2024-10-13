@@ -486,7 +486,7 @@ git clone https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate.git
 > **Server Management and Isolation by Kubernetes:**
 > - The `Storage` is secure and fully encrypted (`end-to-end`), designed with flexibility in mind. It is suitable for `automated attach/detach` processes within a `cluster`.
 > - The `Network` utilizes a `network load balancer` controlled by `Ingress Nginx`, optimizing latency for the `APAC` region, ensuring smooth sailing ⛵ ☸.
-> - The `Git SSH` should work as it uses the `TCP Service Nginx`.
+> - The `Git SSH` should function properly as it utilizes the `TCP Service Nginx`. It is `fully secured`, making it resistant to `brute-force attacks` and `exploits` due to its `underlying logic`, which incorporates [`Elliptic Curve Cryptography (ECC)`](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography).
 
 ## License
 
