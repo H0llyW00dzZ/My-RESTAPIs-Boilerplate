@@ -120,9 +120,10 @@ func TestKeyIdentifier(t *testing.T) {
 	}
 }
 
+// Note: This ECC suitable for GPG, SSH, Signed Commit, HTTPS/TLS, Signed other object, E2E
 func TestKeyIdentifierWithFixedRand(t *testing.T) {
 	// Generate an ECDSA private key
-	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.FixedSize32Bytes())
+	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.FixedSizeECC(elliptic.P256()))
 	if err != nil {
 		t.Fatalf("Failed to generate ECDSA private key: %v", err)
 	}
@@ -134,7 +135,7 @@ func TestKeyIdentifierWithFixedRand(t *testing.T) {
 		PrivateKey:       privateKey,
 		Digest:           sha256.New,
 		SignedContextKey: "signature",
-		Rand:             rand.FixedSize32Bytes(),
+		Rand:             rand.FixedSizeECC(elliptic.P256()),
 	})
 
 	// Extract the public key from the private key
@@ -221,7 +222,7 @@ func TestKeyIdentifierWithFixedRand(t *testing.T) {
 // Note: If test fail then the fixed size it's incorrect
 func TestKeyIdentifierWithFixedRandECDSA(t *testing.T) {
 	// Generate an ECDSA private key
-	privateKey, err := ecdsa.GenerateKey(elliptic.P384(), rand.FixedSizeECDSA(elliptic.P384()))
+	privateKey, err := ecdsa.GenerateKey(elliptic.P384(), rand.FixedSizeECC(elliptic.P384()))
 	if err != nil {
 		t.Fatalf("Failed to generate ECDSA private key: %v", err)
 	}
@@ -233,7 +234,7 @@ func TestKeyIdentifierWithFixedRandECDSA(t *testing.T) {
 		PrivateKey:       privateKey,
 		Digest:           sha512.New384,
 		SignedContextKey: "signature",
-		Rand:             rand.FixedSizeECDSA(elliptic.P384()),
+		Rand:             rand.FixedSizeECC(elliptic.P384()),
 	})
 
 	// Extract the public key from the private key
