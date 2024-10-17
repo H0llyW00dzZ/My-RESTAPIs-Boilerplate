@@ -14,6 +14,9 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 > This boilerplate is specifically tailored for extensive codebases and scalable RESTful API applications, along with frontend websites that may span multiple sites.
 > Its design ensures scalability and straightforward maintenance, making it highly suitable for complex projects. However, it may not be the ideal choice for smaller-scale RESTful API applications or single-website frontends where such robust architecture is not required.
 
+> [!TIP]
+> Given that this boilerplate focuses on `high performance` (e.g., `it can handle substantial workloads`), it is recommended to `run and isolate` it on [`Kubernetes`](https://kubernetes.io/). It has been tested alongside the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and has proven to be `fully stable` for `low to high workloads (concurrency)`. `Running and isolating` it on [`Kubernetes`](https://kubernetes.io/) allows for easy scaling when additional `resources`, such as `vCPUs`, are needed.
+
 ## Features
 
 - Use Fiber Framework
