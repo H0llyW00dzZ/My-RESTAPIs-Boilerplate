@@ -102,6 +102,11 @@
 //	  Normal  SuccessfulRescale  29m (x31 over 4d1h)   horizontal-pod-autoscaler  New size: 14; reason: cpu resource utilization (percentage of request) above target
 //	  Normal  SuccessfulRescale  24m (x53 over 5d)     horizontal-pod-autoscaler  New size: 12; reason: All metrics below target
 //
+// HPA with 22 vCPUs (Extremely Scalable) for REST API Concurrency: Fully Stable:
+//
+//			NAME        		REFERENCE          	TARGETS      MINPODS   MAXPODS   REPLICAS   AGE
+//	senior-golang-worker-hpa   Deployment/senior-golang   cpu: 75%/80%   1         60        41         35d
+//
 // Also note that for more efficiency, as this worker mostly consumes CPU, it is recommended to use AMD CPUs (get good get AMD) for the server specification,
 // as they perform better than Intel CPUs for this use case.
 //
