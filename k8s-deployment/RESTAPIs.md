@@ -147,6 +147,8 @@ The provided deployment files are designed to be customizable. You can modify th
 
 ## Tips
 
+### K8S Network Performance
+
 Here are some tips to boost/improve the network performance. These are well-known in GKE because most important components are already built-in, and you only need to enable them:
 
 - GKE:
@@ -156,6 +158,25 @@ Enable [Dataplane V2 Observability](https://docs.cilium.io/en/stable/internals/h
 > [!NOTE]
 > It can also improve the security mechanism if you have a deep understanding of networking.
 > Other cloud providers might be added later, as I don't have experience with them. Additionally, the K8s ecosystem is large, not small.
+
+### REST API Concurrency with HPA
+
+- **Install [Cluster Autoscaler (CA)](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler)**: If you are using **GKE Autopilot**, you do not need to install the CA manually, as it is managed for you.
+
+To enhance REST API concurrency (in combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker)) and improve HPA performance:
+
+- Start with a small deployment (e.g., **1 node**), and set the **maximum CPU** to **350m** with **80% utilization** for the HPA. This strategy allows for scaling as demand increases.
+
+#### Example of REST API Concurrency with HPA
+
+```bash
+b0zal@Linux:~$ kubectl get hpa
+NAME                        REFERENCE                   TARGETS        MINPODS   MAXPODS   REPLICAS    AGE
+senior-golang-worker-hpa   Deployment/senior-golang   cpu: 75%/80%      1         60        41         35d
+```
+
+> [!NOTE]
+> In this example, the REST API ([This Repo](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate)) is running with **22 vCPUs** (extremely scalable) across **8 nodes**, for **41 Pods**.
 
 ## Cleanup
 
