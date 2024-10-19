@@ -60,6 +60,10 @@ func NewFiberServer(app *fiber.App, appName, monitorPath string) *FiberServer {
 // TODO: Implement an additional protocol mechanism for non-HTTPS/TLS (e.g., force redirect to HTTPS/TLS on the default port 443 or other HTTPS/TLS Ports) since it currently only handles a single port,
 // as it seems possible to support dual ports.
 func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, streamListener net.Listener) {
+	// Important: Do not modify the current implementation of the HTTPS/TLS mechanism (e.g., by removing the tlsHandler struct).
+	// This implementation is similar to the default Fiber setup, with the key difference being that it can be customized to support both HTTP and HTTPS/TLS protocols with custom ports.
+	// Additionally, this current implementation works effectively and stably on Kubernetes with Ingress NGINX without terminating the HTTPS/TLS.
+	// Modifying this (e.g., removing tlsHandler struct) may lead to security issues (e.g., vulnerabilities, CVEs).
 	tlsHandler := &fiber.TLSHandler{}
 	go func() {
 		// TODO: Improve the Listener by creating another Fiber app when tlsConfig and streamListener are configured. This way, it can connect to other Fiber apps (Sharing is caring).
