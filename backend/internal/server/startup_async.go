@@ -56,6 +56,9 @@ func NewFiberServer(app *fiber.App, appName, monitorPath string) *FiberServer {
 }
 
 // Start runs the Fiber server in a separate goroutine to listen for incoming requests.
+//
+// TODO: Implement an additional protocol mechanism for non-HTTPS/TLS (e.g., force redirect to HTTPS/TLS on the default port 443 or other HTTPS/TLS Ports) since it currently only handles a single port,
+// as it seems possible to support dual ports.
 func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, streamListener net.Listener) {
 	tlsHandler := &fiber.TLSHandler{}
 	go func() {
