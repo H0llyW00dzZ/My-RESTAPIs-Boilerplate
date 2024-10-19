@@ -10,8 +10,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: restapis
----
 # Note: most env here are bound into secrets, so for generate secrets especially if the k8s has "HSM" use bash script "create_k8s_secret.sh"
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -28,170 +28,173 @@ spec:
         app: restapis
     spec:
       containers:
-        - name: restapis
-          image: <IMAGE_HERE> # Put Image related to this repository here
-          # Note: The securityContext section with runAsNonRoot: true might be optional, as the original application (this repository)
-          # does not require running with root privileges or rely on root privileges for the operating system or container.
-          # It primarily relies on system resources such as vCPU, RAM, Network, and disk space not operating system or container. Thus, this deployment template is secure by default.
-          #
-          # Note: This setting has been disabled due to issues causing container errors when enabled.
-          # whoever enabled it should review the source code (how is it secure) of this repository and fix the underlying problem if it's possible otherwise then disabled.
-          # securityContext:
-          #   runAsNonRoot: true
-          #
-          # Note: This should be work, and it wont causing container error.
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: ["NET_RAW"]
-          ports:
-            - containerPort: 8080
-          resources:
-            requests:
-              # This is suitable for Cluster Autoscaler (Autopilot) or GKE Autopilot that use nodes with low average specs (e.g., 4 vCPU, 2 vCPU).
-              # For example, when the CPU reaches 350m or 500m due to concurrency (e.g., the goroutine workers), the HPA replica count will be around 4 or more.
-              # If the replica count reaches 5 or higher, it will cause pending pods, and the Cluster Autoscaler (Autopilot) or GKE Autopilot will attach another node until there are no pending pods.
-              # Later, each node (e.g., 5 nodes) will have a CPU under 80%.
-              # Also note that this example demonstrates how to handle unpredictable and dynamic CPU and memory resource usage, as it is difficult to predict resource usage accurately, even if you are a genius.
-              # For example, both dynamic consumed:
-              # NAME                                    CPU(cores)   MEMORY(bytes)
-              # senior-golang-worker-75bxc5lxa-lqxcm   274m         29Mi
-              # senior-golang-worker-75bxc5lxa-m68zw   283m         53Mi
-              # senior-golang-worker-75bxc5lxa-n8nnz   291m         86Mi
-              # senior-golang-worker-75bxc5lxa-nt97t   284m         78Mi
-              # senior-golang-worker-75bxc5lxa-qczs8   275m         75Mi
-              #
-              # That dynamic resource usage for each pod is considered stable + suitable for HPA along with Cluster Autoscaler (Autopilot) or GKE Autopilot, unlike static resource usage where when CPU grows, all pods memory remains the same.
-              memory: "359Mi"
-              cpu: "350m"
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
-          tty: true # Enable TTY for bubble tea
-          env:
-            - name: PORT
-              valueFrom:
-                secretKeyRef:
-                  key: PORT
-                  name: restapis-env
-            - name: APP_NAME
-              valueFrom:
-                secretKeyRef:
-                  key: APP_NAME
-                  name: restapis-env
-            - name: DB_HOST
-              valueFrom:
-                secretKeyRef:
-                  key: DB_HOST
-                  name: restapis-env
-            - name: DB_PORT
-              valueFrom:
-                secretKeyRef:
-                  key: DB_PORT
-                  name: restapis-env
-            - name: DB_DATABASE
-              valueFrom:
-                secretKeyRef:
-                  key: DB_DATABASE
-                  name: restapis-env
-            - name: DB_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  key: DB_USERNAME
-                  name: restapis-env
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: DB_PASSWORD
-                  name: restapis-env
-            # This optional.
-            # - name: DB_ROOT_PASSWORD
-            #   valueFrom:
-            #     secretKeyRef:
-            #       key: DB_ROOT_PASSWORD
-            #       name: restapis-env
-            - name: MONITOR_PATH
-              valueFrom:
-                secretKeyRef:
-                  key: MONITOR_PATH
-                  name: restapis-env
-            - name: RDB_ADDRESS
-              valueFrom:
-                secretKeyRef:
-                  key: RDB_ADDRESS
-                  name: restapis-env
-            - name: RDB_PORT
-              valueFrom:
-                secretKeyRef:
-                  key: RDB_PORT
-                  name: restapis-env
-            - name: RDB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: RDB_PASSWORD
-                  name: restapis-env
-            - name: RDB_DATABASE
-              valueFrom:
-                secretKeyRef:
-                  key: RDB_DATABASE
-                  name: restapis-env
-            - name: TIME_FORMAT
-              valueFrom:
-                secretKeyRef:
-                  key: TIME_FORMAT
-                  name: restapis-env
-            - name: WRITE_TIMEOUT
-              valueFrom:
-                secretKeyRef:
-                  key: WRITE_TIMEOUT
-                  name: restapis-env
-            - name: READ_TIMEOUT
-              valueFrom:
-                secretKeyRef:
-                  key: READ_TIMEOUT
-                  name: restapis-env
-            - name: SHUTDOWN_TIMEOUT
-              valueFrom:
-                secretKeyRef:
-                  key: SHUTDOWN_TIMEOUT
-                  name: restapis-env
-            - name: RDB_POOL_TIMEOUT
-              valueFrom:
-                secretKeyRef:
-                  key: RDB_POOL_TIMEOUT
-                  name: restapis-env
-            - name: REDIS_MAXCONN_IDLE_TIME
-              valueFrom:
-                secretKeyRef:
-                  key: REDIS_MAXCONN_IDLE_TIME
-                  name: restapis-env
-            - name: REDIS_MAXCONN_LIFE_TIME
-              valueFrom:
-                secretKeyRef:
-                  key: REDIS_MAXCONN_LIFE_TIME
-                  name: restapis-env
-            - name: DOMAIN
-              valueFrom:
-                secretKeyRef:
-                  key: DOMAIN
-                  name: restapis-env
-            - name: API_SUB_DOMAIN
-              valueFrom:
-                secretKeyRef:
-                  key: API_SUB_DOMAIN
-                  name: restapis-env
-            - name: MYSQL_CERTS_TLS
-              valueFrom:
-                secretKeyRef:
-                  key: MYSQL_CERTS_TLS
-                  name: restapis-env
-            - name: REDIS_CERTS_TLS
-              valueFrom:
-                secretKeyRef:
-                  key: REDIS_CERTS_TLS
-                  name: restapis-env
----
+      - name: restapis
+        image: <IMAGE_HERE> # Put Image related to this repository here
+        # Note: The securityContext section with runAsNonRoot: true might be optional, as the original application (this repository)
+        # does not require running with root privileges or rely on root privileges for the operating system or container.
+        # It primarily relies on system resources such as vCPU, RAM, Network, and disk space not operating system or container. Thus, this deployment template is secure by default.
+        #
+        # Note: This setting has been disabled due to issues causing container errors when enabled.
+        # whoever enabled it should review the source code (how is it secure) of this repository and fix the underlying problem if it's possible otherwise then disabled.
+        # securityContext:
+        #   runAsNonRoot: true
+        #
+        # Note: This should be work, and it wont causing container error.
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["NET_RAW"]
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            # This is suitable for Cluster Autoscaler (Autopilot) or GKE Autopilot that use nodes with low average specs (e.g., 4 vCPU, 2 vCPU).
+            # For example, when the CPU reaches 350m or 500m due to concurrency (e.g., the goroutine workers), the HPA replica count will be around 4 or more.
+            # If the replica count reaches 5 or higher, it will cause pending pods, and the Cluster Autoscaler (Autopilot) or GKE Autopilot will attach another node until there are no pending pods.
+            # Later, each node (e.g., 5 nodes) will have a CPU under 80%.
+            # Also note that this example demonstrates how to handle unpredictable and dynamic CPU and memory resource usage, as it is difficult to predict resource usage accurately, even if you are a genius.
+            # For example, both dynamic consumed:
+            # NAME                                    CPU(cores)   MEMORY(bytes)
+            # senior-golang-worker-75bxc5lxa-lqxcm   274m         29Mi
+            # senior-golang-worker-75bxc5lxa-m68zw   283m         53Mi
+            # senior-golang-worker-75bxc5lxa-n8nnz   291m         86Mi
+            # senior-golang-worker-75bxc5lxa-nt97t   284m         78Mi
+            # senior-golang-worker-75bxc5lxa-qczs8   275m         75Mi
+            #
+            # That dynamic resource usage for each pod is considered stable + suitable for HPA along with Cluster Autoscaler (Autopilot) or GKE Autopilot, unlike static resource usage where when CPU grows, all pods memory remains the same.
+            memory: "359Mi"
+            cpu: "350m"
+          limits:
+            # Note: When using HPA with averageUtilization set to 80, the limits will not be affected. 
+            # HPA only considers the requests, not the limits. Therefore, it will calculate based on the CPU request of "350m" and memory request of "359Mi".
+            # So, this configuration should be fine as is.
+            memory: "512Mi"
+            cpu: "500m"
+        tty: true # Enable TTY for bubble tea
+        env:
+        - name: PORT
+          valueFrom:
+            secretKeyRef:
+              key: PORT
+              name: restapis-env
+        - name: APP_NAME
+          valueFrom:
+            secretKeyRef:
+              key: APP_NAME
+              name: restapis-env
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              key: DB_HOST
+              name: restapis-env
+        - name: DB_PORT
+          valueFrom:
+            secretKeyRef:
+              key: DB_PORT
+              name: restapis-env
+        - name: DB_DATABASE
+          valueFrom:
+            secretKeyRef:
+              key: DB_DATABASE
+              name: restapis-env
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: DB_USERNAME
+              name: restapis-env
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: DB_PASSWORD
+              name: restapis-env
+        #     secretKeyRef:
+        #       key: DB_ROOT_PASSWORD
+        #       name: restapis-env
+        - name: MONITOR_PATH
+          # This optional.
+          #   valueFrom:
+          # - name: DB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: MONITOR_PATH
+              name: restapis-env
+        - name: RDB_ADDRESS
+          valueFrom:
+            secretKeyRef:
+              key: RDB_ADDRESS
+              name: restapis-env
+        - name: RDB_PORT
+          valueFrom:
+            secretKeyRef:
+              key: RDB_PORT
+              name: restapis-env
+        - name: RDB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: RDB_PASSWORD
+              name: restapis-env
+        - name: RDB_DATABASE
+          valueFrom:
+            secretKeyRef:
+              key: RDB_DATABASE
+              name: restapis-env
+        - name: TIME_FORMAT
+          valueFrom:
+            secretKeyRef:
+              key: TIME_FORMAT
+              name: restapis-env
+        - name: WRITE_TIMEOUT
+          valueFrom:
+            secretKeyRef:
+              key: WRITE_TIMEOUT
+              name: restapis-env
+        - name: READ_TIMEOUT
+          valueFrom:
+            secretKeyRef:
+              key: READ_TIMEOUT
+              name: restapis-env
+        - name: SHUTDOWN_TIMEOUT
+          valueFrom:
+            secretKeyRef:
+              key: SHUTDOWN_TIMEOUT
+              name: restapis-env
+        - name: RDB_POOL_TIMEOUT
+          valueFrom:
+            secretKeyRef:
+              key: RDB_POOL_TIMEOUT
+              name: restapis-env
+        - name: REDIS_MAXCONN_IDLE_TIME
+          valueFrom:
+            secretKeyRef:
+              key: REDIS_MAXCONN_IDLE_TIME
+              name: restapis-env
+        - name: REDIS_MAXCONN_LIFE_TIME
+          valueFrom:
+            secretKeyRef:
+              key: REDIS_MAXCONN_LIFE_TIME
+              name: restapis-env
+        - name: DOMAIN
+          valueFrom:
+            secretKeyRef:
+              key: DOMAIN
+              name: restapis-env
+        - name: API_SUB_DOMAIN
+          valueFrom:
+            secretKeyRef:
+              key: API_SUB_DOMAIN
+              name: restapis-env
+        - name: MYSQL_CERTS_TLS
+          valueFrom:
+            secretKeyRef:
+              key: MYSQL_CERTS_TLS
+              name: restapis-env
+        - name: REDIS_CERTS_TLS
+          valueFrom:
+            secretKeyRef:
+              key: REDIS_CERTS_TLS
+              name: restapis-env
 # Note: When using nginx-ingress for expose service it's better keep like this
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -201,36 +204,35 @@ spec:
   selector:
     app: restapis
   ports:
-    - name: http
-      port: 80
-      protocol: TCP
-      targetPort: 8080
-    # Note: This is optional which is already safe/secure by Ingress-Nginx (example),
-    # unless one knows how to set it up (e.g., set up the hostname bound to *.example.com, example.com),
-    # and a wildcard certificate is required as it's recommended
-    #
-    # Example public wildcard CAs that can be used for an ingress or directly:
-    # - https://crt.sh/?q=a8bc9093e1f4ba202fc769b8818b8a279a5f70c91bee458d29d6ad3c5ac5e88c
-    #
-    # Additionally, to enforce HTTPS and enable SSL passthrough (now supported), add the annotation
-    # nginx.ingress.kubernetes.io/ssl-passthrough: "true" to the ingress resource. This configuration instructs Nginx
-    # to send encrypted traffic directly to the restapis service, which handles the decryption. Implementing SSL passthrough
-    # can lead to improved throughput. This is especially true since restapis with Fiber leverages ECC, which has been proven to be
-    # significantly faster and more capable of managing a large number of concurrent requests than Nginx (bottleneck) with ECC.
-    #
-    # - name: https
-    #   port: 443
-    #   protocol: TCP
-    #   targetPort: 8080
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  # Note: This is optional which is already safe/secure by Ingress-Nginx (example),
+  # unless one knows how to set it up (e.g., set up the hostname bound to *.example.com, example.com),
+  # and a wildcard certificate is required as it's recommended
+  #
+  # Example public wildcard CAs that can be used for an ingress or directly:
+  # - https://crt.sh/?q=a8bc9093e1f4ba202fc769b8818b8a279a5f70c91bee458d29d6ad3c5ac5e88c
+  #
+  # Additionally, to enforce HTTPS and enable SSL passthrough (now supported), add the annotation
+  # nginx.ingress.kubernetes.io/ssl-passthrough: "true" to the ingress resource. This configuration instructs Nginx
+  # to send encrypted traffic directly to the restapis service, which handles the decryption. Implementing SSL passthrough
+  # can lead to improved throughput. This is especially true since restapis with Fiber leverages ECC, which has been proven to be
+  # significantly faster and more capable of managing a large number of concurrent requests than Nginx (bottleneck) with ECC.
+  #
+  # - name: https
+  #   port: 443
+  #   protocol: TCP
+  #   targetPort: 8080
   # Note: The timeoutSeconds can be customized, which is a good choice for QoS: Burstable pods that handle concurrency and maintain session affinity
   sessionAffinity: ClientIP
   sessionAffinityConfig:
     clientIP:
       timeoutSeconds: 10800
----
 # Note: This HPA is designed for microservices that consume vCPU.
-# This boilerplate primarily consumes vCPU (combined with a worker) and bandwidth to handle high traffic (e.g., network load)
 # because Fiber is built with zero-allocation memory.
+---
 #
 # TIPS: While running on Kubernetes without auto-pilots, due to HPA, it's suitable to install the Cluster Autoscaler (CA) from https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler.
 # To save costs on any cloud provider, use a small spec server (e.g., 2 vCPU, 4GB RAM), then set the maximum number of nodes to 4 or 2, starting from 1.
@@ -248,16 +250,16 @@ spec:
   minReplicas: 1
   maxReplicas: 50
   metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 80
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Resource
     # Now both can grow dynamically, highly stable for extreme scalability
-    - type: Resource
-      resource:
-        name: memory
-        target:
-          type: Utilization
-          averageUtilization: 80
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
