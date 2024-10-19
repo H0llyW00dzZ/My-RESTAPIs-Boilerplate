@@ -103,15 +103,19 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 		// TODO: Improve this that can be customize
 		go func() {
 			httpAddr := ":80" // Listen on port 80 for HTTP
-			httpServer := &http.Server{
+			s.httpServer = &http.Server{
 				Addr: httpAddr,
 				Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					httpsPort := strings.Split(addr, ":")[1]
-					target := httpsURI + r.Host + ":" + httpsPort + r.URL.RequestURI()
+					portPart := ""
+					if httpsPort != "443" {
+						portPart = ":" + httpsPort
+					}
+					target := httpsURI + r.Host + portPart + r.URL.RequestURI()
 					http.Redirect(w, r, target, http.StatusMovedPermanently)
 				}),
 			}
-			if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 				log.LogFatalf("Error starting HTTP redirect server: %v", err)
 			}
 		}()
