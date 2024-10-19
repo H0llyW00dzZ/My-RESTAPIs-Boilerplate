@@ -12,8 +12,10 @@ import (
 	"crypto/x509"
 	"fmt"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -56,9 +58,6 @@ func NewFiberServer(app *fiber.App, appName, monitorPath string) *FiberServer {
 }
 
 // Start runs the Fiber server in a separate goroutine to listen for incoming requests.
-//
-// TODO: Implement an additional protocol mechanism for non-HTTPS/TLS (e.g., force redirect to HTTPS/TLS on the default port 443 or other HTTPS/TLS Ports) since it currently only handles a single port,
-// as it seems possible to support dual ports.
 func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, streamListener net.Listener) {
 	// Important: Do not modify the current implementation of the HTTPS/TLS mechanism (e.g., by removing the tlsHandler struct).
 	// This implementation is similar to the default Fiber setup, with the key difference being that it can be customized to support
@@ -96,6 +95,27 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 			}
 		}
 	}()
+
+	// Start the HTTP server for redirecting to HTTPS only if TLS is configured
+	// this actually work lmao 2 goroutine listening
+	if tlsConfig != nil {
+		// TODO: Improve this that can be customize
+		go func() {
+			httpAddr := ":80" // Listen on port 80 for HTTP
+			httpServer := &http.Server{
+				Addr: httpAddr,
+				Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					httpsPort := strings.Split(addr, ":")[1]
+					target := httpsURI + r.Host + ":" + httpsPort + r.URL.RequestURI()
+					http.Redirect(w, r, target, http.StatusMovedPermanently)
+				}),
+			}
+			if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+				log.LogFatalf("Error starting HTTP redirect server: %v", err)
+			}
+		}()
+	}
+
 }
 
 // Shutdown gracefully stops the Fiber server using the provided context.

@@ -25,3 +25,7 @@ const (
 	// ErrorClosingTheDatabase is the error message format for an error encountered when closing the database connection.
 	ErrorClosingTheDatabase = "Error closing the database: %v"
 )
+
+const (
+	httpsURI = "https://"
+)
