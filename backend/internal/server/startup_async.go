@@ -99,6 +99,7 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 	// Start the HTTP server for redirecting to HTTPS only if TLS is configured
 	// this actually work lmao 2 goroutine listening
 	if tlsConfig != nil {
+		// TODO: Improve this that can be customize
 		go func() {
 			httpAddr := ":80" // Listen on port 80 for HTTP
 			httpServer := &http.Server{
