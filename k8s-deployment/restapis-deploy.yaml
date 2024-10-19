@@ -71,7 +71,18 @@ spec:
             memory: "512Mi"
             cpu: "500m"
         tty: true # Enable TTY for bubble tea
+        # Note: These are tips for using HTTPS/TLS with Ingress-Nginx (Same Certs).
+        # Make sure you have issued/uploaded the HTTPS/TLS certificates for the Ingress first.
+        # Then, in the Ingress configuration, simply pass through SSL, similar to when deploying GitOps (e.g., ArgoCD) with HTTPS in the Ingress.
+        #
+        # volumeMounts:
+        # - mountPath: /etc/tls
+        #   name: https-tls
         env:
+        # - name: TLS_CERT_FILE
+        #   value: /etc/tls/tls.crt
+        # - name: TLS_KEY_FILE
+        #   value: /etc/tls/tls.key
         - name: PORT
           valueFrom:
             secretKeyRef:
@@ -108,16 +119,16 @@ spec:
               key: DB_PASSWORD
               name: restapis-env
         - name: MONITOR_PATH
-          # This optional.
-          #       name: restapis-env
-          #       key: DB_ROOT_PASSWORD
-          #     secretKeyRef:
-          #   valueFrom:
-          # - name: DB_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
               key: MONITOR_PATH
               name: restapis-env
+        # This optional.
+        # - name: DB_ROOT_PASSWORD
+        #   secretKeyRef:
+        #     valueFrom:
+        #         name: restapis-env
+        #         key: DB_ROOT_PASSWORD
         - name: RDB_ADDRESS
           valueFrom:
             secretKeyRef:
@@ -193,8 +204,14 @@ spec:
             secretKeyRef:
               key: REDIS_CERTS_TLS
               name: restapis-env
-# Note: When using nginx-ingress for expose service it's better keep like this
+        # Note: You now need to bind the secrets and set the defaultMode as required.
+        # volumes:
+        # - name: https-tls
+        #   secret:
+        #     defaultMode: 420
+        #     secretName: restapis-api-tls-secret
 ---
+# Note: When using nginx-ingress for expose service it's better keep like this
 apiVersion: v1
 kind: Service
 metadata:
