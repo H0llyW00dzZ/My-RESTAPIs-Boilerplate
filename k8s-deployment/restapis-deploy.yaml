@@ -107,11 +107,11 @@ spec:
             secretKeyRef:
               key: DB_PASSWORD
               name: restapis-env
-        #     secretKeyRef:
-        #       key: DB_ROOT_PASSWORD
-        #       name: restapis-env
         - name: MONITOR_PATH
           # This optional.
+          #       name: restapis-env
+          #       key: DB_ROOT_PASSWORD
+          #     secretKeyRef:
           #   valueFrom:
           # - name: DB_ROOT_PASSWORD
           valueFrom:
@@ -230,13 +230,12 @@ spec:
   sessionAffinityConfig:
     clientIP:
       timeoutSeconds: 10800
-# Note: This HPA is designed for microservices that consume vCPU.
-# because Fiber is built with zero-allocation memory.
+# Note: This HPA is designed for microservices that consume vCPU & Memory (Optional for memory).
 ---
-#
-# TIPS: While running on Kubernetes without auto-pilots, due to HPA, it's suitable to install the Cluster Autoscaler (CA) from https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler.
-# To save costs on any cloud provider, use a small spec server (e.g., 2 vCPU, 4GB RAM), then set the maximum number of nodes to 4 or 2, starting from 1.
-# Also note that this deployment template is so smooth for sailing ⛵ ☸ at high scalability, especially with nginx-ingress and 100% zer0-downtime.
+# TIPS: When running on Kubernetes without auto-pilots, it's advisable to install the Cluster Autoscaler (CA) from https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler.
+# To save costs with any cloud provider, use a small server specification (e.g., 2 vCPU, 4GB RAM), and set the maximum number of nodes to 2 or 4, starting from 1.
+# Additionally, this deployment template is designed for smooth sailing ⛵ ☸ at high scalability, especially with nginx-ingress and 100% zero downtime.
+# Without CA (Auto-Pilots), the experience may not be as smooth, as manual configuration is typically required (similar to traditional cluster management hahaha).
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
