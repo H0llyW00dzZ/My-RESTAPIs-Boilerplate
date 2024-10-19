@@ -99,6 +99,12 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 
 	// Start the HTTP server for redirecting to HTTPS only if TLS is configured
 	// this actually work lmao 2 goroutine listening
+	//
+	// Note: When using Kubernetes with Ingress NGINX, this HTTP redirect is not necessary
+	// because NGINX handles traffic at the front end. It is recommended not to terminate
+	// HTTPS/TLS in Ingress NGINX, as doing so can degrade performance due to concurrency
+	// issues and pose security risks. This is because traffic is unencrypted if HTTPS/TLS
+	// is terminated at the ingress and then forwarded as HTTP.
 	if tlsConfig != nil {
 		// TODO: Improve this that can be customize
 		go func() {
