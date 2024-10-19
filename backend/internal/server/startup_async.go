@@ -124,7 +124,7 @@ func (s *FiberServer) Shutdown(ctx context.Context) error {
 	// http server (insecure) it will be first
 	if s.httpServer != nil {
 		if err := s.httpServer.Shutdown(ctx); err != nil {
-			log.LogErrorf("Error shutting down HTTP server: %v", err)
+			log.LogErrorf("Error shutting down HTTP server (insecure): %v", err)
 			return err
 		}
 	}
