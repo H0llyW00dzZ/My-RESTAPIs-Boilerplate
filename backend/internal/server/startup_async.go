@@ -38,8 +38,9 @@ type Server interface {
 
 // FiberServer implements the Server interface for a Fiber application.
 type FiberServer struct {
-	App *fiber.App
-	db  database.Service
+	App        *fiber.App
+	db         database.Service
+	httpServer *http.Server
 }
 
 // NewFiberServer returns a new FiberServer with the given Fiber app, application name, and monitor path.
@@ -120,6 +121,13 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 
 // Shutdown gracefully stops the Fiber server using the provided context.
 func (s *FiberServer) Shutdown(ctx context.Context) error {
+	// http server (insecure) it will be first
+	if s.httpServer != nil {
+		if err := s.httpServer.Shutdown(ctx); err != nil {
+			log.LogErrorf("Error shutting down HTTP server: %v", err)
+			return err
+		}
+	}
 	return s.App.ShutdownWithContext(ctx)
 }
 
