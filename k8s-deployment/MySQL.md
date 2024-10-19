@@ -30,7 +30,12 @@ To deploy the MySQL service using the provided K8s deployment files, follow thes
    Replace `your-mysql-root-password` with your desired MySQL root password, and `path/to/your/certificate.cer`, `path/to/your/server-key.pem`, and `path/to/your/ECC.crt` with the paths to your SSL certificate files.
 
 > [!NOTE]
-> The example below shows how `SSL/TLS` is correctly set up and can be used through `any load balancer mechanism` (Recommended: `standalone load balancer`). This deployment is designed to be `dedicated` and `less noisy from neighbors`:
+> The example below demonstrates how `SSL/TLS` is correctly set up and can be utilized through any load balancer mechanism (recommended: a `standalone load balancer`). This deployment is designed to be dedicated and less noisy from neighboring services.
+>
+> Additionally, `TLS configuration` for `MySQL` is possible using `NGINX Ingress` Same `REST APIs Deployment` with other services (e.g., `TCP/UDP service NGINX`). However, this approach is not recommended. It is preferable to use a dedicated load balancer specifically for MySQL (e.g., `a single load balancer` only for MySQL) to avoid noisy from neighbor.
+>
+> It is advisable to use [`ECC`](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography) instead of [`RSA`](https://en.wikipedia.org/wiki/RSA_(cryptosystem)) for encryption traffic; however, if `bandwidth is not a concern`, [`RSA`](https://en.wikipedia.org/wiki/RSA_(cryptosystem)) can be used as an alternative.
+
 
 ```bash
 2024-09-13 15:52:16+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.4.2-1.el9 started.
