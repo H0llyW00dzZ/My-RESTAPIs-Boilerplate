@@ -197,7 +197,14 @@ func (s *service) dumpTableData(ctx context.Context, file *os.File, tableName st
 func buildInsertStatement(tableName string, columns []string, values []any) string {
 	var sb strings.Builder
 	sb.WriteString(fmt.Sprintf("INSERT INTO `%s` (", tableName))
-	sb.WriteString(strings.Join(columns, ", "))
+	// This is now correct and can be imported via phpMyAdmin as well.
+	for i, column := range columns {
+		if i > 0 {
+			sb.WriteString(", ")
+		}
+		sb.WriteString(fmt.Sprintf("`%s`", column))
+	}
+
 	sb.WriteString(") VALUES (")
 
 	for i, val := range values {
@@ -209,7 +216,7 @@ func buildInsertStatement(tableName string, columns []string, values []any) stri
 		} else if b, ok := val.([]byte); ok {
 			sb.WriteString(fmt.Sprintf("'%s'", escapeString(string(b))))
 		} else {
-			sb.WriteString(fmt.Sprintf("'%v'", escapeString(fmt.Sprintf("%v", val))))
+			sb.WriteString(fmt.Sprintf("'%s'", escapeString(fmt.Sprintf("%v", val))))
 		}
 	}
 	sb.WriteString(");\n")

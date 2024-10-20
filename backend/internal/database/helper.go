@@ -102,6 +102,12 @@ func IsValidTableName(name string) bool {
 }
 
 // escapeString safely escapes special characters in strings.
+//
+// This is now correct and can be imported via phpMyAdmin as well.
 func escapeString(value string) string {
-	return strings.ReplaceAll(strings.ReplaceAll(value, "'", "''"), "\\", "\\\\")
+	value = strings.ReplaceAll(value, "'", "''")
+	value = strings.ReplaceAll(value, "\\", "\\\\")
+	value = strings.ReplaceAll(value, "\n", "\\n")
+	value = strings.ReplaceAll(value, "\"", "\\\"")
+	return value
 }
