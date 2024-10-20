@@ -65,6 +65,10 @@ func getEnvVariables() (appName, port, monitorPath, timeFormat string, readTimeo
 // It sets up the JSON encoder/decoder, case sensitivity, and strict routing,
 // and applies the application name to the server headers.
 func setupFiber(appName string, readTimeout, writeTimeout time.Duration) *fiber.App {
+	// TODO: Implement a server startup message mechanism similar to "Fiber" ASCII art,
+	// with animation (e.g., similar to a streaming/bubble tea spinner) for multiple sites or large codebases.
+	// The current static "Fiber" ASCII art only shows one site when there are multiple, which isn't ideal.
+	// However, animated ASCII art may not be necessary right now, as it only works properly in terminals.
 	return fiber.New(fiber.Config{
 		ServerHeader: appName,
 		AppName:      appName,
