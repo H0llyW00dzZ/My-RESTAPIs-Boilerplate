@@ -22,8 +22,16 @@ import (
 	"h0llyw00dz-template/backend/internal/database"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware"
+	"h0llyw00dz-template/env"
 
 	"github.com/gofiber/fiber/v2"
+)
+
+var (
+	// apiSubdomain is the subdomain for the API endpoints.
+	// It is set using the API_SUB_DOMAIN environment variable.
+	// Example: set API_SUB_DOMAIN=api.localhost:8080 for local development.
+	apiSubdomain = os.Getenv(env.APISUBDOMAIN)
 )
 
 // Server defines the interface for a server that can be started, shut down, and clean up its database.
@@ -119,7 +127,18 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 						portPart = ":" + httpsPort
 					}
 					target := httpsURI + r.Host + portPart + r.URL.RequestURI()
-					http.Redirect(w, r, target, http.StatusMovedPermanently)
+
+					// Extract the host from the API subdomain
+					apiHost := strings.Split(apiSubdomain, ":")[0]
+
+					// Check if the request is for the API subdomain
+					if apiHost != "" && strings.HasPrefix(r.Host, apiHost) {
+						// Note: Use a 308 redirect for REST APIs to preserve the HTTP method and body.
+						// A 301 redirect is better for SEO, as it is well-recognized by search engines for business with google, bing, other search engine hahaha.
+						http.Redirect(w, r, target, http.StatusPermanentRedirect) // 308 redirect for API
+					} else {
+						http.Redirect(w, r, target, http.StatusMovedPermanently) // 301 redirect for others
+					}
 				}),
 			}
 			if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
