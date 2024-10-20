@@ -179,13 +179,31 @@ func (s *service) dumpTableData(ctx context.Context, file *os.File, tableName st
 		valuePtrs[i] = &values[i]
 	}
 
+	// Adjust the batch size as needed.
+	// The default size of 1000 is typically sufficient.
+	var batchSize = 1000
+	var insertStatements []string
+
 	for rows.Next() {
 		if err := rows.Scan(valuePtrs...); err != nil {
 			return fmt.Errorf("failed to scan row: %w", err)
 		}
 
-		insertStmt := buildInsertStatement(tableName, columns, values)
-		if _, err := file.WriteString(insertStmt); err != nil {
+		insertStmt := buildValuesString(values)
+		insertStatements = append(insertStatements, insertStmt)
+
+		if len(insertStatements) >= batchSize {
+			fullInsert := buildInsertStatement(tableName, columns, insertStatements)
+			if _, err := file.WriteString(fullInsert); err != nil {
+				return err
+			}
+			insertStatements = insertStatements[:0]
+		}
+	}
+
+	if len(insertStatements) > 0 {
+		fullInsert := buildInsertStatement(tableName, columns, insertStatements)
+		if _, err := file.WriteString(fullInsert); err != nil {
 			return err
 		}
 	}
@@ -193,8 +211,8 @@ func (s *service) dumpTableData(ctx context.Context, file *os.File, tableName st
 	return err
 }
 
-// buildInsertStatement constructs an SQL INSERT statement for a single row of data.
-func buildInsertStatement(tableName string, columns []string, values []any) string {
+// buildInsertStatement constructs an SQL INSERT statement for multiple row of data.
+func buildInsertStatement(tableName string, columns []string, values []string) string {
 	var sb strings.Builder
 	sb.WriteString(fmt.Sprintf("INSERT INTO `%s` (", tableName))
 	// This is now correct and can be imported via phpMyAdmin as well.
@@ -204,9 +222,17 @@ func buildInsertStatement(tableName string, columns []string, values []any) stri
 		}
 		sb.WriteString(fmt.Sprintf("`%s`", column))
 	}
+	sb.WriteString(") VALUES ")
 
-	sb.WriteString(") VALUES (")
+	sb.WriteString(strings.Join(values, ", "))
+	sb.WriteString(";\n")
+	return sb.String()
+}
 
+// buildValuesString constructs the VALUES part of an SQL INSERT statement.
+func buildValuesString(values []any) string {
+	var sb strings.Builder
+	sb.WriteString("(")
 	for i, val := range values {
 		if i > 0 {
 			sb.WriteString(", ")
@@ -216,9 +242,14 @@ func buildInsertStatement(tableName string, columns []string, values []any) stri
 		} else if b, ok := val.([]byte); ok {
 			sb.WriteString(fmt.Sprintf("'%s'", escapeString(string(b))))
 		} else {
-			sb.WriteString(fmt.Sprintf("'%s'", escapeString(fmt.Sprintf("%v", val))))
+			switch v := val.(type) {
+			case int64, float64, bool:
+				sb.WriteString(fmt.Sprintf("%v", v))
+			default:
+				sb.WriteString(fmt.Sprintf("'%s'", escapeString(fmt.Sprintf("%v", v))))
+			}
 		}
 	}
-	sb.WriteString(");\n")
+	sb.WriteString(")")
 	return sb.String()
 }
