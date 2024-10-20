@@ -69,6 +69,11 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 	hosts := map[string]*fiber.App{}
 
 	// restAPIs subdomain
+	//
+	// TODO: Implement a server startup message mechanism similar to "Fiber" ASCII art,
+	// with animation (e.g., similar to a streaming/bubble tea spinner) for multiple sites or large codebases.
+	// The current static "Fiber" ASCII art only shows one site when there are multiple, which isn't ideal.
+	// However, animated ASCII art may not be necessary right now, as it only works properly in terminals.
 	api := fiber.New(fiber.Config{
 		ServerHeader: appName,
 		AppName:      appName,
@@ -98,6 +103,11 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 	hosts[apiSubdomain] = api
 
 	// Frontend domain
+	//
+	// TODO: Implement a server startup message mechanism similar to "Fiber" ASCII art,
+	// with animation (e.g., similar to a streaming/bubble tea spinner) for multiple sites or large codebases.
+	// The current static "Fiber" ASCII art only shows one site when there are multiple, which isn't ideal.
+	// However, animated ASCII art may not be necessary right now, as it only works properly in terminals.
 	frontend := fiber.New(fiber.Config{
 		ServerHeader: appName,
 		AppName:      appName,
