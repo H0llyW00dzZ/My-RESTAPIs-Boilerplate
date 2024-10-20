@@ -134,7 +134,7 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 					// Check if the request is for the API subdomain
 					if apiHost != "" && strings.HasPrefix(r.Host, apiHost) {
 						// Note: Use a 308 redirect for REST APIs to preserve the HTTP method and body.
-						// A 301 redirect is better for SEO, as it is well-recognized by search engines.
+						// A 301 redirect is better for SEO, as it is well-recognized by search engines for business with google, bing, other search engine hahaha.
 						http.Redirect(w, r, target, http.StatusPermanentRedirect) // 308 redirect for API
 					} else {
 						http.Redirect(w, r, target, http.StatusMovedPermanently) // 301 redirect for others
