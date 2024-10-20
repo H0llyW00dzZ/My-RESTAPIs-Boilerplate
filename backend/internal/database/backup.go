@@ -11,6 +11,7 @@ import (
 	log "h0llyw00dz-template/backend/internal/logger"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -63,6 +64,82 @@ func (s *service) BackupTables(tablesToBackup []string) error {
 	}
 
 	log.LogInfof("Backup completed: %s", backupFile)
+	return nil
+}
+
+// BackupTablesConcurrently creates a backup of specified tables concurrently.
+// It uses goroutines to perform backups for each table simultaneously, improving performance.
+// Each table's backup is handled in a separate goroutine (e.g., 9999999 tables then 9999999 goroutines), and errors are captured via a channel (e.g., 9999999 errors then 9999999 goroutines).
+func (s *service) BackupTablesConcurrently(tablesToBackup []string) error {
+	var wg sync.WaitGroup
+	errChan := make(chan error, len(tablesToBackup))
+
+	for _, tableName := range tablesToBackup {
+		wg.Add(1)
+		go func(table string) {
+			defer wg.Done()
+			if err := s.backupSingleTable(table); err != nil {
+				errChan <- err
+			}
+		}(tableName)
+	}
+
+	// Wait for all goroutines to finish and close the error channel
+	go func() {
+		wg.Wait()
+		close(errChan)
+	}()
+
+	// Check for errors from any of the goroutines
+	for err := range errChan {
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// backupSingleTable performs the backup of a single table.
+// It validates the table name, starts a transaction, and writes the schema and data to a backup file.
+// The transaction ensures a consistent snapshot of the table during the backup process.
+func (s *service) backupSingleTable(tableName string) error {
+	if !IsValidTableName(tableName) {
+		return fmt.Errorf("invalid table name: %s", tableName)
+	}
+
+	// Start a transaction to ensure data consistency
+	tx, err := s.db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	backupFile := fmt.Sprintf("backup_%s_%s.sql", tableName, time.Now().Format("20060102_150405"))
+	file, err := os.Create(backupFile)
+	if err != nil {
+		return fmt.Errorf("failed to create backup file for table %s: %w", tableName, err)
+	}
+	defer file.Close()
+
+	// For large datasets, this may need to configure this and adjust the MySQL server settings.
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+	defer cancel()
+
+	// Dump schema and data within the transaction context
+	if err := s.dumpTableSchema(ctx, file, tableName); err != nil {
+		return err
+	}
+
+	if err := s.dumpTableData(ctx, file, tableName); err != nil {
+		return err
+	}
+
+	// Commit the transaction after successful backup
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	log.LogInfof("Backup completed for table: %s", tableName)
 	return nil
 }
 

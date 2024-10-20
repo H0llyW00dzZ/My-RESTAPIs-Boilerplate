@@ -155,6 +155,12 @@ type Service interface {
 
 	// BackupTables creates a backup of specified tables in the database.
 	BackupTables(tablesToBackup []string) error
+
+	// BackupTablesConcurrently creates a backup of specified tables in the database concurrently.
+	// This method uses goroutines to back up each table simultaneously (e.g., 9999999 tables then 9999999 goroutines). To ensure consistency
+	// similar to sequential backups, consider using transactions or read locks to capture
+	// a consistent snapshot of each table, preventing updates during the backup process.
+	BackupTablesConcurrently(tablesToBackup []string) error
 }
 
 // service is a concrete implementation of the Service interface.
