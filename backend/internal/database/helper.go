@@ -11,6 +11,7 @@ package database
 import (
 	"errors"
 	log "h0llyw00dz-template/backend/internal/logger"
+	"regexp"
 	"strings"
 	"time"
 
@@ -87,4 +88,20 @@ func isDuplicateEntryError(err error) bool {
 		return true
 	}
 	return false
+}
+
+// IsValidTableName checks if the table name is valid to prevent SQL injection.
+func IsValidTableName(name string) bool {
+	// Regex to allow alphanumeric characters and underscores, adjust as needed
+	validNamePattern := `^[a-zA-Z0-9_]+$`
+	matched, err := regexp.MatchString(validNamePattern, name)
+	if err != nil {
+		return false
+	}
+	return matched
+}
+
+// escapeString safely escapes special characters in strings.
+func escapeString(value string) string {
+	return strings.ReplaceAll(strings.ReplaceAll(value, "'", "''"), "\\", "\\\\")
 }
