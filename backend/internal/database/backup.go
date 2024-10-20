@@ -69,7 +69,11 @@ func (s *service) BackupTables(tablesToBackup []string) error {
 
 // BackupTablesConcurrently creates a backup of specified tables concurrently.
 // It uses goroutines to perform backups for each table simultaneously, improving performance.
-// Each table's backup is handled in a separate goroutine (e.g., 9999999 tables then 9999999 goroutines), and errors are captured via a channel (e.g., 9999999 errors then 9999999 goroutines).
+// Each table's backup is handled in a separate goroutine (e.g., 9999999 tables then 9999999 goroutines),
+// and errors are captured via a channel (e.g., 9999999 errors then 9999999 goroutines).
+//
+// Additionally, if this performance improvement is still insufficient for large infrastructures,
+// it can be combined with the worker package. Ensure that your infrastructure can handle up to 1 billion operations, as this is just good business.
 func (s *service) BackupTablesConcurrently(tablesToBackup []string) error {
 	var wg sync.WaitGroup
 	errChan := make(chan error, len(tablesToBackup))
