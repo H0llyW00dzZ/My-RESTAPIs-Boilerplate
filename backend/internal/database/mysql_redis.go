@@ -152,6 +152,9 @@ type Service interface {
 
 	// GetKeysAtPipeline efficiently retrieves the values for the given keys from Redis/Valkey using pipelining.
 	GetKeysAtPipeline(keys []string) (map[string]any, error)
+
+	// BackupTables creates a backup of specified tables in the database.
+	BackupTables(tablesToBackup []string) error
 }
 
 // service is a concrete implementation of the Service interface.
@@ -194,11 +197,6 @@ var (
 // Note: For better connection establishment, it's recommended to put this in the "func init()"
 // so that it will initialize before the "func main()" runs. This is because the connection will be
 // shared across the entire codebase (sharing is caring), even if the codebase grows to billions of lines of Go code (e.g, Senior Golang).
-//
-// TODO: Implement a background task to automatically backup the database using a fully encrypted mechanism
-// provided by the "opengpg" utility. Instead of manually using "mysqldump", store the backups (archived) in a cloud
-// storage service. This task should run periodically without relying on cron jobs, as Go supports goroutines
-// and scheduling mechanisms.
 func New() Service {
 	if dbInstance != nil {
 		return dbInstance
