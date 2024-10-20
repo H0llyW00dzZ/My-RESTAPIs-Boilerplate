@@ -103,8 +103,9 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 	// Note: When using Kubernetes with Ingress NGINX, this HTTP redirect is not necessary
 	// because NGINX handles traffic at the front end. It is recommended not to terminate
 	// HTTPS/TLS in Ingress NGINX, as doing so can degrade performance due to concurrency
-	// issues and pose security risks. This is because traffic is unencrypted if HTTPS/TLS
-	// is terminated at the ingress and then forwarded as HTTP.
+	// issues (a logical flaw, related nginx itself not a bug) and pose security risks.
+	// This is because traffic is unencrypted (easily get compromised)
+	/// if HTTPS/TLS is terminated at the ingress and then forwarded as HTTP.
 	if tlsConfig != nil {
 		// TODO: Improve this that can be customize
 		go func() {
