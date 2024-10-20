@@ -105,7 +105,7 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 	// HTTPS/TLS in Ingress NGINX, as doing so can degrade performance due to concurrency
 	// issues (a logical flaw, related nginx itself not a bug) and pose security risks.
 	// This is because traffic is unencrypted (easily get compromised)
-	/// if HTTPS/TLS is terminated at the ingress and then forwarded as HTTP.
+	// if HTTPS/TLS is terminated at the ingress and then forwarded as HTTP.
 	if tlsConfig != nil {
 		// TODO: Improve this that can be customize
 		go func() {
