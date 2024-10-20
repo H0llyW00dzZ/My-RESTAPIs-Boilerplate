@@ -106,7 +106,7 @@ func (s *service) BackupTablesConcurrently(tablesToBackup []string) error {
 // backupSingleTable performs the backup of a single table.
 // It validates the table name, starts a transaction, and writes the schema and data to a backup file.
 // The transaction ensures a consistent snapshot of the table during the backup process.
-func (s *service) backupSingleTable(tableName string) error {
+func (s *service) backupSingleTable(tableName string) (err error) {
 	if !IsValidTableName(tableName) {
 		return fmt.Errorf("invalid table name: %s", tableName)
 	}
@@ -123,7 +123,17 @@ func (s *service) backupSingleTable(tableName string) error {
 	if err != nil {
 		return fmt.Errorf("failed to create backup file for table %s: %w", tableName, err)
 	}
-	defer file.Close()
+
+	defer func() {
+		if cerr := file.Close(); cerr != nil {
+			log.LogErrorf("Failed to close file: %v", cerr)
+		}
+		if err != nil {
+			if remErr := os.Remove(backupFile); remErr != nil {
+				log.LogErrorf("Failed to remove incomplete backup file: %v", remErr)
+			}
+		}
+	}()
 
 	// For large datasets, this may need to configure this and adjust the MySQL server settings.
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
