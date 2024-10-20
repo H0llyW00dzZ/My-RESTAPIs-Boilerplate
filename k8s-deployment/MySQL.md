@@ -64,6 +64,10 @@ To connect to the MySQL server, you can use the domain name `database.example.co
 > [!NOTE]
 > Also note that the default `MySQL configuration` from this repository uses `TLSv1.3` and can be used with `Public SSL/TLS CAs` as well. However, not all `MySQL clients` support the `TLSv1.3` protocol because they are built on `legacy systems`. For example, the `Navicat client's SSL/TLS protocol` for clients does not support `TLSv1.3`.
 
+> [!TIP]
+> When configuring TLS for `MySQL` and using a domain name through a load balancer, it is recommended to configure a network policy mechanism. The specifics of the network policy depend on the cloud provider. For instance, in GKE, when creating an external load balancer, it is possible to implement a network policy mechanism. In GKE, the load balancer does not matter if pods connect using a domain name; it will show the internal IPs of the pods. However, from external sources, it will display the real external IPs (e.g., visitor IPs). By configuring a network policy, you can whitelist only the pod IP range (using CIDR) to allow connections to the MySQL domain name. This ensures that the load balancer dedicated to MySQL remains secure.
+> Additionally, keep in mind that the approach may vary by cloud provider. For instance, in AWS or other cloud, you might need to configure everything from scratch for sailing ⛵ ☸.
+
 3. Create a persistent volume claim for MySQL storage:
 
    ```bash
