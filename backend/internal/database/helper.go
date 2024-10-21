@@ -10,6 +10,7 @@ package database
 
 import (
 	"errors"
+	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"os"
 	"regexp"
@@ -83,6 +84,7 @@ func convertStringToInterface(strs []string) []any {
 // the need for string comparisons or manual error code checks.
 //
 // Note: This function relies on the [github.com/go-sql-driver/mysql] package for the MySQLError type.
+// Additionaly Use [WrapMySQLError] function can be used across the codebase to handle various MySQL error types with custom messages.
 func isDuplicateEntryError(err error) bool {
 	var mysqlErr *mysql.MySQLError
 	if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
@@ -119,5 +121,60 @@ func writeSQLHeader(file *os.File) error {
 -- Generation Time: ` + time.Now().Format("Jan 02, 2006 at 03:04 PM") + `
 ` + "\n"
 	_, err := file.WriteString(header)
+	return err
+}
+
+// MySQLError represents a custom error type for MySQL errors.
+type MySQLError struct {
+	OriginalError error
+	Number        uint16
+	Message       string
+}
+
+// Error returns a formatted error message for the MySQLError type.
+//
+// This method implements the error interface, providing a detailed string
+// representation of the MySQL error, including the error number, custom message,
+// and the original error.
+//
+// Example Output:
+//
+//	"MySQL Error 1062: Error occurred while inserting user - <original error>"
+func (e *MySQLError) Error() string {
+	return fmt.Sprintf("MySQL Error %d: %s - %v", e.Number, e.Message, e.OriginalError)
+}
+
+// WrapMySQLError wraps a MySQL error with a custom message based on the error number.
+//
+// Example Usage:
+//
+//	// Example query that might cause a duplicate entry error
+//	_, err = db.Exec("INSERT INTO users (username) VALUES (?)", "gopher")
+//	if err != nil {
+//		err = WrapMySQLError(err, "inserting user")
+//		var myErr *MySQLError
+//		if errors.As(err, &myErr) {
+//			switch myErr.Number {
+//			case 1062:
+//				// Handle duplicate entry error
+//				log.Printf("Duplicate entry detected: %v", myErr)
+//			default:
+//				// Handle other MySQL errors
+//				log.Printf("MySQL error occurred: %v", myErr)
+//			}
+//		} else {
+//			// Handle non-MySQL errors
+//			log.Printf("Non-MySQL error occurred: %v", err)
+//		}
+//	}
+func WrapMySQLError(err error, context string) error {
+	var mysqlErr *mysql.MySQLError
+	if errors.As(err, &mysqlErr) {
+		return &MySQLError{
+			OriginalError: err,
+			Number:        mysqlErr.Number,
+			Message:       fmt.Sprintf("Error occurred while %s", context),
+		}
+	}
 	return err
 }
