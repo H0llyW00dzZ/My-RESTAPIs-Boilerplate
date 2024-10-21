@@ -11,6 +11,7 @@ package database
 import (
 	"errors"
 	log "h0llyw00dz-template/backend/internal/logger"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -110,4 +111,13 @@ func escapeString(value string) string {
 	value = strings.ReplaceAll(value, "\n", "\\n")
 	value = strings.ReplaceAll(value, "\"", "\\\"")
 	return value
+}
+
+// writeSQLHeader writes a header to the SQL file.
+func writeSQLHeader(file *os.File) error {
+	header := `-- A Better MySQL Dump Written in Go by H0llyW00dzZ
+-- Generation Time: ` + time.Now().Format("Jan 02, 2006 at 03:04 PM") + `
+` + "\n"
+	_, err := file.WriteString(header)
+	return err
 }
