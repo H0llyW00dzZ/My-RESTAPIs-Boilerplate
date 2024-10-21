@@ -49,6 +49,11 @@ func (s *service) BackupTables(tablesToBackup []string) error {
 		}
 	}()
 
+	// Write the header to the file
+	if err = writeSQLHeader(file); err != nil {
+		return err
+	}
+
 	// For large datasets, this may need to configure this and adjust the MySQL server settings.
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
@@ -134,6 +139,11 @@ func (s *service) backupSingleTable(tableName string) (err error) {
 			}
 		}
 	}()
+
+	// Write the header to the file
+	if err = writeSQLHeader(file); err != nil {
+		return err
+	}
 
 	// For large datasets, this may need to configure this and adjust the MySQL server settings.
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
