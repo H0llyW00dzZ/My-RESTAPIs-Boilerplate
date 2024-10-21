@@ -20,7 +20,7 @@ import (
 // the database schema and insert all the current data for each specified table.
 //
 // TODO: Enhance this function by implementing a background task to automatically back up the database
-// using a fully encrypted mechanism provided by the "opengpg" utility.
+// using a fully encrypted mechanism provided by the "opengpg/gpg" utility.
 // Currently, it only performs a basic backup and stores it directly on disk. Instead,
 // the backups should be archived and stored in a cloud storage service.
 // This function should be handled by goroutines for task to run periodically without relying on cron jobs,
@@ -33,8 +33,8 @@ func (s *service) BackupTables(tablesToBackup []string) error {
 	}
 
 	// TODO: Implement directory storage for direct disk backup.
-	// In the future, this should stream directly with encryption using OpenPGP
-	// to cloud storage for enhanced security against potential compromises.
+	// In the future, this should stream directly with encryption (easy implementation) using OpenPGP/GPG
+	// to cloud storage for enhanced security against potential compromises (e.g., between cloud it's self, human error, other).
 	backupFile := fmt.Sprintf("backup_%s.sql", time.Now().Format("20060102_150405"))
 	file, err := os.Create(backupFile)
 	if err != nil {
@@ -127,8 +127,8 @@ func (s *service) backupSingleTable(tableName string) (err error) {
 	defer tx.Rollback()
 
 	// TODO: Implement directory storage for direct disk backup.
-	// In the future, this should stream directly with encryption using OpenPGP
-	// to cloud storage for enhanced security against potential compromises.
+	// In the future, this should stream directly with encryption (easy implementation) using OpenPGP/GPG
+	// to cloud storage for enhanced security against potential compromises (e.g., between cloud it's self, human error, other).
 	backupFile := fmt.Sprintf("backup_%s_%s.sql", tableName, time.Now().Format("20060102_150405"))
 	file, err := os.Create(backupFile)
 	if err != nil {
