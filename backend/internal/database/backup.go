@@ -32,6 +32,9 @@ func (s *service) BackupTables(tablesToBackup []string) error {
 		}
 	}
 
+	// TODO: Implement directory storage for direct disk backup.
+	// In the future, this should stream directly with encryption using OpenPGP
+	// to cloud storage for enhanced security against potential compromises.
 	backupFile := fmt.Sprintf("backup_%s.sql", time.Now().Format("20060102_150405"))
 	file, err := os.Create(backupFile)
 	if err != nil {
@@ -123,6 +126,9 @@ func (s *service) backupSingleTable(tableName string) (err error) {
 	}
 	defer tx.Rollback()
 
+	// TODO: Implement directory storage for direct disk backup.
+	// In the future, this should stream directly with encryption using OpenPGP
+	// to cloud storage for enhanced security against potential compromises.
 	backupFile := fmt.Sprintf("backup_%s_%s.sql", tableName, time.Now().Format("20060102_150405"))
 	file, err := os.Create(backupFile)
 	if err != nil {
