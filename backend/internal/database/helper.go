@@ -167,6 +167,9 @@ func (e *MySQLError) Error() string {
 //			log.Printf("Non-MySQL error occurred: %v", err)
 //		}
 //	}
+//
+// Also note that this can be effectively improves HTTP/HTTPS traffic performance as well (e.g., against DDoS for INSERTING Data)
+// if MySQL is used directly without Redis (e.g., caching/vice versa).
 func WrapMySQLError(err error, context string) error {
 	var mysqlErr *mysql.MySQLError
 	if errors.As(err, &mysqlErr) {
