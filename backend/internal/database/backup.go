@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
+	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/gpg"
 	"os"
 	"strings"
 	"sync"
@@ -108,6 +109,78 @@ func (s *service) BackupTablesConcurrently(tablesToBackup []string) error {
 			return err
 		}
 	}
+	return nil
+}
+
+// BackupTablesWithGPG creates a backup of specified tables in the database and encrypts it using a PGP public key.
+func (s *service) BackupTablesWithGPG(tablesToBackup []string, publicKey string) error {
+	for _, tableName := range tablesToBackup {
+		if !IsValidTableName(tableName) {
+			return fmt.Errorf("invalid table name: %s", tableName)
+		}
+	}
+
+	// TODO: Implement directory storage for direct disk backup.
+	// In the future, this should stream directly with encryption (easy implementation) using OpenPGP/GPG
+	// to cloud storage for enhanced security against potential compromises (e.g., between cloud it's self, human error, other).
+	backupFile := fmt.Sprintf("backup_%s.sql", time.Now().Format("20060102_150405"))
+	file, err := os.Create(backupFile)
+	if err != nil {
+		return fmt.Errorf("failed to create backup file: %w", err)
+	}
+
+	defer func() {
+		if file != nil {
+			if cerr := file.Close(); cerr != nil {
+				log.LogErrorf("Failed to close file: %v", cerr)
+			}
+		}
+		if err != nil {
+			if remErr := os.Remove(backupFile); remErr != nil {
+				log.LogErrorf("Failed to remove incomplete backup file: %v", remErr)
+			}
+		}
+	}()
+
+	// Write the header to the file
+	if err = writeSQLHeader(file); err != nil {
+		return err
+	}
+
+	// For large datasets, this may need to configure this and adjust the MySQL server settings.
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+	defer cancel()
+
+	for _, tableName := range tablesToBackup {
+		if err = s.dumpTableSchema(ctx, file, tableName); err != nil {
+			return err
+		}
+
+		if err = s.dumpTableData(ctx, file, tableName); err != nil {
+			return err
+		}
+	}
+
+	// Close the file after writing to it
+	if cerr := file.Close(); cerr != nil {
+		log.LogErrorf("Failed to close file before encryption: %v", cerr)
+		return cerr
+	}
+	file = nil // Prevent deferred close
+
+	// Encrypt the backup file
+	encryptedFile := fmt.Sprintf("%s.gpg", backupFile)
+	if err = gpg.EncryptFile(backupFile, encryptedFile, publicKey); err != nil {
+		return err
+	}
+
+	log.LogInfof("Backup and encryption completed: %s", encryptedFile)
+
+	// Remove the unencrypted backup file
+	if err = os.Remove(backupFile); err != nil {
+		log.LogErrorf("Failed to remove unencrypted backup file: %v", err)
+	}
+
 	return nil
 }
 
