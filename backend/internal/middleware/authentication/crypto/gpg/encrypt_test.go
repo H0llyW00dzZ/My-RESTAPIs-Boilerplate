@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-// Sample PGP/GPG keys for testing
+// Sample PGP/GPG keys for testing (RFC 9580) Sections 12.7, 5.2.3.4, and 11.5 Latest strong mechanisms for GPG/OpenPGP.
 //
 // KEY:
 //
