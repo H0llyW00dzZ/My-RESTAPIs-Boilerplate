@@ -64,6 +64,8 @@ func EncryptStream(input io.Reader, output io.Writer, publicKey string) error {
 		return fmt.Errorf("failed to create key ring: %w", err)
 	}
 
+	// Note: The buffer size of 4096 bytes is suitable for streaming encryption.
+	// It allows processing of large files or whole disk efficiently without loading the entire file into memory.
 	buffer := make([]byte, 4096) // Define a buffer size
 	for {
 		n, err := input.Read(buffer)
