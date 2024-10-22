@@ -15,6 +15,7 @@ import (
 // Sample PGP/GPG keys for testing
 //
 // KEY:
+//
 // - https://keys.openpgp.org/search?q=95F9A1D43F57344AB88BFFFEA0F9424A7002343A
 //
 // REST APIs GPG Proton Lookup (created by H0llyW00dzZ):
