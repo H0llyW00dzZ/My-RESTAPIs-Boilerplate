@@ -28,22 +28,48 @@ func EncryptFile(inputFile, outputFile, publicKey string) error {
 		return fmt.Errorf("failed to create key ring: %w", err)
 	}
 
-	// Read the input file
-	data, err := os.ReadFile(inputFile)
+	// Open the input file
+	inFile, err := os.Open(inputFile)
 	if err != nil {
-		return fmt.Errorf("failed to read input file: %w", err)
+		return fmt.Errorf("failed to open input file: %w", err)
+	}
+	defer inFile.Close()
+
+	// Create the output file
+	outFile, err := os.Create(outputFile)
+	if err != nil {
+		return fmt.Errorf("failed to create output file: %w", err)
+	}
+	defer outFile.Close()
+
+	// Create metadata for the encryption
+	metadata := &crypto.PlainMessageMetadata{
+		IsBinary: true,
 	}
 
-	// Encrypt the data
-	message := crypto.NewPlainMessage(data)
-	encryptedMessage, err := keyRing.Encrypt(message, nil)
+	// Create a writer for the encrypted output
+	encryptWriter, err := keyRing.EncryptStream(outFile, metadata, nil)
 	if err != nil {
-		return fmt.Errorf("failed to encrypt data: %w", err)
+		return fmt.Errorf("failed to create encryption stream: %w", err)
 	}
+	defer encryptWriter.Close()
 
-	// Write the encrypted data to the output file
-	if err := os.WriteFile(outputFile, encryptedMessage.GetBinary(), 0644); err != nil {
-		return fmt.Errorf("failed to write encrypted file: %w", err)
+	// Stream the data
+	//
+	// This differs from "EncryptStream" which to a object because it stream writes directly to a file, not an object.
+	buf := make([]byte, 4096) // Buffer size of 4KB
+	for {
+		n, err := inFile.Read(buf)
+		if err != nil && err != io.EOF {
+			return fmt.Errorf("failed to read from input file: %w", err)
+		}
+		if n == 0 {
+			break
+		}
+
+		if _, err := encryptWriter.Write(buf[:n]); err != nil {
+			return fmt.Errorf("failed to write encrypted data: %w", err)
+		}
 	}
 
 	return nil
