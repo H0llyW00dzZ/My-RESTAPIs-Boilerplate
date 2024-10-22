@@ -46,7 +46,7 @@ func TestEncryptFile(t *testing.T) {
 	defer os.Remove(inputFile.Name())
 
 	// Write some data to the input file
-	_, err = inputFile.WriteString("Hello GPG/OpenGPG From H0llyW00dzZ.")
+	_, err = inputFile.WriteString("Hello GPG/OpenPGP From H0llyW00dzZ.")
 	if err != nil {
 		t.Fatalf("Failed to write to input file: %v", err)
 	}
@@ -70,7 +70,7 @@ func TestEncryptFile(t *testing.T) {
 
 func TestEncryptStream(t *testing.T) {
 	// Create a buffer to simulate the input file
-	inputData := []byte("Hello GPG/OpenGPG From H0llyW00dzZ.")
+	inputData := []byte("Hello GPG/OpenPGP From H0llyW00dzZ.")
 	inputBuffer := bytes.NewReader(inputData)
 
 	// Create a buffer to simulate the output file
