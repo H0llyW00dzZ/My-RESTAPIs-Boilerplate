@@ -161,6 +161,58 @@ type Service interface {
 	// similar to sequential backups, consider using transactions or read locks to capture
 	// a consistent snapshot of each table, preventing updates during the backup process.
 	BackupTablesConcurrently(tablesToBackup []string) error
+
+	// BackupTablesWithGPG creates a backup of specified tables in the database and encrypts it using a PGP public key.
+	// This function generates a .sql file containing the SQL statements needed to recreate
+	// the database schema and insert all the current data for each specified table.
+	// After generating the backup file, it encrypts the file using the provided PGP public key.
+	//
+	// Parameters:
+	//   - tablesToBackup: A slice of strings containing the names of the tables to back up.
+	//   - publicKey: A string representing the PGP public key used to encrypt the backup file.
+	//
+	// Returns:
+	//   - error: An error is returned if any part of the backup or encryption process fails.
+	//
+	// Process:
+	//   1. Validate the table names to ensure they are correct.
+	//   2. Create a backup file with a timestamped name to store the SQL dump.
+	//   3. Write SQL headers and dump the schema and data for each specified table into the file.
+	//   4. Close the file to ensure all data is written and the file handle is released.
+	//   5. Encrypt the backup file using the provided PGP public key, creating an encrypted file with a .gpg extension.
+	//   6. Log the successful completion of the backup and encryption process.
+	//   7. Remove the unencrypted backup file to ensure data security.
+	//
+	// Notes:
+	//   - The function uses a context with a timeout to ensure that the backup process does not run indefinitely.
+	//   - It is important to handle file closures and removals carefully to avoid resource leaks and ensure security.
+	//   - The encryption process uses the proton library for PGP encryption.
+	//
+	// Example Usage:
+	// if err := db.BackupTablesWithGPG([]string{"users", "orders"}, publicKey); err != nil {
+	// 	log.LogErrorf("Backup failed: %v", err)
+	// }
+	//
+	// Note: For decryption, this should work with any GPG frontend (e.g., https://github.com/saturneric/GpgFrontend).
+	//
+	// For example, decryption (tested on my strong GPG):
+	//
+	// Decrypt Operation - Success
+	//
+	// General State:
+	//
+	// 	- MIME: false
+	// 	- Message Integrity Protection: true
+	// 	- Symmetric Encryption Algorithm: AES256.CFB
+	// 	- German Encryption Standards: false
+	//
+	// Recipient(s):
+	//
+	// Recipient [1]: h0llyw00dzz@pm.me<h0llyw00dzz@pm.me>
+	// 	- Key ID: AB68BB42A56C9894
+	// 	- Public Key Algo: ECDH
+	// 	- Status: Success
+	BackupTablesWithGPG(tablesToBackup []string, publicGPGKey string) error
 }
 
 // service is a concrete implementation of the Service interface.
