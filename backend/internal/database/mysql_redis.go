@@ -194,6 +194,23 @@ type Service interface {
 	// }
 	//
 	// Note: For decryption, this should work with any GPG frontend (e.g., https://github.com/saturneric/GpgFrontend).
+	//
+	// For example, decryption (tested on my strong GPG):
+	// Decrypt Operation - Success
+	//
+	// General State:
+	//
+	// 	- MIME: false
+	// 	- Message Integrity Protection: true
+	// 	- Symmetric Encryption Algorithm: AES256.CFB
+	// 	- German Encryption Standards: false
+	//
+	// Recipient(s):
+	//
+	// Recipient [1]: h0llyw00dzz@pm.me<h0llyw00dzz@pm.me>
+	// 	- Key ID: AB68BB42A56C9894
+	// 	- Public Key Algo: ECDH
+	// 	- Status: Success
 	BackupTablesWithGPG(tablesToBackup []string, publicGPGKey string) error
 }
 
