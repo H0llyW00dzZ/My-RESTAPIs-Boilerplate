@@ -11,7 +11,7 @@ import (
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 )
 
-// Encryptor handles encryption using a PGP public key.
+// Encryptor handles encryption using a OpenPGP/GPG public key.
 type Encryptor struct {
 	publicKey string
 }
