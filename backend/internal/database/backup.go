@@ -169,8 +169,13 @@ func (s *service) BackupTablesWithGPG(tablesToBackup []string, publicKey string)
 	file = nil // Prevent deferred close
 
 	// Encrypt the backup file
+	gpg, err := gpg.NewEncryptor(publicKey)
+	if err != nil {
+		return fmt.Errorf("failed to create encryptor: %w", err)
+	}
+
 	encryptedFile := fmt.Sprintf("%s.gpg", backupFile)
-	if err = gpg.EncryptFile(backupFile, encryptedFile, publicKey); err != nil {
+	if err = gpg.EncryptFile(backupFile, encryptedFile); err != nil {
 		return err
 	}
 

@@ -61,9 +61,14 @@ func TestEncryptFile(t *testing.T) {
 	outputFile := inputFile.Name() + ".gpg"
 	defer os.Remove(outputFile)
 
-	// Call the EncryptFile function
-	err = gpg.EncryptFile(inputFile.Name(), outputFile, testPublicKey)
+	// Encrypt the backup file
+	gpg, err := gpg.NewEncryptor(testPublicKey)
 	if err != nil {
+		t.Fatalf("Failed to create encryptor: %v", err)
+	}
+
+	// Call the EncryptFile function
+	if err = gpg.EncryptFile(inputFile.Name(), outputFile); err != nil {
 		t.Fatalf("EncryptFile failed: %v", err)
 	}
 

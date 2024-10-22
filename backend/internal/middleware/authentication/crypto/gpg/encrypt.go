@@ -14,11 +14,9 @@ import (
 )
 
 // EncryptFile encrypts the given file using the provided PGP public key.
-//
-// TODO: Improve this Use Struct
-func EncryptFile(inputFile, outputFile, publicKey string) error {
+func (e *Encryptor) EncryptFile(inputFile, outputFile string) error {
 	// Read the public key
-	key, err := crypto.NewKeyFromArmored(publicKey)
+	key, err := crypto.NewKeyFromArmored(e.publicKey)
 	if err != nil {
 		return fmt.Errorf("failed to read public key: %w", err)
 	}
