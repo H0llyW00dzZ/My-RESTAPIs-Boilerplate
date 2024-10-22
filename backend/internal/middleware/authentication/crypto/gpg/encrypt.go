@@ -45,7 +45,7 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) error {
 	}
 
 	// Create a writer for the encrypted output
-	encryptWriter, err := keyRing.EncryptStream(outFile, metadata, nil)
+	encryptWriter, err := keyRing.EncryptStreamWithCompression(outFile, metadata, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create encryption stream: %w", err)
 	}
