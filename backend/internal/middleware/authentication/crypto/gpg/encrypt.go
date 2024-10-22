@@ -15,14 +15,10 @@ import (
 
 // EncryptFile encrypts the given file using the provided GPG/OpenPGP public key.
 func (e *Encryptor) EncryptFile(inputFile, outputFile string) error {
-	// Read the public key
-	//
-	// Remove the "if err" handler for this case, as having too many is not ideal.
-	key, _ := crypto.NewKeyFromArmored(e.publicKey)
-
-	keyRing, err := crypto.NewKeyRing(key)
+	// Create a key ring from the public key
+	keyRing, err := e.createKeyRing()
 	if err != nil {
-		return fmt.Errorf("failed to create key ring: %w", err)
+		return err
 	}
 
 	// Open the input file
@@ -72,19 +68,14 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) error {
 	return nil
 }
 
-// EncryptStream encrypts data from an input stream and writes to an output stream using the provided PGP public key.
+// EncryptStream encrypts data from an input stream and writes to an output stream using the Encryptor's public key.
 //
-// TODO: Improve this Use Struct
-func EncryptStream(input io.Reader, output io.Writer, publicKey string) error {
-	// Read the public key
-	key, err := crypto.NewKeyFromArmored(publicKey)
+// TODO: Improve this
+func (e *Encryptor) EncryptStream(input io.Reader, output io.Writer) error {
+	// Create a key ring from the public key
+	keyRing, err := e.createKeyRing()
 	if err != nil {
-		return fmt.Errorf("failed to read public key: %w", err)
-	}
-
-	keyRing, err := crypto.NewKeyRing(key)
-	if err != nil {
-		return fmt.Errorf("failed to create key ring: %w", err)
+		return err
 	}
 
 	// Note: The buffer size of 4096 bytes is suitable for streaming encryption.

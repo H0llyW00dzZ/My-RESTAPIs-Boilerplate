@@ -86,9 +86,13 @@ func TestEncryptStream(t *testing.T) {
 	// Create a buffer to simulate the output file
 	outputBuffer := &bytes.Buffer{}
 
-	// Call the EncryptStream function
-	err := gpg.EncryptStream(inputBuffer, outputBuffer, testPublicKey)
+	gpg, err := gpg.NewEncryptor(testPublicKey)
 	if err != nil {
+		t.Fatalf("Failed to create encryptor: %v", err)
+	}
+
+	// Call the EncryptStream function
+	if err = gpg.EncryptStream(inputBuffer, outputBuffer); err != nil {
 		t.Fatalf("EncryptStream failed: %v", err)
 	}
 
