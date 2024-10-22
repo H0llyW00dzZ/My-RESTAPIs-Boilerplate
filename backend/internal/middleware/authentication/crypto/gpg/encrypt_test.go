@@ -88,6 +88,11 @@ func TestEncryptStream(t *testing.T) {
 		t.Fatalf("Output buffer is empty")
 	}
 
+	// Compare original and encrypted data
+	if bytes.Equal(inputData, outputBuffer.Bytes()) {
+		t.Fatalf("Encrypted data is the same as original data")
+	}
+
 	// Optionally, you can add more checks to see if the data is encrypted
 	// This would typically involve decrypting with a private key and verifying the content
 }
