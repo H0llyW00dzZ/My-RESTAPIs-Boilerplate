@@ -13,7 +13,7 @@ import (
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 )
 
-// EncryptFile encrypts the given file using the provided PGP public key.
+// EncryptFile encrypts the given file using the provided GPG/OpenPGP public key.
 func (e *Encryptor) EncryptFile(inputFile, outputFile string) error {
 	// Read the public key
 	//
