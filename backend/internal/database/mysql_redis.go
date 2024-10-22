@@ -212,7 +212,7 @@ type Service interface {
 	// 	- Key ID: AB68BB42A56C9894
 	// 	- Public Key Algo: ECDH
 	// 	- Status: Success
-	BackupTablesWithGPG(tablesToBackup []string, publicGPGKey string) error
+	BackupTablesWithGPG(tablesToBackup []string, publicGPGKey []string) error
 }
 
 // service is a concrete implementation of the Service interface.

@@ -62,7 +62,7 @@ func TestEncryptFile(t *testing.T) {
 	defer os.Remove(outputFile)
 
 	// Encrypt the backup file
-	gpg, err := gpg.NewEncryptor(testPublicKey)
+	gpg, err := gpg.NewEncryptor([]string{testPublicKey})
 	if err != nil {
 		t.Fatalf("Failed to create encryptor: %v", err)
 	}
@@ -86,7 +86,7 @@ func TestEncryptStream(t *testing.T) {
 	// Create a buffer to simulate the output file
 	outputBuffer := &bytes.Buffer{}
 
-	gpg, err := gpg.NewEncryptor(testPublicKey)
+	gpg, err := gpg.NewEncryptor([]string{testPublicKey})
 	if err != nil {
 		t.Fatalf("Failed to create encryptor: %v", err)
 	}

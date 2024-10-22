@@ -113,7 +113,7 @@ func (s *service) BackupTablesConcurrently(tablesToBackup []string) error {
 }
 
 // BackupTablesWithGPG creates a backup of specified tables in the database and encrypts it using a PGP public key.
-func (s *service) BackupTablesWithGPG(tablesToBackup []string, publicKey string) error {
+func (s *service) BackupTablesWithGPG(tablesToBackup []string, publicKey []string) error {
 	for _, tableName := range tablesToBackup {
 		if !IsValidTableName(tableName) {
 			return fmt.Errorf("invalid table name: %s", tableName)
