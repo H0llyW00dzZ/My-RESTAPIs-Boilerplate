@@ -71,6 +71,7 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) error {
 // EncryptStream encrypts data from an input stream and writes to an output stream using the Encryptor's public key.
 //
 // TODO: Improve this. It should be an object that can be stored (e.g., in a database or storage mechanism) for compatibility with HPA in Kubernetes.
+// It should be secure enough that even if it is exposed to the public (e.g., a human error, missconfigured related storage mechanism such as bucket), the data remains protected due to encryption.
 func (e *Encryptor) EncryptStream(input io.Reader, output io.Writer) error {
 	// Create a key ring from the public key
 	keyRing, err := e.createKeyRing()
