@@ -4,6 +4,7 @@ go 1.23.2
 
 require (
 	github.com/H0llyW00dzZ/FiberValidator v0.5.2
+	github.com/ProtonMail/gopenpgp/v2 v2.7.5
 	github.com/a-h/templ v0.2.778
 	github.com/ansrivas/fiberprometheus/v2 v2.7.0
 	github.com/bytedance/sonic v1.12.3
@@ -35,8 +36,6 @@ require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.1.0-beta.0-proton // indirect
 	github.com/ProtonMail/go-mime v0.0.0-20230322103455-7d82a3887f2f // indirect
-	github.com/ProtonMail/gopenpgp/v2 v2.7.5 // indirect
-	github.com/ProtonMail/gopenpgp/v3 v3.0.0-beta.2-proton // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
