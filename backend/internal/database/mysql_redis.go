@@ -196,6 +196,7 @@ type Service interface {
 	// Note: For decryption, this should work with any GPG frontend (e.g., https://github.com/saturneric/GpgFrontend).
 	//
 	// For example, decryption (tested on my strong GPG):
+	//
 	// Decrypt Operation - Success
 	//
 	// General State:
