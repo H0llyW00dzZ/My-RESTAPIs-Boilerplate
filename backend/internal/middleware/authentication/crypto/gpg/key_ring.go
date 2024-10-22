@@ -13,14 +13,23 @@ import (
 
 // createKeyRing creates a KeyRing from the public key.
 func (e *Encryptor) createKeyRing() (*crypto.KeyRing, error) {
-	key, err := crypto.NewKeyFromArmored(e.publicKey)
-	if err != nil {
-		return nil, fmt.Errorf("invalid public key: %w", err)
-	}
+	var keyRing *crypto.KeyRing
 
-	keyRing, err := crypto.NewKeyRing(key)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create key ring: %w", err)
+	for _, pubKey := range e.publicKey {
+		key, err := crypto.NewKeyFromArmored(pubKey)
+		if err != nil {
+			return nil, fmt.Errorf("invalid public key: %w", err)
+		}
+
+		if keyRing == nil {
+			keyRing, err = crypto.NewKeyRing(key)
+		} else {
+			err = keyRing.AddKey(key)
+		}
+
+		if err != nil {
+			return nil, fmt.Errorf("failed to add key to key ring: %w", err)
+		}
 	}
 
 	return keyRing, nil

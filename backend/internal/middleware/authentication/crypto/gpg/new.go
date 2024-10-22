@@ -7,14 +7,13 @@ package gpg
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 )
 
 // Encryptor handles encryption using a OpenPGP/GPG public key.
 type Encryptor struct {
-	publicKey string
+	publicKey []string
 }
 
 var (
@@ -22,18 +21,30 @@ var (
 	ErrorCantEncrypt = errors.New("Crypto: GPG/OpenPGP the provided key cannot be used for encryption")
 )
 
-// NewEncryptor creates a new Encryptor instance.
-func NewEncryptor(publicKey string) (*Encryptor, error) {
-	// Validate the public key
-	key, err := crypto.NewKeyFromArmored(publicKey)
-	if err != nil {
-		return nil, fmt.Errorf("invalid public key: %w", err)
+// NewEncryptor creates a new Encryptor instance with multiple public keys.
+//
+// Note: Ensure that the provided public key can be used for encryption.
+// This function handles multiple keys within an armored key block.
+// Filtering keys from a complex, multi-key armored block can be challenging.
+func NewEncryptor(publicKeys []string) (*Encryptor, error) {
+	var validKeys []string
+
+	for _, pubKey := range publicKeys {
+		// Validate the public key
+		key, err := crypto.NewKeyFromArmored(pubKey)
+		if err != nil {
+			continue // Skip invalid keys
+		}
+
+		// Check if the key can be used for encryption
+		if key.CanEncrypt() {
+			validKeys = append(validKeys, pubKey)
+		}
 	}
 
-	// Check if the key can be used for encryption
-	if !key.CanEncrypt() {
+	if len(validKeys) == 0 {
 		return nil, ErrorCantEncrypt
 	}
 
-	return &Encryptor{publicKey: publicKey}, nil
+	return &Encryptor{publicKey: validKeys}, nil
 }
