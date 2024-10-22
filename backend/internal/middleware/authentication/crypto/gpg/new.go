@@ -6,6 +6,7 @@
 package gpg
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
@@ -16,12 +17,22 @@ type Encryptor struct {
 	publicKey string
 }
 
+var (
+	// ErrorCantEncrypt is returned when the provided public key cannot be used for encryption.
+	ErrorCantEncrypt = errors.New("Crypto: GPG/OpenPGP the provided key cannot be used for encryption")
+)
+
 // NewEncryptor creates a new Encryptor instance.
 func NewEncryptor(publicKey string) (*Encryptor, error) {
 	// Validate the public key
-	_, err := crypto.NewKeyFromArmored(publicKey)
+	key, err := crypto.NewKeyFromArmored(publicKey)
 	if err != nil {
 		return nil, fmt.Errorf("invalid public key: %w", err)
+	}
+
+	// Check if the key can be used for encryption
+	if !key.CanEncrypt() {
+		return nil, ErrorCantEncrypt
 	}
 
 	return &Encryptor{publicKey: publicKey}, nil
