@@ -23,6 +23,10 @@ import (
 //	curl -X POST https://api.b0zal.io/v1/gpg/proton/lookup \
 //	-H "Content-Type: application/json" \
 //	-d '{"email":"H0llyW00dzZ@pm.me"}'
+//
+// Note: If you attempt to look up the GPG Proton Public Key using the REST API and receive a 403 Forbidden response,
+// it means your IP network has been blocked due to suspicious activity (e.g., your network might be compromised, such as by a botnet).
+// My firewall mechanism is precise in identifying normal users, bots, or infected devices.
 const testPublicKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
 
 mDMEZhww9xYJKwYBBAHaRw8BAQdAA9nmVRaTTKJe7EDCQ8OhshfDim+9kjCpbUU6
