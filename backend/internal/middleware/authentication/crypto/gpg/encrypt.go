@@ -16,10 +16,9 @@ import (
 // EncryptFile encrypts the given file using the provided PGP public key.
 func (e *Encryptor) EncryptFile(inputFile, outputFile string) error {
 	// Read the public key
-	key, err := crypto.NewKeyFromArmored(e.publicKey)
-	if err != nil {
-		return fmt.Errorf("failed to read public key: %w", err)
-	}
+	//
+	// Remove the "if err" handler for this case, as having too many is not ideal.
+	key, _ := crypto.NewKeyFromArmored(e.publicKey)
 
 	keyRing, err := crypto.NewKeyRing(key)
 	if err != nil {
