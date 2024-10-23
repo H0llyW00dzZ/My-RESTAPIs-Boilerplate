@@ -30,14 +30,18 @@ func BenchmarkEncryptLargeFile(b *testing.B) {
 
 	// Write 1 GiB of data to the input file.
 	//
-	// Note: During benchmark testing, this operation uses memory allocation. However, in production, memory usage should be minimal,
-	// even for large data sizes (e.g., 250 MiB+ backup sql), with memory usage around 15-16 MiB.
-	// This is because data is streamed directly from the file/disk, not held in memory.
+	// Note: During benchmark testing, memory allocation is used. However, in production, memory usage should be minimal,
+	// even for large data sizes (e.g., 250 MiB+ backup SQL), with memory usage around 15-16 MiB.
+	// This efficiency is achieved by streaming data directly from the file/disk, rather than holding it in memory.
 	const size = 1 << 30 // 1 GiB
-	data := make([]byte, size)
-	_, err = inputFile.Write(data)
-	if err != nil {
-		b.Fatalf("Failed to write to input file: %v", err)
+
+	// Simulate streaming data to the file in chunks to avoid large memory allocations that might occur on other architectures hahaha
+	chunkSize := 4 << 20 // 4 MiB
+	data := make([]byte, chunkSize)
+	for written := int64(0); written < size; written += int64(chunkSize) {
+		if _, err := inputFile.Write(data); err != nil {
+			b.Fatalf("Failed to write to input file: %v", err)
+		}
 	}
 	inputFile.Close()
 
