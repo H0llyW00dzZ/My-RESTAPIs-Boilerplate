@@ -31,7 +31,7 @@ func BenchmarkEncryptLargeFile(b *testing.B) {
 	// Write 1 GiB of data to the input file.
 	//
 	// Note: During benchmark testing, this operation uses memory allocation. However, in production, memory usage should be minimal,
-	// even for large data sizes (e.g., 250 MB+ backup sql), with memory usage around 15-16 MB.
+	// even for large data sizes (e.g., 250 MiB+ backup sql), with memory usage around 15-16 MiB.
 	// This is because data is streamed directly from the file/disk, not held in memory.
 	const size = 1 << 30 // 1 GiB
 	data := make([]byte, size)
