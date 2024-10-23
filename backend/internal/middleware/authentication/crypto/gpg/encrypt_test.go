@@ -132,3 +132,45 @@ func TestNewEncryptorWithInvalidKey(t *testing.T) {
 		t.Fatalf("Expected ErrorCantEncrypt, but got: %v", err)
 	}
 }
+
+func TestGetKeyInfos(t *testing.T) {
+	// Sample public key
+	publicKeys := []string{
+		testPublicKey,
+		testPublicECDSACantEncrypt,
+	}
+
+	// Create an Encryptor instance
+	gpg, err := gpg.NewEncryptor(publicKeys)
+	if err != nil {
+		t.Fatalf("Failed to create Encryptor: %v", err)
+	}
+
+	// Get key infos
+	keyInfos := gpg.GetKeyInfos()
+
+	// Check that keyInfos is not empty
+	if len(keyInfos) == 0 {
+		t.Fatal("Expected keyInfos to contain key metadata, but it was empty")
+	}
+
+	// Log detailed key information
+	for i, info := range keyInfos {
+		t.Logf("Key %d:", i+1)
+		t.Logf("KeyID: %d", info.KeyID)
+		t.Logf("Hex KeyID: %s", info.HexKeyID)
+		t.Logf("CanEncrypt: %t", info.CanEncrypt)
+		t.Logf("CanVerify: %t", info.CanVerify)
+		t.Logf("IsExpired: %t", info.IsExpired)
+		t.Logf("IsRevoked: %t", info.IsRevoked)
+		t.Logf("Key Fingerprints: %s", info.Fingerprint)
+		t.Logf("Digest Fingerprints: %v", info.DigestFingerprint)
+	}
+
+	// Example check: Verify the first key's CanEncrypt field
+	if !keyInfos[0].CanEncrypt {
+		t.Fatal("Expected first key to be capable of encryption")
+	}
+
+	// Additional checks can be added based on expected key metadata
+}
