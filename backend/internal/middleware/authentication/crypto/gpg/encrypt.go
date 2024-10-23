@@ -35,9 +35,11 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) error {
 	}
 	defer outFile.Close()
 
-	// Create metadata for the encryption
+	// Create metadata (header) for the encryption
 	metadata := &crypto.PlainMessageMetadata{
 		IsBinary: true,
+		Filename: outFile.Name(),
+		ModTime:  crypto.GetUnixTime(),
 	}
 
 	// Create a writer for the encrypted output
