@@ -183,7 +183,8 @@ func (s *service) BackupTablesWithGPG(tablesToBackup []string, publicKey []strin
 
 	// Remove the unencrypted backup file
 	//
-	// Note: It's not possible to remove during GPG encryption because EncryptFile streams the data.
+	// Note: It's not possible to remove the file during GPG encryption because EncryptFile streams data using an [io.WriteCloser].
+	// This process directly uses a file, not an [io] object, so it should be safe, as well as the file being locked during GPG encryption while open then reading and writing to another file.
 	// Consider exploring alternative methods (marked as TODO).
 	if err = os.Remove(backupFile); err != nil {
 		log.LogErrorf("Failed to remove unencrypted backup file: %v", err)
