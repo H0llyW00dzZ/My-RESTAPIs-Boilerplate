@@ -14,7 +14,7 @@ import (
 )
 
 // EncryptFile encrypts the given file using the provided GPG/OpenPGP public key.
-func (e *Encryptor) EncryptFile(inputFile, outputFile string) error {
+func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 	// Create a key ring from the public key
 	keyRing, err := e.createKeyRing()
 	if err != nil {
@@ -33,7 +33,12 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) error {
 	if err != nil {
 		return fmt.Errorf("failed to create output file: %w", err)
 	}
-	defer outFile.Close()
+
+	defer func() {
+		if cerr := outFile.Close(); cerr != nil || err != nil {
+			os.Remove(outputFile)
+		}
+	}()
 
 	// Create metadata (header) for the encryption
 	metadata := &crypto.PlainMessageMetadata{
