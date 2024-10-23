@@ -14,6 +14,7 @@ import (
 // Encryptor handles encryption using a OpenPGP/GPG public key.
 type Encryptor struct {
 	publicKey []string
+	keyInfos  []KeyInfo
 }
 
 var (
@@ -28,6 +29,7 @@ var (
 // Filtering keys from a complex, multi-key armored block can be challenging.
 func NewEncryptor(publicKeys []string) (*Encryptor, error) {
 	var validKeys []string
+	var keyInfos []KeyInfo
 
 	for _, pubKey := range publicKeys {
 		// Validate the public key
@@ -35,6 +37,10 @@ func NewEncryptor(publicKeys []string) (*Encryptor, error) {
 		if err != nil {
 			continue // Skip invalid keys
 		}
+
+		// Extract key information
+		keyInfo := extractKeyInfo(key)
+		keyInfos = append(keyInfos, keyInfo)
 
 		// Check if the key can be used for encryption
 		if key.CanEncrypt() {
@@ -46,5 +52,23 @@ func NewEncryptor(publicKeys []string) (*Encryptor, error) {
 		return nil, ErrorCantEncrypt
 	}
 
-	return &Encryptor{publicKey: validKeys}, nil
+	return &Encryptor{
+		publicKey: validKeys,
+		keyInfos:  keyInfos,
+	}, nil
+}
+
+// extractKeyInfo extracts metadata from a given crypto.Key and returns it as a KeyInfo struct.
+// This function gathers essential details about the key, such as its ID, capabilities, and fingerprints.
+func extractKeyInfo(key *crypto.Key) KeyInfo {
+	return KeyInfo{
+		KeyID:             key.GetKeyID(),
+		HexKeyID:          key.GetHexKeyID(),
+		CanEncrypt:        key.CanEncrypt(),
+		CanVerify:         key.CanVerify(),
+		IsExpired:         key.IsExpired(),
+		IsRevoked:         key.IsRevoked(),
+		Fingerprint:       key.GetFingerprint(),
+		DigestFingerprint: key.GetSHA256Fingerprints(),
+	}
 }
