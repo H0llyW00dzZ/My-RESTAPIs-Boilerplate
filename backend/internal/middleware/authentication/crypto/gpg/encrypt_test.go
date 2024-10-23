@@ -42,6 +42,18 @@ zAozXAC69DgM8AOJzEnsiA55ic1D56y64baz31cD
 -----END PGP PUBLIC KEY BLOCK-----
 `
 
+const testPublicECDSACantEncrypt = `-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mFIEZxh27BMIKoZIzj0DAQcCAwRw2BIEuz/lUbsWB11eKNDzDTS86SU8t5S1+WhL
+PnWxuW8ylRjIaLzv6QRs0idiagE9dLVdpm9XwVhojyOCx91mtCRUZXN0IEtleShU
+ZXN0IEtleSk8dGVzdEBleGFtcGxlLmNvbT6IkwQTEwgAOxYhBJoZ+uA5zgwcjmzC
+3sydPySjCpmPBQJnGHbsAhsDBQsJCAcCAiICBhUKCQgLAgQWAgMBAh4HAheAAAoJ
+EMydPySjCpmP548A/3cKzb/YjiNPH5NOQvVeizEuU2Jo8ZBgK52JuVpqxakrAQDP
+lQD3Q4dlnY9UeRlO+wvaMYtg/y9UCpdBWG8qrxyMOw==
+=zFbO
+-----END PGP PUBLIC KEY BLOCK-----
+`
+
 func TestEncryptFile(t *testing.T) {
 	// Create a temporary file to encrypt
 	inputFile, err := os.CreateTemp("", "test_input_*.txt")
@@ -108,4 +120,15 @@ func TestEncryptStream(t *testing.T) {
 
 	// Optionally, you can add more checks to see if the data is encrypted
 	// This would typically involve decrypting with a private key and verifying the content
+}
+
+func TestNewEncryptorWithInvalidKey(t *testing.T) {
+	_, err := gpg.NewEncryptor([]string{testPublicECDSACantEncrypt})
+	if err == nil {
+		t.Fatalf("Expected error when creating encryptor with a key that cannot encrypt, but got none")
+	}
+
+	if err != gpg.ErrorCantEncrypt {
+		t.Fatalf("Expected ErrorCantEncrypt, but got: %v", err)
+	}
 }
