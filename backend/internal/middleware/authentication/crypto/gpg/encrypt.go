@@ -14,6 +14,9 @@ import (
 )
 
 // EncryptFile encrypts the given file using the provided GPG/OpenPGP public key.
+//
+// Note: Performance may depends on CPU and disk speed. However In K8s, this can be challenging for HPA
+// because the encryption writes to disk, not to an object that can be easily stored elsewhere (e.g., storage mechanisms by Fiber, buckets, etc.).
 func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 	// Create a key ring from the public key
 	keyRing, err := e.createKeyRing()
