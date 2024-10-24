@@ -150,8 +150,8 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 		//
 		// - https://www.immuniweb.com/ssl/git.b0zal.io/KRIX2G2F/
 		// - https://decoder.link/sslchecker/git.b0zal.io/443
-		// - https://decoder.link/sslchecker/b0zal.io/443 (this repository is used for sandbox development exposed to public/prods)
-		// - https://decoder.link/sslchecker/api.b0zal.io/443 (this repository is used for sandbox development exposed to public/prods)
+		// - https://decoder.link/sslchecker/b0zal.io/443 (from this repository boilerplate is used for sandbox development exposed to public/prods)
+		// - https://decoder.link/sslchecker/api.b0zal.io/443 (from this repository boilerplate is used for sandbox development exposed to public/prods)
 		//
 		// Additionally, note that if "enable-ocsp" is set to true in the Ingress Nginx ConfigMap, OCSP Stapling remains optional.
 		// This is because when Nginx passes requests to HTTPS/TLS related to this service without terminating it,
