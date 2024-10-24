@@ -358,7 +358,7 @@ func buildValuesString(values []any) string {
 			sb.WriteString(", ")
 		}
 		if val == nil {
-			sb.WriteString("NULL")
+			sb.WriteString(nullObject)
 		} else if b, ok := val.([]byte); ok {
 			sb.WriteString(fmt.Sprintf("'%s'", escapeString(string(b))))
 		} else {
