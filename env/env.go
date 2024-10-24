@@ -56,6 +56,10 @@ const (
 	// If the implementation is incorrect, this ship ⛵ BlackPearl, will be shrinking.
 	SERVERCERTTLS = "TLS_CERT_FILE"
 	SERVERKEYTLS  = "TLS_KEY_FILE"
+	// DISABLEDEFAULTPORTHTTP determines whether the application should disable listening on the default HTTP port (port 80).
+	// Set this environment variable to "true" to prevent the server from accepting insecure HTTP connections.
+	// This enhances security by ensuring that only secure connections (HTTPS/TLS) are accepted.
+	DISABLEDEFAULTPORTHTTP = "DISABLE_PORT_HTTPINSECURE"
 )
 
 // Site Middleware Configuration (Optional since it boilerplate and must rewrite a "DomainRouter" in RegisterRoutes (see backend/internal/middleware/routes.go))
