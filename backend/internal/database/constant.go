@@ -43,3 +43,7 @@ const (
 const (
 	defaultCtxTimeout = 5 * time.Minute
 )
+
+const (
+	nullObject = "NULL"
+)
