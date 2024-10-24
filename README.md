@@ -28,8 +28,8 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 - Cryptography Techniques
 - High Quality Go Codes
 - Rich Presence TUIs using [`charm.sh`](https://charm.sh/)
-- Boring TLS 1.3 Protocol (WIP)
-- Certificate Transparency (CT) Log
+- ~~Boring TLS 1.3 Protocol (WIP)~~ -> EOL (No longer actively developed due to time constraints)
+- ~~Certificate Transparency (CT) Log~~ -> EOL (No longer actively developed due to time constraints)
 
 > [!NOTE]  
 > `Boring TLS 1.3 Protocol` This project utilizes the industry-standard TLS 1.3 protocol, known for its exceptional security and reliability. We call it `Boring TLS` because its robust security makes it almost boring.
@@ -40,6 +40,9 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 > [!WARNING]
 > Some features might not work as expected when running this repo on certain cloud providers. For example, the `Rich Presence TUIs` feature requires a [`tty`](https://en.wikipedia.org/wiki/Tty_(Unix)).
 > The reason why some features might not work as expected after implementation is because this repo is designed to be `top-level` and follow the `Unix philosophy`. Plus, most of the `Go code` in this repo follows many `best practices` and idioms from `Effective Go`.
+
+> [!TIP]
+> Due to the large codebase of this repository, which includes many sub-packages such as helper functions (lazy splitting into another repository), consider implementing your own or an alternative `main` Go mechanism ([`follow best practices here`](https://go.dev/doc/modules/layout)). This can be used across multiple containers in a single deployment for infrastructure purposes. Personally, I have created many such mechanisms for running in [`Kubernetes (k8s)`](https://kubernetes.io/) based on this starter repository.
 
 ## TODO Features
 
