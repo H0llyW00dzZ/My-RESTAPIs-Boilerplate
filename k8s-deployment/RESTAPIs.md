@@ -178,7 +178,7 @@ senior-golang-worker-hpa   Deployment/senior-golang   cpu: 75%/80%      1       
 > [!NOTE]
 > In this example, the REST API ([This Repo](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate)) is running with **22 vCPUs** (extremely scalable) across **8 nodes**, for **41 Pods**.
 
-### Example of 80% Utilization for the HPA in Math (`LateX`)
+### Example of 80% Utilization for the HPA in Math ([`LaTeX`](https://en.wikipedia.org/wiki/LaTeX))
 
 To understand how the utilization and vCPUs work together, consider the following calculations:
 
