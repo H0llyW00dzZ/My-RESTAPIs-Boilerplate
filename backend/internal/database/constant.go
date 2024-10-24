@@ -66,7 +66,7 @@ const (
 
 // Miscellaneous constants.
 const (
-	// nullObject represents a null value as a string.
+	// nullObject represents a null (nil in Go) value as a string.
 	nullObject = "NULL"
 
 	// valuesObject represents a value as a string.
