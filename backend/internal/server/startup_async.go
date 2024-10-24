@@ -32,6 +32,11 @@ var (
 	// It is set using the API_SUB_DOMAIN environment variable.
 	// Example: set API_SUB_DOMAIN=api.localhost:8080 for local development.
 	apiSubdomain = os.Getenv(env.APISUBDOMAIN)
+
+	// disableHTTPInsecure determines if the server should avoid listening on port 80 for HTTP.
+	// This is controlled by the DISABLE_PORT_HTTPINSECURE environment variable.
+	// If set to "true", the server will not set up an HTTP listener on port 80 otherwise it will listening.
+	disableHTTPInsecure = os.Getenv(env.DISABLEDEFAULTPORTHTTP) == "true"
 )
 
 // Server defines the interface for a server that can be started, shut down, and clean up its database.
@@ -114,11 +119,7 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 	// issues (a logical flaw, related nginx itself not a bug) and pose security risks.
 	// This is because traffic is unencrypted (easily get compromised)
 	// if HTTPS/TLS is terminated at the ingress and then forwarded as HTTP.
-	//
-	// Also note that since there is currently no configuration mechanism (this may be implemented later),
-	// it doesn't matter if the pods in Kubernetes are listening on port 80, as long as
-	// port 80 is not exposed to the service. This will help avoid potential conflicts by not exposing ports 80.
-	if tlsConfig != nil {
+	if tlsConfig != nil && !disableHTTPInsecure {
 		// TODO: Improve this that can be customize
 		go func() {
 			httpAddr := ":80" // Listen on port 80 for HTTP
