@@ -408,7 +408,7 @@ func (s *service) Close() error {
 // Health checks the health of the database and Redis connections.
 // It returns a map with keys indicating various health statistics.
 func (s *service) Health(filter string) map[string]string {
-	ctx, cancel := context.WithTimeout(context.Background(), defaultCtxTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), DefaultCtxTimeout)
 	defer cancel()
 
 	stats := make(map[string]string)
@@ -719,7 +719,7 @@ func (s *service) ScanAndDel(patterns ...string) error {
 
 	// Use a context with a timeout to avoid hanging indefinitely
 	// Note: This should fix an issue where the function hangs when using RedisClientConfig with "ContextTimeoutEnabled" set to true.
-	ctx, cancel := context.WithTimeout(context.Background(), defaultCtxTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), DefaultCtxTimeout)
 	defer cancel()
 
 	var totalDeleted int
@@ -898,7 +898,7 @@ func (s *service) SetKeysAtPipeline(keyValues map[string]any, ttl time.Duration)
 	defer s.mu.Unlock()
 
 	// Use a context with a timeout to avoid hanging indefinitely
-	ctx, cancel := context.WithTimeout(context.Background(), defaultCtxTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), DefaultCtxTimeout)
 	defer cancel()
 
 	// Initialize a new pipeline.
@@ -935,7 +935,7 @@ func (s *service) GetKeysAtPipeline(keys []string) (map[string]any, error) {
 	defer s.mu.Unlock()
 
 	// Use a context with a timeout to avoid hanging indefinitely
-	ctx, cancel := context.WithTimeout(context.Background(), defaultCtxTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), DefaultCtxTimeout)
 	defer cancel()
 
 	// Initialize a new pipeline

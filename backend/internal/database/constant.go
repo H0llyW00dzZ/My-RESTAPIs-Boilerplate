@@ -30,20 +30,45 @@ const (
 
 // Message constants for Redis-related operations.
 const (
+	// MsgRedisHighConnectedClients indicates that Redis has a high number of connected clients.
 	MsgRedisHighConnectedClients = "Redis has a high number of connected clients"
-	MsgRedisHighMemoryUsage      = "Redis is using a significant amount of memory"
-	MsgRedisRecentlyRestarted    = "Redis has been recently restarted"
-	MsgRedisHasStaleConnections  = "Redis has %d stale (%.2f%% High) connections."
+
+	// MsgRedisHighMemoryUsage indicates that Redis is using a significant amount of memory.
+	MsgRedisHighMemoryUsage = "Redis is using a significant amount of memory"
+
+	// MsgRedisRecentlyRestarted indicates that Redis has been recently restarted.
+	MsgRedisRecentlyRestarted = "Redis has been recently restarted"
+
+	// MsgRedisHasStaleConnections indicates the number and percentage of stale connections in Redis.
+	MsgRedisHasStaleConnections = "Redis has %d stale (%.2f%% High) connections."
+
+	// MsgRedisFailedToRetrieveInfo indicates a failure to retrieve Redis information.
 	MsgRedisFailedToRetrieveInfo = "Failed to retrieve Redis info: %v"
-	MsgRedisHighIdleConnections  = "Redis has a high number of idle connections"
-	MsgRedisHighPoolUtilization  = "Redis connection pool utilization is high"
-	MsgRedisHighPoolBottleneck   = "CRITICAL: Redis connection pool bottlenecked! Utilization exceeds 100%. Possible misconfiguration!"
+
+	// MsgRedisHighIdleConnections indicates that Redis has a high number of idle connections.
+	MsgRedisHighIdleConnections = "Redis has a high number of idle connections"
+
+	// MsgRedisHighPoolUtilization indicates that the Redis connection pool utilization is high.
+	MsgRedisHighPoolUtilization = "Redis connection pool utilization is high"
+
+	// MsgRedisHighPoolBottleneck indicates a critical bottleneck in the Redis connection pool.
+	MsgRedisHighPoolBottleneck = "CRITICAL: Redis connection pool bottlenecked! Utilization exceeds 100%. Possible misconfiguration!"
 )
 
+// Default context timeouts for operations.
 const (
-	defaultCtxTimeout = 5 * time.Minute
+	// DefaultCtxTimeout is the default timeout for context operations, set to 5 minutes.
+	DefaultCtxTimeout = 5 * time.Minute
+
+	// DefaultBackupCtxTimeout is the default timeout for backup context operations, set to 30 minutes.
+	DefaultBackupCtxTimeout = 30 * time.Minute
 )
 
+// Miscellaneous constants.
 const (
+	// nullObject represents a null (nil in Go) value as a string.
 	nullObject = "NULL"
+
+	// valuesObject represents a value as a string.
+	valuesObject = ") VALUES "
 )

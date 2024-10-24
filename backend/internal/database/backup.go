@@ -148,7 +148,7 @@ func (s *service) BackupTablesWithGPG(tablesToBackup []string, publicKey []strin
 	}
 
 	// For large datasets, this may need to configure this and adjust the MySQL server settings.
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), DefaultBackupCtxTimeout)
 	defer cancel()
 
 	for _, tableName := range tablesToBackup {
@@ -343,7 +343,7 @@ func buildInsertStatement(tableName string, columns []string, values []string) s
 		}
 		sb.WriteString(fmt.Sprintf("`%s`", column))
 	}
-	sb.WriteString(") VALUES ")
+	sb.WriteString(valuesObject)
 
 	sb.WriteString(strings.Join(values, ", "))
 	sb.WriteString(";\n")
