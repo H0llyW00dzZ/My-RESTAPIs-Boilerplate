@@ -68,4 +68,7 @@ const (
 const (
 	// nullObject represents a null value as a string.
 	nullObject = "NULL"
+
+	// valuesObject represents a value as a string.
+	valuesObject = ") VALUES "
 )

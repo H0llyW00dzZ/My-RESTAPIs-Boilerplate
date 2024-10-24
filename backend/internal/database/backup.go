@@ -343,7 +343,7 @@ func buildInsertStatement(tableName string, columns []string, values []string) s
 		}
 		sb.WriteString(fmt.Sprintf("`%s`", column))
 	}
-	sb.WriteString(") VALUES ")
+	sb.WriteString(valuesObject)
 
 	sb.WriteString(strings.Join(values, ", "))
 	sb.WriteString(";\n")
