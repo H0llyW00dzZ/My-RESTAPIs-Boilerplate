@@ -42,7 +42,7 @@ This project provides a boilerplate for building RESTful APIs using Go. It is de
 > The reason why some features might not work as expected after implementation is because this repo is designed to be `top-level` and follow the `Unix philosophy`. Plus, most of the `Go code` in this repo follows many `best practices` and idioms from `Effective Go`.
 
 > [!TIP]
-> Due to the large codebase of this repository, which includes many sub-packages such as helper functions (lazy splitting into another repository), consider implementing your own or an alternative `main` Go mechanism. This can be used across multiple containers in a single deployment for `infrastructure purposes`. Personally, I have created many such mechanisms for running in [`Kubernetes (k8s)`](https://kubernetes.io/) based on this repository (starter).
+> Due to the large codebase of this repository, which includes many sub-packages such as helper functions (lazy splitting into another repository), consider implementing your own or an alternative `main` Go mechanism ([`follow best practices here`](https://go.dev/doc/modules/layout)). This can be used across multiple containers in a single deployment for infrastructure purposes. Personally, I have created many such mechanisms for running in [`Kubernetes (k8s)`](https://kubernetes.io/) based on this starter repository.
 
 ## TODO Features
 
