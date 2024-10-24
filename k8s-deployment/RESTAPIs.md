@@ -187,18 +187,14 @@ To understand how the utilization and vCPUs work together, consider the followin
    - With **41 Pods**, the total vCPUs used is:
 
 $$
-   \[
    \text{Total vCPUs} = 41 \text{ Pods} \times 0.35 \text{ vCPUs/Pod} = 14.35 \text{ vCPUs}
-   \]
 $$
 
 2. **Calculate required vCPUs based on utilization:**
    - If you are targeting **80% utilization**, the required vCPUs can be calculated as:
 
 $$
-   \[
    \text{Required vCPUs} = \frac{\text{Total vCPUs}}{\text{Utilization}} = \frac{14.35}{0.80} \approx 17.94 \text{ vCPUs}
-   \]
 $$
 
 This means that with **22 vCPUs** available, you have sufficient capacity to handle the load of **41 Pods** while maintaining an 80% utilization target.
