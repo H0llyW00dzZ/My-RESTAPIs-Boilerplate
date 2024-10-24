@@ -114,6 +114,10 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 	// issues (a logical flaw, related nginx itself not a bug) and pose security risks.
 	// This is because traffic is unencrypted (easily get compromised)
 	// if HTTPS/TLS is terminated at the ingress and then forwarded as HTTP.
+	//
+	// Also note that since there is currently no configuration mechanism (this may be implemented later),
+	// it doesn't matter if the pods in Kubernetes are listening on port 80, as long as
+	// port 80 is not exposed to the service. This will help avoid potential conflicts by not exposing ports 80.
 	if tlsConfig != nil {
 		// TODO: Improve this that can be customize
 		go func() {
