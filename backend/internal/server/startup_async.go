@@ -171,8 +171,8 @@ func (s *FiberServer) CleanupDB() error {
 
 	// If the database service is present, close it which will close both the SQL db and Redis connections
 	if s.db != nil {
-		err = s.db.Close()
-		if err != nil {
+		// Use the common Go idiom style for concise error checking.
+		if err = s.db.Close(); err != nil {
 			log.LogErrorf("Error closing the database service: %v", err)
 			// Do not return here yet, to ensure all cleanup is attempted
 		} else {
