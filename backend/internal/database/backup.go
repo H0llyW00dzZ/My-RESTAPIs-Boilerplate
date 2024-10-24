@@ -285,6 +285,7 @@ func (s *service) dumpTableData(ctx context.Context, file *os.File, tableName st
 		return fmt.Errorf("failed to get columns: %w", err)
 	}
 
+	// This zero allocations because it passes pointers to the values themselves.
 	values := make([]any, len(columns))
 	valuePtrs := make([]any, len(columns))
 	for i := range values {
