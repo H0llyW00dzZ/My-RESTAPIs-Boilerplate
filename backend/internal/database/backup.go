@@ -270,7 +270,7 @@ func (s *service) dumpTableSchema(ctx context.Context, file *os.File, tableName 
 // dumpTableData retrieves all rows from the specified table and writes them as INSERT statements to the backup file.
 //
 // Note: This differs from MySQL Dumper and PhpMyAdmin Export, both of which use single-row INSERT statements for data.
-// This implementation uses multi-row INSERT statements, which can improve performance when importing large datasets
+// This implementation uses multi-row INSERT statements + Batching, which can improve performance when importing large datasets
 // and help avoid MySQL deadlocks (not due to Go, but inherent to MySQL itself).
 func (s *service) dumpTableData(ctx context.Context, file *os.File, tableName string) error {
 	query := fmt.Sprintf("SELECT * FROM `%s`", tableName)
@@ -330,7 +330,7 @@ func (s *service) dumpTableData(ctx context.Context, file *os.File, tableName st
 // buildInsertStatement constructs an SQL INSERT statement for multiple row of data.
 //
 // Note: This differs from MySQL Dumper and PhpMyAdmin Export, both of which use single-row INSERT statements for data.
-// This implementation uses multi-row INSERT statements, which can improve performance when importing large datasets
+// This implementation uses multi-row INSERT statements + Batching, which can improve performance when importing large datasets
 // and help avoid MySQL deadlocks (not due to Go, but inherent to MySQL itself).
 func buildInsertStatement(tableName string, columns []string, values []string) string {
 	var sb strings.Builder
