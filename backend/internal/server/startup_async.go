@@ -35,7 +35,7 @@ var (
 
 	// disableHTTPInsecure determines if the server should avoid listening on port 80 for HTTP.
 	// This is controlled by the DISABLE_PORT_HTTPINSECURE environment variable.
-	// If set to "true", the server will not set up an HTTP listener on port 80 otherwise it will listening.
+	// If set to "true", the server will not set up an HTTP listener on port 80 otherwise it will listening (e.g., keep empty the env).
 	disableHTTPInsecure = os.Getenv(env.DISABLEDEFAULTPORTHTTP) == "true"
 )
 
