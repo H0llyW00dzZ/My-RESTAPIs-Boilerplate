@@ -234,7 +234,7 @@ func (s *service) backupSingleTable(tableName string) (err error) {
 	}
 
 	// For large datasets, this may need to configure this and adjust the MySQL server settings.
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), DefaultBackupCtxTimeout)
 	defer cancel()
 
 	// Dump schema and data within the transaction context
