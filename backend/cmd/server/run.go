@@ -146,7 +146,7 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 		// However, if it's used externally and allows TLSv1.2, then OCSP should be configured, provided that
 		// there is knowledge on how to set it up.
 		//
-		// For an example of OCSP stapling and TLSv1.2 configuration that follows best practices for securing websites, see:
+		// For an example of OCSP stapling and TLSv1.2 configuration (using "nginx.ingress.kubernetes.io/backend-protocol: HTTPS", enable-ocsp) that follows best practices for securing websites, see:
 		//
 		// - https://www.immuniweb.com/ssl/git.b0zal.io/KRIX2G2F/ (most all green)
 		// - https://www.immuniweb.com/ssl/api.b0zal.io/VPdKSN3p/ (most all green)
@@ -157,6 +157,8 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 		// Additionally, note that if "enable-ocsp" is set to true in the Ingress Nginx ConfigMap, OCSP Stapling remains optional.
 		// This is because when Nginx passes requests to HTTPS/TLS related to this service without terminating it,
 		// as long as the certificate is the same for both Ingress and this service, OCSP Stapling can still be utilized.
+		// If your cluster has any Kubernetes network mechanism that doesn't work with these configurations (e.g., nginx.ingress.kubernetes.io/backend-protocol: HTTPS, enable-ocsp),
+		// then there may be an issue with your Kubernetes network configuration.
 		tlsConfig = &tls.Config{
 			Certificates: []tls.Certificate{cert},
 		}
