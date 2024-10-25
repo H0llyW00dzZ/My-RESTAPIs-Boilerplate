@@ -104,8 +104,11 @@ func (e *Encryptor) EncryptStream(input io.Reader, output io.Writer) error {
 	// Start a goroutine to handle encryption
 	go func() {
 		defer writer.Close()
-
 		// Create a writer for the encrypted output
+		//
+		// Note: When encrypting data then send over the network, whether secure network or insecure network,
+		// additional compression is optional. This encryption process already includes built-in compression,
+		// which can help reduce bandwidth costs.
 		encryptWriter, err := keyRing.EncryptStreamWithCompression(writer, metadata, nil)
 		if err != nil {
 			writer.CloseWithError(fmt.Errorf("failed to create encryption stream: %w", err))
