@@ -174,3 +174,43 @@ func TestGetKeyInfos(t *testing.T) {
 
 	// Additional checks can be added based on expected key metadata
 }
+
+// Use this for local development, such as testing with different GPG keys.
+func TestEncryptStreamToFile(t *testing.T) {
+	// Create a buffer to simulate the input data
+	inputData := []byte("Hello GPG/OpenPGP From H0llyW00dzZ.")
+	inputBuffer := bytes.NewReader(inputData)
+
+	// Define the output file
+	outputFile, err := os.CreateTemp("", "test_output_*.gpg")
+	if err != nil {
+		t.Fatalf("Failed to create temporary output file: %v", err)
+	}
+	defer outputFile.Close()
+	// Note: Do not defer os.Remove(outputFile.Name()) to keep the file for decryption testing
+
+	// Create an Encryptor instance
+	encryptor, err := gpg.NewEncryptor([]string{testPublicKey})
+	if err != nil {
+		t.Fatalf("Failed to create encryptor: %v", err)
+	}
+
+	// Call the EncryptStream function
+	if err = encryptor.EncryptStream(inputBuffer, outputFile); err != nil {
+		t.Fatalf("EncryptStream failed: %v", err)
+	}
+
+	// Check if the output file has data
+	fileInfo, err := outputFile.Stat()
+	if err != nil {
+		t.Fatalf("Failed to get output file info: %v", err)
+	}
+	if fileInfo.Size() == 0 {
+		t.Fatalf("Output file is empty")
+	}
+
+	// Log the name of the output file for reference
+	t.Logf("Encrypted data written to file: %s", outputFile.Name())
+
+	// Optionally, add decryption and verification logic here
+}
