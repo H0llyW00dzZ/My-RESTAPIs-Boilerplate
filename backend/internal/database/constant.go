@@ -62,6 +62,9 @@ const (
 
 	// DefaultBackupCtxTimeout is the default timeout for backup context operations, set to 30 minutes.
 	DefaultBackupCtxTimeout = 30 * time.Minute
+
+	// DefaultBackupCtxTimeout is the default timeout for ping context operations, set to 5 seconds.
+	DefaultPingCtxTimeout = 5 * time.Second
 )
 
 // Miscellaneous constants.
