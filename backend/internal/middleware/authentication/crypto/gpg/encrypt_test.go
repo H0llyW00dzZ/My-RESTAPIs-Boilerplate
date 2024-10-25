@@ -181,6 +181,7 @@ func TestEncryptStreamToFile(t *testing.T) {
 	publicKeys := []string{
 		testPublicKey,
 	}
+
 	// Create a buffer to simulate the input data
 	inputData := []byte("Hello GPG/OpenPGP From H0llyW00dzZ.")
 	inputBuffer := bytes.NewReader(inputData)
