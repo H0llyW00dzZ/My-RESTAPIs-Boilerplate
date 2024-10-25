@@ -94,6 +94,7 @@ func (e *Encryptor) EncryptStream(input io.Reader, output io.Writer) error {
 	// Note: This object does not explicitly include the filename.
 	metadata := &crypto.PlainMessageMetadata{
 		IsBinary: true,
+		ModTime:  crypto.GetUnixTime(),
 	}
 
 	// Start a goroutine to handle encryption
