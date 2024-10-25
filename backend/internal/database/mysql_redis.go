@@ -216,7 +216,9 @@ type Service interface {
 
 	// PingDB checks the connectivity of both the MySQL database and the Redis instance.
 	//
-	// Note: This is effective for health probes (e.g., liveness/readiness) on Kubernetes + HPA.
+	// Note: This is effective for health probes (e.g., liveness/readiness) on Kubernetes with HPA.
+	// It is also recommended to implement a new listener mechanism for health probes that can only be accessed
+	// within the cluster itself and not exposed publicly. In GKE, this can effectively speed up pod replacement.
 	PingDB(ctx context.Context) bool
 }
 
