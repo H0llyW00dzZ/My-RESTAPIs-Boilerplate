@@ -215,6 +215,8 @@ type Service interface {
 	BackupTablesWithGPG(tablesToBackup []string, publicGPGKey []string) error
 
 	// PingDB checks the connectivity of both the MySQL database and the Redis instance.
+	//
+	// Note: This is effective for health probes (e.g., liveness/readiness) on Kubernetes + HPA.
 	PingDB() bool
 }
 
