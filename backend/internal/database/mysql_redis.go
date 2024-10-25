@@ -217,7 +217,7 @@ type Service interface {
 	// PingDB checks the connectivity of both the MySQL database and the Redis instance.
 	//
 	// Note: This is effective for health probes (e.g., liveness/readiness) on Kubernetes + HPA.
-	PingDB() bool
+	PingDB(ctx context.Context) bool
 }
 
 // service is a concrete implementation of the Service interface.
@@ -1010,8 +1010,10 @@ func (s *service) GetKeysAtPipeline(keys []string) (map[string]any, error) {
 
 // PingDB checks the connectivity of both the MySQL database and the Redis instance.
 // It returns true if both services are reachable, otherwise it returns false.
-func (s *service) PingDB() bool {
-	ctx, cancel := context.WithTimeout(context.Background(), DefaultPingCtxTimeout)
+//
+// Note: Logging is optional and not strictly necessary, effective replacing pods automated in Kubernetes.
+func (s *service) PingDB(ctx context.Context) bool {
+	ctx, cancel := context.WithTimeout(ctx, DefaultPingCtxTimeout)
 	defer cancel()
 
 	// Ping the MySQL database to verify connectivity.
