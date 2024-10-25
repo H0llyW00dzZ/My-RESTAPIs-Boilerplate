@@ -213,6 +213,9 @@ type Service interface {
 	// 	- Public Key Algo: ECDH
 	// 	- Status: Success
 	BackupTablesWithGPG(tablesToBackup []string, publicGPGKey []string) error
+
+	// PingDB checks the connectivity of both the MySQL database and the Redis instance.
+	PingDB() bool
 }
 
 // service is a concrete implementation of the Service interface.
@@ -1001,4 +1004,24 @@ func (s *service) GetKeysAtPipeline(keys []string) (map[string]any, error) {
 
 	// Return the populated results map and a nil error to signify successful execution
 	return results, nil
+}
+
+// PingDB checks the connectivity of both the MySQL database and the Redis instance.
+// It returns true if both services are reachable, otherwise it returns false.
+func (s *service) PingDB() bool {
+	ctx, cancel := context.WithTimeout(context.Background(), DefaultPingCtxTimeout)
+	defer cancel()
+
+	// Ping the MySQL database to verify connectivity.
+	if err := s.db.PingContext(ctx); err != nil {
+		return false
+	}
+
+	// Ping the Redis server to verify connectivity.
+	if err := s.redisClient.Ping(ctx).Err(); err != nil {
+		return false
+	}
+
+	// Return true if both MySQL and Redis are reachable.
+	return true
 }
