@@ -78,7 +78,8 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 	return nil
 }
 
-// EncryptStream (Object) encrypts data from an input stream and writes to an output stream using the Encryptor's public key.
+// EncryptStream (Object) encrypts data from an input stream and writes it to an output stream using the Encryptor's public key.
+// This method is efficient for sending data over a network (e.g., TCP not only HTTP or GRPC whatever it is) or writing to a file.
 //
 // Note: Memory allocations may vary depending on the input and output types.
 // If writing to a file (file disk not a memory again), the allocations are minimal.
