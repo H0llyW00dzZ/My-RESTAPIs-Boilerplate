@@ -81,7 +81,7 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 // EncryptStream (Object) encrypts data from an input stream and writes to an output stream using the Encryptor's public key.
 //
 // Note: Memory allocations may vary depending on the input and output types.
-// If writing to a file, the allocations are minimal.
+// If writing to a file (file disk not a memory again), the allocations are minimal.
 func (e *Encryptor) EncryptStream(input io.Reader, output io.Writer) error {
 	// Create a key ring from the public key
 	keyRing, err := e.createKeyRing()
