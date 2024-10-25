@@ -78,11 +78,10 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 	return nil
 }
 
-// EncryptStream encrypts data from an input stream and writes to an output stream using the Encryptor's public key.
+// EncryptStream (Object) encrypts data from an input stream and writes to an output stream using the Encryptor's public key.
 //
-// TODO: Improve this. It should be an object that can be stored (e.g., in a database or storage mechanism) for compatibility with HPA in Kubernetes.
-// It should be secure enough that even if it is exposed to the public (e.g., a human error, missconfigured related storage mechanism such as bucket),
-// the data remains protected due to encryption.
+// Note: Memory allocations may vary depending on the input and output types.
+// If writing to a file, the allocations are minimal.
 func (e *Encryptor) EncryptStream(input io.Reader, output io.Writer) error {
 	// Create a key ring from the public key
 	keyRing, err := e.createKeyRing()
@@ -90,29 +89,52 @@ func (e *Encryptor) EncryptStream(input io.Reader, output io.Writer) error {
 		return err
 	}
 
-	// Note: The buffer size of 4096 bytes is suitable for streaming encryption.
-	// It allows processing of large files or whole disk efficiently without loading the entire file into memory.
-	buffer := make([]byte, 4096) // Define a buffer size
-	for {
-		n, err := input.Read(buffer)
-		if err != nil && err != io.EOF {
-			return fmt.Errorf("failed to read input: %w", err)
-		}
-		if n == 0 {
-			break
-		}
+	// Create a pipe to handle streaming encryption
+	reader, writer := io.Pipe()
 
-		// Encrypt the data chunk
-		message := crypto.NewPlainMessage(buffer[:n])
-		encryptedMessage, err := keyRing.Encrypt(message, nil)
+	// Create metadata (header) for the encryption
+	//
+	// Note: This object does not explicitly include the filename.
+	metadata := &crypto.PlainMessageMetadata{
+		IsBinary: true,
+		ModTime:  crypto.GetUnixTime(),
+	}
+
+	// Start a goroutine to handle encryption
+	go func() {
+		defer writer.Close()
+
+		// Create a writer for the encrypted output
+		encryptWriter, err := keyRing.EncryptStreamWithCompression(writer, metadata, nil)
 		if err != nil {
-			return fmt.Errorf("failed to encrypt data: %w", err)
+			writer.CloseWithError(fmt.Errorf("failed to create encryption stream: %w", err))
+			return
 		}
+		defer encryptWriter.Close()
 
-		// Write the encrypted data to the output
-		if _, err := output.Write(encryptedMessage.GetBinary()); err != nil {
-			return fmt.Errorf("failed to write encrypted data: %w", err)
+		// Note: The buffer size of 4096 bytes is suitable for streaming encryption.
+		// It allows processing of large files or whole disk efficiently without loading the entire file into memory.
+		buffer := make([]byte, 4096) // Define a buffer size
+		for {
+			n, err := input.Read(buffer)
+			if err != nil && err != io.EOF {
+				writer.CloseWithError(fmt.Errorf("failed to read input: %w", err))
+				return
+			}
+			if n == 0 {
+				break
+			}
+
+			if _, err := encryptWriter.Write(buffer[:n]); err != nil {
+				writer.CloseWithError(fmt.Errorf("failed to write encrypted data: %w", err))
+				return
+			}
 		}
+	}()
+
+	// Copy the encrypted data from the pipe reader to the output
+	if _, err := io.Copy(output, reader); err != nil {
+		return fmt.Errorf("failed to write encrypted data to output: %w", err)
 	}
 
 	return nil
