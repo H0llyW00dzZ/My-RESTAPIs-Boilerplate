@@ -177,6 +177,10 @@ func TestGetKeyInfos(t *testing.T) {
 
 // Use this for local development, such as testing with different GPG keys.
 func TestEncryptStreamToFile(t *testing.T) {
+	// Sample public key
+	publicKeys := []string{
+		testPublicKey,
+	}
 	// Create a buffer to simulate the input data
 	inputData := []byte("Hello GPG/OpenPGP From H0llyW00dzZ.")
 	inputBuffer := bytes.NewReader(inputData)
@@ -190,7 +194,7 @@ func TestEncryptStreamToFile(t *testing.T) {
 	// Note: Do not defer os.Remove(outputFile.Name()) to keep the file for decryption testing
 
 	// Create an Encryptor instance
-	encryptor, err := gpg.NewEncryptor([]string{testPublicKey})
+	encryptor, err := gpg.NewEncryptor(publicKeys)
 	if err != nil {
 		t.Fatalf("Failed to create encryptor: %v", err)
 	}
