@@ -1013,8 +1013,8 @@ func (s *service) GetKeysAtPipeline(keys []string) (map[string]any, error) {
 //
 // Note: Logging is optional and not strictly necessary, effective replacing pods automated in Kubernetes.
 func (s *service) PingDB(ctx context.Context) bool {
-	ctx, cancel := context.WithTimeout(ctx, DefaultPingCtxTimeout)
-	defer cancel()
+	// Use the context directly without setting a new timeout,
+	// as the timeout can be set by the caller.
 
 	// Ping the MySQL database to verify connectivity.
 	if err := s.db.PingContext(ctx); err != nil {
