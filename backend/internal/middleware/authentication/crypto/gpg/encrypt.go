@@ -81,6 +81,55 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 // EncryptStream (Object) encrypts data from an input stream and writes it to an output stream using the Encryptor's public key.
 // This method is efficient for sending data over a network (e.g., TCP not only HTTP or GRPC whatever it is) or writing to a file.
 //
+// For Example (E2E Logic):
+//
+//	func main() {
+//		// Listen on TCP port 8080
+//		listener, err := net.Listen("tcp", ":8080")
+//		if err != nil {
+//			log.Fatalf("Failed to listen on port 8080: %v", err)
+//		}
+//		defer listener.Close()
+//
+//		log.Println("Server listening on port 8080")
+//
+//		for {
+//			conn, err := listener.Accept()
+//			if err != nil {
+//				log.Printf("Failed to accept connection: %v", err)
+//				continue
+//			}
+//
+//			go handleConnection(conn)
+//		}
+//	}
+//
+//	func handleConnection(conn net.Conn) {
+//		defer conn.Close()
+//
+//		// Create a new Encryptor with the public key
+//		encryptor, err := gpg.NewEncryptor([]string{"your-armored-public-key"})
+//		if err != nil {
+//			log.Printf("Failed to create encryptor: %v", err)
+//			return
+//		}
+//
+//		// Prepare the data to be encrypted
+//		inputData := []byte("This is the data to be encrypted.")
+//		inputBuffer := bytes.NewReader(inputData)
+//
+//		// Encrypt the data and send it over the network connection
+//		if err := encryptor.EncryptStream(inputBuffer, conn); err != nil {
+//			log.Printf("Failed to encrypt and send data: %v", err)
+//			return
+//		}
+//
+//			log.Println("Data encrypted and sent successfully")
+//		}
+//
+// For enhanced traffic, consider using TLS over protocols like HTTPS or gRPC.
+// Additionally, any network or other mechanism that supports I/O operations will work well with this.
+//
 // Note: Memory allocations may vary depending on the input and output types.
 // If writing to a file (file disk not a memory again), the allocations are minimal.
 func (e *Encryptor) EncryptStream(input io.Reader, output io.Writer) error {
