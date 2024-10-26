@@ -28,7 +28,7 @@ var (
 // This function handles multiple keys within an armored key block.
 // Filtering keys from a complex, multi-key armored block can be challenging.
 //
-// TODO: Implement similar logic for Verify/Sign mechanisms ?
+// TODO: Implement similar logic for Verify/Sign mechanisms that can be used for authentication over the network (GPG Modern) ?
 func NewEncryptor(publicKeys []string) (*Encryptor, error) {
 	var validKeys []string
 	var keyInfos []KeyInfo
