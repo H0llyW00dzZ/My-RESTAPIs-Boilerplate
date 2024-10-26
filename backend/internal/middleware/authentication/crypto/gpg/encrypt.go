@@ -9,8 +9,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 )
@@ -196,30 +194,10 @@ func (e *Encryptor) EncryptStream(i io.Reader, o io.Writer) error {
 	// Create a pipe to handle streaming encryption
 	r, w := io.Pipe()
 
-	// Determine if the input is a file and set the filename.
-	//
-	// This effectively Go detects actual files in I/O.
-	//
-	// # Result:
-	// 	Decrypt Operation - Success
-	//
-	// # General State:
-	// 	- File Name: test_output_1960559248.txt
-	// 	- MIME: false
-	// 	- Message Integrity Protection: true
-	// 	- Symmetric Encryption Algorithm: AES256.CFB
-	// 	- German Encryption Standards: false
-	var filename string
-	if file, ok := i.(*os.File); ok {
-		filename = filepath.Base(file.Name())
-	} else {
-		// If input is not a file, check if output is a file
-		if outFile, ok := o.(*os.File); ok {
-			outName := filepath.Base(outFile.Name())
-			if strings.HasSuffix(outName, newGPGModern) {
-				filename = strings.TrimSuffix(outName, newGPGModern)
-			}
-		}
+	// Determine if the input and output I/O is a file and set the filename.
+	filename, err := extractFilename(i, o, newGPGModern)
+	if err != nil {
+		return err
 	}
 
 	// Create metadata (header) for the encryption
