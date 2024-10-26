@@ -15,6 +15,7 @@ import (
 type Encryptor struct {
 	publicKey []string
 	keyInfos  []KeyInfo
+	config    *Config
 }
 
 var (
@@ -29,7 +30,13 @@ var (
 // Filtering keys from a complex, multi-key armored block can be challenging.
 //
 // TODO: Implement similar logic for Verify/Sign mechanisms that can be used for authentication over the network (GPG Modern) ?
-func NewEncryptor(publicKeys []string) (*Encryptor, error) {
+func NewEncryptor(publicKeys []string, opts ...Option) (*Encryptor, error) {
+	// Apply user-provided options to override defaults
+	config := NewDefaultConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+
 	var validKeys []string
 	var keyInfos []KeyInfo
 	// Track unique keys by fingerprint
@@ -57,6 +64,13 @@ func NewEncryptor(publicKeys []string) (*Encryptor, error) {
 			// Mark key as added
 			uniqueKeys[keyInfo.Fingerprint] = true
 		}
+
+		// Check if the key can be used for future verification
+		if config.AllowVerfy && key.CanVerify() {
+			validKeys = append(validKeys, pubKey)
+			keyInfos = append(keyInfos, keyInfo)
+			uniqueKeys[keyInfo.Fingerprint] = true
+		}
 	}
 
 	if len(validKeys) == 0 {
@@ -66,6 +80,7 @@ func NewEncryptor(publicKeys []string) (*Encryptor, error) {
 	return &Encryptor{
 		publicKey: validKeys,
 		keyInfos:  keyInfos,
+		config:    config,
 	}, nil
 }
 

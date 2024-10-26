@@ -169,7 +169,11 @@ func TestEncryptStream(t *testing.T) {
 	// Create a buffer to simulate the output file
 	outputBuffer := &bytes.Buffer{}
 
-	gpg, err := gpg.NewEncryptor(publicKeys)
+	gpg, err := gpg.NewEncryptor(
+		publicKeys,
+		gpg.WithBinary(false),
+	)
+
 	if err != nil {
 		t.Fatalf("Failed to create encryptor: %v", err)
 	}
