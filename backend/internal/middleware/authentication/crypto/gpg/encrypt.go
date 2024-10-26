@@ -183,7 +183,7 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 //
 // Note: Memory allocations may vary depending on the input and output types.
 // If writing to a file (file disk not a memory again), the allocations are minimal.
-func (e *Encryptor) EncryptStream(input io.Reader, output io.Writer) error {
+func (e *Encryptor) EncryptStream(i io.Reader, o io.Writer) error {
 	// Create a key ring from the public key
 	keyRing, err := e.createKeyRing()
 	if err != nil {
@@ -220,7 +220,7 @@ func (e *Encryptor) EncryptStream(input io.Reader, output io.Writer) error {
 		// It allows processing of large files or whole disk efficiently without loading the entire file into memory.
 		buffer := make([]byte, 4096) // Define a buffer size
 		for {
-			n, err := input.Read(buffer)
+			n, err := i.Read(buffer)
 			if err != nil && err != io.EOF {
 				writer.CloseWithError(fmt.Errorf("failed to read input: %w", err))
 				return
@@ -237,7 +237,7 @@ func (e *Encryptor) EncryptStream(input io.Reader, output io.Writer) error {
 	}()
 
 	// Copy the encrypted data from the pipe reader to the output
-	if _, err := io.Copy(output, reader); err != nil {
+	if _, err := io.Copy(o, reader); err != nil {
 		return fmt.Errorf("failed to write encrypted data to output: %w", err)
 	}
 
