@@ -81,7 +81,7 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 // EncryptStream (Object) encrypts data from an input stream and writes it to an output stream using the Encryptor's public key.
 // This method is efficient for sending data over a network (e.g., TCP not only HTTP or GRPC whatever it is) or writing to a file.
 //
-// For Example (E2E Logic):
+// For Example Server-Side (E2E Logic transmission over a network):
 //
 //	func main() {
 //		// Listen on TCP port 8080
@@ -105,7 +105,11 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 //	}
 //
 //	func handleConnection(conn net.Conn) {
-//		defer conn.Close()
+//		defer func() {
+//			if err := conn.Close(); err != nil {
+//				log.Printf("Failed to close connection: %v", err)
+//			}
+//		}()
 //
 //		// Create a new Encryptor with the public key
 //		encryptor, err := gpg.NewEncryptor([]string{"your-armored-public-key"})
@@ -126,6 +130,53 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 //
 //			log.Println("Data encrypted and sent successfully")
 //		}
+//
+// For Example Client-Side (E2E Logic transmission over a network):
+//
+//	func main() {
+//		// Connect to the server
+//		conn, err := net.Dial("tcp", "localhost:8080")
+//		if err != nil {
+//			log.Fatalf("Failed to connect to server: %v", err)
+//		}
+//		defer conn.Close()
+//
+//		// Read the encrypted data from the connection
+//		var encryptedData bytes.Buffer
+//		if _, err := io.Copy(&encryptedData, conn); err != nil {
+//			log.Fatalf("Failed to read encrypted data: %v", err)
+//		}
+//
+//		// Decrypt the data
+//		decryptedData, err := decryptData(encryptedData.Bytes(), "your-armored-private-key", "your-passphrase")
+//		if err != nil {
+//			log.Fatalf("Failed to decrypt data: %v", err)
+//		}
+//
+//		fmt.Println("Decrypted data:", string(decryptedData))
+//	}
+//
+//	func decryptData(encryptedData []byte, armoredPrivateKey, passphrase string) ([]byte, error) {
+//		// Unlock the private key
+//		privateKey, err := crypto.NewKeyFromArmored(armoredPrivateKey)
+//		if err != nil {
+//			return nil, fmt.Errorf("failed to parse private key: %w", err)
+//		}
+//
+//		unlockedKey, err := privateKey.Unlock([]byte(passphrase))
+//		if err != nil {
+//			return nil, fmt.Errorf("failed to unlock private key: %w", err)
+//		}
+//
+//		// Decrypt the message
+//		message := crypto.NewPGPMessage(encryptedData)
+//		plainMessage, err := helper.DecryptMessage(unlockedKey, message)
+//		if err != nil {
+//			return nil, fmt.Errorf("failed to decrypt message: %w", err)
+//		}
+//
+//		return plainMessage.GetBinary(), nil
+//	}
 //
 // For enhanced traffic, consider using TLS over protocols like HTTPS or gRPC.
 // Additionally, any network or other mechanism that supports I/O operations will work well with this.
