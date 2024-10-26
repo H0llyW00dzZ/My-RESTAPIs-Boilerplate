@@ -15,7 +15,7 @@ import (
 
 // extractFilename checks if the input or output is a file and extracts the filename.
 //
-// This effectively Go detects actual files in I/O.
+// This effectively Go detects actual files (file disk not a memory again) in I/O.
 //
 // # Result:
 //
@@ -27,6 +27,9 @@ import (
 //   - Message Integrity Protection: true
 //   - Symmetric Encryption Algorithm: AES256.CFB
 //   - German Encryption Standards: false
+//
+// Note: This helper function uses [os.File], which connects to the filesystem.
+// If files are handled differently (other way), they may reside entirely in memory and not actual on disk.
 func extractFilename(i io.Reader, o io.Writer, suffix string) (string, error) {
 	// Check if the input is a file.
 	if file, ok := i.(*os.File); ok {
