@@ -181,7 +181,7 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 //	}
 //
 // For enhanced traffic, consider using TLS over protocols like HTTPS or gRPC.
-// Additionally, any network or other mechanism (e.g., Implement own storage mechanism, such as using buckets better than any (e.g., aws),
+// Additionally, any network or other mechanism (e.g., Implement own storage mechanism over the network, such as using buckets better than any (e.g., aws),
 // which is ideal for Kubernetes environments.) that supports I/O operations will work well with this.
 //
 // Note: Memory allocations may vary depending on the input and output types.
