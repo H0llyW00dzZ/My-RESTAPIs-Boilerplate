@@ -50,8 +50,14 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 		ModTime:  e.config.modTime,
 	}
 
+	// Choose the appropriate encryption function based on the compress option
+	encryptFunc := keyRing.EncryptStream
+	if e.config.compress {
+		encryptFunc = keyRing.EncryptStreamWithCompression
+	}
+
 	// Create a writer for the encrypted output
-	encryptWriter, err := keyRing.EncryptStreamWithCompression(outFile, metadata, nil)
+	encryptWriter, err := encryptFunc(outFile, metadata, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create encryption stream: %w", err)
 	}
@@ -105,6 +111,12 @@ func (e *Encryptor) EncryptStream(i io.Reader, o io.Writer) error {
 		ModTime:  e.config.modTime,
 	}
 
+	// Choose the appropriate encryption function based on the compress option
+	encryptFunc := keyRing.EncryptStream
+	if e.config.compress {
+		encryptFunc = keyRing.EncryptStreamWithCompression
+	}
+
 	// Start a goroutine to handle encryption
 	go func() {
 		defer w.Close()
@@ -113,7 +125,7 @@ func (e *Encryptor) EncryptStream(i io.Reader, o io.Writer) error {
 		// Note: When encrypting data then send over the network, whether secure network or insecure network,
 		// additional compression is optional. This encryption process already includes built-in compression,
 		// which can help reduce bandwidth costs.
-		encryptWriter, err := keyRing.EncryptStreamWithCompression(w, metadata, nil)
+		encryptWriter, err := encryptFunc(w, metadata, nil)
 		if err != nil {
 			w.CloseWithError(fmt.Errorf("failed to create encryption stream: %w", err))
 			return
