@@ -83,3 +83,7 @@ func extractKeyInfo(key *crypto.Key) KeyInfo {
 		DigestFingerprint: key.GetSHA256Fingerprints(),
 	}
 }
+
+const (
+	newGPGModern = ".gpg"
+)
