@@ -19,6 +19,4 @@ type KeyInfo struct {
 
 // GetKeyInfos returns a slice of KeyInfo structs containing metadata
 // about all the public keys managed by the Encryptor.
-func (e *Encryptor) GetKeyInfos() []KeyInfo {
-	return e.keyInfos
-}
+func (e *Encryptor) GetKeyInfos() []KeyInfo { return e.keyInfos }
