@@ -163,7 +163,8 @@ NfNFelYPzjgEZhww9xIKKwYBBAGXVQEFAQEHQI55aMA1TdV6P/DNh+/TMb3bb1jN
 odQ/VzRKuIv//qD5QkpwAjQ6AABELAD/YG153FordpFJMJTI8OEzAvZwRxAvszdv
 PAMzqI+BSlYBAIBjzAozXAC69DgM8AOJzEnsiA55ic1D56y64baz31cD
 =qodo
------END PGP PUBLIC KEY BLOCK-----`
+-----END PGP PUBLIC KEY BLOCK-----
+`
 
 // Mirror (My K8s for Sandbox Development very secure): https://git.b0zal.io/H0llyW00dzZ.gpg
 const testPublicKeyfromGitea = `-----BEGIN PGP PUBLIC KEY BLOCK-----
