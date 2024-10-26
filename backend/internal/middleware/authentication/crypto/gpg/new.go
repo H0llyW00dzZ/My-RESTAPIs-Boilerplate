@@ -27,9 +27,13 @@ var (
 // Note: Ensure that the provided public key can be used for encryption.
 // This function handles multiple keys within an armored key block.
 // Filtering keys from a complex, multi-key armored block can be challenging.
+//
+// TODO: Implement similar logic for Verify/Sign mechanisms ?
 func NewEncryptor(publicKeys []string) (*Encryptor, error) {
 	var validKeys []string
 	var keyInfos []KeyInfo
+	// Track unique keys by fingerprint
+	uniqueKeys := make(map[string]bool)
 
 	for _, pubKey := range publicKeys {
 		// Validate the public key
@@ -40,11 +44,18 @@ func NewEncryptor(publicKeys []string) (*Encryptor, error) {
 
 		// Extract key information
 		keyInfo := extractKeyInfo(key)
-		keyInfos = append(keyInfos, keyInfo)
+
+		// Check if the key is already added using its fingerprint
+		if uniqueKeys[keyInfo.Fingerprint] {
+			continue // Skip duplicate keys
+		}
 
 		// Check if the key can be used for encryption
 		if key.CanEncrypt() {
 			validKeys = append(validKeys, pubKey)
+			keyInfos = append(keyInfos, keyInfo)
+			// Mark key as added
+			uniqueKeys[keyInfo.Fingerprint] = true
 		}
 	}
 
