@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 )
@@ -193,11 +194,18 @@ func (e *Encryptor) EncryptStream(i io.Reader, o io.Writer) error {
 	// Create a pipe to handle streaming encryption
 	r, w := io.Pipe()
 
-	// Create metadata (header) for the encryption
+	// Determine if the input is a file and set the filename.
 	//
-	// Note: This object does not explicitly include the filename.
+	// This effectively Go detects actual files in I/O.
+	var filename string
+	if file, ok := i.(*os.File); ok {
+		filename = filepath.Base(file.Name())
+	}
+
+	// Create metadata (header) for the encryption
 	metadata := &crypto.PlainMessageMetadata{
 		IsBinary: true,
+		Filename: filename,
 		ModTime:  crypto.GetUnixTime(),
 	}
 
