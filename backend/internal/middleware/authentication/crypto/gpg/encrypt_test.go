@@ -216,6 +216,8 @@ func TestGetKeyInfos(t *testing.T) {
 		// This key will be invalid due to GPG Proton's implementation
 		// (it does not support a single armored block with multiple keys, so each must be processed individually).
 		testPublicKeyfromGitea,
+		// this should be duplicated now
+		testPublicKey,
 	}
 
 	// Create an Encryptor instance
