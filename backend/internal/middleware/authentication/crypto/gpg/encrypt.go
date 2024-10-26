@@ -45,9 +45,9 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 
 	// Create metadata (header) for the encryption
 	metadata := &crypto.PlainMessageMetadata{
-		IsBinary: true,
+		IsBinary: e.config.isBinary,
 		Filename: inFile.Name(),
-		ModTime:  crypto.GetUnixTime(),
+		ModTime:  e.config.modTime,
 	}
 
 	// Create a writer for the encrypted output
@@ -100,9 +100,9 @@ func (e *Encryptor) EncryptStream(i io.Reader, o io.Writer) error {
 
 	// Create metadata (header) for the encryption
 	metadata := &crypto.PlainMessageMetadata{
-		IsBinary: true,
+		IsBinary: e.config.isBinary,
 		Filename: filename,
-		ModTime:  crypto.GetUnixTime(),
+		ModTime:  e.config.modTime,
 	}
 
 	// Start a goroutine to handle encryption
