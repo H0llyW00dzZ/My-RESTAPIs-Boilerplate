@@ -219,7 +219,10 @@ func TestGetKeyInfos(t *testing.T) {
 	}
 
 	// Create an Encryptor instance
-	gpg, err := gpg.NewEncryptor(publicKeys)
+	gpg, err := gpg.NewEncryptor(
+		publicKeys,
+		gpg.WithAllowVerify(true),
+	)
 	if err != nil {
 		t.Fatalf("Failed to create Encryptor: %v", err)
 	}

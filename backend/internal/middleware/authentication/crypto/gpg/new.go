@@ -57,16 +57,9 @@ func NewEncryptor(publicKeys []string, opts ...Option) (*Encryptor, error) {
 			continue // Skip duplicate keys
 		}
 
-		// Check if the key can be used for encryption
-		if key.CanEncrypt() {
-			validKeys = append(validKeys, pubKey)
-			keyInfos = append(keyInfos, keyInfo)
-			// Mark key as added
-			uniqueKeys[keyInfo.Fingerprint] = true
-		}
-
-		// Check if the key can be used for future verification
-		if config.AllowVerfy && key.CanVerify() {
+		// Check if the key can be used for encryption or Check if the key can be used for future verification
+		// prevent duplicate keys
+		if key.CanEncrypt() || (config.AllowVerfy && key.CanVerify()) {
 			validKeys = append(validKeys, pubKey)
 			keyInfos = append(keyInfos, keyInfo)
 			uniqueKeys[keyInfo.Fingerprint] = true
