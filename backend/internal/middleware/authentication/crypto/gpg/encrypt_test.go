@@ -269,6 +269,7 @@ func TestEncryptStream(t *testing.T) {
 	// Sample public key
 	publicKeys := []string{
 		testPublicKey,
+		// This Both key will be invalid due to the implementation of GPG Proton.
 		testPublicKeyfromGithub,
 		testPublicKeyfromGitea,
 	}
@@ -320,6 +321,7 @@ func TestGetKeyInfos(t *testing.T) {
 	publicKeys := []string{
 		testPublicKey,
 		testPublicECDSACantEncrypt,
+		// This Both key will be invalid due to the implementation of GPG Proton.
 		testPublicKeyfromGithub,
 		testPublicKeyfromGitea,
 	}
