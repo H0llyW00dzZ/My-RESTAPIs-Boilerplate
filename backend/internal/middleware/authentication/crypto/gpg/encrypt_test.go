@@ -256,9 +256,27 @@ func TestEncryptStreamToFile(t *testing.T) {
 		testPublicKey,
 	}
 
-	// Create a buffer to simulate the input data
-	inputData := []byte("Hello GPG/OpenPGP From H0llyW00dzZ.")
-	inputBuffer := bytes.NewReader(inputData)
+	// Create a temporary file to simulate the input
+	inputFile, err := os.CreateTemp("", "test_input_*.txt")
+	if err != nil {
+		t.Fatalf("Failed to create temporary input file: %v", err)
+	}
+
+	// Keep this to clean up the input file
+	defer os.Remove(inputFile.Name())
+	defer inputFile.Close()
+
+	// Write some data to the file
+	_, err = inputFile.WriteString("Hello GPG/OpenPGP From H0llyW00dzZ.")
+	if err != nil {
+		t.Fatalf("Failed to write to input file: %v", err)
+	}
+
+	// Re-open the file for reading
+	inputFile, err = os.Open(inputFile.Name())
+	if err != nil {
+		t.Fatalf("Failed to open input file for reading: %v", err)
+	}
 
 	// Define the output file
 	//
@@ -279,7 +297,7 @@ func TestEncryptStreamToFile(t *testing.T) {
 	}
 
 	// Call the EncryptStream function
-	if err = encryptor.EncryptStream(inputBuffer, outputFile); err != nil {
+	if err = encryptor.EncryptStream(inputFile, outputFile); err != nil {
 		t.Fatalf("EncryptStream failed: %v", err)
 	}
 
