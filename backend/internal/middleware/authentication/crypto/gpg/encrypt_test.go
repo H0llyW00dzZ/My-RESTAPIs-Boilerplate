@@ -240,6 +240,11 @@ func TestGetKeyInfos(t *testing.T) {
 	// Log detailed key information
 	for i, info := range keyInfos {
 		t.Logf("Key %d:", i+1)
+		// Log user IDs
+		for _, userID := range info.UserIDs {
+			t.Logf("UserID: %s", userID)
+		}
+		t.Logf("Primary Key: %s", info.PrimaryKey)
 		t.Logf("KeyID: %d", info.KeyID)
 		t.Logf("Hex KeyID: %s", info.HexKeyID)
 		t.Logf("CanEncrypt: %t", info.CanEncrypt)

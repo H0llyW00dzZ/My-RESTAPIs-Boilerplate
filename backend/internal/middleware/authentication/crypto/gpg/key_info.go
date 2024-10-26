@@ -7,6 +7,8 @@ package gpg
 
 // KeyInfo holds metadata about a public key.
 type KeyInfo struct {
+	UserIDs           []string
+	PrimaryKey        string
 	KeyID             uint64
 	HexKeyID          string
 	CanEncrypt        bool
