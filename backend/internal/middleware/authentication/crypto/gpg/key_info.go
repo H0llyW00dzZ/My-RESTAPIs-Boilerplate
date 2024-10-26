@@ -5,10 +5,13 @@
 
 package gpg
 
+import "time"
+
 // KeyInfo holds metadata about a public key.
 type KeyInfo struct {
 	UserIDs           []string
 	PrimaryKey        string
+	CreationDate      time.Time
 	KeyID             uint64
 	HexKeyID          string
 	CanEncrypt        bool
