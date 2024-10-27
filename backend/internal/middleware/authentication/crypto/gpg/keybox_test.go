@@ -39,11 +39,21 @@ func TestKeybox_SaveAndLoad(t *testing.T) {
 	// Output the JSON format for visual inspection.
 	//
 	// This format will not be corrupted and provides better readability when there are many keys.
-	// For example:
-	// [
-	// "-----BEGIN PGP PUBLIC KEY BLOCK-----\n...\n-----END PGP PUBLIC KEY BLOCK-----",
-	// "-----BEGIN PGP PUBLIC KEY BLOCK-----\n...\n-----END PGP PUBLIC KEY BLOCK-----"
-	// ]
+	// For example (JSON):
+	// {
+	// 	"keys": [
+	// 	  {
+	// 		"fingerprint": "ABC123DEF456...",
+	// 		"creation_date": "2023-10-28T00:00:00Z",
+	// 		"armored_key": "-----BEGIN PGP PUBLIC KEY BLOCK-----\n...\n-----END PGP PUBLIC KEY BLOCK-----"
+	// 	  },
+	// 	  {
+	// 		"fingerprint": "XYZ789GHI012...",
+	// 		"creation_date": "2024-01-15T00:00:00Z",
+	// 		"armored_key": "-----BEGIN PGP PUBLIC KEY BLOCK-----\n...\n-----END PGP PUBLIC KEY BLOCK-----"
+	// 	  }
+	// 	]
+	//   }
 	t.Logf("JSON output: %s", buffer.String())
 
 	loadedKb, err := gpg.Load(&buffer)

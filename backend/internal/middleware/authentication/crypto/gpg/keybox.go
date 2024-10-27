@@ -8,20 +8,30 @@ package gpg
 import (
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 	"github.com/bytedance/sonic"
 )
 
+// KeyMetadata contains metadata about a GPG/OpenPGP key, including its fingerprint, creation date, and armored representation.
+//
+// TODO: Adding support for YAML format ?
+type KeyMetadata struct {
+	Fingerprint  string `json:"fingerprint"`
+	CreationDate string `json:"creation_date"`
+	ArmoredKey   string `json:"armored_key"`
+}
+
 // Keybox manages a collection of keys that can be stored and retrieved.
 type Keybox struct {
-	Keys []crypto.Key `json:"-"`
+	Keys []KeyMetadata `json:"keys"`
 }
 
 // NewKeybox creates a new Keybox instance.
 func NewKeybox() *Keybox {
 	return &Keybox{
-		Keys: []crypto.Key{},
+		Keys: []KeyMetadata{},
 	}
 }
 
@@ -32,7 +42,15 @@ func (kb *Keybox) AddKey(armoredKey string) error {
 		return fmt.Errorf("invalid key: %w", err)
 	}
 
-	kb.Keys = append(kb.Keys, *key)
+	creationDate := key.GetEntity().PrimaryKey.CreationTime.UTC().Format(time.RFC3339)
+
+	keyInfo := KeyMetadata{
+		Fingerprint:  key.GetFingerprint(),
+		CreationDate: creationDate,
+		ArmoredKey:   armoredKey,
+	}
+
+	kb.Keys = append(kb.Keys, keyInfo)
 	return nil
 }
 
@@ -41,16 +59,7 @@ func (kb *Keybox) AddKey(armoredKey string) error {
 // Note: Since it allow supports multiple purposes, it's recommended to store it in a file (e.g., over the network smiliar encrypt stream), network storage, or a database that can handle this object.
 // Avoid using GPG key handling mechanisms that store keys directly in memory (bad), as it inefficient for a large number of keys.
 func (kb *Keybox) Save(w io.Writer) error {
-	var armoredKeys []string
-	for _, key := range kb.Keys {
-		armored, err := key.Armor()
-		if err != nil {
-			return fmt.Errorf("failed to armor key: %w", err)
-		}
-		armoredKeys = append(armoredKeys, armored)
-	}
-
-	data, err := sonic.Marshal(armoredKeys)
+	data, err := sonic.MarshalIndent(kb, "", "  ")
 	if err != nil {
 		return fmt.Errorf("failed to marshal keybox: %w", err)
 	}
@@ -67,31 +76,24 @@ func (kb *Keybox) Save(w io.Writer) error {
 // Note: Since it allow supports multiple purposes, it's recommended to store it in a file (e.g., over the network smiliar encrypt stream), network storage, or a database that can handle this object.
 // Avoid using GPG key handling mechanisms that store keys directly in memory (bad), as it inefficient for a large number of keys.
 func Load(r io.Reader) (*Keybox, error) {
-	var armoredKeys []string
-	if err := sonic.ConfigDefault.NewDecoder(r).Decode(&armoredKeys); err != nil {
+	var kb Keybox
+	if err := sonic.ConfigDefault.NewDecoder(r).Decode(&kb); err != nil {
 		return nil, fmt.Errorf("failed to decode keybox: %w", err)
 	}
 
-	kb := NewKeybox()
-	for _, armoredKey := range armoredKeys {
-		if err := kb.AddKey(armoredKey); err != nil {
-			return nil, err
-		}
-	}
-
-	return kb, nil
+	return &kb, nil
 }
 
 // GetEncryptor creates an Encryptor from the keys in the Keybox that can be used for encryption.
 func (kb *Keybox) GetEncryptor() (*Encryptor, error) {
 	var encryptKeys []string
-	for _, key := range kb.Keys {
+	for _, keyInfo := range kb.Keys {
+		key, err := crypto.NewKeyFromArmored(keyInfo.ArmoredKey)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse armored key: %w", err)
+		}
 		if key.CanEncrypt() {
-			armored, err := key.Armor()
-			if err != nil {
-				return nil, fmt.Errorf("failed to armor key: %w", err)
-			}
-			encryptKeys = append(encryptKeys, armored)
+			encryptKeys = append(encryptKeys, keyInfo.ArmoredKey)
 		}
 	}
 
