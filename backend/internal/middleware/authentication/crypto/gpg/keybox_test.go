@@ -12,7 +12,10 @@ import (
 )
 
 func TestKeybox_AddKey(t *testing.T) {
-	kb := gpg.NewKeybox()
+	kb, err := gpg.NewKeybox()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	if err := kb.AddKey(testPublicKey); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -23,7 +26,10 @@ func TestKeybox_AddKey(t *testing.T) {
 }
 
 func TestKeybox_SaveAndLoad(t *testing.T) {
-	kb := gpg.NewKeybox()
+	kb, err := gpg.NewKeybox()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	if err := kb.AddKey(testPublicKey); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -40,6 +46,7 @@ func TestKeybox_SaveAndLoad(t *testing.T) {
 	// This format will not be corrupted and provides better readability when there are many keys.
 	// For example (JSON):
 	// {
+	//	"uuid": "1ee90424-2892-4df4-bad8-522a5a5dade6",
 	// 	"keys": [
 	// 	  {
 	// 		"fingerprint": "ABC123DEF456...",
@@ -65,7 +72,11 @@ func TestKeybox_SaveAndLoad(t *testing.T) {
 }
 
 func TestKeybox_GetEncryptor(t *testing.T) {
-	kb := gpg.NewKeybox()
+	kb, err := gpg.NewKeybox()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
 	if err := kb.AddKey(testPublicKey); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -80,9 +91,12 @@ func TestKeybox_GetEncryptor(t *testing.T) {
 }
 
 func TestKeybox_GetEncryptor_NoKeys(t *testing.T) {
-	kb := gpg.NewKeybox()
+	kb, err := gpg.NewKeybox()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
-	_, err := kb.GetEncryptor()
+	_, err = kb.GetEncryptor() // Remove redeclaration of err
 	if err == nil {
 		t.Fatal("expected error, got nil")
 	}
