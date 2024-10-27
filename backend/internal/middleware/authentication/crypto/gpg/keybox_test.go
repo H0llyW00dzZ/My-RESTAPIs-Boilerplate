@@ -6,8 +6,8 @@
 package gpg_test
 
 import (
-	"bytes"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/gpg"
+	"strings"
 	"testing"
 )
 
@@ -30,7 +30,8 @@ func TestKeybox_SaveAndLoad(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	var buffer bytes.Buffer
+	// This is compatible with most standard libraries due to its I/O operations.
+	var buffer strings.Builder
 	err = kb.Save(&buffer)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -56,7 +57,7 @@ func TestKeybox_SaveAndLoad(t *testing.T) {
 	//   }
 	t.Logf("JSON output: %s", buffer.String())
 
-	loadedKb, err := gpg.Load(&buffer)
+	loadedKb, err := gpg.Load(strings.NewReader(buffer.String()))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
