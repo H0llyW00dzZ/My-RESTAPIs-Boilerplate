@@ -245,6 +245,7 @@ func TestGetKeyInfos(t *testing.T) {
 			t.Logf("UserID: %s", userID)
 		}
 		t.Logf("Primary Key: %s", info.PrimaryKey)
+		t.Logf("Creation Date: %s", info.CreationDate.Format("2006-01-02 15:04:05"))
 		t.Logf("KeyID: %d", info.KeyID)
 		t.Logf("Hex KeyID: %s", info.HexKeyID)
 		t.Logf("CanEncrypt: %t", info.CanEncrypt)

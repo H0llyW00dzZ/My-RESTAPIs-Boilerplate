@@ -79,6 +79,8 @@ func NewEncryptor(publicKeys []string, opts ...Option) (*Encryptor, error) {
 
 // extractKeyInfo extracts metadata from a given crypto.Key and returns it as a KeyInfo struct.
 // This function gathers essential details about the key, such as its ID, capabilities, and fingerprints.
+// If there were many keys used for end-to-end encryption, it recommended to store them in a database.
+// This was primarily used for automated backups that sent data over the network due to its efficiency.
 func extractKeyInfo(key *crypto.Key) KeyInfo {
 	entity := key.GetEntity()
 	var userIDs []string
@@ -89,6 +91,7 @@ func extractKeyInfo(key *crypto.Key) KeyInfo {
 	return KeyInfo{
 		UserIDs:           userIDs,
 		PrimaryKey:        entity.PrimaryKey.KeyIdString(),
+		CreationDate:      entity.PrimaryKey.CreationTime,
 		KeyID:             key.GetKeyID(),
 		HexKeyID:          key.GetHexKeyID(),
 		CanEncrypt:        key.CanEncrypt(),
