@@ -59,7 +59,7 @@ func (kb *Keybox) AddKey(armoredKey string) error {
 // Note: Since it allow supports multiple purposes, it's recommended to store it in a file (e.g., over the network smiliar encrypt stream), network storage, or a database that can handle this object.
 // Avoid using GPG key handling mechanisms that store keys directly in memory (bad), as it inefficient for a large number of keys.
 func (kb *Keybox) Save(w io.Writer) error {
-	// Now we can perform this operation over the network.
+	// Now we can perform this operation over the network, especially when using Kubernetes. It's very smooth sailing.
 	pr, pw := io.Pipe()
 	go func() {
 		defer pw.Close()
@@ -88,7 +88,7 @@ func (kb *Keybox) Save(w io.Writer) error {
 // Note: Since it allow supports multiple purposes, it's recommended to store it in a file (e.g., over the network smiliar encrypt stream), network storage, or a database that can handle this object.
 // Avoid using GPG key handling mechanisms that store keys directly in memory (bad), as it inefficient for a large number of keys.
 func Load(r io.Reader) (*Keybox, error) {
-	// Now we can perform this operation over the network.
+	// Now we can perform this operation over the network, especially when using Kubernetes. It's very smooth sailing.
 	pr, pw := io.Pipe()
 
 	go func() {
