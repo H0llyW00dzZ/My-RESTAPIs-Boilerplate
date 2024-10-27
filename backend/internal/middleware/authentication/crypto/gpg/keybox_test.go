@@ -36,6 +36,16 @@ func TestKeybox_SaveAndLoad(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
+	// Output the JSON format for visual inspection.
+	//
+	// This format will not be corrupted and provides better readability when there are many keys.
+	// For example:
+	// [
+	// "-----BEGIN PGP PUBLIC KEY BLOCK-----\n...\n-----END PGP PUBLIC KEY BLOCK-----",
+	// "-----BEGIN PGP PUBLIC KEY BLOCK-----\n...\n-----END PGP PUBLIC KEY BLOCK-----"
+	// ]
+	t.Logf("JSON output: %s", buffer.String())
+
 	loadedKb, err := gpg.Load(&buffer)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
