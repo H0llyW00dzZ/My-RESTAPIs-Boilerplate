@@ -117,6 +117,27 @@ gUpWAQCAY8wKM1wAuvQ4DPADicxJ7IgOeYnNQ+esuuG2s99XAw==
 -----END PGP PUBLIC KEY BLOCK-----
 `
 
+// This key is commonly used in GPG/OpenPGP frontends when creating a keypair, unlike the first one, "testPublicKey".
+const testPublicKeyRSA2048 = `-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mQENBGcdlWEBCACtzsjHuAsTOUxFeWn2q/zbN9GpmlrUPXPBqbj1ENYPMCby61/c
+siC6SdOcAIM7hqc7syWnivd+womL+pYy4LPWhR+zQ0NsW4iwtz/4YkuMdqrpAWMH
+xYUJ0jXMqyBPofHJ1dO9leZTOup+oPVa2TwPadh8JUhrVU2BqKtLlVrwaJf2eAwA
+revFzOZ1iveI7kAN3LvXBv9h/S7UD98Mi25YSGmrfCqnaEnTcTj3Hzbvf5Ntl1nN
+pSkQrlLyznusHlMwSl4xxD02Inzm7kw46pnPNlsi1AeTMFz/+Js3ZivruS/Bv+qN
+0cfPliz/Uwk0/02ILa2m55ZXoCvtDRlbVKXfABEBAAG0HFRlc3QgUlNBKCk8dGVz
+dEBleGFtcGxlLmNvbT6JAVEEEwEIADsWIQREMMgc27QZ0ns3GJ36L8r0F9TgDQUC
+Zx2VYQIbLwULCQgHAgIiAgYVCgkICwIEFgIDAQIeBwIXgAAKCRD6L8r0F9TgDRqv
+B/97a1vqWkNaerLLiRt0f8BU2YUmW/+R/Y5KXMbMCsJOyd4rRdjMGPHNu7YYAHKH
+nEPZR6R+F6K4wEq7OlwTGqR1wSWP5+lnpi1LT5Q91yEf5k6sDgeBTXi8hUcgW/rx
+vhy3tE9V5mX+5a6VHNgr0SORaDbod2JFMuC0obgoeldEOxCq5ua4SAt5GU3LFUdu
+/sNb0OUo2qmixFw5z36Zswjp4MDyG0bJRjthuXCxTCkmBknBR3+eXZ8nmJMykzZi
+SKwGnTPxIEnHE/JtSuIyglJ+04QasosucDmGBgUORtWzpllbhzlQTmAsae9qVNqr
+xAIQdeSVe262QGfx3EuTuDfH
+=GCxh
+-----END PGP PUBLIC KEY BLOCK-----
+`
+
 func TestEncryptFile(t *testing.T) {
 	// Create a temporary file to encrypt
 	inputFile, err := os.CreateTemp("", "test_input_*.txt")
@@ -156,7 +177,9 @@ func TestEncryptFile(t *testing.T) {
 func TestEncryptStream(t *testing.T) {
 	// Sample public key
 	publicKeys := []string{
+		// Support multiple public key
 		testPublicKey,
+		testPublicKeyRSA2048,
 		// This key will be invalid due to GPG Proton's implementation
 		// (it does not support a single armored block with multiple keys, so each must be processed individually).
 		testPublicKeyfromGitea,
@@ -213,6 +236,7 @@ func TestGetKeyInfos(t *testing.T) {
 	publicKeys := []string{
 		testPublicKey,
 		testPublicECDSACantEncrypt,
+		testPublicKeyRSA2048,
 		// This key will be invalid due to GPG Proton's implementation
 		// (it does not support a single armored block with multiple keys, so each must be processed individually).
 		testPublicKeyfromGitea,
@@ -268,7 +292,9 @@ func TestGetKeyInfos(t *testing.T) {
 func TestEncryptStreamToFile(t *testing.T) {
 	// Sample public key
 	publicKeys := []string{
+		// Support multiple public key
 		testPublicKey,
+		testPublicKeyRSA2048,
 	}
 
 	// Create a temporary file to simulate the input
@@ -335,7 +361,9 @@ func TestEncryptStreamToFile(t *testing.T) {
 func TestEncryptStreamFromBytesToFile(t *testing.T) {
 	// Sample public key
 	publicKeys := []string{
+		// Support multiple public key
 		testPublicKey,
+		testPublicKeyRSA2048,
 	}
 
 	// Create a buffer to simulate the input data
