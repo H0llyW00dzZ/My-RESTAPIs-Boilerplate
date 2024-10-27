@@ -37,6 +37,9 @@ func (kb *Keybox) AddKey(armoredKey string) error {
 }
 
 // Save saves the Keybox to an [io.Writer] in JSON format.
+//
+// Note: Since it allow supports multiple purposes, it's recommended to store it in a file (e.g., over the network smiliar encrypt stream), network storage, or a database that can handle this object.
+// Avoid using GPG key handling mechanisms that store keys directly in memory (bad), as it inefficient for a large number of keys.
 func (kb *Keybox) Save(w io.Writer) error {
 	var armoredKeys []string
 	for _, key := range kb.Keys {
@@ -60,6 +63,9 @@ func (kb *Keybox) Save(w io.Writer) error {
 }
 
 // Load loads a Keybox from an [io.Reader] in JSON format.
+//
+// Note: Since it allow supports multiple purposes, it's recommended to store it in a file (e.g., over the network smiliar encrypt stream), network storage, or a database that can handle this object.
+// Avoid using GPG key handling mechanisms that store keys directly in memory (bad), as it inefficient for a large number of keys.
 func Load(r io.Reader) (*Keybox, error) {
 	var armoredKeys []string
 	if err := sonic.ConfigDefault.NewDecoder(r).Decode(&armoredKeys); err != nil {
