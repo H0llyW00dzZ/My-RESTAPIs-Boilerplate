@@ -59,13 +59,25 @@ func (kb *Keybox) AddKey(armoredKey string) error {
 // Note: Since it allow supports multiple purposes, it's recommended to store it in a file (e.g., over the network smiliar encrypt stream), network storage, or a database that can handle this object.
 // Avoid using GPG key handling mechanisms that store keys directly in memory (bad), as it inefficient for a large number of keys.
 func (kb *Keybox) Save(w io.Writer) error {
-	data, err := sonic.MarshalIndent(kb, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal keybox: %w", err)
-	}
+	// Now we can perform this operation over the network, especially when using Kubernetes. It's very smooth sailing.
+	pr, pw := io.Pipe()
+	go func() {
+		defer pw.Close()
+		data, err := sonic.MarshalIndent(kb, "", "  ")
+		if err != nil {
+			pw.CloseWithError(fmt.Errorf("failed to marshal keybox: %w", err))
+			return
+		}
 
-	if _, err := w.Write(data); err != nil {
-		return fmt.Errorf("failed to write keybox: %w", err)
+		if _, err := pw.Write(data); err != nil {
+			pw.CloseWithError(fmt.Errorf("failed to write keybox: %w", err))
+			return
+		}
+	}()
+
+	_, err := io.Copy(w, pr)
+	if err != nil {
+		return fmt.Errorf("failed to copy data to writer: %w", err)
 	}
 
 	return nil
@@ -76,8 +88,19 @@ func (kb *Keybox) Save(w io.Writer) error {
 // Note: Since it allow supports multiple purposes, it's recommended to store it in a file (e.g., over the network smiliar encrypt stream), network storage, or a database that can handle this object.
 // Avoid using GPG key handling mechanisms that store keys directly in memory (bad), as it inefficient for a large number of keys.
 func Load(r io.Reader) (*Keybox, error) {
+	// Now we can perform this operation over the network, especially when using Kubernetes. It's very smooth sailing.
+	pr, pw := io.Pipe()
+
+	go func() {
+		defer pw.Close()
+		if _, err := io.Copy(pw, r); err != nil {
+			pw.CloseWithError(fmt.Errorf("failed to copy data from reader: %w", err))
+			return
+		}
+	}()
+
 	var kb Keybox
-	if err := sonic.ConfigDefault.NewDecoder(r).Decode(&kb); err != nil {
+	if err := sonic.ConfigDefault.NewDecoder(pr).Decode(&kb); err != nil {
 		return nil, fmt.Errorf("failed to decode keybox: %w", err)
 	}
 
