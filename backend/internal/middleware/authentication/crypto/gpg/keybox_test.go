@@ -60,6 +60,9 @@ func TestKeybox_SaveAndLoad(t *testing.T) {
 	// 	  }
 	// 	]
 	// }
+	//
+	// Also the UUID can later be used as an identifier or for other purposes as needed.
+	// It is secure, and even if someone tries to guess it, it remains a random number.
 	t.Logf("JSON output: %s", buffer.String())
 
 	loadedKb, err := gpg.Load(strings.NewReader(buffer.String()))
