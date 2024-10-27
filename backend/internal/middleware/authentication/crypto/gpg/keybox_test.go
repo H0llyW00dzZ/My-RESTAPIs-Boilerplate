@@ -14,26 +14,24 @@ import (
 func TestKeybox_AddKey(t *testing.T) {
 	kb := gpg.NewKeybox()
 
-	err := kb.AddKey(testPublicKey)
-	if err != nil {
+	if err := kb.AddKey(testPublicKey); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if len(kb.Keys) != 1 {
-		t.Fatalf("expected 1 key, got %d", len(kb.Keys))
+	if kb.KeyCount() != 1 {
+		t.Fatalf("expected 1 key, got %d", kb.KeyCount())
 	}
 }
 
 func TestKeybox_SaveAndLoad(t *testing.T) {
 	kb := gpg.NewKeybox()
-	err := kb.AddKey(testPublicKey)
-	if err != nil {
+
+	if err := kb.AddKey(testPublicKey); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
 	// This is compatible with most standard libraries due to its I/O operations.
 	var buffer strings.Builder
-	err = kb.Save(&buffer)
-	if err != nil {
+	if err := kb.Save(&buffer); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -54,22 +52,21 @@ func TestKeybox_SaveAndLoad(t *testing.T) {
 	// 		"armored_key": "-----BEGIN PGP PUBLIC KEY BLOCK-----\n...\n-----END PGP PUBLIC KEY BLOCK-----"
 	// 	  }
 	// 	]
-	//   }
+	// }
 	t.Logf("JSON output: %s", buffer.String())
 
 	loadedKb, err := gpg.Load(strings.NewReader(buffer.String()))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if len(loadedKb.Keys) != 1 {
-		t.Fatalf("expected 1 key, got %d", len(loadedKb.Keys))
+	if loadedKb.KeyCount() != 1 {
+		t.Fatalf("expected 1 key, got %d", loadedKb.KeyCount())
 	}
 }
 
 func TestKeybox_GetEncryptor(t *testing.T) {
 	kb := gpg.NewKeybox()
-	err := kb.AddKey(testPublicKey)
-	if err != nil {
+	if err := kb.AddKey(testPublicKey); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
