@@ -7,6 +7,7 @@ package gpg
 
 import (
 	"fmt"
+	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand"
 	"io"
 	"time"
 
@@ -25,14 +26,20 @@ type KeyMetadata struct {
 
 // Keybox manages a collection of keys that can be stored and retrieved.
 type Keybox struct {
+	UUID string        `json:"uuid"`
 	Keys []KeyMetadata `json:"keys"`
 }
 
 // NewKeybox creates a new Keybox instance.
-func NewKeybox() *Keybox {
-	return &Keybox{
-		Keys: []KeyMetadata{},
+func NewKeybox() (*Keybox, error) {
+	uuid, err := rand.GenerateFixedUUID()
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate UUID: %w", err)
 	}
+	return &Keybox{
+		UUID: uuid,
+		Keys: []KeyMetadata{},
+	}, nil
 }
 
 // AddKey adds a new key to the Keybox, supporting multiple purposes.

@@ -8,6 +8,7 @@ package rand_test
 import (
 	"crypto/elliptic"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand"
+	"regexp"
 	"testing"
 )
 
@@ -222,5 +223,34 @@ func TestFixedSizeRSA(t *testing.T) {
 		if string(buf) == string(buf2) {
 			t.Errorf("Expected different random bytes on subsequent reads for modulus %d bits", ms.modulusBits)
 		}
+	}
+}
+
+func TestGenerateFixedUUID(t *testing.T) {
+	// Define a regex pattern for a valid UUID v4 and variant (RFC 4122) bits.
+	uuidPattern := `^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$`
+	re := regexp.MustCompile(uuidPattern)
+
+	// Generate a UUID and check for errors.
+	uuid, err := rand.GenerateFixedUUID()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	t.Logf("Generated UUID: %s", uuid)
+
+	// Verify the format of the UUID.
+	if !re.MatchString(uuid) {
+		t.Errorf("UUID %s does not match expected format", uuid)
+	}
+
+	// Generate another UUID and ensure it is different from the first.
+	uuid2, err := rand.GenerateFixedUUID()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	t.Logf("Generated UUID: %s", uuid2)
+
+	if uuid == uuid2 {
+		t.Error("expected different UUIDs, but got the same")
 	}
 }
