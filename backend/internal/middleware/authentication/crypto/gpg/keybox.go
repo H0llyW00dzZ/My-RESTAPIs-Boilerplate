@@ -58,7 +58,7 @@ func (kb *Keybox) AddKey(armoredKey string) error {
 //
 // Note: Since it allow supports multiple purposes, it's recommended to store it in a file (e.g., over the network smiliar encrypt stream), network storage, or a database that can handle this object.
 // Avoid using GPG key handling mechanisms that store keys directly in memory (bad), as it inefficient for a large number of keys.
-func (kb *Keybox) Save(w io.Writer) error {
+func (kb *Keybox) Save(o io.Writer) error {
 	// Now we can perform this operation over the network, especially when using Kubernetes. It's very smooth sailing.
 	pr, pw := io.Pipe()
 	go func() {
@@ -75,7 +75,7 @@ func (kb *Keybox) Save(w io.Writer) error {
 		}
 	}()
 
-	_, err := io.Copy(w, pr)
+	_, err := io.Copy(o, pr)
 	if err != nil {
 		return fmt.Errorf("failed to copy data to writer: %w", err)
 	}
@@ -87,13 +87,13 @@ func (kb *Keybox) Save(w io.Writer) error {
 //
 // Note: Since it allow supports multiple purposes, it's recommended to store it in a file (e.g., over the network smiliar encrypt stream), network storage, or a database that can handle this object.
 // Avoid using GPG key handling mechanisms that store keys directly in memory (bad), as it inefficient for a large number of keys.
-func Load(r io.Reader) (*Keybox, error) {
+func Load(i io.Reader) (*Keybox, error) {
 	// Now we can perform this operation over the network, especially when using Kubernetes. It's very smooth sailing.
 	pr, pw := io.Pipe()
 
 	go func() {
 		defer pw.Close()
-		if _, err := io.Copy(pw, r); err != nil {
+		if _, err := io.Copy(pw, i); err != nil {
 			pw.CloseWithError(fmt.Errorf("failed to copy data from reader: %w", err))
 			return
 		}
