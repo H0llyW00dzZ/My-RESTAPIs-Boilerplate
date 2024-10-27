@@ -130,6 +130,4 @@ func (kb *Keybox) GetEncryptor() (*Encryptor, error) {
 // KeyCount returns the number of keys in the Keybox.
 //
 // This method provides a safe and easy way to get the count.
-func (kb *Keybox) KeyCount() int {
-	return len(kb.Keys)
-}
+func (kb *Keybox) KeyCount() int { return len(kb.Keys) }
