@@ -30,6 +30,7 @@ func TestKeybox_SaveAndLoad(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
+	// This is compatible with most standard libraries due to its I/O operations.
 	var buffer strings.Builder
 	err = kb.Save(&buffer)
 	if err != nil {
