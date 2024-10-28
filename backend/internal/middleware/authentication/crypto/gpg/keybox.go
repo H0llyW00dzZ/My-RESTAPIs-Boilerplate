@@ -160,17 +160,6 @@ func (kb *Keybox) armorKeyWithHeader(key crypto.Key) (string, error) {
 	return armored, nil
 }
 
-func (kb *Keybox) encryptKeys(encryptor *Encryptor) error {
-	for i, keyInfo := range kb.Keys {
-		encryptedKey, err := encryptor.encryptArmored(keyInfo.ArmoredKey)
-		if err != nil {
-			return fmt.Errorf("failed to encrypt key: %w", err)
-		}
-		kb.Keys[i].ArmoredKey = encryptedKey
-	}
-	return nil
-}
-
 // EncryptBeforeSave encrypts all keys in the Keybox and writes the encrypted Keybox to an [io.Writer].
 //
 // This method first encrypts each key stored in the Keybox using the provided Encryptor. It then serializes
