@@ -75,8 +75,11 @@ func (kb *Keybox) AddKey(armoredKey string) error {
 
 // Save saves the Keybox to an [io.Writer] in JSON format.
 //
-// Note: Since it allow supports multiple purposes, it's recommended to store it in a file (e.g., over the network smiliar encrypt stream), network storage, or a database that can handle this object.
-// Avoid using GPG key handling mechanisms that store keys directly in memory (bad), as it inefficient for a large number of keys.
+// Note: Since it supports multiple purposes, it's recommended to store it in a file, network storage, or a database that can handle this object.
+// Avoid using GPG key handling mechanisms that store keys directly in memory, as it is inefficient for a large number of keys.
+//
+// For example, handling many keys or UIDs (e.g., revoked UIDs) in armored format can be inefficient
+// because they still require processing during export/import.
 func (kb *Keybox) Save(o io.Writer) error {
 	// Now we can perform this operation over the network, especially when using Kubernetes. It's very smooth sailing.
 	pr, pw := io.Pipe()
@@ -103,8 +106,11 @@ func (kb *Keybox) Save(o io.Writer) error {
 
 // Load loads a Keybox from an [io.Reader] in JSON format.
 //
-// Note: Since it allow supports multiple purposes, it's recommended to store it in a file (e.g., over the network smiliar encrypt stream), network storage, or a database that can handle this object.
-// Avoid using GPG key handling mechanisms that store keys directly in memory (bad), as it inefficient for a large number of keys.
+// Note: Since it supports multiple purposes, it's recommended to store it in a file, network storage, or a database that can handle this object.
+// Avoid using GPG key handling mechanisms that store keys directly in memory, as it is inefficient for a large number of keys.
+//
+// For example, handling many keys or UIDs (e.g., revoked UIDs) in armored format can be inefficient
+// because they still require processing during export/import.
 func Load(i io.Reader) (*Keybox, error) {
 	// Now we can perform this operation over the network, especially when using Kubernetes. It's very smooth sailing.
 	pr, pw := io.Pipe()
