@@ -268,4 +268,28 @@
 // For enhanced traffic, consider using TLS over protocols like HTTPS or gRPC.
 // Additionally, any network or other mechanism (e.g., Implement own storage mechanism over the network, such as using buckets better than any (e.g., aws),
 // which is ideal for Kubernetes environments.) that supports I/O operations will work well with this.
+//
+// # Compatibility Considerations:
+//
+// The gopenpgp/gpgproton library and this package rely on specific cipher algorithms and
+// Go language features. It's important to consider compatibility when updating
+// Go versions or changing cipher settings.
+//
+// # Cipher Compatibility:
+//
+//   - The default cipher mode for OpenPGP is typically CFB (Cipher Feedback). While
+//     it is secure for most applications, ensure that any changes to the cipher
+//     algorithm are supported by all systems involved in the encryption/decryption process.
+//   - If you modify the cipher settings, verify that these changes are compatible
+//     with the gopenpgp/gpgproton library's capabilities and the OpenPGP standard
+//
+// # Go Version Compatibility:
+//
+//   - Always test your application when upgrading to a new Go version. Changes in
+//     the Go runtime or standard library might affect cryptographic operations.
+//   - If a new Go version introduces changes that impact cipher operations or
+//     cryptographic libraries, evaluate whether these changes are necessary for
+//     your application. If the changes are not relevant/not make any sense (e.g., deprecating certain ciphers that are still secure),
+//     consider postponing the upgrade until compatibility is ensured. Alternatively, just fork the old version and maintain it yourself,
+//     as Go programming makes this manageable.
 package gpg
