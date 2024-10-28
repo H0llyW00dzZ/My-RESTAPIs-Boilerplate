@@ -159,3 +159,24 @@ func (e *Encryptor) EncryptStream(i io.Reader, o io.Writer) error {
 
 	return nil
 }
+
+func (e *Encryptor) encryptArmored(armoredKey string) (string, error) {
+	keyRing, err := e.createKeyRing()
+	if err != nil {
+		return "", fmt.Errorf("failed to create key ring: %w", err)
+	}
+
+	message := crypto.NewPlainMessageFromString(armoredKey)
+	encryptedMessage, err := keyRing.Encrypt(message, nil)
+	if err != nil {
+		return "", fmt.Errorf("failed to encrypt armored key: %w", err)
+	}
+
+	// Use custom headers to remove the comment
+	armored, err := encryptedMessage.GetArmoredWithCustomHeaders(customHeader, keyBoxVersion)
+	if err != nil {
+		return "", fmt.Errorf("failed to get armored message: %w", err)
+	}
+
+	return armored, nil
+}

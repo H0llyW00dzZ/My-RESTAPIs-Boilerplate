@@ -107,3 +107,41 @@ func TestKeybox_GetEncryptor_NoKeys(t *testing.T) {
 		t.Fatalf("expected ErrorCantEncrypt, got %v", err)
 	}
 }
+
+func TestKeybox_EncryptBeforeSave(t *testing.T) {
+	kb, err := gpg.NewKeybox()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if err := kb.AddKey(testPublicKey); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	encryptor, err := kb.GetEncryptor()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// Use a buffer to simulate file writing
+	var buffer strings.Builder
+
+	// Encrypt and save the Keybox
+	if err := kb.EncryptBeforeSave(&buffer, encryptor); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// Log the encrypted JSON output for inspection
+	t.Logf("Encrypted JSON output: %s", buffer.String())
+
+	// Load the Keybox from the buffer to ensure it is correctly saved
+	loadedKb, err := gpg.Load(strings.NewReader(buffer.String()))
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// Check if the loaded Keybox has the same number of keys
+	if loadedKb.KeyCount() != 1 {
+		t.Fatalf("expected 1 key, got %d", loadedKb.KeyCount())
+	}
+}
