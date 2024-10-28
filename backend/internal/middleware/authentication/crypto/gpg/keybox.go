@@ -222,8 +222,7 @@ func (kb *Keybox) EncryptBeforeSave(o io.Writer, encryptor *Encryptor) error {
 		}
 	}()
 
-	_, err := io.Copy(o, pr)
-	if err != nil {
+	if _, err := io.Copy(o, pr); err != nil {
 		return fmt.Errorf("failed to copy data to writer: %w", err)
 	}
 
