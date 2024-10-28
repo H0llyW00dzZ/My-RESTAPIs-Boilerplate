@@ -30,6 +30,11 @@ type Keybox struct {
 	Keys []KeyMetadata `json:"keys"`
 }
 
+// KeyMetadataEncrypted contains metadata about a GPG/OpenPGP key, including its encrypted representation.
+type KeyMetadataEncrypted struct {
+	Encrypted string `json:"encrypted"`
+}
+
 // NewKeybox creates a new Keybox instance.
 func NewKeybox() (*Keybox, error) {
 	uuid, err := rand.GenerateFixedUUID()
@@ -146,12 +151,81 @@ func (kb *Keybox) KeyCount() int { return len(kb.Keys) }
 
 // TODO: Implement automated version detection for improved versioning
 const keyBoxVersion = "v0.0.0-beta"
+const customHeader = "From GPG/OpenPGP Keybox ⛵ 📦 🔐 🗝️  Written In Go by H0llyW00dzZ"
 
 func (kb *Keybox) armorKeyWithHeader(key crypto.Key) (string, error) {
-	customHeader := fmt.Sprintf("From GPG/OpenPGP Keybox ⛵ 📦 🔐 🗝️  Written In Go by H0llyW00dzZ")
 	armored, err := key.ArmorWithCustomHeaders(customHeader, keyBoxVersion)
 	if err != nil {
 		return "", fmt.Errorf("failed to armor key: %w", err)
 	}
 	return armored, nil
+}
+
+func (kb *Keybox) encryptKeys(encryptor *Encryptor) error {
+	for i, keyInfo := range kb.Keys {
+		encryptedKey, err := encryptor.encryptArmored(keyInfo.ArmoredKey)
+		if err != nil {
+			return fmt.Errorf("failed to encrypt key: %w", err)
+		}
+		kb.Keys[i].ArmoredKey = encryptedKey
+	}
+	return nil
+}
+
+// EncryptBeforeSave encrypts all keys in the Keybox and writes the encrypted Keybox to an [io.Writer].
+//
+// This method first encrypts each key stored in the Keybox using the provided Encryptor. It then serializes
+// the Keybox, including the encrypted keys, into JSON format and writes it to the provided [io.Writer].
+//
+// Note:
+//   - This method ensures that keys are securely encrypted (effective for private keys) before being saved or transmitted over the network.
+//   - The encryption process uses the public keys contained within the provided Encryptor.
+//   - It is important to ensure that the Encryptor is properly initialized with valid public keys capable of encryption.
+func (kb *Keybox) EncryptBeforeSave(o io.Writer, encryptor *Encryptor) error {
+	encryptedKeys := []KeyMetadataEncrypted{}
+
+	for _, keyInfo := range kb.Keys {
+		encryptedKey, err := encryptor.encryptArmored(keyInfo.ArmoredKey)
+		if err != nil {
+			return fmt.Errorf("failed to encrypt key: %w", err)
+		}
+
+		encryptedKeys = append(encryptedKeys, KeyMetadataEncrypted{
+			Encrypted: encryptedKey,
+		})
+	}
+
+	// Create a temporary structure to hold the UUID and encrypted keys
+	type EncryptedKeybox struct {
+		UUID string                 `json:"uuid"`
+		Keys []KeyMetadataEncrypted `json:"keys"`
+	}
+
+	encryptedKeybox := EncryptedKeybox{
+		UUID: kb.UUID,
+		Keys: encryptedKeys,
+	}
+
+	// Now we can perform this operation over the network, especially when using Kubernetes. It's very smooth sailing.
+	pr, pw := io.Pipe()
+	go func() {
+		defer pw.Close()
+		data, err := sonic.MarshalIndent(encryptedKeybox, "", "  ")
+		if err != nil {
+			pw.CloseWithError(fmt.Errorf("failed to marshal encrypted keybox: %w", err))
+			return
+		}
+
+		if _, err := pw.Write(data); err != nil {
+			pw.CloseWithError(fmt.Errorf("failed to write encrypted keybox: %w", err))
+			return
+		}
+	}()
+
+	_, err := io.Copy(o, pr)
+	if err != nil {
+		return fmt.Errorf("failed to copy data to writer: %w", err)
+	}
+
+	return nil
 }
