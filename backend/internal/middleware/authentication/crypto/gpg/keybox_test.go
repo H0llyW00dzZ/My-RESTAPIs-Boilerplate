@@ -31,7 +31,11 @@ func TestKeybox_SaveAndLoad(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
+	// Add multiple keys to the Keybox
 	if err := kb.AddKey(testPublicKey); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if err := kb.AddKey(testPublicKeyRSA2048); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -69,8 +73,8 @@ func TestKeybox_SaveAndLoad(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if loadedKb.KeyCount() != 1 {
-		t.Fatalf("expected 1 key, got %d", loadedKb.KeyCount())
+	if loadedKb.KeyCount() != 2 {
+		t.Fatalf("expected 2 key, got %d", loadedKb.KeyCount())
 	}
 }
 
@@ -114,7 +118,11 @@ func TestKeybox_EncryptBeforeSave(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
+	// Add multiple keys to the Keybox
 	if err := kb.AddKey(testPublicKey); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if err := kb.AddKey(testPublicKeyRSA2048); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -157,7 +165,7 @@ func TestKeybox_EncryptBeforeSave(t *testing.T) {
 	}
 
 	// Check if the loaded Keybox has the same number of keys
-	if loadedKb.KeyCount() != 1 {
-		t.Fatalf("expected 1 key, got %d", loadedKb.KeyCount())
+	if loadedKb.KeyCount() != 2 {
+		t.Fatalf("expected 2 key, got %d", loadedKb.KeyCount())
 	}
 }

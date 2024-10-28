@@ -48,6 +48,8 @@ func NewKeybox() (*Keybox, error) {
 }
 
 // AddKey adds a new key to the Keybox, supporting multiple purposes.
+//
+// TODO: Do we really need a slice for this ?
 func (kb *Keybox) AddKey(armoredKey string) error {
 	key, err := crypto.NewKeyFromArmored(armoredKey)
 	if err != nil {
