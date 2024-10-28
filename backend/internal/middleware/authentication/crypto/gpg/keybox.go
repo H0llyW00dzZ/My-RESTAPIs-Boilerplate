@@ -48,28 +48,28 @@ func NewKeybox() (*Keybox, error) {
 }
 
 // AddKey adds a new key to the Keybox, supporting multiple purposes.
-//
-// TODO: Do we really need a slice for this ?
-func (kb *Keybox) AddKey(armoredKey string) error {
-	key, err := crypto.NewKeyFromArmored(armoredKey)
-	if err != nil {
-		return fmt.Errorf("invalid key: %w", err)
+func (kb *Keybox) AddKey(armoredKey []string) error {
+	for _, armoredKeys := range armoredKey {
+		key, err := crypto.NewKeyFromArmored(armoredKeys)
+		if err != nil {
+			return fmt.Errorf("invalid key: %w", err)
+		}
+
+		creationDate := key.GetEntity().PrimaryKey.CreationTime.UTC().Format(time.RFC3339)
+
+		armoredWithHeader, err := kb.armorKeyWithHeader(*key)
+		if err != nil {
+			return fmt.Errorf("failed to add custom header: %w", err)
+		}
+
+		keyInfo := KeyMetadata{
+			Fingerprint:  key.GetFingerprint(),
+			CreationDate: creationDate,
+			ArmoredKey:   armoredWithHeader,
+		}
+
+		kb.Keys = append(kb.Keys, keyInfo)
 	}
-
-	creationDate := key.GetEntity().PrimaryKey.CreationTime.UTC().Format(time.RFC3339)
-
-	armoredWithHeader, err := kb.armorKeyWithHeader(*key)
-	if err != nil {
-		return fmt.Errorf("failed to add custom header: %w", err)
-	}
-
-	keyInfo := KeyMetadata{
-		Fingerprint:  key.GetFingerprint(),
-		CreationDate: creationDate,
-		ArmoredKey:   armoredWithHeader,
-	}
-
-	kb.Keys = append(kb.Keys, keyInfo)
 	return nil
 }
 

@@ -12,12 +12,17 @@ import (
 )
 
 func TestKeybox_AddKey(t *testing.T) {
+	// Sample public key
+	publicKeys := []string{
+		testPublicKey,
+	}
+
 	kb, err := gpg.NewKeybox()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if err := kb.AddKey(testPublicKey); err != nil {
+	if err := kb.AddKey(publicKeys); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if kb.KeyCount() != 1 {
@@ -26,16 +31,20 @@ func TestKeybox_AddKey(t *testing.T) {
 }
 
 func TestKeybox_SaveAndLoad(t *testing.T) {
+	// Sample public key
+	publicKeys := []string{
+		// Support multiple public key
+		testPublicKey,
+		testPublicKeyRSA2048,
+	}
+
 	kb, err := gpg.NewKeybox()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
 	// Add multiple keys to the Keybox
-	if err := kb.AddKey(testPublicKey); err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if err := kb.AddKey(testPublicKeyRSA2048); err != nil {
+	if err := kb.AddKey(publicKeys); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -79,12 +88,17 @@ func TestKeybox_SaveAndLoad(t *testing.T) {
 }
 
 func TestKeybox_GetEncryptor(t *testing.T) {
+	// Sample public key
+	publicKeys := []string{
+		testPublicKey,
+	}
+
 	kb, err := gpg.NewKeybox()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if err := kb.AddKey(testPublicKey); err != nil {
+	if err := kb.AddKey(publicKeys); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -113,16 +127,20 @@ func TestKeybox_GetEncryptor_NoKeys(t *testing.T) {
 }
 
 func TestKeybox_EncryptBeforeSave(t *testing.T) {
+	// Sample public key
+	publicKeys := []string{
+		// Support multiple public key
+		testPublicKey,
+		testPublicKeyRSA2048,
+	}
+
 	kb, err := gpg.NewKeybox()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
 	// Add multiple keys to the Keybox
-	if err := kb.AddKey(testPublicKey); err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if err := kb.AddKey(testPublicKeyRSA2048); err != nil {
+	if err := kb.AddKey(publicKeys); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
