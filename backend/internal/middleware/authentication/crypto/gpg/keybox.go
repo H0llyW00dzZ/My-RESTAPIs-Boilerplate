@@ -51,10 +51,15 @@ func (kb *Keybox) AddKey(armoredKey string) error {
 
 	creationDate := key.GetEntity().PrimaryKey.CreationTime.UTC().Format(time.RFC3339)
 
+	armoredWithHeader, err := kb.armorKeyWithHeader(*key)
+	if err != nil {
+		return fmt.Errorf("failed to add custom header: %w", err)
+	}
+
 	keyInfo := KeyMetadata{
 		Fingerprint:  key.GetFingerprint(),
 		CreationDate: creationDate,
-		ArmoredKey:   armoredKey,
+		ArmoredKey:   armoredWithHeader,
 	}
 
 	kb.Keys = append(kb.Keys, keyInfo)
@@ -138,3 +143,15 @@ func (kb *Keybox) GetEncryptor() (*Encryptor, error) {
 //
 // This method provides a safe and easy way to get the count.
 func (kb *Keybox) KeyCount() int { return len(kb.Keys) }
+
+// TODO: Implement automated version detection for improved versioning
+const keyBoxVersion = "v0.0.0-beta"
+
+func (kb *Keybox) armorKeyWithHeader(key crypto.Key) (string, error) {
+	customHeader := fmt.Sprintf("From GPG/OpenPGP Keybox ⛵ 📦 🔐 🗝️  Written In Go by H0llyW00dzZ")
+	armored, err := key.ArmorWithCustomHeaders(customHeader, keyBoxVersion)
+	if err != nil {
+		return "", fmt.Errorf("failed to armor key: %w", err)
+	}
+	return armored, nil
+}
