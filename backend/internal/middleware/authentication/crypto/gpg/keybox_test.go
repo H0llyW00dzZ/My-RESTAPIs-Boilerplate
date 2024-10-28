@@ -15,6 +15,8 @@ func TestKeybox_AddKey(t *testing.T) {
 	// Sample public key
 	publicKeys := []string{
 		testPublicKey,
+		// test duplicate public key
+		testPublicKey,
 	}
 
 	kb, err := gpg.NewKeybox()

@@ -49,10 +49,21 @@ func NewKeybox() (*Keybox, error) {
 
 // AddKey adds a new key to the Keybox, supporting multiple purposes.
 func (kb *Keybox) AddKey(armoredKey []string) error {
+	// Set of existing fingerprints to avoid duplicates.
+	existingFingerprints := make(map[string]bool)
+	for _, keyInfo := range kb.Keys {
+		existingFingerprints[keyInfo.Fingerprint] = true
+	}
+
 	for _, armoredKeys := range armoredKey {
 		key, err := crypto.NewKeyFromArmored(armoredKeys)
 		if err != nil {
 			return fmt.Errorf("invalid key: %w", err)
+		}
+
+		fingerprint := key.GetFingerprint()
+		if existingFingerprints[fingerprint] {
+			continue // Skip duplicate keys
 		}
 
 		creationDate := key.GetEntity().PrimaryKey.CreationTime.UTC().Format(time.RFC3339)
@@ -68,6 +79,7 @@ func (kb *Keybox) AddKey(armoredKey []string) error {
 			ArmoredKey:   armoredWithHeader,
 		}
 
+		existingFingerprints[fingerprint] = true
 		kb.Keys = append(kb.Keys, keyInfo)
 	}
 	return nil
