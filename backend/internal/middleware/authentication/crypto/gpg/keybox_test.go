@@ -132,6 +132,22 @@ func TestKeybox_EncryptBeforeSave(t *testing.T) {
 	}
 
 	// Log the encrypted JSON output for inspection
+	//
+	// This format will not be corrupted and provides better readability when there are many keys.
+	// For example (JSON):
+	// {
+	// 	"uuid": "1ee90424-2892-4df4-bad8-522a5a5dade6",
+	// 	"keys": [
+	// 	  {
+	// 		"encrypted": "-----BEGIN PGP MESSAGE-----\n...\n-----END PGP MESSAGE-----"
+	// 	  },
+	// 	  {
+	// 		"encrypted": "-----BEGIN PGP MESSAGE-----\n...\n-----END PGP MESSAGE-----"
+	// 	  }
+	// 	]
+	// }
+	// Also the UUID can later be used as an identifier or for other purposes as needed.
+	// It is secure, and even if someone tries to guess it, it remains a random number.
 	t.Logf("Encrypted JSON output: %s", buffer.String())
 
 	// Load the Keybox from the buffer to ensure it is correctly saved
