@@ -13,7 +13,7 @@ import (
 // GenerateFixedUUID creates a new UUID using [crypto/rand] for high randomness.
 //
 // Note: Unlike most UUID implementations bound by RFC standards,
-// this is purely random and not bound to any specific format/resource (e.g., disk, memory).
+// this is purely random and not bound to any specific format/resource (e.g., disk (serial), memory, clock, other hardware id).
 func GenerateFixedUUID() (string, error) {
 	uuid := make([]byte, 16)
 	_, err := rand.Read(uuid)
