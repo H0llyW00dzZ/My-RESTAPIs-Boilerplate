@@ -46,5 +46,7 @@ func WithCompress(compress bool) Option { return func(c *Config) { c.compress = 
 
 // WithArmor sets the option to armor the encrypted message.
 //
-// Note: Default to false to minimize memory allocation, effective for on-the-fly encryption
+// Note: Default is false to minimize memory allocation, which is effective for on-the-fly encryption (when set false).
+//
+// Learn more about how on-the-fly encryption works at: https://www.east-tec.com/kb/safebit/protecting-your-confidential-information/what-does-on-the-fly-encryption-mean/
 func WithArmor(armor bool) Option { return func(c *Config) { c.armor = armor } }
