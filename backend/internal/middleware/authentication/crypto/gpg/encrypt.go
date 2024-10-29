@@ -122,9 +122,9 @@ func (e *Encryptor) EncryptStream(i io.Reader, o io.Writer) error {
 		defer w.Close()
 		// Create a writer for the encrypted output
 		//
-		// Note: When encrypting data then send over the network, whether secure network or insecure network,
-		// additional compression is optional. This encryption process already includes built-in compression,
-		// which can help reduce bandwidth costs.
+		// Note: When encrypting data to send over the network, whether on a secure or insecure network,
+		// additional compression is optional (e.g., disable compression). This encryption process already includes built-in compression,
+		// which can help reduce bandwidth costs and also helps reduce memory usage.
 		encryptWriter, err := encryptFunc(w, metadata, nil)
 		if err != nil {
 			w.CloseWithError(fmt.Errorf("failed to create encryption stream: %w", err))
