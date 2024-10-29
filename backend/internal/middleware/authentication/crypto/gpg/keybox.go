@@ -94,6 +94,9 @@ func (kb *Keybox) AddKey(armoredKey []string) error {
 //
 // For example, handling many keys or UIDs (e.g., revoked UIDs) in armored format can be inefficient
 // because they still require processing during export/import.
+//
+// Ensure that the Save function is called to store the Keybox whenever changes are made or before
+// application shutdown to prevent data loss and facilitate seamless recovery or data transmission over the network.
 func (kb *Keybox) Save(o io.Writer) error {
 	// Now we can perform this operation over the network, especially when using Kubernetes. It's very smooth sailing.
 	pr, pw := io.Pipe()
@@ -191,6 +194,9 @@ func (kb *Keybox) armorKeyWithHeader(key crypto.Key) (string, error) {
 //   - This method ensures that keys are securely encrypted (effective for private keys) before being saved or transmitted over the network.
 //   - The encryption process uses the public keys contained within the provided Encryptor.
 //   - It is important to ensure that the Encryptor is properly initialized with valid public keys capable of encryption.
+//
+// Ensure that the EncryptBeforeSave function is called to store the Keybox whenever changes are made or before
+// application shutdown to prevent data loss and facilitate seamless recovery or data transmission over the network.
 func (kb *Keybox) EncryptBeforeSave(o io.Writer, encryptor *Encryptor) error {
 	encryptedKeys := []KeyMetadataEncrypted{}
 
