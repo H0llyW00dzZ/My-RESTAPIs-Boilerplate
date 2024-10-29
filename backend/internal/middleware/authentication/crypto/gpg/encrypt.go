@@ -6,6 +6,7 @@
 package gpg
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -152,9 +153,31 @@ func (e *Encryptor) EncryptStream(i io.Reader, o io.Writer) error {
 		}
 	}()
 
-	// Copy the encrypted data from the pipe reader to the output
-	if _, err := io.Copy(o, r); err != nil {
-		return fmt.Errorf("failed to write encrypted data to output: %w", err)
+	// Conditionally armor the message
+	if e.config.armor {
+		// Buffer to store the encrypted data for armoring
+		var encryptedBuffer bytes.Buffer
+		if _, err := io.Copy(&encryptedBuffer, r); err != nil {
+			return fmt.Errorf("failed to copy encrypted data: %w", err)
+		}
+
+		// Create a PGPMessage from the encrypted buffer
+		encryptedMessage := crypto.NewPGPMessage(encryptedBuffer.Bytes())
+
+		armored, err := encryptedMessage.GetArmoredWithCustomHeaders(customHeader, keyBoxVersion)
+		if err != nil {
+			return fmt.Errorf("failed to armor message: %w", err)
+		}
+
+		// Write the armored message to the output
+		if _, err := io.Copy(o, bytes.NewReader([]byte(armored))); err != nil {
+			return fmt.Errorf("failed to write armored message to output: %w", err)
+		}
+	} else {
+		// Copy the encrypted data from the pipe reader to the output
+		if _, err := io.Copy(o, r); err != nil {
+			return fmt.Errorf("failed to write encrypted message to output: %w", err)
+		}
 	}
 
 	return nil
