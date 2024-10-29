@@ -146,3 +146,24 @@ func FixedSizeRSA(modulusBits int) io.Reader {
 		size: byteSize,
 	}
 }
+
+// FixedSizeReader returns an [io.Reader] that generates a fixed-size random byte stream.
+//
+// Note: If the buffer size does not match the specified size, such as in the example below:
+//
+//	// Use rand.FixedSizeReader to ensure a consistent 16-byte read.
+//	reader := rand.FixedSizeReader(16)
+//	uuid := make([]byte, 10)
+//
+//	if _, err := reader.Read(uuid); err != nil {
+//	    return "", fmt.Errorf("failed to generate UUID: %w", err)
+//	}
+//
+// It will fill the buffer with 10 random bytes, and the remaining 6 bytes will be zero.
+//
+// For example:
+//
+//	Generated UUID: 14215a72-cebd-4b3a-9d98-000000000000
+func FixedSizeReader(size int) io.Reader {
+	return &fixedReader{size: size}
+}
