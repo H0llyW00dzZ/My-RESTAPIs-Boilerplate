@@ -52,6 +52,9 @@ func (e *Encryptor) extractFilename(i io.Reader, o io.Writer, suffix string) (st
 // getFilename determines the appropriate filename to use for encryption.
 // It checks whether a custom suffix should be applied and extracts the filename accordingly.
 // If a custom suffix is configured and valid, it uses that; otherwise, it defaults to ".gpg".
+//
+// Note: This helper function uses [os.File], which connects to the filesystem.
+// If files are handled differently (other way), they may reside entirely in memory and not actual on disk.
 func (e *Encryptor) getFilename(i io.Reader, o io.Writer) (string, error) {
 	if e.useCustomSuffix(i, o) {
 		return e.extractFilename(i, o, e.config.suffix)
@@ -62,6 +65,9 @@ func (e *Encryptor) getFilename(i io.Reader, o io.Writer) (string, error) {
 // useCustomSuffix checks the configuration to decide if a custom suffix should be used.
 // It returns true if the input is not a file, armor is enabled, and the output file has an extension
 // that matches the custom suffix and differs from the default.
+//
+// Note: This helper function uses [os.File], which connects to the filesystem.
+// If files are handled differently (other way), they may reside entirely in memory and not actual on disk.
 func (e *Encryptor) useCustomSuffix(i io.Reader, o io.Writer) bool {
 	// Check if the input is a file.
 	if _, ok := i.(*os.File); ok {
