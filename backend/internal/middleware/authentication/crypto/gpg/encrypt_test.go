@@ -456,7 +456,7 @@ func TestEncryptStreamFromBytesToFileWithArmored(t *testing.T) {
 	// Note: The output file should include the original file extension before ".gpg".
 	// For example, if the file is a text file, use ".txt.gpg" (e.g., filename.txt.gpg).
 	// This way, when a GPG frontend or other OpenPGP mechanism decrypts it, the result will be filename.txt.
-	outputFile, err := os.CreateTemp("C:/test/dir", "test_output_*.txt.gpg")
+	outputFile, err := os.CreateTemp("", "test_output_*.txt.gpg")
 	if err != nil {
 		t.Fatalf("Failed to create temporary output file: %v", err)
 	}
