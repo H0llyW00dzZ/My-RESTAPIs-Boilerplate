@@ -19,7 +19,7 @@ import (
 //	cpu: Intel(R) Core(TM) i9-10980HK CPU @ 2.40GHz
 //	BenchmarkEncryptLargeFile-16    	       1	4775101100 ns/op	 2476872 B/op	    6585 allocs/op
 //
-// Note that it's arround 4 ~ 5 seconds for 1GiB
+// Note that it takes around 4 to 5 seconds for 1 GiB with compression. Without compression, it allocates 1 GiB of memory and may take around 10 seconds or more.
 func BenchmarkEncryptLargeFile(b *testing.B) {
 	// Create a temporary file to encrypt
 	inputFile, err := os.CreateTemp("", "test_input_*.txt")
@@ -78,7 +78,7 @@ func BenchmarkEncryptLargeFile(b *testing.B) {
 //	cpu: Intel(R) Core(TM) i9-10980HK CPU @ 2.40GHz
 //	BenchmarkEncryptLargeStream-16    	       1	4575467300 ns/op	 2513520 B/op	    6622 allocs/op
 //
-// Note that it's arround 4 ~ 5 seconds for 1GiB
+// Note that it takes around 4 to 5 seconds for 1 GiB with compression. Without compression, it allocates 1 GiB of memory and may take around 10 seconds or more.
 func BenchmarkEncryptLargeStream(b *testing.B) {
 	// Create a temporary file to simulate large input data
 	inputFile, err := os.CreateTemp("", "test_input_*.txt")
