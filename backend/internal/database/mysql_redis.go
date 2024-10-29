@@ -108,6 +108,10 @@ type Service interface {
 	QueryRow(ctx context.Context, query string, args ...any) *sql.Row
 
 	// FiberStorage returns the [fiber.Storage] interface for storage middleware.
+	//
+	// Note: This uses Redis. For other storage options, it is recommended to implement something similar
+	// to how this is done. You can find more information at https://docs.gofiber.io/storage/.
+	// It is possible to use, for example, 5 different databases/storage options in this repository at large scale.
 	FiberStorage() fiber.Storage
 
 	// ScanAndDel uses the Redis SCAN command to iterate over a set of keys and delete them.
