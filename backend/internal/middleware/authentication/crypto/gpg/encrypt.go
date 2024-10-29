@@ -215,7 +215,7 @@ func (e *Encryptor) armorAndWrite(r io.Reader, o io.Writer) error {
 
 	// Write the armored message to the output
 	//
-	// 4807534900 ns/op & 15813712 B/op for 1GiB
+	// 4807534900 ns/op  15813712 B/op 40713 allocs/op for 1GiB
 	if _, err := io.Copy(o, strings.NewReader(armored)); err != nil {
 		return fmt.Errorf("failed to write armored message to output: %w", err)
 	}
