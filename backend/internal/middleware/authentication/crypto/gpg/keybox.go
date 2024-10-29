@@ -250,22 +250,29 @@ func (kb *Keybox) EncryptBeforeSave(o io.Writer, encryptor *Encryptor) error {
 // Note:
 //   - Ensure that the fingerprint provided is accurate and corresponds to a key
 //     currently stored in the Keybox.
-func (kb *Keybox) DeleteKey(fingerprint string) error {
-	index := -1
-	for i, key := range kb.Keys {
-		if key.Fingerprint == fingerprint {
-			index = i
-			break
-		}
+func (kb *Keybox) DeleteKey(fingerprints []string) error {
+	fingerprintMap := make(map[string]bool)
+	for _, fp := range fingerprints {
+		fingerprintMap[fp] = true
 	}
 
-	if index == -1 {
-		return fmt.Errorf("key with fingerprint %s not found", fingerprint)
-	}
+	originalCount := kb.TotalKeys
+	kb.Keys = filterKeys(kb.Keys, fingerprintMap)
+	kb.TotalKeys = kb.KeyCount()
 
-	// Remove the key from the slice
-	kb.Keys = append(kb.Keys[:index], kb.Keys[index+1:]...)
-	kb.TotalKeys-- // Decrement the total key count
+	if originalCount == kb.TotalKeys {
+		return fmt.Errorf("key with fingerprint %s not found", fingerprints)
+	}
 
 	return nil
+}
+
+func filterKeys(keys []KeyMetadata, fingerprintMap map[string]bool) []KeyMetadata {
+	filtered := keys[:0] // Reuse the original slice
+	for _, key := range keys {
+		if !fingerprintMap[key.Fingerprint] {
+			filtered = append(filtered, key)
+		}
+	}
+	return filtered
 }

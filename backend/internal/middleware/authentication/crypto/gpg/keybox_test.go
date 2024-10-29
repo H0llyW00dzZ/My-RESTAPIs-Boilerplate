@@ -218,8 +218,12 @@ func TestKeybox_DeleteKey(t *testing.T) {
 		t.Fatalf("expected 2 keys, got %d", kb.KeyCount())
 	}
 
+	testFingerprint := []string{
+		testFingerprint1,
+	}
+
 	// Delete the first key
-	err = kb.DeleteKey(testFingerprint1)
+	err = kb.DeleteKey(testFingerprint)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -230,13 +234,13 @@ func TestKeybox_DeleteKey(t *testing.T) {
 	}
 
 	// Try to delete a key that doesn't exist
-	err = kb.DeleteKey("non_existent_fingerprint")
+	err = kb.DeleteKey(testFingerprint)
 	if err == nil {
 		t.Fatal("expected error, got nil")
 	}
 
 	// Ensure the error message is correct
-	expectedErrorMsg := "key with fingerprint non_existent_fingerprint not found"
+	expectedErrorMsg := "key with fingerprint [95f9a1d43f57344ab88bfffea0f9424a7002343a] not found"
 	if err.Error() != expectedErrorMsg {
 		t.Fatalf("expected error message '%s', got '%s'", expectedErrorMsg, err.Error())
 	}
