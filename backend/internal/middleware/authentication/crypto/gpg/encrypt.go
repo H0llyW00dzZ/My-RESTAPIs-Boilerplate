@@ -6,11 +6,11 @@
 package gpg
 
 import (
-	"bytes"
 	"fmt"
 	"h0llyw00dz-template/backend/pkg/gc"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 )
@@ -213,18 +213,8 @@ func (e *Encryptor) armorAndWrite(r io.Reader, o io.Writer) error {
 		return fmt.Errorf("failed to armor message: %w", err)
 	}
 
-	// Use a new buffer for the armored message
-	armoredBuffer := gc.BufferPool.Get()
-	defer func() {
-		armoredBuffer.Reset()
-		gc.BufferPool.Put(armoredBuffer)
-	}()
-
-	// Write the armored message to the buffer
-	armoredBuffer.WriteString(armored)
-
 	// Write the armored message to the output
-	if _, err := io.Copy(o, bytes.NewReader(armoredBuffer.Bytes())); err != nil {
+	if _, err := io.Copy(o, strings.NewReader(armored)); err != nil {
 		return fmt.Errorf("failed to write armored message to output: %w", err)
 	}
 
