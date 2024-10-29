@@ -240,3 +240,39 @@ func (kb *Keybox) EncryptBeforeSave(o io.Writer, encryptor *Encryptor) error {
 
 	return nil
 }
+
+// DeleteKey removes a key from the Keybox based on its fingerprint.
+//
+// This method searches for a key with the specified fingerprint within the Keybox.
+// If the key is found, it is removed from the internal slice of keys, and the total
+// key count is decremented. If the key is not found, an error is returned.
+//
+// Note:
+//   - Ensure that the fingerprint provided is accurate and corresponds to a key
+//     currently stored in the Keybox.
+func (kb *Keybox) DeleteKey(fingerprints []string) error {
+	fingerprintMap := make(map[string]bool)
+	for _, fp := range fingerprints {
+		fingerprintMap[fp] = true
+	}
+
+	originalCount := kb.TotalKeys
+	kb.Keys = filterKeys(kb.Keys, fingerprintMap)
+	kb.TotalKeys = kb.KeyCount()
+
+	if originalCount == kb.TotalKeys {
+		return fmt.Errorf("key with fingerprint %s not found", fingerprints)
+	}
+
+	return nil
+}
+
+func filterKeys(keys []KeyMetadata, fingerprintMap map[string]bool) []KeyMetadata {
+	filtered := keys[:0] // Reuse the original slice
+	for _, key := range keys {
+		if !fingerprintMap[key.Fingerprint] {
+			filtered = append(filtered, key)
+		}
+	}
+	return filtered
+}
