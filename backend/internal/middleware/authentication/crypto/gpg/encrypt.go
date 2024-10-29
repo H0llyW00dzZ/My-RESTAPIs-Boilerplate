@@ -188,6 +188,9 @@ func (e *Encryptor) encryptArmored(armoredKey string) (string, error) {
 }
 
 // armorAndWrite handles armoring of the encrypted data and writes it to the output.
+//
+// Note: The parameters r and o refer to different I/O Operations than typical input/output (i and o).
+// This function specifically deals with reading from an intermediate [io.Reader] and writing to the final output [io.Writer].
 func (e *Encryptor) armorAndWrite(r io.Reader, o io.Writer) error {
 	// Buffer to store the encrypted data for armoring
 	var encryptedBuffer bytes.Buffer
