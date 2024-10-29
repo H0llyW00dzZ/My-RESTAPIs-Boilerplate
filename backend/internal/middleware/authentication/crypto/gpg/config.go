@@ -15,6 +15,7 @@ type Config struct {
 	compress   bool
 	isBinary   bool
 	modTime    int64
+	armor      bool
 }
 
 // NewDefaultConfig creates a default configuration.
@@ -24,6 +25,7 @@ func NewDefaultConfig() *Config {
 		compress:   true,
 		isBinary:   true,
 		modTime:    crypto.GetUnixTime(),
+		armor:      false,
 	}
 }
 
@@ -41,3 +43,8 @@ func WithAllowVerify(allowVerfy bool) Option { return func(c *Config) { c.AllowV
 
 // WithCompress sets the option to use compression during encryption.
 func WithCompress(compress bool) Option { return func(c *Config) { c.compress = compress } }
+
+// WithArmor sets the option to armor the encrypted message.
+//
+// Note: Default to false to minimize memory allocation, effective for on-the-fly encryption
+func WithArmor(armor bool) Option { return func(c *Config) { c.armor = armor } }
