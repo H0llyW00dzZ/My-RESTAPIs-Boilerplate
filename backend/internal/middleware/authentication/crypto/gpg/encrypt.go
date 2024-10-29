@@ -8,6 +8,7 @@ package gpg
 import (
 	"bytes"
 	"fmt"
+	"h0llyw00dz-template/backend/pkg/gc"
 	"io"
 	"os"
 
@@ -192,21 +193,38 @@ func (e *Encryptor) encryptArmored(armoredKey string) (string, error) {
 // Note: The parameters r and o refer to different I/O Operations than typical input/output (i and o).
 // This function specifically deals with reading from an intermediate [io.Reader] and writing to the final output [io.Writer].
 func (e *Encryptor) armorAndWrite(r io.Reader, o io.Writer) error {
-	// Buffer to store the encrypted data for armoring
-	var encryptedBuffer bytes.Buffer
-	if _, err := io.Copy(&encryptedBuffer, r); err != nil {
+	// Get a buffer from the pool
+	encryptedBuffer := gc.BufferPool.Get()
+	// Return the buffer to the pool after the function completes
+	defer func() {
+		encryptedBuffer.Reset()
+		gc.BufferPool.Put(encryptedBuffer)
+	}()
+
+	// Copy encrypted data into the buffer
+	if _, err := io.Copy(encryptedBuffer, r); err != nil {
 		return fmt.Errorf("failed to copy encrypted data: %w", err)
 	}
 
 	// Create a PGPMessage from the encrypted buffer
-	encryptedMessage := crypto.NewPGPMessage(encryptedBuffer.Bytes())
+	encryptedMessage := crypto.NewPGPMessage(encryptedBuffer.B)
 	armored, err := encryptedMessage.GetArmoredWithCustomHeaders(customHeader, keyBoxVersion)
 	if err != nil {
 		return fmt.Errorf("failed to armor message: %w", err)
 	}
 
+	// Use a new buffer for the armored message
+	armoredBuffer := gc.BufferPool.Get()
+	defer func() {
+		armoredBuffer.Reset()
+		gc.BufferPool.Put(armoredBuffer)
+	}()
+
+	// Write the armored message to the buffer
+	armoredBuffer.WriteString(armored)
+
 	// Write the armored message to the output
-	if _, err := io.Copy(o, bytes.NewReader([]byte(armored))); err != nil {
+	if _, err := io.Copy(o, bytes.NewReader(armoredBuffer.Bytes())); err != nil {
 		return fmt.Errorf("failed to write armored message to output: %w", err)
 	}
 
