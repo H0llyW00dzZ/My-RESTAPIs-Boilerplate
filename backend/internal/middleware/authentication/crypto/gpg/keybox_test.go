@@ -191,3 +191,53 @@ func TestKeybox_EncryptBeforeSave(t *testing.T) {
 		t.Fatalf("expected 2 key, got %d", loadedKb.KeyCount())
 	}
 }
+
+const (
+	testFingerprint1 = "95f9a1d43f57344ab88bfffea0f9424a7002343a"
+)
+
+func TestKeybox_DeleteKey(t *testing.T) {
+	// Sample public keys
+	publicKeys := []string{
+		testPublicKey,
+		testPublicKeyRSA2048,
+	}
+
+	kb, err := gpg.NewKeybox()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// Add keys to the Keybox
+	if err := kb.AddKey(publicKeys); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// Ensure both keys are added
+	if kb.KeyCount() != 2 {
+		t.Fatalf("expected 2 keys, got %d", kb.KeyCount())
+	}
+
+	// Delete the first key
+	err = kb.DeleteKey(testFingerprint1)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// Check if the key count is decremented
+	if kb.KeyCount() != 1 {
+		t.Fatalf("expected 1 key, got %d", kb.KeyCount())
+	}
+
+	// Try to delete a key that doesn't exist
+	err = kb.DeleteKey("non_existent_fingerprint")
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+
+	// Ensure the error message is correct
+	expectedErrorMsg := "key with fingerprint non_existent_fingerprint not found"
+	if err.Error() != expectedErrorMsg {
+		t.Fatalf("expected error message '%s', got '%s'", expectedErrorMsg, err.Error())
+	}
+}
