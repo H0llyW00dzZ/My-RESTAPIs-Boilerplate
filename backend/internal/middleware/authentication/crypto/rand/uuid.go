@@ -6,7 +6,6 @@
 package rand
 
 import (
-	"crypto/rand"
 	"fmt"
 )
 
@@ -15,9 +14,10 @@ import (
 // Note: Unlike most UUID implementations bound by RFC standards,
 // this is purely random and not bound to any specific format/resource (e.g., disk (serial), memory, clock, other hardware id).
 func GenerateFixedUUID() (string, error) {
+	// Use FixedSizeReader to ensure a consistent 16-byte read.
+	reader := FixedSizeReader(16)
 	uuid := make([]byte, 16)
-	_, err := rand.Read(uuid)
-	if err != nil {
+	if _, err := reader.Read(uuid); err != nil {
 		return "", fmt.Errorf("failed to generate UUID: %w", err)
 	}
 
@@ -25,6 +25,9 @@ func GenerateFixedUUID() (string, error) {
 	//
 	// Example:
 	// Generated UUID: 14215a72-cebd-4b3a-9d98-86cde9c261e0
+	//
+	// Note: This is similar to Google's UUID, but it does not use a pool (mutex); it directly generates random numbers.
+	// It is safe to call from multiple goroutines simultaneously.
 	uuid[6] = (uuid[6] & 0x0f) | 0x40 // Version 4
 	uuid[8] = (uuid[8] & 0x3f) | 0x80 // Variant is 10
 
