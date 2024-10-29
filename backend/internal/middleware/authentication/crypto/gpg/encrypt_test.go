@@ -456,7 +456,7 @@ func TestEncryptStreamFromBytesToFileWithArmored(t *testing.T) {
 	// Note: The output file should include the original file extension before ".gpg".
 	// For example, if the file is a text file, use ".txt.gpg" (e.g., filename.txt.gpg).
 	// This way, when a GPG frontend or other OpenPGP mechanism decrypts it, the result will be filename.txt.
-	outputFile, err := os.CreateTemp("", "test_output_*.txt.gpg")
+	outputFile, err := os.CreateTemp("C:/test/dir", "test_output_*.txt.gpg")
 	if err != nil {
 		t.Fatalf("Failed to create temporary output file: %v", err)
 	}
@@ -467,6 +467,61 @@ func TestEncryptStreamFromBytesToFileWithArmored(t *testing.T) {
 	encryptor, err := gpg.NewEncryptor(
 		publicKeys,
 		gpg.WithArmor(true),
+	)
+	if err != nil {
+		t.Fatalf("Failed to create encryptor: %v", err)
+	}
+
+	// Call the EncryptStream function
+	if err = encryptor.EncryptStream(inputBuffer, outputFile); err != nil {
+		t.Fatalf("EncryptStream failed: %v", err)
+	}
+
+	// Check if the output file has data
+	fileInfo, err := outputFile.Stat()
+	if err != nil {
+		t.Fatalf("Failed to get output file info: %v", err)
+	}
+	if fileInfo.Size() == 0 {
+		t.Fatalf("Output file is empty")
+	}
+
+	// Log the name of the output file for reference
+	t.Logf("Encrypted data written to file: %s", outputFile.Name())
+
+	// Optionally, add decryption and verification logic here
+}
+
+// Use this for local development, such as testing with different GPG keys.
+func TestEncryptStreamFromBytesToFileWithArmoredAndCustomSuffix(t *testing.T) {
+	// Sample public key
+	publicKeys := []string{
+		// Support multiple public key
+		testPublicKey,
+		testPublicKeyRSA2048,
+	}
+
+	// Create a buffer to simulate the input data
+	inputData := []byte("Hello GPG/OpenPGP From H0llyW00dzZ.")
+	inputBuffer := bytes.NewReader(inputData)
+
+	// Define the output file
+	//
+	// Note: The output file should include the original file extension before ".gpg".
+	// For example, if the file is a text file, use ".txt.gpg" (e.g., filename.txt.gpg).
+	// This way, when a GPG frontend or other OpenPGP mechanism decrypts it, the result will be filename.txt.
+	outputFile, err := os.CreateTemp("", "test_output_*.txt")
+	if err != nil {
+		t.Fatalf("Failed to create temporary output file: %v", err)
+	}
+	defer outputFile.Close()
+	// Note: Do not defer os.Remove(outputFile.Name()) to keep the file for decryption testing
+
+	// Create an Encryptor instance
+	encryptor, err := gpg.NewEncryptor(
+		publicKeys,
+		gpg.WithArmor(true),
+		gpg.WithCustomSuffix(".txt"),
 	)
 	if err != nil {
 		t.Fatalf("Failed to create encryptor: %v", err)

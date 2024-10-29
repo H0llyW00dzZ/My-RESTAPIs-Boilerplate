@@ -16,6 +16,7 @@ type Config struct {
 	isBinary   bool
 	modTime    int64
 	armor      bool
+	suffix     string
 }
 
 // NewDefaultConfig creates a default configuration.
@@ -26,6 +27,7 @@ func NewDefaultConfig() *Config {
 		isBinary:   true,
 		modTime:    crypto.GetUnixTime(),
 		armor:      false,
+		suffix:     newGPGModern,
 	}
 }
 
@@ -50,3 +52,12 @@ func WithCompress(compress bool) Option { return func(c *Config) { c.compress = 
 //
 // Learn more about how on-the-fly encryption works at: https://www.east-tec.com/kb/safebit/protecting-your-confidential-information/what-does-on-the-fly-encryption-mean/
 func WithArmor(armor bool) Option { return func(c *Config) { c.armor = armor } }
+
+// WithCustomSuffix sets a custom suffix for the output filename.
+//
+// This option is effective when armor is enabled and the input is not a file.
+// It allows you to specify a suffix other than the default ".gpg".
+// Ensure the suffix is not empty and differs from the default to apply custom behavior
+// during filename extraction. The suffix will be used if the output file has an extension
+// matching the custom suffix.
+func WithCustomSuffix(suffix string) Option { return func(c *Config) { c.suffix = suffix } }
