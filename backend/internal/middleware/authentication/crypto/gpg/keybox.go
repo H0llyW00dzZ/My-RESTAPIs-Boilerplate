@@ -26,8 +26,9 @@ type KeyMetadata struct {
 
 // Keybox manages a collection of keys that can be stored and retrieved.
 type Keybox struct {
-	UUID string        `json:"uuid"`
-	Keys []KeyMetadata `json:"keys"`
+	UUID      string        `json:"uuid"`
+	TotalKeys int           `json:"total_keys"`
+	Keys      []KeyMetadata `json:"keys"`
 }
 
 // KeyMetadataEncrypted contains metadata about a GPG/OpenPGP key, including its encrypted representation.
@@ -81,6 +82,7 @@ func (kb *Keybox) AddKey(armoredKey []string) error {
 
 		existingFingerprints[fingerprint] = true
 		kb.Keys = append(kb.Keys, keyInfo)
+		kb.TotalKeys++ // Increment the total key count
 	}
 	return nil
 }
@@ -205,13 +207,15 @@ func (kb *Keybox) EncryptBeforeSave(o io.Writer, encryptor *Encryptor) error {
 
 	// Create a temporary structure to hold the UUID and encrypted keys
 	type EncryptedKeybox struct {
-		UUID string                 `json:"uuid"`
-		Keys []KeyMetadataEncrypted `json:"keys"`
+		UUID      string                 `json:"uuid"`
+		TotalKeys int                    `json:"total_keys"`
+		Keys      []KeyMetadataEncrypted `json:"keys"`
 	}
 
 	encryptedKeybox := EncryptedKeybox{
-		UUID: kb.UUID,
-		Keys: encryptedKeys,
+		UUID:      kb.UUID,
+		TotalKeys: kb.TotalKeys,
+		Keys:      encryptedKeys,
 	}
 
 	// Now we can perform this operation over the network, especially when using Kubernetes. It's very smooth sailing.
