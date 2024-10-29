@@ -62,6 +62,7 @@ func TestKeybox_SaveAndLoad(t *testing.T) {
 	// For example (JSON):
 	// {
 	//	"uuid": "1ee90424-2892-4df4-bad8-522a5a5dade6",
+	//	"total_keys": 2,
 	// 	"keys": [
 	// 	  {
 	// 		"fingerprint": "ABC123DEF456...",
@@ -165,6 +166,7 @@ func TestKeybox_EncryptBeforeSave(t *testing.T) {
 	// For example (JSON):
 	// {
 	// 	"uuid": "1ee90424-2892-4df4-bad8-522a5a5dade6",
+	//	"total_keys": 2,
 	// 	"keys": [
 	// 	  {
 	// 		"encrypted": "-----BEGIN PGP MESSAGE-----\n...\n-----END PGP MESSAGE-----"
