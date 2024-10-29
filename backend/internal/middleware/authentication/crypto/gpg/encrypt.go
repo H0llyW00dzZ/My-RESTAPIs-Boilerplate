@@ -100,7 +100,7 @@ func (e *Encryptor) EncryptStream(i io.Reader, o io.Writer) error {
 	r, w := io.Pipe()
 
 	// Determine if the input and output I/O is a file and set the filename.
-	filename, err := extractFilename(i, o, newGPGModern)
+	filename, err := e.getFilename(i, o)
 	if err != nil {
 		return err
 	}
