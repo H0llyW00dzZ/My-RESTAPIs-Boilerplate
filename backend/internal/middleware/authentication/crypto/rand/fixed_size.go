@@ -33,11 +33,7 @@ import (
 // Also note that the fixed reader of 32 random bytes is a well-known entropy size for nonces and RSA blinding. When captured in Wireshark,
 // it is always unique. Plus, it is suitable for use by multiple goroutines because it provides an independent reader for each goroutine,
 // and the size cannot be changed or increased.
-func FixedSize32Bytes() io.Reader {
-	return &fixedReader{
-		size: 32,
-	}
-}
+func FixedSize32Bytes() io.Reader { return &fixedReader{size: 32} }
 
 // fixedReader is a custom [io.Reader] implementation that provides a fixed-size random byte stream.
 // It generates random bytes using the cryptographic random generator from the [crypto/rand] package.
@@ -164,6 +160,4 @@ func FixedSizeRSA(modulusBits int) io.Reader {
 // For example:
 //
 //	Generated UUID: 14215a72-cebd-4b3a-9d98-000000000000
-func FixedSizeReader(size int) io.Reader {
-	return &fixedReader{size: size}
-}
+func FixedSizeReader(size int) io.Reader { return &fixedReader{size: size} }
