@@ -19,7 +19,8 @@ import (
 //	cpu: Intel(R) Core(TM) i9-10980HK CPU @ 2.40GHz
 //	BenchmarkEncryptLargeFile-16    	       1	4775101100 ns/op	 2476872 B/op	    6585 allocs/op
 //
-// Note that it takes around 4 to 5 seconds for 1 GiB with compression. Without compression, it allocates 1 GiB of memory and may take around 10 seconds or more.
+// Note that with compression, it takes around 4 to 5 seconds to process 1 GiB.
+// Without compression, it may allocate 1 GiB of memory and take around 10 seconds or more.
 func BenchmarkEncryptLargeFile(b *testing.B) {
 	// Create a temporary file to encrypt
 	inputFile, err := os.CreateTemp("", "test_input_*.txt")
@@ -78,7 +79,8 @@ func BenchmarkEncryptLargeFile(b *testing.B) {
 //	cpu: Intel(R) Core(TM) i9-10980HK CPU @ 2.40GHz
 //	BenchmarkEncryptLargeStream-16    	       1	4575467300 ns/op	 2513520 B/op	    6622 allocs/op
 //
-// Note that it takes around 4 to 5 seconds for 1 GiB with compression. Without compression, it allocates 1 GiB of memory and may take around 10 seconds or more.
+// Note that with compression, it takes around 4 to 5 seconds to process 1 GiB.
+// Without compression, it may allocate 1 GiB of memory and take around 10 seconds or more.
 func BenchmarkEncryptLargeStream(b *testing.B) {
 	// Create a temporary file to simulate large input data
 	inputFile, err := os.CreateTemp("", "test_input_*.txt")
@@ -115,6 +117,73 @@ func BenchmarkEncryptLargeStream(b *testing.B) {
 
 		// Create a temporary output file
 		outputFile, err := os.CreateTemp("", "test_output_*.gpg")
+		if err != nil {
+			b.Fatalf("Failed to create temporary output file: %v", err)
+		}
+		defer os.Remove(outputFile.Name())
+
+		// Perform the encryption
+		if err = gpg.EncryptStream(inFile, outputFile); err != nil {
+			b.Fatalf("EncryptStream failed: %v", err)
+		}
+
+		// Close files
+		inFile.Close()
+		outputFile.Close()
+	}
+}
+
+// BenchmarkEncryptLargeStreamWithArmorAndCustomSuffix benchmarks the EncryptStream function for large data.
+// Average times on my laptop without overclocking:
+//
+//	goos: windows
+//	goarch: amd64
+//	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/gpg
+//	cpu: Intel(R) Core(TM) i9-10980HK CPU @ 2.40GHz
+//	BenchmarkEncryptLargeStream-16    	       1	4842444300 ns/op        15809352 B/op      40714 allocs/op
+//
+// Note that with compression, it takes around 4 to 5 seconds to process 1 GiB.
+// Without compression, it may allocate 1 GiB of memory and take around 10 seconds or more.
+func BenchmarkEncryptLargeStreamWithArmorAndCustomSuffix(b *testing.B) {
+	// Create a temporary file to simulate large input data
+	inputFile, err := os.CreateTemp("", "test_input_*.txt")
+	if err != nil {
+		b.Fatalf("Failed to create temporary input file: %v", err)
+	}
+	defer os.Remove(inputFile.Name())
+
+	// Write 1 GiB of data to the input file
+	const size = 1 << 30 // 1 GiB
+	chunkSize := 4 << 20 // 4 MiB
+	data := make([]byte, chunkSize)
+	for written := int64(0); written < size; written += int64(chunkSize) {
+		if _, err := inputFile.Write(data); err != nil {
+			b.Fatalf("Failed to write to input file: %v", err)
+		}
+	}
+	inputFile.Close()
+
+	// Create the encryptor
+	gpg, err := gpg.NewEncryptor(
+		[]string{testPublicKey},
+		gpg.WithArmor(true),
+		gpg.WithCustomSuffix(".txt"),
+	)
+	if err != nil {
+		b.Fatalf("Failed to create encryptor: %v", err)
+	}
+
+	// Run the benchmark
+	b.ResetTimer() // Reset the timer to exclude setup time
+	for i := 0; i < b.N; i++ {
+		// Reopen the input file for reading
+		inFile, err := os.Open(inputFile.Name())
+		if err != nil {
+			b.Fatalf("Failed to open input file: %v", err)
+		}
+
+		// Create a temporary output file
+		outputFile, err := os.CreateTemp("", "test_output_*.txt")
 		if err != nil {
 			b.Fatalf("Failed to create temporary output file: %v", err)
 		}
