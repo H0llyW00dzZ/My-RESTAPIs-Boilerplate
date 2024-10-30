@@ -30,7 +30,7 @@ import (
 //
 // Note: This helper function uses [os.File], which connects to the filesystem.
 // If files are handled differently (other way), they may reside entirely in memory and not actual on disk.
-func (e *Encryptor) extractFilename(i io.Reader, o io.Writer, suffix string) (string, error) {
+func (h *helper) extractFilename(i io.Reader, o io.Writer, suffix string) (string, error) {
 	// Check if the input is a file.
 	if file, ok := i.(*os.File); ok {
 		return filepath.Base(file.Name()), nil
@@ -55,11 +55,11 @@ func (e *Encryptor) extractFilename(i io.Reader, o io.Writer, suffix string) (st
 //
 // Note: This helper function uses [os.File], which connects to the filesystem.
 // If files are handled differently (other way), they may reside entirely in memory and not actual on disk.
-func (e *Encryptor) getFilename(i io.Reader, o io.Writer) (string, error) {
-	if e.useCustomSuffix(i, o) {
-		return e.extractFilename(i, o, e.config.suffix)
+func (h *helper) getFilename(i io.Reader, o io.Writer) (string, error) {
+	if h.useCustomSuffix(i, o) {
+		return h.extractFilename(i, o, h.suffix)
 	}
-	return e.extractFilename(i, o, newGPGModern)
+	return h.extractFilename(i, o, newGPGModern)
 }
 
 // useCustomSuffix checks the configuration to decide if a custom suffix should be used.
@@ -68,7 +68,7 @@ func (e *Encryptor) getFilename(i io.Reader, o io.Writer) (string, error) {
 //
 // Note: This helper function uses [os.File], which connects to the filesystem.
 // If files are handled differently (other way), they may reside entirely in memory and not actual on disk.
-func (e *Encryptor) useCustomSuffix(i io.Reader, o io.Writer) bool {
+func (h *helper) useCustomSuffix(i io.Reader, o io.Writer) bool {
 	// Check if the input is a file.
 	if _, ok := i.(*os.File); ok {
 		return false
@@ -77,7 +77,7 @@ func (e *Encryptor) useCustomSuffix(i io.Reader, o io.Writer) bool {
 	// Check if the output is a file and has an extension that matches the custom suffix.
 	if outFile, ok := o.(*os.File); ok {
 		ext := filepath.Ext(outFile.Name())
-		return e.config.armor && ext != "" && ext == e.config.suffix && e.config.suffix != newGPGModern
+		return h.armor && ext != "" && ext == h.suffix && h.suffix != newGPGModern
 	}
 
 	return false

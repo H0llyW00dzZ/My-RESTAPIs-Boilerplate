@@ -16,6 +16,15 @@ type Encryptor struct {
 	publicKey []string
 	keyInfos  []KeyInfo
 	config    *Config
+	*helper
+}
+
+// helper provides utility functions that can be embedded in other structs.
+// This allows for shared code functionality across different components without duplicating code.
+// By embedding helper, structs can access common methods easily.
+type helper struct {
+	armor  bool
+	suffix string
 }
 
 var (
@@ -74,6 +83,10 @@ func NewEncryptor(publicKeys []string, opts ...Option) (*Encryptor, error) {
 		publicKey: validKeys,
 		keyInfos:  keyInfos,
 		config:    config,
+		helper: &helper{
+			armor:  config.armor,
+			suffix: config.suffix,
+		},
 	}, nil
 }
 
