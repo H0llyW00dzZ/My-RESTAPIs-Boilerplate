@@ -552,7 +552,11 @@ func TestEncryptStreamFromBytesToFileWithArmoredAndCustomSuffix(t *testing.T) {
 // They can also be used over the network, not just with files (files are used here for testing purposes).
 func TestEncryptStreamFromBytesToFileAsync(t *testing.T) {
 	// Sample public key
-	publicKeys := []string{testPublicKey}
+	publicKeys := []string{
+		// Support multiple public key
+		testPublicKey,
+		testPublicKeyRSA2048,
+	}
 
 	// Create a buffer to simulate the input data
 	inputData := []byte("Hello GPG/OpenPGP From H0llyW00dzZ.")
@@ -577,6 +581,79 @@ func TestEncryptStreamFromBytesToFileAsync(t *testing.T) {
 
 			// Create an Encryptor instance
 			gpg, err := gpg.NewEncryptor(publicKeys)
+			if err != nil {
+				done <- fmt.Errorf("Failed to create encryptor: %v", err)
+				return
+			}
+
+			// Perform encryption
+			if err = gpg.EncryptStream(inputBuffer, outputFile); err != nil {
+				done <- fmt.Errorf("EncryptStream failed: %v", err)
+				return
+			}
+
+			// Check if the output file has data
+			fileInfo, err := outputFile.Stat()
+			if err != nil {
+				done <- fmt.Errorf("Failed to get output file info: %v", err)
+				return
+			}
+			if fileInfo.Size() == 0 {
+				done <- fmt.Errorf("Output file is empty")
+				return
+			}
+
+			// Log the name of the output file for reference
+			t.Logf("Encrypted data written to file: %s", outputFile.Name())
+
+			// Signal successful completion
+			done <- nil
+		}(i)
+	}
+
+	// Wait for all goroutines to complete
+	for i := 0; i < 5; i++ {
+		if err := <-done; err != nil {
+			t.Fatalf("Goroutine %d failed: %v", i, err)
+		}
+	}
+}
+
+func TestEncryptStreamFromBytesToFileAsyncWithArmoredAndCustomSuffix(t *testing.T) {
+	// Sample public key
+	publicKeys := []string{
+		// Support multiple public key
+		testPublicKey,
+		testPublicKeyRSA2048,
+	}
+
+	// Create a buffer to simulate the input data
+	inputData := []byte("Hello GPG/OpenPGP From H0llyW00dzZ.")
+
+	// Channel to signal completion for each goroutine
+	done := make(chan error, 5)
+
+	// Start 5 goroutines
+	for i := 0; i < 5; i++ {
+		go func(i int) {
+			// Create a new input buffer for each goroutine
+			inputBuffer := bytes.NewReader(inputData)
+
+			// Define the output file
+			outputFile, err := os.CreateTemp("", fmt.Sprintf("test_output_%d_*.txt", i))
+			if err != nil {
+				done <- fmt.Errorf("Failed to create temporary output file: %v", err)
+				return
+			}
+			defer outputFile.Close()
+			defer os.Remove(outputFile.Name())
+
+			// Create an Encryptor instance
+			gpg, err := gpg.NewEncryptor(
+				publicKeys,
+				gpg.WithArmor(true),
+				gpg.WithCustomSuffix(".txt"),
+			)
 			if err != nil {
 				done <- fmt.Errorf("Failed to create encryptor: %v", err)
 				return

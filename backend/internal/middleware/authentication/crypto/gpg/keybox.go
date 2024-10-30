@@ -256,6 +256,8 @@ func (kb *Keybox) EncryptBeforeSave(o io.Writer, encryptor *Encryptor) error {
 // Note:
 //   - Ensure that the fingerprint provided is accurate and corresponds to a key
 //     currently stored in the Keybox.
+//
+// TODO: Improve This
 func (kb *Keybox) DeleteKey(fingerprints []string) error {
 	fingerprintMap := make(map[string]bool)
 	for _, fp := range fingerprints {
