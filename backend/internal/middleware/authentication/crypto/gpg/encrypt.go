@@ -90,6 +90,9 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 // This method is efficient for sending data over a network (e.g., TCP not only HTTP or GRPC whatever it is) or writing to a file.
 // Note: Memory allocations may vary depending on the input and output types.
 // If writing to a file (file disk not a memory again), the allocations are minimal.
+//
+// TODO: Implement I/O DecryptStream for real streaming (Hybrid).
+// For example, read from an encrypted input (i) and write to a decrypted output (o).
 func (e *Encryptor) EncryptStream(i io.Reader, o io.Writer) error {
 	// Create a key ring from the public key
 	keyRing, err := e.createKeyRing()
