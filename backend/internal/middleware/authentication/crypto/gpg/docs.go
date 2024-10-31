@@ -292,4 +292,9 @@
 //     your application. If the changes are not relevant/not make any sense (e.g., deprecating certain ciphers that are still secure),
 //     consider postponing the upgrade until compatibility is ensured. Alternatively, just fork the old version and maintain it yourself,
 //     as Go programming makes this manageable.
+//
+// # This Package Compatibility:
+//
+// - It's important to note that this package does not implement decryption due to zero-access encryption principles + respect privacy on the server side, not the client side.
+// - For decryption, any client-side GPG/OpenPGP frontend should work with this encryption.
 package gpg
