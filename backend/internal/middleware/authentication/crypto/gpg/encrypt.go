@@ -95,9 +95,6 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 // If the network is unstable and disconnects during encryption, the process may not complete successfully.
 // Even if it seems complete, only part of the data may be processed,
 // as EncryptStream operates as a live stream (let's say on-the-fly encryption), which means the encryption process could be incomplete.
-//
-// TODO: Implement I/O DecryptStream for real streaming (Hybrid).
-// For example, read from an encrypted input (i) and write to a decrypted output (o).
 func (e *Encryptor) EncryptStream(i io.Reader, o io.Writer) error {
 	// Create a key ring from the public key
 	keyRing, err := e.createKeyRing()
