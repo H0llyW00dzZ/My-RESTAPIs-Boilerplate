@@ -131,7 +131,7 @@ The provided deployment files are designed to be customizable. You can modify th
 
 ### K8S Network Performance
 
-### Well-Known Issue When Running on Kubernetes (DigitalOcean)
+#### Well-Known Issue When Running on Kubernetes (DigitalOcean)
 
 ##### How to Fix the Issue
 
