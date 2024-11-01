@@ -494,6 +494,9 @@ git clone https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate.git
 > - The `Network` utilizes a `network load balancer` controlled by `Ingress Nginx`, optimizing latency for the `APAC` region, ensuring smooth sailing ⛵ ☸.
 > - The `Git SSH` should function properly as it utilizes the `TCP Service Nginx`. It is `fully secured`, making it resistant to `brute-force attacks` and `exploits` due to its `underlying logic`, which incorporates [`Elliptic Curve Cryptography (ECC)`](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography).
 
+> [!TIP]
+> For those in `Indonesia`, if you are unable to clone repositories (e.g., using `git clone`) from the [`Git Mirror (Auto Synced)`](https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate.git), try using a VPN. This issue may be related to the new load balancer, which could be blocked (by internet provider) or filtered by my firewall mechanism.
+
 ## License
 
 This project is dual-licensed under the BSD 3-Clause License and the MIT License - see the [LICENSE](LICENSE) file for details.
