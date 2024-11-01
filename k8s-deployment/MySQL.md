@@ -137,7 +137,6 @@ To resolve the well-known issue `Connection Reset by Peer` when running on Kuber
 
 ```yaml
       service.beta.kubernetes.io/do-loadbalancer-enable-backend-keepalive: "true"
-      service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
       service.beta.kubernetes.io/do-loadbalancer-hostname: db.example.com
       service.beta.kubernetes.io/do-loadbalancer-http-idle-timeout-seconds: "180"
       service.beta.kubernetes.io/do-loadbalancer-size-unit: "1"
