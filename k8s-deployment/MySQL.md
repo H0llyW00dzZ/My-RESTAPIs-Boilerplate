@@ -136,9 +136,7 @@ The provided deployment files are designed to be customizable. You can modify th
 To resolve the well-known issue `Connection Reset by Peer` when running on Kubernetes with DigitalOcean, modify your service for the Database Load Balancer (after request it) using the following YAML:
 
 ```yaml
-      service.beta.kubernetes.io/do-loadbalancer-enable-backend-keepalive: "true"
       service.beta.kubernetes.io/do-loadbalancer-hostname: db.example.com
-      service.beta.kubernetes.io/do-loadbalancer-http-idle-timeout-seconds: "180"
       service.beta.kubernetes.io/do-loadbalancer-size-unit: "1"
       service.beta.kubernetes.io/do-loadbalancer-tls-passthrough: "true"
 ```
