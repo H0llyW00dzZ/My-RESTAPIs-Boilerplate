@@ -129,7 +129,7 @@ The provided deployment files are designed to be customizable. You can modify th
 
 ## Tips
 
-### Well-Known Issue When Running on Kubernetes (DigitalOcean)
+### Well-Known Issue `Connection Reset by Peer` When Running on Kubernetes (DigitalOcean)
 
 ##### How to Fix the Issue
 

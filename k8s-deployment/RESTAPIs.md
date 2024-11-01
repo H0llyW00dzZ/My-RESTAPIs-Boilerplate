@@ -199,7 +199,7 @@ $$
 
 This means that with **22 vCPUs** available, you have sufficient capacity to handle the load of **41 Pods** while maintaining an 80% utilization target.
 
-### Well-Known Issue When Running on Kubernetes (DigitalOcean)
+### Well-Known Issue `Connection Reset by Peer` When Running on Kubernetes (DigitalOcean)
 
 ##### How to Fix the Issue
 
