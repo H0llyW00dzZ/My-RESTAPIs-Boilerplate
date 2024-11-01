@@ -127,6 +127,25 @@ Adjust the VPA configuration in the `mysql-deploy.yaml` file to suit your applic
 
 The provided deployment files are designed to be customizable. You can modify the resource limits, environment variables, and other configurations according to your application's needs.
 
+## Tips
+
+### Well-Known Issue: `Connection Reset by Peer` When Running on Kubernetes (DigitalOcean)
+
+##### How to Fix the Issue
+
+To resolve the well-known issue `Connection Reset by Peer` when running on Kubernetes with DigitalOcean, modify your service for the Database Load Balancer (after request it) using the following YAML:
+
+```yaml
+      service.beta.kubernetes.io/do-loadbalancer-hostname: db.example.com
+      service.beta.kubernetes.io/do-loadbalancer-size-unit: "1"
+      service.beta.kubernetes.io/do-loadbalancer-tls-passthrough: "true"
+```
+
+Ensure that the `service.beta.kubernetes.io/do-loadbalancer-hostname` is correctly set for your database, allowing your REST APIs to connect through it.
+
+> [!NOTE]
+> If you are using two load balancers—one for the database as a standalone (without NGINX Ingress) and the second for the application—set `service.beta.kubernetes.io/do-loadbalancer-hostname` to `service.beta.kubernetes.io/do-loadbalancer-hostname: db.example.com` for the database. This adjustment will ensure proper connectivity and help prevent "Connection Reset by Peer" errors.
+
 ## Cleanup
 
 To remove the deployed resources from your Kubernetes cluster, run the following commands:
