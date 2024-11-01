@@ -199,6 +199,28 @@ $$
 
 This means that with **22 vCPUs** available, you have sufficient capacity to handle the load of **41 Pods** while maintaining an 80% utilization target.
 
+### Well-Known Issue When Running on Kubernetes (DigitalOcean)
+
+##### How to Fix the Issue
+
+To resolve the well-known issue when running on Kubernetes with DigitalOcean, modify your service for the NGINX Ingress (after installing it) using the following YAML:
+
+```yaml
+      meta.helm.sh/release-name: ingress-nginx
+      meta.helm.sh/release-namespace: ingress-nginx
+      service.beta.kubernetes.io/do-loadbalancer-enable-backend-keepalive: "true"
+      service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
+      service.beta.kubernetes.io/do-loadbalancer-hostname: api.example.com
+      service.beta.kubernetes.io/do-loadbalancer-http-idle-timeout-seconds: "180"
+      service.beta.kubernetes.io/do-loadbalancer-size-unit: "1"
+      service.beta.kubernetes.io/do-loadbalancer-tls-passthrough: "true"
+```
+
+Make sure to modify the `service.beta.kubernetes.io/do-loadbalancer-hostname` within your REST APIs.
+
+> [!NOTE]
+> If you are using two load balancers (one for the database as a standalone without NGINX Ingress, and the second for the application), change `service.beta.kubernetes.io/do-loadbalancer-hostname` to `service.beta.kubernetes.io/do-loadbalancer-hostname: db.example.com` for the database. This will ensure proper connectivity and prevent "Connection Reset by Peer" errors.
+
 ## Cleanup
 
 To remove the deployed resources from your Kubernetes cluster, run the following commands:
