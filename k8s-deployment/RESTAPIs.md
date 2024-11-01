@@ -199,11 +199,11 @@ $$
 
 This means that with **22 vCPUs** available, you have sufficient capacity to handle the load of **41 Pods** while maintaining an 80% utilization target.
 
-### Well-Known Issue `Connection Reset by Peer` When Running on Kubernetes (DigitalOcean)
+### Well-Known Issue: `Connection Reset by Peer` When Running on Kubernetes (DigitalOcean)
 
 ##### How to Fix the Issue
 
-To resolve the well-known issue when running on Kubernetes with DigitalOcean, modify your service for the NGINX Ingress (after installing it) using the following YAML:
+To resolve the well-known issue `Connection Reset by Peer` when running on Kubernetes with DigitalOcean, modify your service for the NGINX Ingress (after installing it) using the following YAML:
 
 ```yaml
       meta.helm.sh/release-name: ingress-nginx

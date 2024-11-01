@@ -129,11 +129,11 @@ The provided deployment files are designed to be customizable. You can modify th
 
 ## Tips
 
-### Well-Known Issue `Connection Reset by Peer` When Running on Kubernetes (DigitalOcean)
+### Well-Known Issue: `Connection Reset by Peer` When Running on Kubernetes (DigitalOcean)
 
 ##### How to Fix the Issue
 
-To resolve the well-known issue when running on Kubernetes with DigitalOcean, modify your service for the Database Load Balancer (after request it) using the following YAML:
+To resolve the well-known issue `Connection Reset by Peer` when running on Kubernetes with DigitalOcean, modify your service for the Database Load Balancer (after request it) using the following YAML:
 
 ```yaml
       service.beta.kubernetes.io/do-loadbalancer-enable-backend-keepalive: "true"
