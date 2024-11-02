@@ -145,6 +145,8 @@ Ensure that the `service.beta.kubernetes.io/do-loadbalancer-hostname` is correct
 
 > [!NOTE]
 > If you are using two load balancers—one for the database as a standalone (without NGINX Ingress) and the second for the application—set `service.beta.kubernetes.io/do-loadbalancer-hostname` to `service.beta.kubernetes.io/do-loadbalancer-hostname: db.example.com` for the database. This adjustment will ensure proper connectivity and help prevent "Connection Reset by Peer" errors.
+>
+> Additionally, the `Connection Reset by Peer` error can occur when pods cannot communicate with each other or with themselves. For example, if your pod's IP is `10.0.0.1` and you try to use `curl` to access it via `example.com`, which is bound to `10.0.0.1`, you may encounter the `Connection Reset by Peer` error. However, using `curl` directly to `10.0.0.1` would work properly. This issue can arise even within the same `virtual machine`.
 
 ## Cleanup
 
