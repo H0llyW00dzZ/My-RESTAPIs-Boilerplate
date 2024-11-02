@@ -148,6 +148,10 @@ Ensure that the `service.beta.kubernetes.io/do-loadbalancer-hostname` is correct
 >
 > Additionally, the `Connection Reset by Peer` error can occur when pods cannot communicate with each other or with themselves. For example, if your pod's IP is `10.0.0.1` and you try to use `curl` to access it via `example.com`, which is bound to `10.0.0.1`, you may encounter the `Connection Reset by Peer` error. However, using `curl` directly to `10.0.0.1` would work properly. This issue can arise even within the same `virtual machine`.
 
+### Filtering IP for Load Balancer MySQL in `Kubernetes DigitalOcean (DOKS)`
+
+To filter the IPs for the MySQL load balancer, you can refer to the [`DOKS Documentation`](https://github.com/digitalocean/digitalocean-cloud-controller-manager/blob/master/docs/controllers/services/annotations.md). These documents provide an easy way to allow only specific pod IPs, which can enhance security, for example.
+
 ## Cleanup
 
 To remove the deployed resources from your Kubernetes cluster, run the following commands:
