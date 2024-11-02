@@ -70,7 +70,7 @@ kubectl get deployment -n restapis
 > [!NOTE]
 > This example shows how `Horizontal Pod Autoscaler (HPA)` works properly, handling billions of requests/workers (combined with the [worker package](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker)) `concurrently and efficiently`:
 
-- Events:
+- **Events:**
 
 ```
 12m         Normal   SuccessfulRescale   horizontalpodautoscaler/senior-golang-worker-hpa   New size: 14; reason: cpu resource utilization (percentage of request) below target
@@ -79,7 +79,7 @@ kubectl get deployment -n restapis
 58m         Normal   ScalingReplicaSet   deployment/senior-golang-worker                    Scaled up replica set senior-golang-worker-84bcb968 to 17 from 14
 ```
 
-- Describe HPA:
+- **Describe HPA:**
 
 ```
 Name:                                                  senior-golang-worker-hpa
@@ -106,7 +106,7 @@ Events:
   Normal  SuccessfulRescale  14m (x12 over 2d23h)  horizontal-pod-autoscaler  New size: 14; reason: cpu resource utilization (percentage of request) below target
 ```
 
-- Watching HPA (Stable for long-running (Smooth Sailing ⛵ ☸) processes in combination with [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker)):
+- **Watching HPA (Stable for long-running (Smooth Sailing ⛵ ☸) processes in combination with [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker)):**
 
 ```
 b0zal@Linux:~$ kubectl get hpa --watch
@@ -140,6 +140,12 @@ The `cpu: 78%/80%` going `up/down` and `REPLICAS 22` are `dynamic` (depending on
 > It's important to note that `Horizontal Pod Autoscaler (HPA)` can be used with various types of software and applications, including `websites` and `game servers`, as long as they are deployed as pods in a Kubernetes cluster. The choice between `HPA` and `Vertical Pod Autoscaler (VPA)` depends on the specific requirements and characteristics of the workload. For example, for a `game server` [Counter-Strike 2](https://www.counter-strike.net/cs2) `Community Servers`, the stability and performance may depend on factors such as server hardware, network infrastructure, and configuration (if you have a deep understanding of Kubernetes, this can be easily managed), rather than solely on the use of `HPA` or `VPA`. Based on personal experience hosting a [Counter-Strike 2](https://www.counter-strike.net/cs2) `game server` fully managed and isolated by `Kubernetes`, it was found to be more stable than the official servers provided by `Steam` or `Faceit`.
 
 Adjust the HPA configuration in the `restapis-deploy.yaml` file to suit your application's scaling requirements.
+
+- **Average CPU and Memory Usage When Idle (as viewed on Grafana):**
+
+<p align="center">
+   <img src="https://i.imgur.com/y9Ky3xZ.png" alt="fully-managed-and-isolated-by-k8s">
+</p>
 
 ## Customization
 
