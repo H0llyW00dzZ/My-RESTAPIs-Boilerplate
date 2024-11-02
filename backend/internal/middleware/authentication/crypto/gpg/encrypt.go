@@ -19,6 +19,7 @@ import (
 //
 // Note: Performance may depends on CPU and disk speed. However In K8s, this can be challenging for HPA
 // because the encryption writes to disk, not to an object that can be easily stored elsewhere (e.g., storage mechanisms by Fiber, buckets, etc.).
+// Additionally, this method may not be suitable for on-the-fly encryption, over a network. Use [EncryptStream] instead.
 func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 	// Create a key ring from the public key
 	keyRing, err := e.createKeyRing()
@@ -68,7 +69,7 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 	// Stream the data
 	//
 	// This differs from "EncryptStream" which to a object because it stream writes directly to a file, not an object.
-	buf := make([]byte, 4096) // Buffer size of 4KB
+	buf := make([]byte, e.config.chunkSize) // Buffer size of 4KB
 	for {
 		n, err := inFile.Read(buf)
 		if err != nil && err != io.EOF {
@@ -94,7 +95,7 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 // Important: When using [EncryptStream] over a network, ensure the network is stable.
 // If the network is unstable and disconnects during encryption, the process may not complete successfully.
 // Even if it seems complete, only part of the data may be processed,
-// as EncryptStream operates as a live stream (let's say on-the-fly encryption), which means the encryption process could be incomplete.
+// as [EncryptStream] operates as a live stream (let's say on-the-fly encryption), which means the encryption process could be incomplete.
 func (e *Encryptor) EncryptStream(i io.Reader, o io.Writer) error {
 	// Create a key ring from the public key
 	keyRing, err := e.createKeyRing()
@@ -141,7 +142,7 @@ func (e *Encryptor) EncryptStream(i io.Reader, o io.Writer) error {
 
 		// Note: The buffer size of 4096 bytes is suitable for streaming encryption.
 		// It allows processing of large files or whole disk efficiently without loading the entire file into memory.
-		buffer := make([]byte, 4096) // Define a buffer size
+		buffer := make([]byte, e.config.chunkSize) // Define a buffer size
 		for {
 			n, err := i.Read(buffer)
 			if err != nil && err != io.EOF {
