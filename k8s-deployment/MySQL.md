@@ -152,6 +152,31 @@ Ensure that the `service.beta.kubernetes.io/do-loadbalancer-hostname` is correct
 
 To filter the IPs for the MySQL load balancer, you can refer to the [`DOKS Documentation`](https://github.com/digitalocean/digitalocean-cloud-controller-manager/blob/master/docs/controllers/services/annotations.md). These documents provide an easy way to allow only specific pod IPs, which can enhance security, for example.
 
+- **Example of Whitelisting in DOKS**:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: database
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  loadBalancerSourceRanges:
+    - 127.0.0.1/32
+    # For example 0.0.0.0 it's my home
+    - 0.0.0.0/32
+  selector:
+    app: mysql
+```
+
+> [!NOTE]
+> In DOKS, `load balancers` are external and not built into Kubernetes itself. The `127.0.0.1/32` serves as a placeholder for public IPs from the nodes (`virtual machines known as droplets`). The `/32` CIDR represents a single IP ([RFC4632](https://datatracker.ietf.org/doc/html/rfc4632)). You must use CIDR notation, as formats like `- 127.0.0.1, 127.0.0.2` are not valid. This can be challenging if you have multiple nodes with different public IPs that are not from a CIDR pool.
+
 ## Cleanup
 
 To remove the deployed resources from your Kubernetes cluster, run the following commands:
