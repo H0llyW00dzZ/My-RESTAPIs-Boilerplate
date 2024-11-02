@@ -177,6 +177,17 @@ spec:
 > [!NOTE]
 > In DOKS, `load balancers` are external and not built into Kubernetes itself. The `127.0.0.1/32` serves as a placeholder for public IPs from the nodes (`virtual machines known as droplets`). The `/32` CIDR represents a single IP ([RFC4632](https://datatracker.ietf.org/doc/html/rfc4632)). You must use CIDR notation, as formats like `- 127.0.0.1, 127.0.0.2` are not valid. This can be challenging if you have multiple nodes with different public IPs that are not from a CIDR pool.
 
+When IP whitelisting/filtering through [CIDR](https://datatracker.ietf.org/doc/html/rfc4632) is successful, external networks will be unable to connect, as shown below:
+
+<p align="center">
+<img src="https://i.imgur.com/oiDBzgC.png" alt="unable-to-connect" width="500">
+</p>
+
+This means only networks within the cluster, including all pods, can connect.
+
+> [!NOTE]
+> It's important to ensure that your cluster, especially if using autoscaling (auto-pilot), is built within a CIDR pool. This way, when it grows with HPA, you won't need to manually whitelist/filter IPs one by one, as is typical with traditional cluster management hahahaha.
+
 ## Cleanup
 
 To remove the deployed resources from your Kubernetes cluster, run the following commands:
