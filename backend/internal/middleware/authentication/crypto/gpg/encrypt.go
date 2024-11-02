@@ -68,7 +68,7 @@ func (e *Encryptor) EncryptFile(inputFile, outputFile string) (err error) {
 	// Stream the data
 	//
 	// This differs from "EncryptStream" which to a object because it stream writes directly to a file, not an object.
-	buf := make([]byte, 4096) // Buffer size of 4KB
+	buf := make([]byte, e.config.chunkSize) // Buffer size of 4KB
 	for {
 		n, err := inFile.Read(buf)
 		if err != nil && err != io.EOF {
@@ -141,7 +141,7 @@ func (e *Encryptor) EncryptStream(i io.Reader, o io.Writer) error {
 
 		// Note: The buffer size of 4096 bytes is suitable for streaming encryption.
 		// It allows processing of large files or whole disk efficiently without loading the entire file into memory.
-		buffer := make([]byte, 4096) // Define a buffer size
+		buffer := make([]byte, e.config.chunkSize) // Define a buffer size
 		for {
 			n, err := i.Read(buffer)
 			if err != nil && err != io.EOF {

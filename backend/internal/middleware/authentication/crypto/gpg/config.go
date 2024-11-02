@@ -17,6 +17,7 @@ type Config struct {
 	modTime    int64
 	armor      bool
 	suffix     string
+	chunkSize  int
 }
 
 // NewDefaultConfig creates a default configuration.
@@ -28,6 +29,7 @@ func NewDefaultConfig() *Config {
 		modTime:    crypto.GetUnixTime(),
 		armor:      false,
 		suffix:     newGPGModern,
+		chunkSize:  4096,
 	}
 }
 
@@ -68,3 +70,17 @@ func WithArmor(armor bool) Option { return func(c *Config) { c.armor = armor } }
 // during filename extraction. The suffix will be used if the output file has an extension
 // matching the custom suffix.
 func WithCustomSuffix(suffix string) Option { return func(c *Config) { c.suffix = suffix } }
+
+// WithCustomChunkSize sets a custom chunk size for encryption operations.
+//
+// This option allows to specify the size of data chunks used during
+// on-the-fly encryption, which is particularly useful when streaming
+// data over a network. The default chunk size is 4096 bytes, chosen to
+// balance memory usage and performance.
+//
+// Considerations:
+//   - Larger chunk sizes may improve throughput on stable networks but
+//     can increase latency on unstable connections.
+//   - Adjust the chunk size based on the nature of the data and network
+//     conditions to optimize performance.
+func WithCustomChunkSize(chunkSize int) Option { return func(c *Config) { c.chunkSize = chunkSize } }
