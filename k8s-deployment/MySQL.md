@@ -152,7 +152,7 @@ Ensure that the `service.beta.kubernetes.io/do-loadbalancer-hostname` is correct
 
 To filter the IPs for the MySQL load balancer, you can refer to the [`DOKS Documentation`](https://github.com/digitalocean/digitalocean-cloud-controller-manager/blob/master/docs/controllers/services/annotations.md). These documents provide an easy way to allow only specific pod IPs, which can enhance security, for example.
 
-- **Example of Whitelisting in DOKS**:
+- **Example of Whitelisting/Filtering IP in DOKS**:
 
 ```yaml
 apiVersion: v1
