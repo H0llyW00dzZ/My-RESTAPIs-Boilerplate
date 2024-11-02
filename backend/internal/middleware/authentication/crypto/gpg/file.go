@@ -28,7 +28,7 @@ import (
 //   - Symmetric Encryption Algorithm: AES256.CFB
 //   - German Encryption Standards: false
 //
-// Note: This helper function uses [os.File], which connects to the filesystem.
+// Note: This helper function uses [os.File], which connects the code to the filesystem for I/O operations.
 // If files are handled differently (other way), they may reside entirely in memory and not actual on disk.
 func (h *helper) extractFilename(i io.Reader, o io.Writer, suffix string) (string, error) {
 	// Check if the input is a file.
@@ -53,7 +53,7 @@ func (h *helper) extractFilename(i io.Reader, o io.Writer, suffix string) (strin
 // It checks whether a custom suffix should be applied and extracts the filename accordingly.
 // If a custom suffix is configured and valid, it uses that; otherwise, it defaults to ".gpg".
 //
-// Note: This helper function uses [os.File], which connects to the filesystem.
+// Note: This helper function uses [os.File], which connects the code to the filesystem for I/O operations.
 // If files are handled differently (other way), they may reside entirely in memory and not actual on disk.
 func (h *helper) getFilename(i io.Reader, o io.Writer) (string, error) {
 	if h.useCustomSuffix(i, o) {
@@ -66,7 +66,7 @@ func (h *helper) getFilename(i io.Reader, o io.Writer) (string, error) {
 // It returns true if the input is not a file, armor is enabled, and the output file has an extension
 // that matches the custom suffix and differs from the default.
 //
-// Note: This helper function uses [os.File], which connects to the filesystem.
+// Note: This helper function uses [os.File], which connects the code to the filesystem for I/O operations.
 // If files are handled differently (other way), they may reside entirely in memory and not actual on disk.
 func (h *helper) useCustomSuffix(i io.Reader, o io.Writer) bool {
 	// Check if the input is a file.
