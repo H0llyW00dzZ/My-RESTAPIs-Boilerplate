@@ -496,6 +496,8 @@ git clone https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate.git
 
 > [!TIP]
 > For those in `Indonesia`, if you are unable to clone repositories (e.g., using `git clone`) from the [`Git Mirror (Auto Synced)`](https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate.git), try using a VPN. This issue may be related to the new load balancer, which could be blocked (by internet provider) or filtered by my firewall mechanism.
+>
+> It is also more faster with the new load balancer, even when using a VPN (`e.g., VPN in Singapore, Indonesia, Malaysia, and other APAC regions`), and this improvement applies to both `mobile devices and desktops`, which incorporate [`Elliptic Curve Cryptography (ECC)`](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography) for `HTTPS/TLS`.
 
 ## License
 
