@@ -238,7 +238,7 @@ To set up a DOKS external load balancer hostname that allows pods to communicate
    service.beta.kubernetes.io/do-loadbalancer-hostname: host.example.com
    ```
 
-2. In `host.example.com`, set the DNS A record with the IP of the ingress load balancer to `host.example.com`.
+2. In `host.example.com`, set the [DNS A record](https://www.cloudflare.com/learning/dns/dns-records/dns-a-record/) with the IP of the ingress load balancer to `host.example.com`.
 
 3. When creating multiple ingresses across different services, you don't need to set each domain to an IP address. Instead, use a [CNAME](https://www.cloudflare.com/learning/dns/dns-records/dns-cname-record/) record pointing to `host.example.com`.
 
