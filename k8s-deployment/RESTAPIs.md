@@ -254,6 +254,23 @@ To set up a DOKS external load balancer hostname that allows pods to communicate
 > [!TIP]
 > To enhance the hostname, you can create a random name, for example, using a SHA-256 digest, such as `936a185caaa266bb9cbe981e9e05cb78cd732b0b3280eb944412bb6f8f8f07af.example.com`.
 
+### Enhance REST API Concurrency with HPA on DOKS Using an External Load Balancer for Ingress-nginx
+
+To enhance REST API concurrency with HPA on DOKS using an external load balancer for `Ingress-nginx`.
+
+Make sure you adjust the load balancer size unit as needed in the `nginx-ingress service` by following this YAML configuration:
+
+```yaml
+meta.helm.sh/release-name: ingress-nginx
+meta.helm.sh/release-namespace: ingress-nginx
+service.beta.kubernetes.io/do-loadbalancer-size-unit: "1"
+```
+
+For example, if you have multiple APIs (`e.g., api1.example.com, api2.example.com, api3.example.com`) in one `ingress-nginx service`, replace `service.beta.kubernetes.io/do-loadbalancer-size-unit: "1"` with `service.beta.kubernetes.io/do-loadbalancer-size-unit: "3"`.
+
+> [!NOTE]
+> In DOKS, you won't incur high costs for Kubernetes resources like nodes (`e.g., virtual machines known as Droplets`). Based on my personal experience, most spending is for the load balancer, as it efficiently manages resource usage such as `CPU and memory`.
+
 ## Cleanup
 
 To remove the deployed resources from your Kubernetes cluster, run the following commands:
