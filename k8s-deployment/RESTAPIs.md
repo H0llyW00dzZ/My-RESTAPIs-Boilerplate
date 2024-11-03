@@ -147,6 +147,15 @@ Adjust the HPA configuration in the `restapis-deploy.yaml` file to suit your app
    <img src="https://i.imgur.com/y9Ky3xZ.png" alt="fully-managed-and-isolated-by-k8s">
 </p>
 
+- **Average CPU (on AMD) and Memory Usage During Smooth Sailing ⛵ ☸ in Combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) (as viewed on Grafana):**
+
+<p align="center">
+   <img src="https://i.imgur.com/4u7i9VV.png" alt="fully-managed-and-isolated-by-k8s">
+   <img src="https://i.imgur.com/x5oRx7h.png" alt="fully-managed-and-isolated-by-k8s">
+</p>
+
+As you can see, the memory usage is dynamic yet `stable and predictable`, unlike static memory usage where CPU growth affects all memory uniformly. This ensures smooth sailing ⛵ ☸, thanks to a new Go package called [`Unique`](https://pkg.go.dev/unique).
+
 ## Customization
 
 The provided deployment files are designed to be customizable. You can modify the resource limits, environment variables, and other configurations according to your application's needs. Additionally, you can adjust the Ingress configuration to match your desired routing rules and TLS settings.
