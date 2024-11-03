@@ -229,6 +229,22 @@ Make sure to modify the `service.beta.kubernetes.io/do-loadbalancer-hostname` wi
 >
 > Additionally, the `Connection Reset by Peer` error can occur when pods cannot communicate with each other or with themselves. For example, if your pod's IP is `10.0.0.1` and you try to use `curl` to access it via `example.com`, which is bound to `10.0.0.1`, you may encounter the `Connection Reset by Peer` error. However, using `curl` directly to `10.0.0.1` would work properly. This issue can arise even within the same `virtual machine`.
 
+### Setup DOKS External Load Balancer Hostname for Ingress-NGINX
+
+To set up a DOKS external load balancer hostname that allows pods to communicate and prevents the error `Connection Reset by Peer`, follow these steps. This setup enables any domain based on DNS.
+
+1. Ensure you replace `service.beta.kubernetes.io/do-loadbalancer-hostname: api.example.com` with `service.beta.kubernetes.io/do-loadbalancer-hostname: host.example.com`:
+   ```yaml
+   service.beta.kubernetes.io/do-loadbalancer-hostname: host.example.com
+   ```
+
+2. In `host.example.com`, set the DNS A record with the IP of the ingress load balancer to `host.example.com`.
+
+3. When creating multiple ingresses across different services, you don't need to set each domain to an IP address. Instead, use a CNAME record pointing to `host.example.com`.
+
+> [!TIP]
+> To enhance the hostname, you can create a random name, for example, using a SHA-256 digest, such as `936a185caaa266bb9cbe981e9e05cb78cd732b0b3280eb944412bb6f8f8f07af.example.com`.
+
 ## Cleanup
 
 To remove the deployed resources from your Kubernetes cluster, run the following commands:
