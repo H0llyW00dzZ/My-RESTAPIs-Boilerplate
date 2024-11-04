@@ -158,6 +158,11 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
 
 > [!NOTE]
 > Note that the memory usage is dynamic. For example, if one of the pods reaches 100 MiB, it will not increase further due to the built-in garbage collection mechanisms in [`Unique`](https://pkg.go.dev/unique). This makes the usage predictable. For instance, if there are 5 pods each using 100 MiB, the total would be 500 MiB. Additionally, memory is used because of the Horizontal Pod Autoscaler (HPA). It's not feasible to bind a disk to many pods, and even when some cloud providers support it, it's typically limited to a few pods and can be more expensive, unless you build your own capable storage mechanism to navigate these challenges effectively. Then it will be very smooth sailing, this a Black Pearl ship, by reducing memory usage to zero allocation.
+>
+> Furthermore, due to the dynamic nature of memory usage while using [`Unique`](https://pkg.go.dev/unique), it is particularly suitable for HPA because its RSS primarily reflects memory usage rather than cache usage. This contrasts with stateful applications, which require disk attachment and often necessitate deployment as a single pod.
+>
+> For control in combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker), you only need to adjust CPU settings because the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) consumes CPU due to its concurrency.
+> The [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) can also be suitable if your Go package or function has minimal memory allocation, allowing you to focus primarily on CPU usage.
 
 ## Customization
 
