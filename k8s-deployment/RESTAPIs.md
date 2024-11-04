@@ -156,6 +156,9 @@ Adjust the HPA configuration in the `restapis-deploy.yaml` file to suit your app
 
 As you can see, the memory usage is dynamic yet `stable and predictable`, unlike static memory usage where CPU growth affects all memory uniformly. This ensures smooth sailing ⛵ ☸, thanks to a new Go package called [`Unique`](https://pkg.go.dev/unique).
 
+> [!NOTE]
+> Note that the memory usage is dynamic. For example, if one of the pods reaches 100 MiB, it will not increase further due to the built-in garbage collection mechanisms in [`Unique`](https://pkg.go.dev/unique). This makes the usage predictable. For instance, if there are 5 pods each using 100 MiB, the total would be 500 MiB. Additionally, memory is used because of the Horizontal Pod Autoscaler (HPA). It's not feasible to bind a disk to many pods, and even when some cloud providers support it, it's typically limited to a few pods and can be more expensive, unless you build your own capable storage mechanism to navigate these challenges effectively. Then it will be very smooth sailing, this a Black Pearl ship, by reducing memory usage to zero allocation.
+
 ## Customization
 
 The provided deployment files are designed to be customizable. You can modify the resource limits, environment variables, and other configurations according to your application's needs. Additionally, you can adjust the Ingress configuration to match your desired routing rules and TLS settings.
