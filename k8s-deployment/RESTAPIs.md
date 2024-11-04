@@ -275,12 +275,12 @@ For example, if you have multiple APIs (`e.g., api1.example.com, api2.example.co
 
 To set up HTTPS/TLS on DOKS for Ingress-nginx across multiple services in one ingress-nginx, for example with [`cert-manager.io`](https://cert-manager.io/), follow these steps after resolving the `Connection Reset by Peer` issue:
 
-- [x] Well-Known Issue: `Connection Reset by Peer` When Running on Kubernetes (DigitalOcean)
-- [x] Setup DOKS External Load Balancer Hostname for Ingress-NGINX
+- [x] [Well-Known Issue: `Connection Reset by Peer` When Running on Kubernetes (DigitalOcean)](RESTAPIs.md#well-known-issue-connection-reset-by-peer-when-running-on-kubernetes-digitalocean)
+- [x] [Setup DOKS External Load Balancer Hostname for Ingress-NGINX](RESTAPIs.md#setup-doks-external-load-balancer-hostname-for-ingress-nginx)
 
 Once resolved, you can set up HTTPS/TLS easily without further issues.
 
-For setting up HTTPS/TLS, I personally don't use [`cert-manager.io`](https://cert-manager.io/) because I already have a certificate issued by [`sectigo.com`](https://www.sectigo.com/). The certificate is a wildcard and uses ECC.
+For setting up HTTPS/TLS, I personally don't use [`cert-manager.io`](https://cert-manager.io/) because I already have a certificate issued by [`sectigo.com`](https://www.sectigo.com/). The certificate is a wildcard and uses [ECC](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography).
 
 For example, the certificate I've been using:
 
