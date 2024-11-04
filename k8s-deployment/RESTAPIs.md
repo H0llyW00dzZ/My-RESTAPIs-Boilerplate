@@ -289,6 +289,10 @@ For example, the certificate I've been using:
 > [!NOTE]
 > The current certificate I am using is `highly trustworthy`, reflecting a healthy ecosystem, as indicated by the Certificate Transparency Log linked above.
 
+> [!TIP]
+> Since this repository supports HTTPS/TLS with certificates issued by [cert-manager.io](https://cert-manager.io/) by binding the TLS secrets provided by cert-manager.io. For a sample deployment, see [here](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/k8s-deployment/restapis-deploy.yaml).
+> This setup allows for HTTPS/TLS without terminating at ingress-nginx. I personally use this method without cert-manager.io (I already have a certificate issued by [`sectigo.com`](https://www.sectigo.com/)) to avoid concurrency issues.
+
 ## Cleanup
 
 To remove the deployed resources from your Kubernetes cluster, run the following commands:
