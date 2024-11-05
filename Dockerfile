@@ -1,5 +1,5 @@
-# This Docker boilerplate has no shell access, mostly because this repository does not rely on the operating system,
-# only on the resources of the machine server such as CPU, memory, network, and disk.
+# This Docker boilerplate does not provide shell access, primarily because this repository does not depend on the operating system.
+# Instead, it relies solely on the server's resources, such as CPU, memory, network, and disk (for serving static files for the front-end site).
 #
 # Use the official Golang image to create a build artifact.
 # This is a multi-stage build. This stage is named 'builder'.
