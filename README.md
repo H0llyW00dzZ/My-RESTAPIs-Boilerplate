@@ -218,16 +218,19 @@ frontend/
 │   ├── cmd
 │   │   └── server
 │   │       ├── run.go
-│   │       └── run_heroku.go
+│   │       ├── run_heroku.go
+│   │       └── run_tls_fips.go
 │   ├── internal
 │   │   ├── database
 │   │   │   ├── auth.go
+│   │   │   ├── backup.go
 │   │   │   ├── cloudflare-kv
 │   │   │   │   └── setup.go
 │   │   │   ├── constant.go
 │   │   │   ├── helper.go
 │   │   │   ├── mysql_redis.go
 │   │   │   ├── setup.go
+│   │   │   ├── sql_injection_test.go
 │   │   │   └── tls.go
 │   │   ├── logger
 │   │   │   ├── constant.go
@@ -252,6 +255,18 @@ frontend/
 │   │   │   │   │   │       ├── docs.go
 │   │   │   │   │   │       ├── gopherkey.go
 │   │   │   │   │   │       └── gopherkey_test.go
+│   │   │   │   │   ├── gpg
+│   │   │   │   │   │   ├── benchmark_test.go
+│   │   │   │   │   │   ├── config.go
+│   │   │   │   │   │   ├── docs.go
+│   │   │   │   │   │   ├── encrypt.go
+│   │   │   │   │   │   ├── encrypt_test.go
+│   │   │   │   │   │   ├── file.go
+│   │   │   │   │   │   ├── key_info.go
+│   │   │   │   │   │   ├── key_ring.go
+│   │   │   │   │   │   ├── keybox.go
+│   │   │   │   │   │   ├── keybox_test.go
+│   │   │   │   │   │   └── new.go
 │   │   │   │   │   ├── helper.go
 │   │   │   │   │   ├── hybrid
 │   │   │   │   │   │   ├── decryptcookie.go
@@ -276,15 +291,22 @@ frontend/
 │   │   │   │   │   │   ├── keyidentifier_test.go
 │   │   │   │   │   │   └── new.go
 │   │   │   │   │   ├── rand
+│   │   │   │   │   │   ├── benchmark_test.go
 │   │   │   │   │   │   ├── fixed_size.go
-│   │   │   │   │   │   └── rand_test.go
+│   │   │   │   │   │   ├── rand_test.go
+│   │   │   │   │   │   └── uuid.go
 │   │   │   │   │   ├── vault
 │   │   │   │   │   │   ├── new.go
 │   │   │   │   │   │   └── transit.go
-│   │   │   │   │   └── web3
-│   │   │   │   │       └── eth
-│   │   │   │   │           ├── docs.go
-│   │   │   │   │           └── new.go
+│   │   │   │   │   ├── web3
+│   │   │   │   │   │   └── eth
+│   │   │   │   │   │       ├── docs.go
+│   │   │   │   │   │       └── new.go
+│   │   │   │   │   └── webauthn
+│   │   │   │   │       ├── docs.go
+│   │   │   │   │       ├── login.go
+│   │   │   │   │       ├── protocol.go
+│   │   │   │   │       └── registration.go
 │   │   │   │   ├── helper
 │   │   │   │   │   ├── constant.go
 │   │   │   │   │   └── keyauth.go
@@ -298,6 +320,7 @@ frontend/
 │   │   │   │   ├── config.go
 │   │   │   │   ├── csp_test.go
 │   │   │   │   └── new.go
+│   │   │   ├── custom_logger_tag.go
 │   │   │   ├── custom_next.go
 │   │   │   ├── filesystem
 │   │   │   │   └── crypto
@@ -307,6 +330,8 @@ frontend/
 │   │   │   │           └── hmac_verify.go
 │   │   │   ├── frontend_routes.go
 │   │   │   ├── helper.go
+│   │   │   ├── init.go
+│   │   │   ├── lb_test.go
 │   │   │   ├── monitor
 │   │   │   │   ├── docs.go
 │   │   │   │   └── prometheus.go
@@ -344,7 +369,8 @@ frontend/
 │       ├── gc
 │       │   ├── docs.go
 │       │   ├── reduce_http_client_overhead.go
-│       │   └── reduce_overhead.go
+│       │   ├── reduce_overhead.go
+│       │   └── unique.go
 │       ├── header
 │       │   └── htmx
 │       │       ├── constant.go
@@ -441,6 +467,7 @@ frontend/
 │       │       ├── htmx.min.js
 │       │       └── tailwind.min.dark.js
 │       └── magic_embedded.go
+├── gcloud-builds.yaml
 ├── go.mod
 ├── go.sum
 ├── k8s-deployment
@@ -452,6 +479,8 @@ frontend/
 │   ├── ingress-nginx-configmap.yaml
 │   ├── mysql-deploy-cpu-boost.yaml
 │   ├── mysql-deploy.yaml
+│   ├── mysql-storage-eks.yaml
+│   ├── mysql-storage-gke.yaml
 │   ├── prometheus_portable.yaml
 │   ├── prometheus_portable_rules_record.yaml
 │   ├── redis-insight.yaml
@@ -466,7 +495,7 @@ frontend/
     ├── jobs.go
     └── worker_test.go
 
-63 directories, 192 files
+66 directories, 219 files
 ```
 
 > [!NOTE]
