@@ -60,6 +60,9 @@ const (
 	// Set this environment variable to "true" to prevent the server from accepting insecure HTTP connections.
 	// This enhances security by ensuring that only secure connections (HTTPS/TLS) are accepted.
 	DISABLEDEFAULTPORTHTTP = "DISABLE_PORT_HTTPINSECURE"
+	// Note: This for mTLS (Optional)
+	SERVERCATLS = "TLS_CA_FILE"
+	ENABLEMTLS  = "ENABLE_MTLS"
 )
 
 // Site Middleware Configuration (Optional since it boilerplate and must rewrite a "DomainRouter" in RegisterRoutes (see backend/internal/middleware/routes.go))

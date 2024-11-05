@@ -6,9 +6,8 @@
 package main
 
 import (
-	"crypto/tls"
 	"fmt"
-	"os"
+	setupTLS "h0llyw00dz-template/backend/internal/middleware/authentication/crypto/tls"
 	"time"
 
 	"github.com/bytedance/sonic"
@@ -127,46 +126,17 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 	// Create a new instance of FiberServer
 	server := handler.NewFiberServer(app, appName, monitorPath)
 
-	// Load TLS certificate and key from environment variables or command-line arguments
+	// Load TLS or mTLS certificates and keys from environment variables or command-line arguments ?
 	//
-	// TODO: ACME Implementations ?
-	tlsCertFile := env.GetEnv(env.SERVERCERTTLS, "")
-	tlsKeyFile := env.GetEnv(env.SERVERKEYTLS, "")
-
-	var tlsConfig *tls.Config
-	if tlsCertFile != "" && tlsKeyFile != "" {
-		// Note: Fiber uses ECC is significantly faster compared to Nginx uses ECC, which struggles to handle a billion concurrent requests.
-		cert, err := tls.LoadX509KeyPair(tlsCertFile, tlsKeyFile)
-		if err != nil {
-			log.LogError(err)
-			os.Exit(1)
-		}
-
-		// Note: For ECC the OCSP, it's optional if explicitly set to TLSv1.3 and used in internal mode.
-		// However, if it's used externally and allows TLSv1.2, then OCSP should be configured, provided that
-		// there is knowledge on how to set it up.
-		//
-		// For an example of OCSP stapling and TLSv1.2 configuration (using "nginx.ingress.kubernetes.io/backend-protocol: HTTPS", enable-ocsp) that follows best practices for securing websites, see:
-		//
-		// - https://www.immuniweb.com/ssl/git.b0zal.io/KRIX2G2F/ (most all green)
-		// - https://www.immuniweb.com/ssl/api.b0zal.io/VPdKSN3p/ (most all green)
-		// - https://decoder.link/sslchecker/git.b0zal.io/443
-		// - https://decoder.link/sslchecker/b0zal.io/443 (from this repository boilerplate is used for sandbox development exposed to public/prods)
-		// - https://decoder.link/sslchecker/api.b0zal.io/443 (from this repository boilerplate is used for sandbox development exposed to public/prods)
-		//
-		// Additionally, note that if "enable-ocsp" is set to true in the Ingress Nginx ConfigMap, OCSP Stapling remains optional.
-		// This is because when Nginx passes requests to HTTPS/TLS related to this service without terminating it,
-		// as long as the certificate is the same for both Ingress and this service, OCSP Stapling can still be utilized.
-		// If your cluster has any Kubernetes network mechanism that doesn't work with these configurations (e.g., nginx.ingress.kubernetes.io/backend-protocol: HTTPS, enable-ocsp),
-		// then there may be an issue with your Kubernetes network configuration.
-		tlsConfig = &tls.Config{
-			Certificates: []tls.Certificate{cert},
-		}
+	// TODO: Implement ACME?
+	tlsConfig, err := setupTLS.LoadConfig()
+	if err != nil {
+		log.LogFatal(err)
 	}
 
 	// Start the server with graceful shutdown and monitor
 	if tlsConfig != nil {
-		// Start the server with TLS
+		// Start the server with TLS or mTLS ?
 		handler.StartServer(server, addr, monitorPath, shutdownTimeout, tlsConfig, nil)
 	} else {
 		// Start the server without TLS
