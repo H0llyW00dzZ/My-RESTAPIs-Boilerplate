@@ -31,6 +31,9 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /restapis ./backe
 
 # Use a Docker multi-stage build to create a lean production image.
 # https://docs.docker.com/develop/develop-images/multistage-build/
+#
+# Note: Consider using a minimalist image that does not rely on the operating system. The only dependency needed for this repository is the ca-certificates package,
+# in case you need to make calls to HTTPS endpoints.
 FROM alpine:latest
 
 # Install the ca-certificates alpine package in case you need to make calls to HTTPS endpoints.
