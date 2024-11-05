@@ -95,6 +95,17 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 			if err != nil {
 				log.LogFatal(err)
 			}
+
+			// Note: This TLS handler mechanism uses a pointer to tlsHandler.GetClientInfo,
+			// allowing it to be bound here, for example:
+			//
+			// tlsConfig.GetCertificate = tlsHandler.GetClientInfo
+			// However, this is optional. In Kubernetes with Ingress-nginx, you typically don't need
+			// "tlsConfig.GetCertificate = tlsHandler.GetClientInfo" because you can use eBPF instead.
+			//
+			// For mTLS, you might set "tlsConfig.GetCertificate = tlsHandler.GetClientInfo",
+			// but this is also optional, as mTLS is not always necessary when TLS is supported.
+			// Don't be misled into setting up mTLS if TLS suffices.
 			tlsListener := tls.NewListener(ln, tlsConfig)
 			s.App.SetTLSHandler(tlsHandler)
 			// Pass the TLS listener directly to the Fiber app
