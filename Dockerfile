@@ -1,5 +1,5 @@
-# This Docker boilerplate has no shell access, mostly because this repository does not rely on the operating system,
-# only on the resources of the machine server such as CPU, memory, network, and disk.
+# This Docker boilerplate does not provide shell access, primarily because this repository does not depend on the operating system.
+# Instead, it relies solely on the server's resources, such as CPU, memory, network, and disk (for serving static files for the front-end site).
 #
 # Use the official Golang image to create a build artifact.
 # This is a multi-stage build. This stage is named 'builder'.
@@ -31,6 +31,9 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /restapis ./backe
 
 # Use a Docker multi-stage build to create a lean production image.
 # https://docs.docker.com/develop/develop-images/multistage-build/
+#
+# Note: Consider using a minimalist image that does not rely on the operating system. The only dependency needed for this repository is the ca-certificates package,
+# in case you need to make calls to HTTPS endpoints.
 FROM alpine:latest
 
 # Install the ca-certificates alpine package in case you need to make calls to HTTPS endpoints.
