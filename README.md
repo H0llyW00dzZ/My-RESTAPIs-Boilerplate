@@ -295,6 +295,9 @@ frontend/
 │   │   │   │   │   │   ├── fixed_size.go
 │   │   │   │   │   │   ├── rand_test.go
 │   │   │   │   │   │   └── uuid.go
+│   │   │   │   │   ├── tls
+│   │   │   │   │   │   ├── docs.go
+│   │   │   │   │   │   └── setup.go
 │   │   │   │   │   ├── vault
 │   │   │   │   │   │   ├── new.go
 │   │   │   │   │   │   └── transit.go
@@ -495,7 +498,7 @@ frontend/
     ├── jobs.go
     └── worker_test.go
 
-66 directories, 219 files
+67 directories, 221 files
 ```
 
 > [!NOTE]
