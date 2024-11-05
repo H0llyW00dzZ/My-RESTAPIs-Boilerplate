@@ -165,6 +165,15 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
 > For control in combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker), you only need to adjust CPU settings because the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) consumes CPU due to its concurrency.
 > The [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) can also be suitable if your Go package or function has minimal memory allocation, allowing you to focus primarily on CPU usage.
 
+- **Average Network Usage During Smooth Sailing ⛵ ☸ (Over a network) in Combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) (as viewed on Grafana):**
+
+<p align="center">
+   <img src="https://i.imgur.com/X8izy98.png" alt="network-concurrency-stable">
+</p>
+
+> [!NOTE]
+> Note that the network `In`/`Out` usage has been very stable, with no drops or issues. Everything is well established ⛵.
+
 ## Customization
 
 The provided deployment files are designed to be customizable. You can modify the resource limits, environment variables, and other configurations according to your application's needs. Additionally, you can adjust the Ingress configuration to match your desired routing rules and TLS settings.
