@@ -150,6 +150,7 @@ Adjust the HPA configuration in the `restapis-deploy.yaml` file to suit your app
 - **Average CPU (on AMD) and Memory Usage During Smooth Sailing ⛵ ☸ in Combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) (as viewed on Grafana):**
 
 <p align="center">
+   <img src="https://i.imgur.com/4UWge7d.png" alt="fiber-framework-stable-at-scale-k8s">
    <img src="https://i.imgur.com/4u7i9VV.png" alt="fully-managed-and-isolated-by-k8s">
    <img src="https://i.imgur.com/x5oRx7h.png" alt="fully-managed-and-isolated-by-k8s">
 </p>
