@@ -104,8 +104,9 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 			// "tlsConfig.GetCertificate = tlsHandler.GetClientInfo" because you can use eBPF instead.
 			//
 			// For mTLS, you might set "tlsConfig.GetCertificate = tlsHandler.GetClientInfo",
-			// but this is also optional, as mTLS is not always necessary when TLS is supported.
-			// Don't be misled into setting up mTLS if TLS suffices.
+			// but this is optional, as mTLS is not always necessary when TLS is supported.
+			// Don't be misled into setting up mTLS if TLS is sufficient, unless you specifically need mTLS for IoT.
+			// However, connecting to this Boilerplate can also be challenging for IoT itself due to its capabilities.
 			tlsListener := tls.NewListener(ln, tlsConfig)
 			s.App.SetTLSHandler(tlsHandler)
 			// Pass the TLS listener directly to the Fiber app
