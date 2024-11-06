@@ -219,6 +219,7 @@ frontend/
 │   │   └── server
 │   │       ├── run.go
 │   │       ├── run_heroku.go
+│   │       ├── run_immutable.go
 │   │       └── run_tls_fips.go
 │   ├── internal
 │   │   ├── database
@@ -347,6 +348,7 @@ frontend/
 │   │   │   │       ├── config.go
 │   │   │   │       └── new.go
 │   │   │   ├── routes.go
+│   │   │   ├── routes_immutable.go
 │   │   │   ├── storage.go
 │   │   │   └── utils.go
 │   │   ├── server
@@ -498,7 +500,7 @@ frontend/
     ├── jobs.go
     └── worker_test.go
 
-67 directories, 221 files
+67 directories, 223 files
 ```
 
 > [!NOTE]
