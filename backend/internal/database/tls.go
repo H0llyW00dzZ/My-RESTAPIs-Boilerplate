@@ -8,7 +8,21 @@ package database
 import (
 	"crypto/x509"
 	"encoding/base64"
+	"errors"
 	"fmt"
+)
+
+var (
+	// ErrorMYSQLCert is returned when the MYSQL_CERTS_TLS environment variable is not set.
+	ErrorMYSQLCert = errors.New("database: MYSQL_CERTS_TLS environment variable is not set")
+
+	// ErrorREDISCert is returned when the REDIS_CERTS_TLS environment variable is not set.
+	ErrorREDISCert = errors.New("database: REDIS_CERTS_TLS environment variable is not set")
+)
+
+var (
+	// ErrorCAPool is returned when the root CA cannot be appended to the certificate pool.
+	ErrorCAPool = errors.New("database: failed to append root CA to cert pool")
 )
 
 // loadMySQLRootCA loads the MySQL root CA certificate from the environment variable.
@@ -23,17 +37,17 @@ import (
 func loadMySQLRootCA() (*x509.CertPool, error) {
 	rootCABase64 := mysqltlsCAs
 	if rootCABase64 == "" {
-		return nil, fmt.Errorf("MYSQL_CERTS_TLS environment variable is not set")
+		return nil, ErrorMYSQLCert
 	}
 
 	rootCABytes, err := base64.StdEncoding.DecodeString(rootCABase64)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode root CA: %v", err)
+		return nil, fmt.Errorf("database: failed to decode root CA: %v", err)
 	}
 
 	rootCAs := x509.NewCertPool()
 	if ok := rootCAs.AppendCertsFromPEM(rootCABytes); !ok {
-		return nil, fmt.Errorf("failed to append root CA to cert pool")
+		return nil, ErrorCAPool
 	}
 
 	return rootCAs, nil
@@ -51,17 +65,17 @@ func loadMySQLRootCA() (*x509.CertPool, error) {
 func loadRedisRootCA() (*x509.CertPool, error) {
 	rootCABase64 := redistlsCAs
 	if rootCABase64 == "" {
-		return nil, fmt.Errorf("REDIS_CERTS_TLS environment variable is not set")
+		return nil, ErrorREDISCert
 	}
 
 	rootCABytes, err := base64.StdEncoding.DecodeString(rootCABase64)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode root CA: %v", err)
+		return nil, fmt.Errorf("database: failed to decode root CA: %v", err)
 	}
 
 	rootCAs := x509.NewCertPool()
 	if ok := rootCAs.AppendCertsFromPEM(rootCABytes); !ok {
-		return nil, fmt.Errorf("failed to append root CA to cert pool")
+		return nil, ErrorCAPool
 	}
 
 	return rootCAs, nil
