@@ -27,6 +27,9 @@ func TestIsValidTableName(t *testing.T) {
 		{"EmptyString", "", false},
 		{"SQLInjectionUnion", "Users; UNION SELECT * FROM Admins; --", false},
 		{"SQLInjectionComment", "Users; --", false},
+		{"SQLInjectionQueryDynamically", "testing' OR 'a'='a", false},
+		{"SQLInjectionQueryConstructedandExecuted", "testing'; DELETE FROM items; --", false},
+		{"SQLInjectionShellCommandPwned", "'; SELECT system('ls') --", false},
 	}
 
 	for _, tt := range tests {
