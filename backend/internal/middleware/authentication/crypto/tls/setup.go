@@ -22,11 +22,24 @@ var (
 	ErrorMTLSCAEmpty = errors.New("crypto/mtls: CA certificate file not provided")
 )
 
+var (
+	// tlsCertFile holds the path to the server TLS certificate file.
+	tlsCertFile = env.GetEnv(env.SERVERCERTTLS, "")
+
+	// tlsKeyFile holds the path to the server TLS key file.
+	tlsKeyFile = env.GetEnv(env.SERVERKEYTLS, "")
+
+	// caCertFile holds the path to the CA certificate file.
+	caCertFile = env.GetEnv(env.SERVERCATLS, "")
+)
+
+var (
+	// enableMTLS indicates whether mutual TLS is enabled, based on the environment variable.
+	enableMTLS = env.GetEnv(env.ENABLEMTLS, "") == "true"
+)
+
 // LoadConfig loads TLS configuration based on environment variables.
 func LoadConfig() (*tls.Config, error) {
-	tlsCertFile := env.GetEnv(env.SERVERCERTTLS, "")
-	tlsKeyFile := env.GetEnv(env.SERVERKEYTLS, "")
-
 	if tlsCertFile != "" && tlsKeyFile != "" {
 		// Note: Fiber uses ECC is significantly faster compared to Nginx uses ECC, which struggles to handle a billion concurrent requests.
 		cert, err := tls.LoadX509KeyPair(tlsCertFile, tlsKeyFile)
@@ -55,7 +68,9 @@ func LoadConfig() (*tls.Config, error) {
 			Certificates: []tls.Certificate{cert},
 		}
 
-		if env.GetEnv(env.ENABLEMTLS, "") == "true" {
+		// This boolean is determined by the environment variable ENABLE_MTLS using env.GetEnv, which performs a lookup.
+		// Unlike other environment variables (e.g., tlsCertFile), it does not directly use the value ENABLE_MTLS=true.
+		if enableMTLS {
 			caCertPool, err := loadCA()
 			if err != nil {
 				return nil, err
@@ -74,7 +89,6 @@ func LoadConfig() (*tls.Config, error) {
 
 // loadCA loads the CA certificates for client verification.
 func loadCA() (*x509.CertPool, error) {
-	caCertFile := env.GetEnv(env.SERVERCATLS, "")
 	if caCertFile == "" {
 		return nil, ErrorMTLSCAEmpty
 	}
