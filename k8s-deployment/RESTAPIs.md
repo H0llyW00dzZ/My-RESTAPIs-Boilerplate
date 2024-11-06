@@ -335,7 +335,7 @@ The annotations `nginx.ingress.kubernetes.io/session-cookie-max-age`, `nginx.ing
 
 > [!WARNING]
 > While this boilerplate uses the [`Fiber Framework`](https://gofiber.io/), it is compatible with `HPA` (Horizontal Pod Autoscaling) for large-scale applications and multiple sites in a single deployment. 
-> Do not switch the deployment to `stateful`, as `stateful` deployments limit your ability to leverage Kubernetes features and experimental solutions for addressing critical infrastructure issues.
+> Do not switch the deployment to `stateful (bad)`, as `stateful (bad)` deployments limit your ability to leverage Kubernetes features and experimental solutions for addressing critical infrastructure issues.
 
 ## Cleanup
 
