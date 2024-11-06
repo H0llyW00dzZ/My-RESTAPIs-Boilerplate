@@ -56,7 +56,8 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 		TrustedProxies: []string{"0.0.0.0/0"},
 		// Trust X-Forwarded-For headers; additionally, this can be customized if using an ingress controller/proxy, especially Ingress Nginx.
 		ProxyHeader: fiber.HeaderXForwardedFor, // Fix where * (wildcard header) doesn't work in some kubernetes ingress eco-system
-		// Using this immutable setting is more efficient + cheap than the standard library's unique (new pkg).
+		// This immutable setting is more efficient and cost-effective than the standard library's new package.
+		// It is also safe to use in combination with the worker package for concurrency.
 		Immutable: true,
 	})
 	registerRESTAPIsRoutes(api, db)
@@ -92,7 +93,8 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 		TrustedProxies: []string{"0.0.0.0/0"},
 		// Trust X-Forwarded-For headers; additionally, this can be customized if using an ingress controller/proxy, especially Ingress Nginx.
 		ProxyHeader: fiber.HeaderXForwardedFor, // Fix where * (wildcard header) doesn't work in some kubernetes ingress eco-system
-		// Using this immutable setting is more efficient + cheap than the standard library's unique (new pkg).
+		// This immutable setting is more efficient and cost-effective than the standard library's new package.
+		// It is also safe to use in combination with the worker package for concurrency.
 		Immutable: true,
 	})
 	registerStaticFrontendRoutes(frontend, appName, db)
