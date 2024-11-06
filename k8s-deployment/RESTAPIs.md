@@ -321,7 +321,7 @@ For example, the certificate I've been using:
 
 ### Set Up Deployment with the `immutable` Tag for HPA in Combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker)
 
-To set up a deployment with the `immutable` tag for HPA in combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker), it depends on how suitable your workloads are based on the default example deployment:
+To set up a deployment with the `immutable` tag for HPA in combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker), it depends on how suitable your workloads are based on the [default example deployment](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/k8s-deployment/restapis-deploy.yaml):
 
 ```yaml
 resources:
@@ -333,7 +333,7 @@ resources:
     cpu: "500m"
 ```
 
-If your workloads are not suitable within the default example deployment, adjust `cpu: "350m"`; for example, you might replace it with `cpu: "450m"`, while keeping `HPA` configured as follows:
+If your workloads are not suitable within the [default example deployment](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/k8s-deployment/restapis-deploy.yaml), adjust `cpu: "350m"`; for example, you might replace it with `cpu: "450m"`, while keeping `HPA` configured as follows:
 
 ```yaml
 apiVersion: autoscaling/v2
