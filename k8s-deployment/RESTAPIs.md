@@ -141,11 +141,17 @@ The `cpu: 78%/80%` going `up/down` and `REPLICAS 22` are `dynamic` (depending on
 
 Adjust the HPA configuration in the `restapis-deploy.yaml` file to suit your application's scaling requirements.
 
-- **Average CPU and Memory Usage When Idle (as viewed on Grafana):**
+- **Average CPU (on AMD) and Memory Usage When Idle (as viewed on Grafana):**
 
 <p align="center">
    <img src="https://i.imgur.com/y9Ky3xZ.png" alt="fully-managed-and-isolated-by-k8s">
+   <img src="https://i.imgur.com/JSlm7w0.png" alt="fully-managed-and-isolated-by-k8s">
+   <img src="https://i.imgur.com/TcRhCI1.png" alt="fully-managed-and-isolated-by-k8s">
 </p>
+
+> [!NOTE]
+> The `Average CPU and Memory Usage When Idle` refers to the state when no jobs are being processed by the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker).
+> This also reflects the average usage of a typical Fiber application, as Fiber is designed with zero memory allocation in mind.
 
 - **Average CPU (on AMD) and Memory Usage During Smooth Sailing ⛵ ☸ in Combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) (as viewed on Grafana):**
 
