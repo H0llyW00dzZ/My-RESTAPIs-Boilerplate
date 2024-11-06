@@ -116,6 +116,9 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 		} else {
 			// Note: This branch handles TLS 1.2 scenarios or TLS 1.3 when run as a receiver forwarder (e.g. from nginx (Non Kubernetes), Ingress from nginx if it's running on Kubernetes)
 			// due to its non-secure nature and requirement to be in internal/development mode.
+			//
+			// TODO: Use a custom listener in the Fiber framework (similar to SetupTLS) to disable prefork,
+			// as it is not compatible with Kubernetes (could this lead to an OOM error for this)?
 			if err := s.App.Listen(addr); err != nil {
 				log.LogFatalf(ErrorHTTPListenAndServe, err)
 			}
