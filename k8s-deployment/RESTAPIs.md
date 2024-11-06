@@ -327,7 +327,11 @@ nginx.ingress.kubernetes.io/session-cookie-name: cookie
 nginx.ingress.kubernetes.io/session-cookie-samesite: Strict
 ```
 
-The annotations `nginx.ingress.kubernetes.io/session-cookie-max-age`, `nginx.ingress.kubernetes.io/session-cookie-name`, and `nginx.ingress.kubernetes.io/session-cookie-samesite` are not supported. If you explicitly set these three, the services in this repository may become unreachable because Fiber has strict validation for headers. Therefore, it is better to remove these annotations and instead use the cookie mechanism that is already implemented in this repository.
+The annotations `nginx.ingress.kubernetes.io/session-cookie-max-age`, `nginx.ingress.kubernetes.io/session-cookie-name`, and `nginx.ingress.kubernetes.io/session-cookie-samesite` are not supported. If you explicitly set these three, the services in this repository may become unreachable because Fiber has strict validation for headers. Therefore, it is better to remove these annotations and instead use the cookie mechanism that is already implemented in this [`repository`](https://docs.gofiber.io/api/middleware/session).
+
+> [!TIP]
+> The [Session/Cookie](https://docs.gofiber.io/api/middleware/session) mechanism in the [`Fiber Framework`](https://gofiber.io/) 
+> is compatible with `HPA` (Horizontal Pod Autoscaling) for large-scale applications + multiple sites in one deployment, as long as you do not use the storage option that relies on [`direct memory`](https://docs.gofiber.io/storage/memory_v2.x.x/memory/).
 
 ## Cleanup
 
