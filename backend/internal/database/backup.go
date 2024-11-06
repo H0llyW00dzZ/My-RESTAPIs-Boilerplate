@@ -256,6 +256,8 @@ func (s *service) backupSingleTable(tableName string) (err error) {
 }
 
 // dumpTableSchema writes the CREATE TABLE statement for the specified table to the backup file.
+//
+// TODO: Enhance this function to support streaming mode, allowing it to operate efficiently over a network instead of relying solely on file output.
 func (s *service) dumpTableSchema(ctx context.Context, file *os.File, tableName string) error {
 	query := fmt.Sprintf("SHOW CREATE TABLE `%s`", tableName)
 	row := s.db.QueryRowContext(ctx, query)
@@ -272,6 +274,8 @@ func (s *service) dumpTableSchema(ctx context.Context, file *os.File, tableName 
 // Note: This differs from MySQL Dumper and PhpMyAdmin Export, both of which use single-row INSERT statements for data.
 // This implementation uses multi-row INSERT statements + Batching, which can improve performance when importing large datasets
 // and help avoid MySQL deadlocks (not due to Go, but inherent to MySQL itself).
+//
+// TODO: Enhance this function to support streaming mode, allowing it to operate efficiently over a network instead of relying solely on file output.
 func (s *service) dumpTableData(ctx context.Context, file *os.File, tableName string) error {
 	query := fmt.Sprintf("SELECT * FROM `%s`", tableName)
 	rows, err := s.db.QueryContext(ctx, query)
