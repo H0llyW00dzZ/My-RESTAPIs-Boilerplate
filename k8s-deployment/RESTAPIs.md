@@ -370,6 +370,68 @@ spec:
 > [!WARNING]
 > When using the `immutable` tag with HPA in combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) or outside Kubernetes, avoid using mutexes again for concurrency. This can degrade performance because the `worker package` already synchronizes using channels. Ensure your functions are immutable/safe for concurrency, even with a large number of workers (e.g., millions or billions of goroutines). They will `efficiently` process jobs by doing `one thing and doing it well`.
 
+For example, how the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) works:
+
+```mermaid
+graph TD;
+    A[Main Goroutine] -->|Start Worker Pool| B[Worker Pool];
+    B -->|Register Job| C[Job Registry];
+    B -->|Submit Job| D[Job Channel];
+    D -->|Distribute Jobs| E1[Worker 1];
+    D -->|Distribute Jobs| E2[Worker 2];
+    D -->|Distribute Jobs| E3[Worker 3];
+    D -->|Distribute Jobs| E4[Worker N];
+    
+    E1 -->|Execute Job| F1[Result/Error Channel];
+    E2 -->|Execute Job| F2[Result/Error Channel];
+    E3 -->|Execute Job| F3[Result/Error Channel];
+    E4 -->|Execute Job| F4[Result/Error Channel];
+    
+    F1 -->|Return Result/Error| G[Main Goroutine];
+    F2 -->|Return Result/Error| G;
+    F3 -->|Return Result/Error| G;
+    F4 -->|Return Result/Error| G;
+    
+    B -->|Stop Worker Pool| H[Shutdown Process];
+```
+
+Note that in the worker package, it is also possible to spawn additional goroutines to communicate with the worker itself. For example:
+
+```mermaid
+graph TD;
+    A[Main Goroutine] -->|Start Worker Pool| B[Worker Pool];
+    B -->|Register Job| C[Job Registry];
+    B -->|Submit Job| D[Job Channel];
+    D -->|Distribute Jobs| E1[Worker 1];
+    D -->|Distribute Jobs| E2[Worker 2];
+    D -->|Distribute Jobs| E3[Worker 3];
+    D -->|Distribute Jobs| E4[Worker N];
+    
+    E1 -->|Execute Job| F1[Result/Error Channel];
+    E2 -->|Execute Job| F2[Result/Error Channel];
+    E3 -->|Execute Job| F3[Result/Error Channel];
+    E4 -->|Execute Job| F4[Result/Error Channel];
+    
+    E1 -->|Spawn Additional Goroutine| G1[Additional Goroutine 1];
+    E2 -->|Spawn Additional Goroutine| G2[Additional Goroutine 2];
+    E3 -->|Spawn Additional Goroutine| G3[Additional Goroutine 3];
+    E4 -->|Spawn Additional Goroutine| G4[Additional Goroutine N];
+
+    G1 -->|Communicate Results| F1;
+    G2 -->|Communicate Results| F2;
+    G3 -->|Communicate Results| F3;
+    G4 -->|Communicate Results| F4;
+
+    F1 -->|Return Result/Error| H[Main Goroutine];
+    F2 -->|Return Result/Error| H;
+    F3 -->|Return Result/Error| H;
+    F4 -->|Return Result/Error| H;
+    
+    B -->|Stop Worker Pool| I[Shutdown Process];
+```
+
+There are no limitations; it can be used across a large codebase with synchronization. The only limitation might be whether the CPU is capable of handling a large number of workers.
+
 ## Compatibility
 
 Since this boilerplate uses the [`Fiber Framework`](https://gofiber.io/), it's important to note that not all configurations in `ingress-nginx` are supported. For example, if you set `annotations` in the ingress service of this boilerplate, such as the following YAML:
