@@ -367,6 +367,9 @@ spec:
 > [!NOTE]
 > Don't forget to set `maxReplicas: 50` based on your needs; for example, you can reduce it to `maxReplicas: 5` for a starter configuration.
 
+> [!WARNING]
+> When using the `immutable` tag with HPA in combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) or outside Kubernetes, avoid using mutexes again for concurrency. This can degrade performance because the `worker package` already synchronizes using channels. Ensure your functions are immutable/safe for concurrency, even with a large number of workers (e.g., millions or billions of goroutines). They will `efficiently` process jobs by doing `one thing and doing it well`.
+
 ## Compatibility
 
 Since this boilerplate uses the [`Fiber Framework`](https://gofiber.io/), it's important to note that not all configurations in `ingress-nginx` are supported. For example, if you set `annotations` in the ingress service of this boilerplate, such as the following YAML:
