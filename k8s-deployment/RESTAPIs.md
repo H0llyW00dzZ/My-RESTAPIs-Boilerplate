@@ -313,6 +313,22 @@ For example, the certificate I've been using:
 > Since this repository supports HTTPS/TLS with certificates issued by [cert-manager.io](https://cert-manager.io/) by binding the TLS secrets provided by cert-manager.io. For a sample deployment, see [here](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/k8s-deployment/restapis-deploy.yaml).
 > This setup allows for HTTPS/TLS without terminating at ingress-nginx. I personally use this method without cert-manager.io (I already have a certificate issued by [`sectigo.com`](https://www.sectigo.com/)) to avoid concurrency issues.
 
+
+## Compatibility
+
+Since this boilerplate uses the [`Fiber Framework`](https://gofiber.io/), it's important to note that not all configurations in `ingress-nginx` are supported. For example, if you set `annotations` in the ingress service of this boilerplate, such as the following YAML:
+
+```yaml
+nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+nginx.ingress.kubernetes.io/force-ssl-redirect: true
+nginx.ingress.kubernetes.io/ssl-passthrough: true
+nginx.ingress.kubernetes.io/session-cookie-max-age: 600
+nginx.ingress.kubernetes.io/session-cookie-name: cookie
+nginx.ingress.kubernetes.io/session-cookie-samesite: Strict
+```
+
+The annotations `nginx.ingress.kubernetes.io/session-cookie-max-age`, `nginx.ingress.kubernetes.io/session-cookie-name`, and `nginx.ingress.kubernetes.io/session-cookie-samesite` are not supported. If you explicitly set these three, the services in this repository may become unreachable because Fiber has strict validation for headers. Therefore, it is better to remove these annotations and instead use the cookie mechanism that is already implemented in this repository.
+
 ## Cleanup
 
 To remove the deployed resources from your Kubernetes cluster, run the following commands:
