@@ -319,6 +319,53 @@ For example, the certificate I've been using:
 > Since this repository supports HTTPS/TLS with certificates issued by [cert-manager.io](https://cert-manager.io/) by binding the TLS secrets provided by cert-manager.io. For a sample deployment, see [here](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/k8s-deployment/restapis-deploy.yaml).
 > This setup allows for HTTPS/TLS without terminating at ingress-nginx. I personally use this method without cert-manager.io (I already have a certificate issued by [`sectigo.com`](https://www.sectigo.com/)) to avoid concurrency issues.
 
+### Set Up Deployment with the `immutable` Tag for HPA in Combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker)
+
+To set up a deployment with the `immutable` tag for HPA in combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker), it depends on how suitable your workloads are based on the default example deployment:
+
+```yaml
+resources:
+  requests:
+    memory: "359Mi"
+    cpu: "350m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+```
+
+If your workloads are not suitable within the default example deployment, adjust `cpu: "350m"`; for example, you might replace it with `cpu: "450m"`, while keeping `HPA` configured as follows:
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  # Note: You can modify the namespace and name later as needed.
+  name: restapis-hpa
+  namespace: restapis
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: restapis
+  minReplicas: 1
+  maxReplicas: 50
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+```
+
+> [!NOTE]
+> Don't forget to set `maxReplicas: 50` based on your needs; for example, you can reduce it to `maxReplicas: 5` for a starter configuration.
 
 ## Compatibility
 
