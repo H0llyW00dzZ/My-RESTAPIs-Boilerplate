@@ -91,7 +91,19 @@ func NewDoWork[T any](opts ...NewDoWorkOption[T]) *Pool[T] {
 	return wp
 }
 
-// Stop gracefully shuts down the worker pool
+// Stop gracefully shuts down the worker pool.
+//
+// Note: When using pool.RegisterJob in a function like init, for example:
+//
+//	func init() {
+//		pool.RegisterJob("myStreamingJob", func(c *fiber.Ctx) worker.Job[string] {
+//			return &MyStreamingJob[string]{c: c}
+//		})
+//	}
+//
+// Place this function where the application shuts down. Additionally, calling this during application shutdown is optional,
+// as this worker pool is designed similarly to a semaphore. Once the jobs are completed, any memory allocated on the worker will be freed.
+// If there is no memory allocation or minimal usage, then it goods.
 func (wp *Pool[T]) Stop() {
 	if wp.atomicStop() {
 		wp.mu.Lock()
