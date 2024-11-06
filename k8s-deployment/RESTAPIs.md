@@ -333,6 +333,10 @@ The annotations `nginx.ingress.kubernetes.io/session-cookie-max-age`, `nginx.ing
 > The [Session/Cookie](https://docs.gofiber.io/api/middleware/session) mechanism in the [`Fiber Framework`](https://gofiber.io/) 
 > is compatible with `HPA` (Horizontal Pod Autoscaling) for large-scale applications + multiple sites in one deployment, as long as you do not use the storage option that relies on [`direct memory`](https://docs.gofiber.io/storage/memory_v2.x.x/memory/).
 
+> [!WARNING]
+> While this boilerplate uses the [`Fiber Framework`](https://gofiber.io/), it is compatible with `HPA` (Horizontal Pod Autoscaling) for large-scale applications and multiple sites in a single deployment. 
+> Do not switch the deployment to `stateful`, as `stateful` deployments limit your ability to leverage Kubernetes features and experimental solutions for addressing critical infrastructure issues.
+
 ## Cleanup
 
 To remove the deployed resources from your Kubernetes cluster, run the following commands:
