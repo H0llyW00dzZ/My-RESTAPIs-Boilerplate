@@ -33,8 +33,8 @@ const (
 	// NumWorkers to 300 and adjust the CPU to 350m ~ 450m. This allows the application to scale
 	// to around 5 pods, ensuring effective synchronization, unlike stateful applications, which
 	// cannot scale as easily as stateless ones.
-	// Stateful applications are typically used for databases, and using them for web services
-	// is not recommended (bad).
+	// Stateful applications are typically used for databases. Using stateful architectures for
+	// web services is not recommended (bad). It's best to avoid using stateful designs for web services (good you are mastering k8s).
 	NumWorkers = 1
 )
 
