@@ -317,9 +317,13 @@ func (s *service) dumpTableData(ctx context.Context, w io.Writer, tableName stri
 	// Adjust the batch size as needed.
 	// The default size of 1000 is typically sufficient.
 	//
-	// Note that this batching can improve performance for importing data in some MySQL tools mechanisms,
+	// Note that batching can improve performance when importing data with some MySQL tools,
 	// such as MySQL Workbench and PhpMyAdmin. However, in Go, this is often unnecessary
 	// because Go can handle streaming efficiently, potentially faster than other languages.
+	//
+	// This primarily benefits importing, and in Go, it doesn't matter as much due to network factors.
+	// For large data (backup), ensure the network is stable, as performance depends on network conditions (e.g., between the client and the MySQL server itself).
+	// For example, with large data, you might set the batch size to 100,000 to speed up the import process into MySQL.
 	var batchSize = 1000
 	var insertStatements []string
 
