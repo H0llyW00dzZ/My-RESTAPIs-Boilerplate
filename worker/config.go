@@ -12,9 +12,11 @@ import (
 
 var (
 	// ErrFailedToGetSomething is returned when failed to get something..
-	ErrFailedToGetSomething = errors.New("worker failed to get something from job")
+	ErrFailedToGetSomething = errors.New("worker: failed to get something from job")
 	// ErrJobsNotFound is returned when a job with the specified name is not registered with the worker pool.
-	ErrJobsNotFound = errors.New("job not found")
+	ErrJobsNotFound = errors.New("worker: job not found")
+	// ErrorInvalidJobType is returned when a job function returns a type that is not expected or supported by the worker.
+	ErrorInvalidJobType = errors.New("worker: invalid job function return type")
 )
 
 const (
@@ -26,6 +28,13 @@ const (
 	// 100 worker = 100mb ~ 150mb++ memory consumed (Approx)
 	//
 	// under 50 worker still consider cheap.
+	//
+	// Additionally, for Horizontal Pod Autoscaling (HPA) in Kubernetes, it's better to set
+	// NumWorkers to 300 and adjust the CPU to 350m ~ 450m. This allows the application to scale
+	// to around 5 pods, ensuring effective synchronization, unlike stateful applications, which
+	// cannot scale as easily as stateless ones.
+	// Stateful applications are typically used for databases, and using them for web services
+	// is not recommended (bad).
 	NumWorkers = 1
 )
 
