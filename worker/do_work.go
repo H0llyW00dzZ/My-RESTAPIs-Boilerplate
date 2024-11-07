@@ -162,7 +162,7 @@ func (wp *Pool[T]) Submit(p any, jobName string) (T, error) {
 	job, ok := resultValues[0].Interface().(Job[T])
 	if !ok {
 		var zero T
-		return zero, fmt.Errorf("invalid job function return type")
+		return zero, ErrorInvalidJobType
 	}
 	wp.jobs <- job
 	select {
