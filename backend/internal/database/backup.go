@@ -323,7 +323,7 @@ func (s *service) dumpTableData(ctx context.Context, w io.Writer, tableName stri
 	//
 	// This primarily benefits importing, and in Go, it doesn't matter as much due to network factors.
 	// For large data (backup), ensure the network is stable, as performance depends on network conditions (e.g., between the client and the MySQL server itself).
-	// For example, with large data, you might set the batch size to 100,000 to speed up the import process into MySQL.
+	// For example, with large data, you might set the batch size to 100,000 to speed up the import (after backup) process into MySQL.
 	var batchSize = 1000
 	var insertStatements []string
 
