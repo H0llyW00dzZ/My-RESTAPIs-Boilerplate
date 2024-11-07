@@ -12,7 +12,7 @@ import (
 	"errors"
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
-	"os"
+	"io"
 	"regexp"
 	"strings"
 	"time"
@@ -115,12 +115,12 @@ func escapeString(value string) string {
 	return value
 }
 
-// writeSQLHeader writes a header to the SQL file.
-func writeSQLHeader(file *os.File) error {
+// writeSQLHeader writes a header to the SQL Object.
+func writeSQLHeader(w io.Writer) error {
 	header := `-- A Better MySQL Dump Written in Go by H0llyW00dzZ
 -- Generation Time: ` + time.Now().Format("Jan 02, 2006 at 03:04 PM") + `
 ` + "\n"
-	_, err := file.WriteString(header)
+	_, err := w.Write([]byte(header))
 	return err
 }
 

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/gpg"
+	"io"
 	"os"
 	"strings"
 	"sync"
@@ -59,7 +60,7 @@ func (s *service) BackupTables(tablesToBackup []string) error {
 	}
 
 	// For large datasets, this may need to configure this and adjust the MySQL server settings.
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), DefaultBackupCtxTimeout)
 	defer cancel()
 
 	for _, tableName := range tablesToBackup {
@@ -77,21 +78,32 @@ func (s *service) BackupTables(tablesToBackup []string) error {
 }
 
 // BackupTablesConcurrently creates a backup of specified tables concurrently.
-// It uses goroutines to perform backups for each table simultaneously, improving performance.
-// Each table's backup is handled in a separate goroutine (e.g., 9999999 tables then 9999999 goroutines),
-// and errors are captured via a channel (e.g., 9999999 errors then 9999999 goroutines).
+// This function leverages goroutines to initiate a backup for each table simultaneously,
+// significantly enhancing performance by utilizing multiple CPU cores.
+//
+// Each table's backup is handled in a separate goroutine, allowing for efficient processing
+// of a large number of tables. Errors encountered during the backup process are captured
+// via a buffered channel, ensuring that all errors are reported correctly.
 //
 // Additionally, if this performance improvement is still insufficient for large infrastructures,
 // it can be combined with the worker package. Ensure that your infrastructure can handle up to 1 billion operations, as this is just good business.
-func (s *service) BackupTablesConcurrently(tablesToBackup []string) error {
+func (s *service) BackupTablesConcurrently(tablesToBackup []string, o io.Writer) error {
+	// Validate table names
+	for _, tableName := range tablesToBackup {
+		if !IsValidTableName(tableName) {
+			return fmt.Errorf("invalid table name: %s", tableName)
+		}
+	}
+
 	var wg sync.WaitGroup
 	errChan := make(chan error, len(tablesToBackup))
 
+	// Start backing up each table concurrently
 	for _, tableName := range tablesToBackup {
 		wg.Add(1)
 		go func(table string) {
 			defer wg.Done()
-			if err := s.backupSingleTable(table); err != nil {
+			if err := s.backupSingleTable(table, o); err != nil {
 				errChan <- err
 			}
 		}(tableName)
@@ -194,11 +206,49 @@ func (s *service) BackupTablesWithGPG(tablesToBackup []string, publicKey []strin
 }
 
 // backupSingleTable performs the backup of a single table.
-// It validates the table name, starts a transaction, and writes the schema and data to a backup file.
-// The transaction ensures a consistent snapshot of the table during the backup process.
-func (s *service) backupSingleTable(tableName string) (err error) {
-	if !IsValidTableName(tableName) {
-		return fmt.Errorf("invalid table name: %s", tableName)
+// It creates a pipe to stream the backup data to the specified writer.
+// A goroutine is used to write the table's schema and data to the pipe,
+// ensuring non-blocking writes. The function validates the table name,
+// initiates the backup process, and sends the data to the desired destination.
+func (s *service) backupSingleTable(tableName string, o io.Writer) error {
+	r, w := io.Pipe()
+	defer r.Close()
+
+	go func() {
+		defer w.Close()
+		if err := s.backupTableToWriter(tableName, w); err != nil {
+			log.LogErrorf("Failed to backup table %s: %v", tableName, err)
+		}
+	}()
+
+	// Send the backup data to the desired destination
+	if err := s.sendTo(r, o); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// sendTo transfers data from the reader to the specified writer.
+// It uses [io.Copy] to efficiently stream data between the reader and writer,
+// allowing for real-time data transfer, such as over a network (on the fly) 🛰️.
+func (s *service) sendTo(r io.Reader, o io.Writer) error {
+	_, err := io.Copy(o, r)
+	return err
+}
+
+// backupTableToWriter writes the schema and data of a table to the provided writer.
+// It begins a transaction to ensure a consistent snapshot of the table.
+// The function writes the SQL header, schema, and data to the writer, then commits
+// the transaction to finalize the backup.
+func (s *service) backupTableToWriter(tableName string, w io.Writer) error {
+	// For large datasets, this may need to configure this and adjust the MySQL server settings.
+	ctx, cancel := context.WithTimeout(context.Background(), DefaultBackupCtxTimeout)
+	defer cancel()
+
+	// Write the header to the object
+	if err := writeSQLHeader(w); err != nil {
+		return err
 	}
 
 	// Start a transaction to ensure data consistency
@@ -208,41 +258,11 @@ func (s *service) backupSingleTable(tableName string) (err error) {
 	}
 	defer tx.Rollback()
 
-	// TODO: Implement directory storage for direct disk backup.
-	// In the future, this should stream directly with encryption (easy implementation) using OpenPGP/GPG
-	// to cloud storage for enhanced security against potential compromises (e.g., between cloud it's self, human error, other).
-	backupFile := fmt.Sprintf("backup_%s_%s.sql", tableName, time.Now().Format("20060102_150405"))
-	file, err := os.Create(backupFile)
-	if err != nil {
-		return fmt.Errorf("failed to create backup file for table %s: %w", tableName, err)
-	}
-
-	defer func() {
-		if cerr := file.Close(); cerr != nil {
-			log.LogErrorf("Failed to close file: %v", cerr)
-		}
-		if err != nil {
-			if remErr := os.Remove(backupFile); remErr != nil {
-				log.LogErrorf("Failed to remove incomplete backup file: %v", remErr)
-			}
-		}
-	}()
-
-	// Write the header to the file
-	if err = writeSQLHeader(file); err != nil {
+	if err := s.dumpTableSchema(ctx, w, tableName); err != nil {
 		return err
 	}
 
-	// For large datasets, this may need to configure this and adjust the MySQL server settings.
-	ctx, cancel := context.WithTimeout(context.Background(), DefaultBackupCtxTimeout)
-	defer cancel()
-
-	// Dump schema and data within the transaction context
-	if err := s.dumpTableSchema(ctx, file, tableName); err != nil {
-		return err
-	}
-
-	if err := s.dumpTableData(ctx, file, tableName); err != nil {
+	if err := s.dumpTableData(ctx, w, tableName); err != nil {
 		return err
 	}
 
@@ -251,32 +271,27 @@ func (s *service) backupSingleTable(tableName string) (err error) {
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
-	log.LogInfof("Backup completed for table: %s", tableName)
 	return nil
 }
 
-// dumpTableSchema writes the CREATE TABLE statement for the specified table to the backup file.
-//
-// TODO: Enhance this function to support streaming mode, allowing it to operate efficiently over a network instead of relying solely on file output.
-func (s *service) dumpTableSchema(ctx context.Context, file *os.File, tableName string) error {
+// dumpTableSchema writes the CREATE TABLE statement for the specified table to the object.
+func (s *service) dumpTableSchema(ctx context.Context, w io.Writer, tableName string) error {
 	query := fmt.Sprintf("SHOW CREATE TABLE `%s`", tableName)
 	row := s.db.QueryRowContext(ctx, query)
 	var table, createTableStmt string
 	if err := row.Scan(&table, &createTableStmt); err != nil {
 		return fmt.Errorf("failed to get create table statement: %w", err)
 	}
-	_, err := file.WriteString(fmt.Sprintf("%s;\n\n", createTableStmt))
+	_, err := fmt.Fprintf(w, "%s;\n\n", createTableStmt)
 	return err
 }
 
-// dumpTableData retrieves all rows from the specified table and writes them as INSERT statements to the backup file.
+// dumpTableData retrieves all rows from the specified table and writes them as INSERT statements to the object.
 //
 // Note: This differs from MySQL Dumper and PhpMyAdmin Export, both of which use single-row INSERT statements for data.
 // This implementation uses multi-row INSERT statements + Batching, which can improve performance when importing large datasets
 // and help avoid MySQL deadlocks (not due to Go, but inherent to MySQL itself).
-//
-// TODO: Enhance this function to support streaming mode, allowing it to operate efficiently over a network instead of relying solely on file output.
-func (s *service) dumpTableData(ctx context.Context, file *os.File, tableName string) error {
+func (s *service) dumpTableData(ctx context.Context, w io.Writer, tableName string) error {
 	query := fmt.Sprintf("SELECT * FROM `%s`", tableName)
 	rows, err := s.db.QueryContext(ctx, query)
 	if err != nil {
@@ -315,7 +330,7 @@ func (s *service) dumpTableData(ctx context.Context, file *os.File, tableName st
 
 		if len(insertStatements) >= batchSize {
 			fullInsert := buildInsertStatement(tableName, columns, insertStatements)
-			if _, err := file.WriteString(fullInsert); err != nil {
+			if _, err := fmt.Fprint(w, fullInsert); err != nil {
 				return err
 			}
 			insertStatements = insertStatements[:0]
@@ -324,11 +339,11 @@ func (s *service) dumpTableData(ctx context.Context, file *os.File, tableName st
 
 	if len(insertStatements) > 0 {
 		fullInsert := buildInsertStatement(tableName, columns, insertStatements)
-		if _, err := file.WriteString(fullInsert); err != nil {
+		if _, err := fmt.Fprint(w, fullInsert); err != nil {
 			return err
 		}
 	}
-	_, err = file.WriteString("\n")
+	_, err = fmt.Fprint(w, "\n")
 	return err
 }
 
