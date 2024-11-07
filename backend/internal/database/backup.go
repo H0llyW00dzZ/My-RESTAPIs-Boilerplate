@@ -60,7 +60,7 @@ func (s *service) BackupTables(tablesToBackup []string) error {
 	}
 
 	// For large datasets, this may need to configure this and adjust the MySQL server settings.
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), DefaultBackupCtxTimeout)
 	defer cancel()
 
 	for _, tableName := range tablesToBackup {
@@ -243,7 +243,7 @@ func (s *service) sendTo(r io.Reader, o io.Writer) error {
 // the transaction to finalize the backup.
 func (s *service) backupTableToWriter(tableName string, w io.Writer) error {
 	// For large datasets, this may need to configure this and adjust the MySQL server settings.
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), DefaultBackupCtxTimeout)
 	defer cancel()
 
 	// Write the header to the object
