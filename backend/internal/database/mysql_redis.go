@@ -311,7 +311,8 @@ func New() Service {
 	// If it's related to a cloud provider issue, I won't fix it, because the issue is related to the cloud provider, not the Go code here.
 	// For example, in Heroku, this still won't work. It works with `tea.WithInput(nil)`, but it won't render anything and will just be blank.
 	//
-	// TODO: Remove Bubble Tea Spinner; it might cause rendering issues in the terminal due to MySQL backups running concurrently.
+	// TODO: Remove the Bubble Tea Spinner. It may cause rendering issues in the terminal due to concurrent MySQL backups,
+	// and it no longer works with the old method for better rendering.
 	p := tea.NewProgram(
 		m,
 		tea.WithOutput(log.NewLogWriter(os.Stdout, timeFormatter)), // Reuse from custom logger.
@@ -322,6 +323,9 @@ func New() Service {
 
 	// Run the Bubble Tea program and initializations in a separate goroutine
 	// Note: This is a cheap operation in terms of CPU usage, unlike other languages that do not support synchronization in this manner (hahaha).
+	//
+	// TODO: Remove the Bubble Tea Spinner. It may cause rendering issues in the terminal due to concurrent MySQL backups,
+	// and it no longer works with the old method for better rendering.
 	go func() {
 		// Initialize the Redis client
 		redisClient, err := initializeRedisClient()
