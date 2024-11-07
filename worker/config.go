@@ -12,9 +12,9 @@ import (
 
 var (
 	// ErrFailedToGetSomething is returned when failed to get something..
-	ErrFailedToGetSomething = errors.New("worker failed to get something from job")
+	ErrFailedToGetSomething = errors.New("worker: failed to get something from job")
 	// ErrJobsNotFound is returned when a job with the specified name is not registered with the worker pool.
-	ErrJobsNotFound = errors.New("job not found")
+	ErrJobsNotFound = errors.New("worker: job not found")
 	// ErrorInvalidJobType is returned when a job function returns a type that is not expected or supported by the worker.
 	ErrorInvalidJobType = errors.New("worker: invalid job function return type")
 )
