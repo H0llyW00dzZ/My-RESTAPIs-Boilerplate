@@ -13,7 +13,10 @@
 # Repo: https://git.b0zal.io/H0llyW00dzZ/golang.git
 #
 # TODO: Automate updates when new versions are available, instead of waiting for the slow maintainer.
-FROM git.b0zal.io/h0llyW00dzz/golang:1.23.3 AS builder
+#
+# Known Bug: Gitea manifests don't work with versions v1.23.3 and 1.23.3.
+# failed commit on ref "index-sha256:524acd083758062a04371a283008aa7d6a82d678fbf479c29a45f5ba86a04c57": unexpected status from PUT request
+FROM git.b0zal.io/h0llyW00dzz/golang:latest AS builder
 
 # Set the working directory outside $GOPATH to enable the support for modules.
 WORKDIR /app
