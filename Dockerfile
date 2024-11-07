@@ -11,7 +11,9 @@
 # This uses a custom base image on Alpine:latest because the official Docker Golang images can be slow the maintainer to update with new versions.
 #
 # Repo: https://git.b0zal.io/H0llyW00dzZ/golang.git
-FROM git.b0zal.io/H0llyW00dzZ/golang:1.23.3 AS builder
+#
+# TODO: Automate updates when new versions are available, instead of waiting for the slow maintainer.
+FROM git.b0zal.io/h0llyW00dzz/golang:1.23.3 AS builder
 
 # Set the working directory outside $GOPATH to enable the support for modules.
 WORKDIR /app
