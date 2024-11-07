@@ -310,6 +310,8 @@ func New() Service {
 	// Note: This may still require a TTY, and there's no guarantee it will work properly (e.g., when running in a cloud provider that doesn't allow TTY).
 	// If it's related to a cloud provider issue, I won't fix it, because the issue is related to the cloud provider, not the Go code here.
 	// For example, in Heroku, this still won't work. It works with `tea.WithInput(nil)`, but it won't render anything and will just be blank.
+	//
+	// TODO: Remove Bubble Tea Spinner; it might cause rendering issues in the terminal due to MySQL backups running concurrently.
 	p := tea.NewProgram(
 		m,
 		tea.WithOutput(log.NewLogWriter(os.Stdout, timeFormatter)), // Reuse from custom logger.
