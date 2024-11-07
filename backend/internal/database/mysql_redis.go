@@ -15,6 +15,7 @@ import (
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/bcrypt"
 	"h0llyw00dz-template/env"
+	"io"
 	"math"
 	"os"
 	"strconv"
@@ -160,11 +161,8 @@ type Service interface {
 	// BackupTables creates a backup of specified tables in the database.
 	BackupTables(tablesToBackup []string) error
 
-	// BackupTablesConcurrently creates a backup of specified tables in the database concurrently.
-	// This method uses goroutines to back up each table simultaneously (e.g., 9999999 tables then 9999999 goroutines). To ensure consistency
-	// similar to sequential backups, consider using transactions or read locks to capture
-	// a consistent snapshot of each table, preventing updates during the backup process.
-	BackupTablesConcurrently(tablesToBackup []string) error
+	// BackupTablesConcurrently is an interface method for creating backups of specified tables concurrently 🛰️.
+	BackupTablesConcurrently(tablesToBackup []string, o io.Writer) error
 
 	// BackupTablesWithGPG creates a backup of specified tables in the database and encrypts it using a PGP public key.
 	// This function generates a .sql file containing the SQL statements needed to recreate
