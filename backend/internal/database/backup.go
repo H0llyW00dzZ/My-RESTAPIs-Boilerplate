@@ -95,6 +95,12 @@ func (s *service) BackupTablesConcurrently(tablesToBackup []string, o io.Writer)
 		}
 	}
 
+	// Write the header once
+	// Moved here to prevent it from being written multiple times. The SQL data remains safe.
+	if err := writeSQLHeader(o); err != nil {
+		return err
+	}
+
 	var wg sync.WaitGroup
 	errChan := make(chan error, len(tablesToBackup))
 
@@ -247,11 +253,6 @@ func (s *service) backupTableToWriter(tableName string, w io.Writer) error {
 	// For large datasets, this may need to configure this and adjust the MySQL server settings.
 	ctx, cancel := context.WithTimeout(context.Background(), DefaultBackupCtxTimeout)
 	defer cancel()
-
-	// Write the header to the object
-	if err := writeSQLHeader(w); err != nil {
-		return err
-	}
 
 	// Start a transaction to ensure data consistency
 	tx, err := s.db.Begin()
