@@ -232,6 +232,8 @@ func (s *service) backupSingleTable(tableName string, o io.Writer) error {
 // sendTo transfers data from the reader to the specified writer.
 // It uses [io.Copy] to efficiently stream data between the reader and writer,
 // allowing for real-time data transfer, such as over a network (on the fly) 🛰️.
+//
+// TODO: Connect to GPG EncryptStream (laverage I/O before fly)
 func (s *service) sendTo(r io.Reader, o io.Writer) error {
 	_, err := io.Copy(o, r)
 	return err
