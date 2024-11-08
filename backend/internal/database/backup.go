@@ -97,6 +97,10 @@ func (s *service) BackupTablesConcurrently(tablesToBackup []string, o io.Writer)
 
 	// Write the header once
 	// Moved here to prevent it from being written multiple times (Not a Race 🤪). The SQL data remains safe.
+	//
+	// Note: Ensure there are no errors before processing (on the fly 🛰️). If an error occurs during processing (in the database),
+	// the output may be incomplete (e.g., if saving to a file, the header may not be empty).
+	// This is due to the real-time nature of the data transfer.
 	if err := writeSQLHeader(o); err != nil {
 		return err
 	}
