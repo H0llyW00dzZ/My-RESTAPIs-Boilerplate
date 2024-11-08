@@ -135,4 +135,10 @@
 //   - Since this worker is concurrent, it is possible to boost the worker (goroutines). For example, if you are only using this worker for handling Fiber requests concurrently (e.g., from a http client),
 //     you should also set the concurrency level in the Fiber configuration accordingly (e.g., "512 * 1024"). This can make both the worker and Fiber faster, as concurrency
 //     should be handled by concurrency.
+//
+// # Immutable Tag:
+//
+//   - When running with an immutable tag and passing any parameter & jobs as a pointer to [fiber.Ctx], this worker performs optimally and is safer due to its immutability.
+//     Additionally, in HPA, it can synchronize stable pods (e.g., 5 pods are stable), which is not possible with stateless configurations hahahaha.
+//     This is why using stateful architectures for web services is generally not recommended (bad). It's best to avoid stateful designs for web services (good you are mastering k8s) to leverage Kubernetes effectively.
 package worker
