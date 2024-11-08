@@ -159,6 +159,13 @@ type Service interface {
 	GetKeysAtPipeline(keys []string) (map[string]any, error)
 
 	// BackupTables creates a backup of specified tables in the database.
+	//
+	// Compatibility:
+	// - Ensure the network is stable and the MySQL server is properly configured in real-world scenarios.
+	// - Race conditions are minimized by default, as seen in the function implementation.
+	// - When performing backups for imports, ensure Unicode characters are handled correctly.
+	//   MySQL Workbench might produce errors like "\xF0\x9F\x87\xAE\xF0\x9F..." during import.
+	// - Set batchSize based on calculation: if a one table has 100K rows, set it to 10K is sufficient.
 	BackupTables(tablesToBackup []string, batchSize int) error
 
 	// BackupTablesConcurrently is an interface method for creating backups of specified tables concurrently 🛰️.
@@ -170,6 +177,7 @@ type Service interface {
 	// - Race conditions are minimized by default, as seen in the function implementation.
 	// - When performing backups for imports, ensure Unicode characters are handled correctly.
 	//   MySQL Workbench might produce errors like "\xF0\x9F\x87\xAE\xF0\x9F..." during import.
+	// - Set batchSize based on calculation: if a one table has 100K rows, set it to 10K is sufficient.
 	BackupTablesConcurrently(tablesToBackup []string, o io.Writer, batchSize int) error
 
 	// BackupTablesWithGPG creates a backup of specified tables in the database and encrypts it using a PGP public key.
@@ -222,6 +230,13 @@ type Service interface {
 	// 	- Key ID: AB68BB42A56C9894
 	// 	- Public Key Algo: ECDH
 	// 	- Status: Success
+	//
+	// Compatibility:
+	// - Ensure the network is stable and the MySQL server is properly configured in real-world scenarios.
+	// - Race conditions are minimized by default, as seen in the function implementation.
+	// - When performing backups for imports, ensure Unicode characters are handled correctly.
+	//   MySQL Workbench might produce errors like "\xF0\x9F\x87\xAE\xF0\x9F..." during import.
+	// - Set batchSize based on calculation: if a one table has 100K rows, set it to 10K is sufficient.
 	BackupTablesWithGPG(tablesToBackup []string, publicGPGKey []string, batchSize int) error
 
 	// PingDB checks the connectivity of both the MySQL database and the Redis instance.
