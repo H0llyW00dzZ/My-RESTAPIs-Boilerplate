@@ -164,7 +164,12 @@ type Service interface {
 	// BackupTablesConcurrently is an interface method for creating backups of specified tables concurrently 🛰️.
 	//
 	// Note: This method also safely writes to a single file and has been tested with over 70MiB of data.
-	// Ensure that the network is stable and the MySQL server is properly configured in real-world scenarios.
+	//
+	// Compatibility:
+	// - Ensure the network is stable and the MySQL server is properly configured in real-world scenarios.
+	// - Race conditions are minimized by default, as seen in the function implementation.
+	// - When performing backups for imports, ensure Unicode characters are handled correctly.
+	//   MySQL Workbench might produce errors like "\xF0\x9F\x87\xAE\xF0\x9F..." during import.
 	BackupTablesConcurrently(tablesToBackup []string, o io.Writer) error
 
 	// BackupTablesWithGPG creates a backup of specified tables in the database and encrypts it using a PGP public key.
