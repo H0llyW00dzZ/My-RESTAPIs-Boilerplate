@@ -298,6 +298,10 @@ func (s *service) dumpTableSchema(ctx context.Context, w io.Writer, tableName st
 // Note: This differs from MySQL Dumper and PhpMyAdmin Export, both of which use single-row INSERT statements for data.
 // This implementation uses multi-row INSERT statements + Batching, which can improve performance when importing large datasets
 // and help avoid MySQL deadlocks (not due to Go, but inherent to MySQL itself).
+//
+// TODO: Improve batchSize calculations using [math/big].
+// The current implementation depends on the architecture (32-bit/64-bit),
+// and it should be sufficient for all cases.
 func (s *service) dumpTableData(ctx context.Context, w io.Writer, tableName string, batchSize int) error {
 	// Adjust the batch size as needed.
 	//
