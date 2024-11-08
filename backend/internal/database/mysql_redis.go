@@ -159,7 +159,7 @@ type Service interface {
 	GetKeysAtPipeline(keys []string) (map[string]any, error)
 
 	// BackupTables creates a backup of specified tables in the database.
-	BackupTables(tablesToBackup []string) error
+	BackupTables(tablesToBackup []string, batchSize int) error
 
 	// BackupTablesConcurrently is an interface method for creating backups of specified tables concurrently 🛰️.
 	//
@@ -170,7 +170,7 @@ type Service interface {
 	// - Race conditions are minimized by default, as seen in the function implementation.
 	// - When performing backups for imports, ensure Unicode characters are handled correctly.
 	//   MySQL Workbench might produce errors like "\xF0\x9F\x87\xAE\xF0\x9F..." during import.
-	BackupTablesConcurrently(tablesToBackup []string, o io.Writer) error
+	BackupTablesConcurrently(tablesToBackup []string, o io.Writer, batchSize int) error
 
 	// BackupTablesWithGPG creates a backup of specified tables in the database and encrypts it using a PGP public key.
 	// This function generates a .sql file containing the SQL statements needed to recreate
@@ -222,7 +222,7 @@ type Service interface {
 	// 	- Key ID: AB68BB42A56C9894
 	// 	- Public Key Algo: ECDH
 	// 	- Status: Success
-	BackupTablesWithGPG(tablesToBackup []string, publicGPGKey []string) error
+	BackupTablesWithGPG(tablesToBackup []string, publicGPGKey []string, batchSize int) error
 
 	// PingDB checks the connectivity of both the MySQL database and the Redis instance.
 	//

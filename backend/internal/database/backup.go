@@ -27,7 +27,7 @@ import (
 // the backups should be archived and stored in a cloud storage service.
 // This function should be handled by goroutines for task to run periodically without relying on cron jobs,
 // as Go supports concurrency with goroutines.
-func (s *service) BackupTables(tablesToBackup []string) error {
+func (s *service) BackupTables(tablesToBackup []string, batchSize int) error {
 	for _, tableName := range tablesToBackup {
 		if !IsValidTableName(tableName) {
 			return fmt.Errorf("invalid table name: %s", tableName)
@@ -68,7 +68,7 @@ func (s *service) BackupTables(tablesToBackup []string) error {
 			return err
 		}
 
-		if err = s.dumpTableData(ctx, file, tableName); err != nil {
+		if err = s.dumpTableData(ctx, file, tableName, batchSize); err != nil {
 			return err
 		}
 	}
@@ -87,7 +87,7 @@ func (s *service) BackupTables(tablesToBackup []string) error {
 //
 // Additionally, if this performance improvement is still insufficient for large infrastructures,
 // it can be combined with the worker package. Ensure that your infrastructure can handle up to 1 billion operations, as this is just good business.
-func (s *service) BackupTablesConcurrently(tablesToBackup []string, o io.Writer) error {
+func (s *service) BackupTablesConcurrently(tablesToBackup []string, o io.Writer, batchSize int) error {
 	// Validate table names
 	for _, tableName := range tablesToBackup {
 		if !IsValidTableName(tableName) {
@@ -113,7 +113,7 @@ func (s *service) BackupTablesConcurrently(tablesToBackup []string, o io.Writer)
 		wg.Add(1)
 		go func(table string) {
 			defer wg.Done()
-			if err := s.backupSingleTable(table, o); err != nil {
+			if err := s.backupSingleTable(table, o, batchSize); err != nil {
 				errChan <- err
 			}
 		}(tableName)
@@ -135,7 +135,7 @@ func (s *service) BackupTablesConcurrently(tablesToBackup []string, o io.Writer)
 }
 
 // BackupTablesWithGPG creates a backup of specified tables in the database and encrypts it using a PGP public key.
-func (s *service) BackupTablesWithGPG(tablesToBackup []string, publicKey []string) error {
+func (s *service) BackupTablesWithGPG(tablesToBackup []string, publicKey []string, batchSize int) error {
 	for _, tableName := range tablesToBackup {
 		if !IsValidTableName(tableName) {
 			return fmt.Errorf("invalid table name: %s", tableName)
@@ -178,7 +178,7 @@ func (s *service) BackupTablesWithGPG(tablesToBackup []string, publicKey []strin
 			return err
 		}
 
-		if err = s.dumpTableData(ctx, file, tableName); err != nil {
+		if err = s.dumpTableData(ctx, file, tableName, batchSize); err != nil {
 			return err
 		}
 	}
@@ -220,13 +220,13 @@ func (s *service) BackupTablesWithGPG(tablesToBackup []string, publicKey []strin
 // A goroutine is used to write the table's schema and data to the pipe,
 // ensuring non-blocking writes. The function validates the table name,
 // initiates the backup process, and sends the data to the desired destination.
-func (s *service) backupSingleTable(tableName string, o io.Writer) error {
+func (s *service) backupSingleTable(tableName string, o io.Writer, batchSize int) error {
 	r, w := io.Pipe()
 	defer r.Close()
 
 	go func() {
 		defer w.Close()
-		if err := s.backupTableToWriter(tableName, w); err != nil {
+		if err := s.backupTableToWriter(tableName, w, batchSize); err != nil {
 			log.LogErrorf("Failed to backup table %s: %v", tableName, err)
 		}
 	}()
@@ -253,7 +253,7 @@ func (s *service) sendTo(r io.Reader, o io.Writer) error {
 // It begins a transaction to ensure a consistent snapshot of the table.
 // The function writes the SQL header, schema, and data to the writer, then commits
 // the transaction to finalize the backup.
-func (s *service) backupTableToWriter(tableName string, w io.Writer) error {
+func (s *service) backupTableToWriter(tableName string, w io.Writer, batchSize int) error {
 	// For large datasets, this may need to configure this and adjust the MySQL server settings.
 	ctx, cancel := context.WithTimeout(context.Background(), DefaultBackupCtxTimeout)
 	defer cancel()
@@ -269,7 +269,7 @@ func (s *service) backupTableToWriter(tableName string, w io.Writer) error {
 		return err
 	}
 
-	if err := s.dumpTableData(ctx, w, tableName); err != nil {
+	if err := s.dumpTableData(ctx, w, tableName, batchSize); err != nil {
 		return err
 	}
 
@@ -298,7 +298,23 @@ func (s *service) dumpTableSchema(ctx context.Context, w io.Writer, tableName st
 // Note: This differs from MySQL Dumper and PhpMyAdmin Export, both of which use single-row INSERT statements for data.
 // This implementation uses multi-row INSERT statements + Batching, which can improve performance when importing large datasets
 // and help avoid MySQL deadlocks (not due to Go, but inherent to MySQL itself).
-func (s *service) dumpTableData(ctx context.Context, w io.Writer, tableName string) error {
+func (s *service) dumpTableData(ctx context.Context, w io.Writer, tableName string, batchSize int) error {
+	// Adjust the batch size as needed.
+	//
+	// Note that batching can improve performance when importing data with some MySQL tools,
+	// such as MySQL Workbench and PhpMyAdmin. However, in Go, this is often unnecessary
+	// because Go can handle streaming efficiently, potentially faster than other languages.
+	//
+	// This primarily benefits importing, and in Go, it doesn't matter as much due to network factors.
+	// For large data (backup), ensure the network is stable, as performance depends on network conditions (e.g., between the client and the MySQL server itself).
+	// For example, with large data, you might set the batch size to 100,000 to speed up the import (after backup) process into MySQL.
+	//
+	// If batchSize is not greater than 0, return an error here.
+	// This is a good point unlike return error early (e.g., tableName).
+	if batchSize <= 0 {
+		return fmt.Errorf("batch size must be greater than 0, got %d", batchSize)
+	}
+
 	query := fmt.Sprintf("SELECT * FROM `%s`", tableName)
 	rows, err := s.db.QueryContext(ctx, query)
 	if err != nil {
@@ -312,23 +328,17 @@ func (s *service) dumpTableData(ctx context.Context, w io.Writer, tableName stri
 	}
 
 	// This zero allocations because it passes pointers to the values themselves.
+	//
+	// It supports any Unicode value within the data by using "any" and passing pointers.
+	// If there are errors during import after backup, they are typically Unicode issues with external tools.
+	// For example, MySQL Workbench might produce errors like "\xF0\x9F\x87\xAE\xF0\x9F..." during import.
+	// For large datasets, there might be batch size issues as well.
 	values := make([]any, len(columns))
 	valuePtrs := make([]any, len(columns))
 	for i := range values {
 		valuePtrs[i] = &values[i]
 	}
 
-	// Adjust the batch size as needed.
-	// The default size of 1000 is typically sufficient.
-	//
-	// Note that batching can improve performance when importing data with some MySQL tools,
-	// such as MySQL Workbench and PhpMyAdmin. However, in Go, this is often unnecessary
-	// because Go can handle streaming efficiently, potentially faster than other languages.
-	//
-	// This primarily benefits importing, and in Go, it doesn't matter as much due to network factors.
-	// For large data (backup), ensure the network is stable, as performance depends on network conditions (e.g., between the client and the MySQL server itself).
-	// For example, with large data, you might set the batch size to 100,000 to speed up the import (after backup) process into MySQL.
-	var batchSize = 1000
 	var insertStatements []string
 
 	for rows.Next() {
