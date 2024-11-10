@@ -207,6 +207,7 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
 - **Average CPU (on AMD) and Memory Usage During Smooth Sailing ⛵ ☸ with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go) for `24/7 Operation Zero Downtime` (as viewed on Grafana):**
 
 <p align="center">
+   <img src="https://i.imgur.com/RxBn1ID.png" alt="zero-downtime">
    <img src="https://i.imgur.com/gqMXz2Z.png" alt="fiber-framework-stable-at-scale-k8s">
    <img src="https://i.imgur.com/0fS0kGa.png" alt="fiber-framework-stable-at-scale-k8s">
 </p>
