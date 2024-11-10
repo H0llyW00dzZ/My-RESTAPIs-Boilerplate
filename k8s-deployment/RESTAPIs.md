@@ -498,6 +498,11 @@ This boilerplate is compliant with autoscaling features in various cloud provide
 
 By adhering to best practices for Horizontal Pod Autoscaler (HPA) and ensuring proper resource management, this boilerplate can efficiently handle scaling requirements in cloud environments.
 
+> [!NOTE]
+> Compliance is provided by default by the cloud providers, so there's no need for manual installation or configuration.
+> If a cloud provider requires you to install or configure components manually for autoscaling, it may not be compatible with this boilerplate.
+> This boilerplate is designed to minimize overhead (be smart), avoiding the need for manual configuration of policies or tools for autoscaling.
+
 ## Cleanup
 
 To remove the deployed resources from your Kubernetes cluster, run the following commands:
