@@ -204,7 +204,7 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
 > The `Average CPU (on AMD) and Memory Usage When Idle & Immutable Tag` refers to the state when no jobs are being processed by the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker).
 > When comparing `Average CPU (on AMD) and Memory Usage When Idle (as viewed on Grafana)`, the primary difference is in `Memory Usage (Cache)`.
 
-- **Average CPU (on AMD) and Memory Usage During Smooth Sailing ⛵ ☸ with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go) for 24/7 Operation (as viewed on Grafana):**
+- **Average CPU (on AMD) and Memory Usage During Smooth Sailing ⛵ ☸ with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go) for `24/7 Operation Zero Downtime` (as viewed on Grafana):**
 
 <p align="center">
    <img src="https://i.imgur.com/gqMXz2Z.png" alt="fiber-framework-stable-at-scale-k8s">
