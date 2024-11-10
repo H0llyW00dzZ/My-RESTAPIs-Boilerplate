@@ -118,7 +118,7 @@ type Service interface {
 	// using 5 storage options (only fiber storage) might shift it from HPA (Horizontal Pod Autoscaler) to HNA (Horizontal Node Autoscaler).
 	//
 	// Warning:
-	// 	- Do not switch to a stateful configuration not recommended (bad).
+	// 	- Switching to a stateful configuration is not recommended (bad).
 	FiberStorage() fiber.Storage
 
 	// ScanAndDel uses the Redis SCAN command to iterate over a set of keys and delete them.
