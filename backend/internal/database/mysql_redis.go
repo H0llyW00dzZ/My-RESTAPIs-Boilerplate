@@ -116,6 +116,7 @@ type Service interface {
 	//
 	// Additionally, due to the current implementation of this boilerplate, which supports compatibility with HPA,
 	// using 5 storage options (only fiber storage) might shift it from HPA (Horizontal Pod Autoscaler) to HNA (Horizontal Node Autoscaler).
+	// If you're not familiar with HNA, it functions as an auto-pilot.
 	//
 	// Warning:
 	// 	- Switching to a stateful configuration is not recommended (bad).
