@@ -110,9 +110,16 @@ type Service interface {
 
 	// FiberStorage returns the [fiber.Storage] interface for storage middleware.
 	//
-	// Note: This uses Redis. For other storage options, it is recommended to implement something similar
-	// to how this is done. You can find more information at https://docs.gofiber.io/storage/.
-	// It is possible to use, for example, 5 different databases/storage options in this repository at large scale.
+	// Note: This uses Redis. For other storage options, it is recommended to implement a similar approach.
+	// More information can be found at https://docs.gofiber.io/storage/.
+	// It is possible to use, for example, 5 different databases/storage options in this repository at a large scale.
+	//
+	// Additionally, due to the current implementation of this boilerplate, which supports compatibility with HPA,
+	// using 5 storage options (only fiber storage) might shift it from HPA (Horizontal Pod Autoscaler) to HNA (Horizontal Node Autoscaler).
+	// If you're not familiar with HNA, it functions as an auto-pilot.
+	//
+	// Warning:
+	// 	- Switching to a stateful configuration is not recommended (bad).
 	FiberStorage() fiber.Storage
 
 	// ScanAndDel uses the Redis SCAN command to iterate over a set of keys and delete them.
