@@ -160,10 +160,10 @@ type Service interface {
 	Auth() ServiceAuth
 
 	// SetKeysAtPipeline efficiently sets multiple key-value pairs in Redis/Valkey with a specified TTL (Time To Live) using pipelining.
-	SetKeysAtPipeline(keyValues map[string]any, ttl time.Duration) error
+	SetKeysAtPipeline(ctx context.Context, keyValues map[string]any, ttl time.Duration) error
 
 	// GetKeysAtPipeline efficiently retrieves the values for the given keys from Redis/Valkey using pipelining.
-	GetKeysAtPipeline(keys []string) (map[string]any, error)
+	GetKeysAtPipeline(ctx context.Context, keys []string) (map[string]any, error)
 
 	// BackupTables creates a backup of specified tables in the database.
 	//
@@ -938,12 +938,15 @@ func (s *service) Auth() ServiceAuth {
 // Important:
 //   - For better performance, avoid using Redis/Valkey JSON commands.
 //     String commands are sufficient as they are immutable and can easily enhance performance by utilizing other JSON encoders/decoders (Most Important Go, unlike other language) for the value key. so ¯\_(ツ)_/¯
-func (s *service) SetKeysAtPipeline(keyValues map[string]any, ttl time.Duration) error {
+func (s *service) SetKeysAtPipeline(ctx context.Context, keyValues map[string]any, ttl time.Duration) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	// Use a context with a timeout to avoid hanging indefinitely
-	ctx, cancel := context.WithTimeout(context.Background(), DefaultCtxTimeout)
+	//
+	// This is compatible/supported with Fiber's context (c.Context()), but it's recommended to use context.Background() if you're familiar with handling contexts.
+	// By default, this explicitly uses "context.WithTimeout".
+	ctx, cancel := context.WithTimeout(ctx, DefaultCtxTimeout)
 	defer cancel()
 
 	// Initialize a new pipeline.
@@ -975,12 +978,15 @@ func (s *service) SetKeysAtPipeline(keyValues map[string]any, ttl time.Duration)
 // Important:
 //   - For better performance, avoid using Redis/Valkey JSON commands.
 //     String commands are sufficient as they are immutable and can easily enhance performance by utilizing other JSON encoders/decoders (Most Important Go, unlike other language) for the value key. so ¯\_(ツ)_/¯
-func (s *service) GetKeysAtPipeline(keys []string) (map[string]any, error) {
+func (s *service) GetKeysAtPipeline(ctx context.Context, keys []string) (map[string]any, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	// Use a context with a timeout to avoid hanging indefinitely
-	ctx, cancel := context.WithTimeout(context.Background(), DefaultCtxTimeout)
+	//
+	// This is compatible/supported with Fiber's context (c.Context()), but it's recommended to use context.Background() if you're familiar with handling contexts.
+	// By default, this explicitly uses "context.WithTimeout".
+	ctx, cancel := context.WithTimeout(ctx, DefaultCtxTimeout)
 	defer cancel()
 
 	// Initialize a new pipeline
