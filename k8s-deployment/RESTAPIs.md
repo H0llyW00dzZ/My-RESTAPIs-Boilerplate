@@ -489,6 +489,15 @@ The annotations `nginx.ingress.kubernetes.io/session-cookie-max-age`, `nginx.ing
 > While this boilerplate uses the [`Fiber Framework`](https://gofiber.io/), it is compatible with `HPA` (Horizontal Pod Autoscaling) for large-scale applications and multiple sites in a single deployment. 
 > Do not switch the deployment to `stateful (bad)`, as `stateful (bad)` deployments limit your ability to leverage Kubernetes features and experimental solutions for addressing critical infrastructure issues.
 
+## Compliance
+
+This boilerplate is compliant with autoscaling features in various cloud providers. For example:
+
+- **GKE Autopilot**: This deployment is fully compatible with GKE Autopilot's autoscaling capabilities.
+- **DOKS (DigitalOcean Kubernetes Service)**: The configuration is also suitable for autoscaling in DOKS.
+
+By adhering to best practices for Horizontal Pod Autoscaler (HPA) and ensuring proper resource management, this boilerplate can efficiently handle scaling requirements in cloud environments.
+
 ## Cleanup
 
 To remove the deployed resources from your Kubernetes cluster, run the following commands:
