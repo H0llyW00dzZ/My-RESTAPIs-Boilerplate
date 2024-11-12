@@ -215,6 +215,9 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
 > [!NOTE]
 > The average CPU (on AMD) and memory usage remains stable during continuous operation (Smooth Sailing ⛵ ☸) with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go).
 > Unlike `stateful configurations`, which can sometimes encounter `OOM` errors due to the need for `explicit node selectors` and `single pod deployment`, `stateless architectures are more stable`. This is the reason why using `stateful architectures` for web services is not recommended (bad); mastering Kubernetes involves leveraging stateless designs (good).
+>
+> Also note that `stateful architectures` are not as scalable (not possible 🤪) as stateless ones because they are typically stable only on a single node and cannot easily scale across multiple nodes.
+> In a comparison between `stateful` and `stateless` architectures, `stateless` ones (win) are generally more scalable.
 
 
 - **Stable Handling of 1 Million+ Keys in Redis (as shown in Redis Insight and my Custom Redis Stats mechanism):**
@@ -226,6 +229,8 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
 
 > [!NOTE]
 > The phrase `Stable Handling of 1 Million+ Keys (1 Million+ data) in Redis (as shown in Redis Insight and my Custom Redis Stats mechanism)` refers to a setup where MySQL stores important, persistent data, while Redis is used for temporary storage. The process works simply: if there's a cache miss in Redis, the data is queried from MySQL and then stored in Redis with a TTL (time-to-live). This way, subsequent requests can retrieve the data directly from Redis if it's available, avoiding repeated queries to MySQL.
+>
+> It's important to note that in a `stateful architecture`, achieving this level of scalability might not be possible 🤪. However, with a `stateless architecture` and `Horizontal Pod Autoscaling (HPA)`, it remains stable without `significant latency`.
 
 ## Customization
 
