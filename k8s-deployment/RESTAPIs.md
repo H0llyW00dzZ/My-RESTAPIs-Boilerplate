@@ -216,6 +216,17 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
 > The average CPU (on AMD) and memory usage remains stable during continuous operation (Smooth Sailing ⛵ ☸) with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go).
 > Unlike `stateful configurations`, which can sometimes encounter `OOM` errors due to the need for `explicit node selectors` and `single pod deployment`, `stateless architectures are more stable`. This is the reason why using `stateful architectures` for web services is not recommended (bad); mastering Kubernetes involves leveraging stateless designs (good).
 
+
+- **Stable Handling of 1 Million+ Keys in Redis (as shown in Redis Insight and my Custom Redis Stats mechanism):**
+
+<p align="center">
+   <img src="https://i.imgur.com/JcjE18s.png" alt="fiber-framework-stable-at-scale-k8s">
+   <img src="https://i.imgur.com/HqW3NFY.png" alt="fiber-framework-stable-at-scale-k8s">
+</p>
+
+> [!NOTE]
+> The phrase `Stable Handling of 1 Million+ Keys (1 Million+ data) in Redis (as shown in Redis Insight and my Custom Redis Stats mechanism)` refers to a setup where MySQL stores important, persistent data, while Redis is used for temporary storage. The process works simply: if there's a cache miss in Redis, the data is queried from MySQL and then stored in Redis with a TTL (time-to-live). This way, subsequent requests can retrieve the data directly from Redis if it's available, avoiding repeated queries to MySQL.
+
 ## Customization
 
 The provided deployment files are designed to be customizable. You can modify the resource limits, environment variables, and other configurations according to your application's needs. Additionally, you can adjust the Ingress configuration to match your desired routing rules and TLS settings.
