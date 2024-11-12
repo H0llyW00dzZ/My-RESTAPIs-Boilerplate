@@ -417,6 +417,34 @@ spec:
 > [!NOTE]
 > Don't forget to set `maxReplicas: 50` based on your needs; for example, you can reduce it to `maxReplicas: 5` for a starter configuration.
 
+> [!TIP]
+> You can also adjust the HPA based on custom metrics, such as HTTP requests, using `Prometheus` and the `Prometheus Adapter` for example:
+>
+> ```yaml
+> apiVersion: autoscaling/v2
+> kind: HorizontalPodAutoscaler
+> metadata:
+>   name: restapis-hpa
+>   namespace: restapis
+> spec:
+>   scaleTargetRef:
+>     apiVersion: apps/v1
+>     kind: Deployment
+>     name: restapis
+>   minReplicas: 1
+>   maxReplicas: 5
+>   metrics:
+>     - type: Pods
+>       pods:
+>         metric:
+>           name: http_requests_per_second
+>         target:
+>           type: AverageValue
+>           averageValue: "100"
+> ```
+>
+> Note that I haven't personally tested custom metrics, as it's already stable with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker). Therefore, custom metrics might not be stable.
+
 > [!WARNING]
 > When using the `immutable` tag with HPA in combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) or outside Kubernetes, avoid using mutexes again for concurrency. This can degrade performance because the `worker package` already synchronizes using channels. Ensure your functions are immutable/safe for concurrency, even with a large number of workers (e.g., millions or billions of goroutines). They will `efficiently` process jobs by doing `one thing and doing it well`.
 
