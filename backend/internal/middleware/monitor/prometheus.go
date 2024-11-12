@@ -56,6 +56,10 @@ var DefaultPrometheusConfig = PrometheusConfig{
 }
 
 // NewPrometheus creates a new Prometheus middleware with optional custom configuration options.
+//
+// Warning: Do not use this in production, especially on Kubernetes, as it does not store metrics on disk or utilize a fiber storage mechanism (https://docs.gofiber.io/storage/).
+// The implementation of github.com/ansrivas/fiberprometheus/v2 lacks a storage mechanism,
+// which means metrics will be stored directly in memory.
 func NewPrometheus(config ...PrometheusConfig) fiber.Handler {
 	cfg := DefaultPrometheusConfig
 
