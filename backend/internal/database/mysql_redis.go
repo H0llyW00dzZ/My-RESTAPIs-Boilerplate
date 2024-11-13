@@ -139,13 +139,13 @@ type Service interface {
 	//       log.LogErrorf("Failed to clear keys cache: %v", err)
 	//       return err
 	//   }
-	ScanAndDel(ctx context.Context, patterns ...string) error
+	ScanAndDel(ctx context.Context, patterns []string) error
 
 	// PrepareInsertStatement prepares a SQL insert statement for the transaction.
 	PrepareInsertStatement(ctx context.Context, tx *sql.Tx, query string) (*sql.Stmt, error)
 
 	// ScanKeys returns a slice of keys for a given pattern starting at the cursor.
-	ScanKeys(ctx context.Context, pattern string, cursor uint64) ([]string, uint64, error)
+	ScanKeys(ctx context.Context, pattern string, cursor uint64, count int64) ([]string, uint64, error)
 
 	// DeleteKeys deletes a slice of keys from Redis and returns the updated count.
 	DeleteKeys(ctx context.Context, keys []string, totalDeleted int) (int, error)
@@ -756,10 +756,7 @@ func (s *service) FiberStorage() fiber.Storage {
 
 // ScanAndDel uses the Redis SCAN command to iterate over a set of keys and delete them.
 // It accepts one or more key patterns and deletes keys matching any of the patterns.
-//
-// TODO: Improve handling when no keys match the pattern,
-// as it sometimes hangs with [context.Background] until the timeout is reached.
-func (s *service) ScanAndDel(ctx context.Context, patterns ...string) error {
+func (s *service) ScanAndDel(ctx context.Context, patterns []string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -769,32 +766,51 @@ func (s *service) ScanAndDel(ctx context.Context, patterns ...string) error {
 	defer cancel()
 
 	var totalDeleted int
-	var err error
+	// Note: The count is dynamically adjusted based on performance.
+	baseCount := 100   // Initial count for retrieving keys
+	maxCount := 100000 // Maximum limit for the count; if insufficient, it can be increased to 1 million
 
 	for _, pattern := range patterns {
 		var cursor uint64
-
+		count := baseCount
 		for {
-			// Retrieve keys matching the current pattern
-			var keys []string
-			keys, cursor, err = s.ScanKeys(ctx, pattern, cursor)
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			default:
+				// Continue scanning keys as the context is still valid.
+				// Do not return here.
+			}
+
+			start := time.Now()
+
+			// Use ScanKeys to retrieve keys
+			keys, nextCursor, err := s.ScanKeys(ctx, pattern, cursor, int64(count))
 			if err != nil {
-				log.LogErrorf("Error retrieving keys from Redis: %v", err)
 				return err
 			}
 
-			// Skip deletion if no keys are found, but continue scanning if not finished.
+			// Calculate time taken for this iteration
+			duration := time.Since(start)
+
+			// Adjust count based on duration
+			if duration < 50*time.Millisecond && count < maxCount {
+				count *= 2 // Double the count if operation is fast
+			} else if duration > 200*time.Millisecond && count > baseCount {
+				count /= 2 // Halve the count if operation is slow
+			}
+
+			// Delete keys if found
 			if len(keys) > 0 {
-				var deleted int
-				deleted, err = s.DeleteKeys(ctx, keys, totalDeleted)
+				deleted, err := s.DeleteKeys(ctx, keys, totalDeleted)
 				if err != nil {
-					log.LogErrorf("Error deleting keys from Redis: %v", err)
 					return err
 				}
 				totalDeleted += deleted
 			}
 
-			// Stop scanning if the cursor returned by SCAN is 0 (iteration complete)
+			cursor = nextCursor
+
 			if cursor == 0 {
 				break
 			}
@@ -815,8 +831,8 @@ func (s *service) ScanAndDel(ctx context.Context, patterns ...string) error {
 }
 
 // ScanKeys returns a slice of keys for a given pattern starting at the cursor.
-func (s *service) ScanKeys(ctx context.Context, pattern string, cursor uint64) ([]string, uint64, error) {
-	return s.redisClient.Scan(ctx, cursor, pattern, 0).Result()
+func (s *service) ScanKeys(ctx context.Context, pattern string, cursor uint64, count int64) ([]string, uint64, error) {
+	return s.redisClient.Scan(ctx, cursor, pattern, count).Result()
 }
 
 // DeleteKeys deletes a slice of keys from Redis and returns the updated count.
