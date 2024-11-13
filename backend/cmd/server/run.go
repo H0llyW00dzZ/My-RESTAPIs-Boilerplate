@@ -18,6 +18,17 @@ import (
 	"h0llyw00dz-template/env"
 )
 
+// Config holds the application configuration settings
+type Config struct {
+	AppName         string
+	Port            string
+	MonitorPath     string
+	TimeFormat      string
+	ReadTimeout     time.Duration
+	WriteTimeout    time.Duration
+	ShutdownTimeout time.Duration
+}
+
 // main is the entry point for the application. It initializes the application
 // by setting up the Fiber web server, configuring middleware, and registering routes.
 // It relies on environment variables to customize the application's behavior,
@@ -27,50 +38,40 @@ import (
 // the IP address "0.0.0.0" is not susceptible to exploits, attacks, or any other vulnerabilities.
 // This is because "0.0.0.0" is my home. So be smart and refer to the source code and documentation to understand how it works you poggers.
 func main() {
-	appName, port, monitorPath, timeFormat, readTimeout, writeTimeout, shutdownTimeout := getEnvVariables()
-	app := setupFiber(appName, readTimeout, writeTimeout)
+	// Retrieve configuration from environment variables
+	config := getConfig()
 
-	// Start the server with graceful shutdown and monitor
-	startServer(app, appName, port, monitorPath, timeFormat, shutdownTimeout)
+	// Set up the Fiber application with the retrieved configuration
+	app := setupFiber(config)
+
+	// Start the server with the configured settings
+	startServer(app, config)
 }
 
-// getEnvVariables retrieves essential configuration settings from environment variables.
-// It provides default values for the application name, port, monitoring path, time format, and timeouts
-// to ensure the application has sensible defaults if environment variables are not set.
-func getEnvVariables() (appName, port, monitorPath, timeFormat string, readTimeout, writeTimeout, shutdownTimeout time.Duration) {
-	// Get the APP_NAME, PORT, and MONITOR_PATH from environment variables or use default values.
-	appName = env.GetEnv(env.APPNAME, "Gopher")
-	port = env.GetEnv(env.PORT, "8080")
-	monitorPath = env.GetEnv(env.MONITORPATH, "/monitor")
-	// Get the TIME_FORMAT from environment variables or use default value
-	// Note: List Time Format Available: unix,default
-	timeFormat = env.GetEnv(env.TIMEFORMAT, "unix")
-
-	// Get the READ_TIMEOUT, WRITE_TIMEOUT, and SHUTDOWN_TIMEOUT from environment variables or use default values.
-	// Note: These default timeout values (5 seconds) are set to help prevent potential deadlocks/hangs.
-	readTimeoutStr := env.GetEnv(env.READTIMEOUT, "5s")
-	writeTimeoutStr := env.GetEnv(env.SHUTDOWNTIMEOUT, "5s")
-	shutdownTimeoutStr := env.GetEnv(env.SHUTDOWNTIMEOUT, "5s")
-
-	// Parse the timeout values into time.Duration
-	readTimeout, _ = time.ParseDuration(readTimeoutStr)
-	writeTimeout, _ = time.ParseDuration(writeTimeoutStr)
-	shutdownTimeout, _ = time.ParseDuration(shutdownTimeoutStr)
-
-	return
+// getConfig retrieves configuration from environment variables or uses default values
+func getConfig() Config {
+	return Config{
+		AppName:         env.GetEnv(env.APPNAME, "Gopher"),
+		Port:            env.GetEnv(env.PORT, "8080"),
+		MonitorPath:     env.GetEnv(env.MONITORPATH, "/monitor"),
+		TimeFormat:      env.GetEnv(env.TIMEFORMAT, "unix"),
+		ReadTimeout:     parseDuration(env.GetEnv(env.READTIMEOUT, "5s")),
+		WriteTimeout:    parseDuration(env.GetEnv(env.WRITETIMEOUT, "5s")),
+		ShutdownTimeout: parseDuration(env.GetEnv(env.SHUTDOWNTIMEOUT, "5s")),
+	}
 }
 
 // setupFiber initializes a new Fiber application with custom configuration.
 // It sets up the JSON encoder/decoder, case sensitivity, and strict routing,
 // and applies the application name to the server headers.
-func setupFiber(appName string, readTimeout, writeTimeout time.Duration) *fiber.App {
+func setupFiber(config Config) *fiber.App {
 	// TODO: Implement a server startup message mechanism similar to "Fiber" ASCII art,
 	// with animation (e.g., similar to a streaming/bubble tea spinner) for multiple sites or large codebases.
 	// The current static "Fiber" ASCII art only shows one site when there are multiple, which isn't ideal.
 	// However, animated ASCII art may not be necessary right now, as it only works properly in terminals.
 	return fiber.New(fiber.Config{
-		ServerHeader: appName,
-		AppName:      appName,
+		ServerHeader: config.AppName,
+		AppName:      config.AppName,
 		// Note: Using the sonic JSON encoder/decoder provides better performance and is more memory-efficient
 		// since Fiber is designed for zero allocation memory usage.
 		JSONEncoder:      sonic.Marshal,
@@ -78,8 +79,8 @@ func setupFiber(appName string, readTimeout, writeTimeout time.Duration) *fiber.
 		CaseSensitive:    true,
 		StrictRouting:    true,
 		DisableKeepalive: false,
-		ReadTimeout:      readTimeout,
-		WriteTimeout:     writeTimeout,
+		ReadTimeout:      config.ReadTimeout,
+		WriteTimeout:     config.WriteTimeout,
 		// Note: It's important to set Prefork to false because if it's enabled and running in Kubernetes,
 		// it may get killed by an Out-of-Memory (OOM) error due to a conflict with the Horizontal Pod Autoscaler (HPA).
 		Prefork: false,
@@ -116,15 +117,15 @@ func setupFiber(appName string, readTimeout, writeTimeout time.Duration) *fiber.
 // When running outside of Kubernetes (e.g., without an ingress), the PORT must be explicitly set to 443 for access via browser or other clients, as the default port is 8080.
 // Make sure the certificate is correctly configured as well (e.g., the certificate chain, which is easy to handle in Go for chaining certificates).
 // If the certificate is valid and properly configured, the server will run; otherwise, it won't run.
-func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, shutdownTimeout time.Duration) {
-	// Initialize the logger with the AppName from the environment variable
-	log.InitializeLogger(app.Config().AppName, timeFormat)
+func startServer(app *fiber.App, config Config) {
+	// Initialize logging with the application name and time format
+	log.InitializeLogger(config.AppName, config.TimeFormat)
 
-	// Define server address
-	addr := fmt.Sprintf(":%s", port) // Use the port from the environment variable
+	// Define the server address using the specified port
+	addr := fmt.Sprintf(":%s", config.Port)
 
-	// Create a new instance of FiberServer
-	server := handler.NewFiberServer(app, appName, monitorPath)
+	// Create a new instance of the server
+	server := handler.NewFiberServer(app, config.AppName, config.MonitorPath)
 
 	// Load TLS or mTLS certificates and keys from environment variables or command-line arguments ?
 	//
@@ -137,9 +138,19 @@ func startServer(app *fiber.App, appName, port, monitorPath, timeFormat string, 
 	// Start the server with graceful shutdown and monitor
 	if tlsConfig != nil {
 		// Start the server with TLS or mTLS ?
-		handler.StartServer(server, addr, monitorPath, shutdownTimeout, tlsConfig, nil)
+		handler.StartServer(server, addr, config.MonitorPath, config.ShutdownTimeout, tlsConfig, nil)
 	} else {
 		// Start the server without TLS
-		handler.StartServer(server, addr, monitorPath, shutdownTimeout, nil, nil)
+		handler.StartServer(server, addr, config.MonitorPath, config.ShutdownTimeout, nil, nil)
 	}
+}
+
+// parseDuration converts a string to a time.Duration, logging an error and defaulting if necessary
+func parseDuration(durationStr string) time.Duration {
+	duration, err := time.ParseDuration(durationStr)
+	if err != nil {
+		log.LogError(fmt.Errorf("invalid duration format: %s, using default 5s", durationStr))
+		return 5 * time.Second
+	}
+	return duration
 }

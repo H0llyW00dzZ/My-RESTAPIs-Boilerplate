@@ -9,8 +9,6 @@
 package main
 
 import (
-	"time"
-
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,14 +16,14 @@ import (
 // setupFiber initializes a new Fiber application with custom configuration.
 // It sets up the JSON encoder/decoder, case sensitivity, and strict routing,
 // and applies the application name to the server headers.
-func setupFiber(appName string, readTimeout, writeTimeout time.Duration) *fiber.App {
+func setupFiber(config Config) *fiber.App {
 	// TODO: Implement a server startup message mechanism similar to "Fiber" ASCII art,
 	// with animation (e.g., similar to a streaming/bubble tea spinner) for multiple sites or large codebases.
 	// The current static "Fiber" ASCII art only shows one site when there are multiple, which isn't ideal.
 	// However, animated ASCII art may not be necessary right now, as it only works properly in terminals.
 	return fiber.New(fiber.Config{
-		ServerHeader: appName,
-		AppName:      appName,
+		ServerHeader: config.AppName,
+		AppName:      config.AppName,
 		// Note: Using the sonic JSON encoder/decoder provides better performance and is more memory-efficient
 		// since Fiber is designed for zero allocation memory usage.
 		JSONEncoder:      sonic.Marshal,
@@ -33,8 +31,8 @@ func setupFiber(appName string, readTimeout, writeTimeout time.Duration) *fiber.
 		CaseSensitive:    true,
 		StrictRouting:    true,
 		DisableKeepalive: false,
-		ReadTimeout:      readTimeout,
-		WriteTimeout:     writeTimeout,
+		ReadTimeout:      config.ReadTimeout,
+		WriteTimeout:     config.WriteTimeout,
 		// Note: It's important to set Prefork to false because if it's enabled and running in Kubernetes,
 		// it may get killed by an Out-of-Memory (OOM) error due to a conflict with the Horizontal Pod Autoscaler (HPA).
 		Prefork: false,
