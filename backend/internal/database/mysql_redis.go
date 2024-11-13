@@ -126,20 +126,20 @@ type Service interface {
 	// It's particularly useful for deleting keys with a common pattern.
 	//
 	// Example Usage:
-	//	// Single key
-	//	if err := db.ScanAndDel("gopher_key:*"); err != nil {
-	//		Log.LogErrorf("Failed to clear gopher keys cache: %v", err)
-	//		return err
-	//	}
+	//   // Single key
+	//   if err := db.ScanAndDel(ctx, "gopher_key:*"); err != nil {
+	//       log.LogErrorf("Failed to clear gopher keys cache: %v", err)
+	//       return err
+	//   }
 	//
-	//	// With Slice
-	// 	slicekey := []string{"gopher_key:*", "another_gopher_key:*"}
+	//   // With Slice
+	//   sliceKey := []string{"gopher_key:*", "another_gopher_key:*"}
 	//
-	//	if err := db.ScanAndDel(slicekey); err != nil {
-	//		Log.LogErrorf("Failed to clear keys cache: %v", err)
-	//		return err
-	//	}
-	ScanAndDel(patterns ...string) error
+	//   if err := db.ScanAndDel(ctx, sliceKey...); err != nil {
+	//       log.LogErrorf("Failed to clear keys cache: %v", err)
+	//       return err
+	//   }
+	ScanAndDel(ctx context.Context, patterns ...string) error
 
 	// PrepareInsertStatement prepares a SQL insert statement for the transaction.
 	PrepareInsertStatement(ctx context.Context, tx *sql.Tx, query string) (*sql.Stmt, error)
@@ -758,13 +758,16 @@ func (s *service) FiberStorage() fiber.Storage {
 
 // ScanAndDel uses the Redis SCAN command to iterate over a set of keys and delete them.
 // It accepts one or more key patterns and deletes keys matching any of the patterns.
-func (s *service) ScanAndDel(patterns ...string) error {
+//
+// TODO: Improve handling when no keys match the pattern,
+// as it sometimes hangs with [context.Background] until the timeout is reached.
+func (s *service) ScanAndDel(ctx context.Context, patterns ...string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	// Use a context with a timeout to avoid hanging indefinitely
 	// Note: This should fix an issue where the function hangs when using RedisClientConfig with "ContextTimeoutEnabled" set to true.
-	ctx, cancel := context.WithTimeout(context.Background(), DefaultCtxTimeout)
+	ctx, cancel := context.WithTimeout(ctx, DefaultCtxTimeout)
 	defer cancel()
 
 	var totalDeleted int
