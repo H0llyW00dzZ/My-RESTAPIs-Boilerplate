@@ -96,7 +96,10 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 		// By default, it is set to 0.0.0.0/0 for local development; however, it can be bound to an ingress controller/proxy.
 		// This can be a private IP range (e.g., 10.0.0.0/8).
 		TrustedProxies: []string{"0.0.0.0/0"},
-		// Trust X-Forwarded-For headers; additionally, this can be customized if using an ingress controller/proxy, especially Ingress Nginx.
+		// Trust X-Forwarded-For headers. This can be customized if using an ingress controller or proxy, especially Ingress NGINX.
+		//
+		// Note: X-Forwarded-* or any * (wildcard header) from a reverse proxy don't work with Kubernetes Ingress NGINX.
+		// It's better to explicitly use X-Forwarded-For or other specific headers without * (wildcard header).
 		ProxyHeader: fiber.HeaderXForwardedFor, // Fix where * (wildcard header) doesn't work in some kubernetes ingress eco-system
 	})
 	registerRESTAPIsRoutes(api, db)
@@ -130,7 +133,10 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 		// By default, it is set to 0.0.0.0/0 for local development; however, it can be bound to an ingress controller/proxy.
 		// This can be a private IP range (e.g., 10.0.0.0/8).
 		TrustedProxies: []string{"0.0.0.0/0"},
-		// Trust X-Forwarded-For headers; additionally, this can be customized if using an ingress controller/proxy, especially Ingress Nginx.
+		// Trust X-Forwarded-For headers. This can be customized if using an ingress controller or proxy, especially Ingress NGINX.
+		//
+		// Note: X-Forwarded-* or any * (wildcard header) from a reverse proxy don't work with Kubernetes Ingress NGINX.
+		// It's better to explicitly use X-Forwarded-For or other specific headers without * (wildcard header).
 		ProxyHeader: fiber.HeaderXForwardedFor, // Fix where * (wildcard header) doesn't work in some kubernetes ingress eco-system
 	})
 	registerStaticFrontendRoutes(frontend, appName, db)
