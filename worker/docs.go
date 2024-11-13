@@ -141,4 +141,11 @@
 //   - When running with an immutable tag and passing any parameter & jobs as a pointer to [fiber.Ctx], this worker performs optimally and is safer due to its immutability.
 //     Additionally, in HPA, it can synchronize stable pods (e.g., 5 pods are stable), which is not possible with stateless configurations hahahaha.
 //     This is why using stateful architectures for web services is generally not recommended (bad). It's best to avoid stateful designs for web services (good you are mastering k8s) to leverage Kubernetes effectively.
+//
+// # Dynamic Memory Allocation & Operation (not static):
+//
+//   - Tasks are handled dynamically (See https://go.dev/blog/laws-of-reflection for more information), with memory allocation dependent on the specific function executed.
+//   - The primary focus of this worker package is on CPU usage.
+//   - If function has a small memory footprint, the allocation will be minimal.
+//   - CPU usage is influenced by the number of workers you configure.
 package worker
