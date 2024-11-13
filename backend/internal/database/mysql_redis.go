@@ -473,8 +473,7 @@ func (s *service) Health(filter string) map[string]string {
 // checkMySQLHealth checks the health of the MySQL database and adds the relevant statistics to the stats map.
 func (s *service) checkMySQLHealth(ctx context.Context, stats map[string]string) map[string]string {
 	// Ping the MySQL database
-	err := s.db.PingContext(ctx)
-	if err != nil {
+	if err := s.db.PingContext(ctx); err != nil {
 		// Note: While using `log.Fatal` is an option, it is not recommended for this REST API.
 		// These APIs are designed for large-scale applications with complex infrastructure rather than
 		// small systems reliant on a single database. Using `log.Fatal` can prematurely terminate
@@ -695,8 +694,7 @@ func (s *service) Exec(ctx context.Context, query string, args ...any) (sql.Resu
 // Note: This method is different from "Exec". Unlike "Exec", it doesn't return "sql.Result".
 // This method is better suited for initializing database schemas or running migrations before the app starts.
 func (s *service) ExecWithoutRow(ctx context.Context, query string, args ...any) error {
-	_, err := s.db.ExecContext(ctx, query, args...)
-	if err != nil {
+	if _, err := s.db.ExecContext(ctx, query, args...); err != nil {
 		log.LogErrorf("Error executing query: %v", err)
 		return err
 	}
@@ -823,8 +821,7 @@ func (s *service) ScanKeys(ctx context.Context, pattern string, cursor uint64) (
 
 // DeleteKeys deletes a slice of keys from Redis and returns the updated count.
 func (s *service) DeleteKeys(ctx context.Context, keys []string, totalDeleted int) (int, error) {
-	_, err := s.redisClient.Del(ctx, keys...).Result()
-	if err != nil {
+	if _, err := s.redisClient.Del(ctx, keys...).Result(); err != nil {
 		return totalDeleted, err
 	}
 	return totalDeleted + len(keys), nil
@@ -962,8 +959,7 @@ func (s *service) SetKeysAtPipeline(ctx context.Context, keyValues map[string]an
 	}
 
 	// Execute the pipelined commands in a single round-trip to the Redis server.
-	_, err := pipe.Exec(ctx)
-	if err != nil {
+	if _, err := pipe.Exec(ctx); err != nil {
 		// Return an enhanced error if the pipelining fails, wrapping the original error for more context.
 		return fmt.Errorf("Pipeline execution failed: %w", err)
 	}
@@ -1030,8 +1026,7 @@ func (s *service) GetKeysAtPipeline(ctx context.Context, keys []string) (map[str
 	// 		return nil, fmt.Errorf("error retrieving from cache: %w", err)
 	// 	}
 	// }
-	_, err := pipe.Exec(ctx)
-	if err != nil {
+	if _, err := pipe.Exec(ctx); err != nil {
 		// Return an enhanced error if the pipelining fails, wrapping the original error for more context
 		return nil, fmt.Errorf("Pipeline execution failed: %w", err)
 	}
