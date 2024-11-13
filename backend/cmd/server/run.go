@@ -15,19 +15,7 @@ import (
 
 	log "h0llyw00dz-template/backend/internal/logger"
 	handler "h0llyw00dz-template/backend/internal/server"
-	"h0llyw00dz-template/env"
 )
-
-// Config holds the application configuration settings
-type Config struct {
-	AppName         string
-	Port            string
-	MonitorPath     string
-	TimeFormat      string
-	ReadTimeout     time.Duration
-	WriteTimeout    time.Duration
-	ShutdownTimeout time.Duration
-}
 
 // main is the entry point for the application. It initializes the application
 // by setting up the Fiber web server, configuring middleware, and registering routes.
@@ -46,19 +34,6 @@ func main() {
 
 	// Start the server with the configured settings
 	startServer(app, config)
-}
-
-// getConfig retrieves configuration from environment variables or uses default values
-func getConfig() Config {
-	return Config{
-		AppName:         env.GetEnv(env.APPNAME, "Gopher"),
-		Port:            env.GetEnv(env.PORT, "8080"),
-		MonitorPath:     env.GetEnv(env.MONITORPATH, "/monitor"),
-		TimeFormat:      env.GetEnv(env.TIMEFORMAT, "unix"),
-		ReadTimeout:     parseDuration(env.GetEnv(env.READTIMEOUT, "5s")),
-		WriteTimeout:    parseDuration(env.GetEnv(env.WRITETIMEOUT, "5s")),
-		ShutdownTimeout: parseDuration(env.GetEnv(env.SHUTDOWNTIMEOUT, "5s")),
-	}
 }
 
 // setupFiber initializes a new Fiber application with custom configuration.
