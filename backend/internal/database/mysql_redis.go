@@ -767,8 +767,8 @@ func (s *service) ScanAndDel(ctx context.Context, patterns []string) error {
 
 	var totalDeleted int
 	// Note: The count is dynamically adjusted based on performance.
-	baseCount := 100  // Initial count for retrieving keys
-	maxCount := 10000 // Maximum limit for the count; if insufficient, it can be increased to 1 million
+	baseCount := 100   // Initial count for retrieving keys
+	maxCount := 100000 // Maximum limit for the count; if insufficient, it can be increased to 1 million
 
 	for _, pattern := range patterns {
 		var cursor uint64
