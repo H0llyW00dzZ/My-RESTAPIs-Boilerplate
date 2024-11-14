@@ -252,6 +252,20 @@ type Service interface {
 	// It is also recommended to implement a new listener mechanism for health probes that can only be accessed
 	// within the cluster itself and not exposed publicly. In GKE, this can effectively speed up pod replacement.
 	PingDB(ctx context.Context) bool
+
+	// GetKeysJSONAtPipeline retrieves multiple objects from Redis using JSON.GET with a custom decoder.
+	// It uses pipelining to fetch multiple keys in a single network call, improving efficiency.
+	//
+	// Note: Ensure your Redis instance has the RedisJSON module enabled.
+	// For more efficiency with simple string values, consider using [GetKeysAtPipeline].
+	GetKeysJSONAtPipeline(ctx context.Context, ids []string, decoder JSONDecoder, path ...string) ([]any, error)
+
+	// SetKeysJSONAtPipeline stores multiple objects in Redis using JSON.SET with a custom encoder and key extractor.
+	// It pipelines the commands to reduce network latency, making it efficient for bulk operations.
+	//
+	// Note: Ensure your Redis instance has the RedisJSON module enabled.
+	// For more efficiency with simple string values, consider using [SetKeysAtPipeline].
+	SetKeysJSONAtPipeline(ctx context.Context, objects []any, encoder JSONEncoder, keyFunc KeyFunc, path ...string) error
 }
 
 // service is a concrete implementation of the Service interface.
