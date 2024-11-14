@@ -274,6 +274,10 @@ type Service interface {
 	// Note: Ensure your Redis instance has the RedisJSON module enabled.
 	// For more efficiency with simple string values, consider using [GetKeysAtPipeline].
 	GetRawJSONAtPipeline(ctx context.Context, ids []string, path ...string) (map[string][]byte, error)
+
+	// DelKeysJSONAtPipeline removes JSON objects from Redis using the JSON.DEL command.
+	// It utilizes pipelining to efficiently delete multiple keys in a single network call.
+	DelKeysJSONAtPipeline(ctx context.Context, ids []string, path ...string) error
 }
 
 // service is a concrete implementation of the Service interface.
