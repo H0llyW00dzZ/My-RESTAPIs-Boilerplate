@@ -126,12 +126,6 @@ type Service interface {
 	// It's particularly useful for deleting keys with a common pattern.
 	//
 	// Example Usage:
-	//   // Single key
-	//   if err := db.ScanAndDel(ctx, "gopher_key:*"); err != nil {
-	//       log.LogErrorf("Failed to clear gopher keys cache: %v", err)
-	//       return err
-	//   }
-	//
 	//   // With Slice
 	//   sliceKey := []string{"gopher_key:*", "another_gopher_key:*"}
 	//
@@ -139,6 +133,10 @@ type Service interface {
 	//       log.LogErrorf("Failed to clear keys cache: %v", err)
 	//       return err
 	//   }
+	//
+	// Note: This method is capable of handling a large number of keys (millions, billions, or more) efficiently,
+	// depending on your infrastructure. It dynamically adjusts the scan count based on performance to ensure
+	// the operation remains efficient and avoids overwhelming the Redis server.
 	ScanAndDel(ctx context.Context, patterns []string) error
 
 	// PrepareInsertStatement prepares a SQL insert statement for the transaction.
