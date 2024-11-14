@@ -170,3 +170,34 @@ func (s *service) GetRawJSONAtPipeline(ctx context.Context, ids []string, path .
 
 	return results, nil
 }
+
+// DelKeysJSONAtPipeline deletes JSON objects from Redis using JSON.DEL.
+// It allows specifying an optional JSON path. If no path is provided, it defaults to the root path.
+func (s *service) DelKeysJSONAtPipeline(ctx context.Context, ids []string, path ...string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	pipe := s.redisClient.Pipeline()
+
+	// Use a context with a timeout to avoid hanging indefinitely
+	//
+	// This is compatible/supported with Fiber's context (c.Context()), but it's recommended to use context.Background() if you're familiar with handling contexts.
+	// By default, this explicitly uses "context.WithTimeout".
+	ctx, cancel := context.WithTimeout(ctx, DefaultCtxTimeout)
+	defer cancel()
+
+	jsonPath := "$"
+	if len(path) > 0 && path[0] != "" {
+		jsonPath = path[0]
+	}
+
+	for _, id := range ids {
+		pipe.Do(ctx, "JSON.DEL", id, jsonPath)
+	}
+
+	if _, err := pipe.Exec(ctx); err != nil {
+		return fmt.Errorf("pipeline execution failed: %w", err)
+	}
+
+	return nil
+}
