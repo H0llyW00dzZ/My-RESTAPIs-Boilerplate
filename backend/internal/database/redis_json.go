@@ -118,3 +118,55 @@ func (s *service) GetKeysJSONAtPipeline(ctx context.Context, ids []string, decod
 
 	return objects, nil
 }
+
+// GetRawJSONAtPipeline retrieves multiple JSON objects from Redis without decoding them.
+// It allows specifying an optional JSON path. If no path is provided, it defaults to the root path.
+func (s *service) GetRawJSONAtPipeline(ctx context.Context, ids []string, path ...string) (map[string][]byte, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	pipe := s.redisClient.Pipeline()
+
+	// Use a context with a timeout to avoid hanging indefinitely
+	//
+	// This is compatible/supported with Fiber's context (c.Context()), but it's recommended to use context.Background() if you're familiar with handling contexts.
+	// By default, this explicitly uses "context.WithTimeout".
+	ctx, cancel := context.WithTimeout(ctx, DefaultCtxTimeout)
+	defer cancel()
+
+	// Default to root path if no path is provided
+	jsonPath := "$"
+	if len(path) > 0 && path[0] != "" {
+		jsonPath = path[0]
+	}
+
+	cmds := make([]*redis.Cmd, len(ids))
+
+	for i, id := range ids {
+		cmds[i] = pipe.Do(ctx, "JSON.GET", id, jsonPath)
+	}
+
+	if _, err := pipe.Exec(ctx); err != nil {
+		return nil, fmt.Errorf("pipeline execution failed: %w", err)
+	}
+
+	results := make(map[string][]byte)
+	for i, cmd := range cmds {
+		result, err := cmd.Result()
+		if err != nil {
+			if err == redis.Nil {
+				continue // Key not found, skip
+			}
+			return nil, fmt.Errorf("error getting key '%s': %w", ids[i], err)
+		}
+
+		data, ok := result.([]byte)
+		if !ok {
+			return nil, fmt.Errorf("unexpected type for key '%s'", ids[i])
+		}
+
+		results[ids[i]] = data
+	}
+
+	return results, nil
+}

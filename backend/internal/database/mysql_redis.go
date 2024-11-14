@@ -266,6 +266,14 @@ type Service interface {
 	// Note: Ensure your Redis instance has the RedisJSON module enabled.
 	// For more efficiency with simple string values, consider using [SetKeysAtPipeline].
 	SetKeysJSONAtPipeline(ctx context.Context, objects []any, encoder JSONEncoder, keyFunc KeyFunc, path ...string) error
+
+	// GetRawJSONAtPipeline retrieves multiple JSON objects from Redis without decoding them.
+	// It uses pipelining to fetch multiple keys in a single network call, improving efficiency.
+	// The function returns a map of keys to their corresponding raw JSON byte slices.
+	//
+	// Note: Ensure your Redis instance has the RedisJSON module enabled.
+	// For more efficiency with simple string values, consider using [GetKeysAtPipeline].
+	GetRawJSONAtPipeline(ctx context.Context, ids []string, path ...string) (map[string][]byte, error)
 }
 
 // service is a concrete implementation of the Service interface.
