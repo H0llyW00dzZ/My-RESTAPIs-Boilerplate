@@ -12,6 +12,9 @@
 # Tips:
 # For runners on Kubernetes, you need to build the container from this repository: https://git.b0zal.io/H0llyW00dzZ/act_runner (a mirror of https://gitea.com/gitea/act_runner.git).
 # If you're unsure how to build the container for the runner, it's better to use a VM/KVM. If you're on bare metal, it's recommended to use a VM/KVM as well.
+#
+# For example, if the runner from https://git.b0zal.io/H0llyW00dzZ/act_runner (a mirror of https://gitea.com/gitea/act_runner.git) is running on a VM/KVM (typical bare metal),
+# you can simply install it and run it in a screen session (tty). However, if the runners are on Kubernetes, it's much easier; you can specify a node selector and set it to a stateful deployment.
 name: Build and Push Docker Image to Private Registry
 
 on:
