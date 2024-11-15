@@ -13,12 +13,18 @@ import (
 )
 
 // JSONEncoder is a function type for encoding an object into JSON.
+//
+// Note: Currently, this implementation uses the default JSON encoder/decoder from the standard library or other libraries like Sonic.
+// Encoding with indentation (e.g., MarshalIndent) is not supported, as it's generally unnecessary for this use case.
 type JSONEncoder func(v any) ([]byte, error)
 
 // JSONDecoder is a function type for decoding JSON data into an object.
 type JSONDecoder func(data []byte, v any) error
 
 // KeyFunc is a function type for extracting a key from an object.
+//
+// TODO: Consider returning []string instead of string to better represent key names or IDs.
+// This change would enhance the reusability of the KeyFunc mechanism.
 type KeyFunc func(v any) (string, error)
 
 // SetKeysJSONAtPipeline stores multiple objects in Redis using JSON.SET with a custom encoder and key extractor.
