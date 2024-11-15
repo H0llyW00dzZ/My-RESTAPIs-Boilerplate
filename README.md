@@ -230,6 +230,7 @@ frontend/
 │   │   │   ├── constant.go
 │   │   │   ├── helper.go
 │   │   │   ├── mysql_redis.go
+│   │   │   ├── redis_json.go
 │   │   │   ├── setup.go
 │   │   │   ├── sql_injection_test.go
 │   │   │   └── tls.go
@@ -500,7 +501,7 @@ frontend/
     ├── jobs.go
     └── worker_test.go
 
-67 directories, 223 files
+67 directories, 224 files
 ```
 
 > [!NOTE]
