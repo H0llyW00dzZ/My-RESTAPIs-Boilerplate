@@ -29,6 +29,8 @@ on:
 
 jobs:
   build:
+    # Note: With Gitea runners, you have the freedom to customize "runs-on" allowing you to build a secure environment.
+    # This is unlike other CI/CD mechanisms.
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
