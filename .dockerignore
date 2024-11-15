@@ -84,3 +84,6 @@ tailwind.go
 
 # GCloud Builds
 gcloud-builds.yaml
+
+# Ignore github
+.github
