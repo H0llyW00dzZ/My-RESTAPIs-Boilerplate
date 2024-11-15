@@ -5,8 +5,9 @@
 # which means you must monitor the build until it completes. If you terminate the process during a build using "gcloud-builds.yaml", it will cancel the build.
 #
 # Compatibility:
-# This supports any Git code hosting. For example, it works with Gitea, which I personally use for GitOps, DevOps, and DevSecOps running on my Kubernetes cluster.
-# However, if you are using GitHub through a private repo, you need to modify this CI/CD by removing the cache after building.
+# This supports any Git code hosting platform. For example, it works with Gitea, which I personally use for GitOps, DevOps, and DevSecOps on my Kubernetes cluster.
+# However, if you are using GitHub with a private repository, you need to modify this CI/CD process by removing the cache after building.
+# It also supports any private registry implementation. For example, if you want to manage your own private registry, it is supported.
 
 name: Build and Push Docker Image to Private Registry
 
