@@ -1,6 +1,8 @@
 # Build and Push Docker Image to Private Registry by H0llyW00dzZ
 #
 # Note: This is a boilerplate CI/CD. You need to modify the registry "example.com".
+# Also note that this is different from "gcloud-builds.yaml" because "gcloud-builds.yaml" involves remote builds, 
+# which means you must monitor the build until it completes. If you terminate the process during a build using "gcloud-builds.yaml", it will cancel the build.
 #
 # Compatibility:
 # This supports any Git code hosting. For example, it works with Gitea, which I personally use for GitOps, DevOps, and DevSecOps running on my Kubernetes cluster.
