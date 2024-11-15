@@ -1,0 +1,42 @@
+# Build and Push Docker Image to Private Registry by H0llyW00dzZ
+#
+# Note: This is a boilerplate CI/CD. You need to modify the registry "example.com".
+#
+# Compatibility:
+# This supports any Git code hosting. For example, it works with Gitea, which I personally use for GitOps, DevOps, and DevSecOps running on my Kubernetes cluster.
+# However, if you are using GitHub through a private repo, you need to modify this CI/CD by removing the cache after building.
+
+name: Build and Push Docker Image to Private Registry
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger only on version tags
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Private Registry
+        uses: docker/login-action@v2
+        with:
+          # Note: Don't forget to modify "example.com"
+          registry: example.com
+          username: ${{ secrets.ACC_EMAIL }}
+          password: ${{ secrets.PASSWORD_REGISTRY }}
+
+      - name: Build and push Docker image to Private Registry
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          # Note: Don't forget to modify "example.com"
+          tags: |
+            example.com/${{ secrets.REPO_NAME }}/${{ secrets.IMAGE_NAME }}:${{ github.ref_name }}
+            example.com/${{ secrets.REPO_NAME }}/${{ secrets.IMAGE_NAME }}:latest
