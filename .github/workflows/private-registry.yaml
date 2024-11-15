@@ -30,7 +30,9 @@ jobs:
         with:
           # Note: Don't forget to modify "example.com"
           registry: example.com
+          # Note: The username depends on the private registry implementation. It can be a username or an email.
           username: ${{ secrets.ACC_EMAIL }}
+          # Note: The password depends on the private registry implementation. It can be a token, API key, or an actual password.
           password: ${{ secrets.PASSWORD_REGISTRY }}
 
       - name: Build and push Docker image to Private Registry
