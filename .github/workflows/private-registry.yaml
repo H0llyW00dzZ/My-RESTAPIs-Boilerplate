@@ -15,6 +15,11 @@
 #
 # For example, if the runner from https://git.b0zal.io/H0llyW00dzZ/act_runner (a mirror of https://gitea.com/gitea/act_runner.git) is running on a VM/KVM (typical bare metal),
 # you can simply install it and run it in a screen session (tty). However, if the runners are on Kubernetes, it's much easier; you can specify a node selector and set it to a stateful deployment.
+#
+# Security Considerations:
+# Whether Gitea runners are on Kubernetes or VM/KVM (typical bare metal), the risk is low because you control the privileges.
+# The runner itself is also secure because it automatically clears everything after completing jobs.
+# This is unlike GitHub CI/CD, where you may need to manually clear items, such as Docker build caches.
 name: Build and Push Docker Image to Private Registry
 
 on:
