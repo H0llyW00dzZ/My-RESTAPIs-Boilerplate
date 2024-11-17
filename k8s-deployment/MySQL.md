@@ -129,6 +129,10 @@ mysql-vpa   Auto   100m   874512384   True       3d13h
 
 Adjust the VPA configuration in the `mysql-deploy.yaml` file to suit your application's scaling requirements.
 
+> [!NOTE]
+> If the `Vertical Pod Autoscaler (VPA)` is not displaying correctly (e.g., it only shows the mode as `Auto` but other fields are empty or blank), it might not be working properly after manual installation.
+> It's advisable to contact your cloud provider for support, as it works correctly in `GKE`, preventing `OOM errors`.
+
 ## Customization
 
 The provided deployment files are designed to be customizable. You can modify the resource limits, environment variables, and other configurations according to your application's needs.
