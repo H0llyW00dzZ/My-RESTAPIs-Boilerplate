@@ -553,6 +553,9 @@ func NewSwaggerMiddleware(options ...any) fiber.Handler {
 // NewIdempotencyMiddleware creates a new idempotency middleware with optional custom configuration options.
 //
 // Ref: https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-02
+//
+// Note: This can improve latency for ingress on an HPA with many pods (e.g., 50+ pods). However, use it carefully as it is similar to cookies.
+// For storage, using Redis is recommended. Ensure the validation header is accurate (e.g., from ingress NGINX not actual client), as it can become overpowered (OP) reduce latency.
 func NewIdempotencyMiddleware(options ...any) fiber.Handler {
 	// Create a new idempotency middleware configuration.
 	config := idempotency.Config{}
