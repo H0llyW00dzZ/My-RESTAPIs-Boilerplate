@@ -9,6 +9,10 @@
 # However, if you are using GitHub with a private repository, you need to modify this CI/CD process by removing the cache after building.
 # It also supports any private registry implementation. For example, if you want to manage your own private registry, it is supported.
 #
+# For multiple build architectures, this CI/CD is stable only with KVM, not HVM.
+# Using HVM can cause significant overhead. For example, on HVM with 16 vCPUs and 32GB RAM, the build could take over an hour or 1 years maybe ?
+# However, on a lower-spec HVM with 4 vCPUs and 4GB RAM, it only took 10 minutes.
+#
 # Tips:
 # For runners on Kubernetes, you need to build the container from this repository: https://git.b0zal.io/H0llyW00dzZ/act_runner (a mirror of https://gitea.com/gitea/act_runner.git).
 # If you're unsure how to build the container for the runner, it's better to use a VM/KVM. If you're on bare metal, it's recommended to use a VM/KVM as well.
