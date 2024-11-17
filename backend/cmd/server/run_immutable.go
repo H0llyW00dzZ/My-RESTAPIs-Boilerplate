@@ -9,9 +9,22 @@
 package main
 
 import (
+	"time"
+
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 )
+
+// Config holds the application configuration settings
+type Config struct {
+	AppName         string
+	Port            string
+	MonitorPath     string
+	TimeFormat      string
+	ReadTimeout     time.Duration
+	WriteTimeout    time.Duration
+	ShutdownTimeout time.Duration
+}
 
 // setupFiber initializes a new Fiber application with custom configuration.
 // It sets up the JSON encoder/decoder, case sensitivity, and strict routing,

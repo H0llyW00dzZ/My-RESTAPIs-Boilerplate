@@ -350,6 +350,7 @@ frontend/
 │   │   │   │       └── new.go
 │   │   │   ├── routes.go
 │   │   │   ├── routes_immutable.go
+│   │   │   ├── routes_non_immutable.go
 │   │   │   ├── storage.go
 │   │   │   └── utils.go
 │   │   ├── server
@@ -501,7 +502,7 @@ frontend/
     ├── jobs.go
     └── worker_test.go
 
-67 directories, 224 files
+67 directories, 225 files
 ```
 
 > [!NOTE]

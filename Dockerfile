@@ -38,7 +38,9 @@ RUN go mod download
 # Build the application.
 #
 # Note: This design might require experimental C + Go, so "-installsuffix cgo" won't work anyway due to CGO_ENABLED=0. If CGO_ENABLED=1, it would work.
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /restapis ./backend/cmd/server/run.go
+# Additionally, if the TAG variable is empty from Variables Management, the build will proceed without any tags (default go build).
+ARG TAG
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags=${TAG} -o /restapis ./backend/cmd/server/run.go
 
 # Use a Docker multi-stage build to create a lean production image.
 # https://docs.docker.com/develop/develop-images/multistage-build/
