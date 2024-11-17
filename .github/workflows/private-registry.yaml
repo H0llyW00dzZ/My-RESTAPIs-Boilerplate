@@ -20,6 +20,9 @@
 # Whether Gitea runners are on Kubernetes or VM/KVM (typical bare metal), the risk is low because you control the privileges.
 # The runner itself is also secure because it automatically clears everything after completing jobs.
 # This is unlike GitHub CI/CD, where you may need to manually clear items, such as Docker build caches.
+#
+# Warning:
+# Never modify this CI/CD boilerplate with hardcoded commands using "run" Hardcoding in CI/CD indicates poor GitOps, DevOps, and DevSecOps practices.
 name: Build and Push Docker Image to Private Registry
 
 on:
@@ -61,7 +64,9 @@ jobs:
           # Note: By default, the architecture is linux/amd64,linux/arm64 because Sonic JSON requires amd64,arm64 (see https://github.com/bytedance/sonic).
           # Tip: If your cloud provider supports multi-architecture nodes for your cluster, it will be great for smooth sailing ⛵ ☸ (HPA + Cluster Autoscaling/Autopilot).
           platforms: linux/amd64,linux/arm64
-          # Note: Don't forget to modify "example.com"
+          # Note: Don't forget to modify "example.com", also "build-args" This is part of Variables Management, which is also supported in Gitea.
           tags: |
             example.com/${{ secrets.REPO_NAME }}/${{ secrets.IMAGE_NAME }}:${{ github.ref_name }}
             example.com/${{ secrets.REPO_NAME }}/${{ secrets.IMAGE_NAME }}:latest
+          build-args: |
+            TAG=${{ vars.TAG }}
