@@ -20,6 +20,9 @@
 # Whether Gitea runners are on Kubernetes or VM/KVM (typical bare metal), the risk is low because you control the privileges.
 # The runner itself is also secure because it automatically clears everything after completing jobs.
 # This is unlike GitHub CI/CD, where you may need to manually clear items, such as Docker build caches.
+#
+# Warning:
+# Never modify this CI/CD boilerplate with hardcoded commands using "run" Hardcoding in CI/CD indicates poor GitOps, DevOps, and DevSecOps practices.
 name: Build and Push Docker Image to Private Registry
 
 on:
