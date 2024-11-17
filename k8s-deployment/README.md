@@ -23,3 +23,8 @@ This section covers the deployment of the REST API boilerplate application.
 This section covers the deployment of the MySQL database service.
 
 - [Documentation for MySQL](MySQL.md)
+
+---
+
+> [!NOTE]
+> For users in Indonesia (🇮🇩), it's recommended to use the Singapore region instead of Indonesia when creating a cluster with a cloud provider. This is due to the traditional instability of the network in Indonesia (our home), which can lead to issues such as latency and packet loss.
