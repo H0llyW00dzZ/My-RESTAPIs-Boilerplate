@@ -2,6 +2,8 @@
 //
 // By accessing or using this software, you agree to be bound by the terms
 // of the License Agreement, which you can find at LICENSE files.
+//
+// Note: If you're unsure how to use this function, consider using GetKeysAtPipeline or SetKeysAtPipeline instead.
 
 package database
 
@@ -21,11 +23,8 @@ type JSONEncoder func(v any) ([]byte, error)
 // JSONDecoder is a function type for decoding JSON data into an object.
 type JSONDecoder func(data []byte, v any) error
 
-// KeyFunc is a function type for extracting a key from an object.
-//
-// TODO: Consider returning []string instead of string to better represent key names or IDs.
-// This change would enhance the reusability of the KeyFunc mechanism.
-type KeyFunc func(v any) (string, error)
+// KeyFunc is a function type for extracting one or more keys from an object.
+type KeyFunc func(v any) ([]string, error)
 
 // SetKeysJSONAtPipeline stores multiple objects in Redis using JSON.SET with a custom encoder and key extractor.
 // It allows specifying an optional JSON path. If no path is provided, it defaults to the root path.
@@ -54,12 +53,14 @@ func (s *service) SetKeysJSONAtPipeline(ctx context.Context, objects []any, enco
 			return fmt.Errorf("failed to encode object: %w", err)
 		}
 
-		key, err := keyFunc(obj)
+		keys, err := keyFunc(obj)
 		if err != nil {
-			return fmt.Errorf("failed to get key: %w", err)
+			return fmt.Errorf("failed to get keys: %w", err)
 		}
 
-		pipe.Do(ctx, "JSON.SET", key, jsonPath, data)
+		for _, key := range keys {
+			pipe.Do(ctx, "JSON.SET", key, jsonPath, data)
+		}
 	}
 
 	if _, err := pipe.Exec(ctx); err != nil {
@@ -71,7 +72,7 @@ func (s *service) SetKeysJSONAtPipeline(ctx context.Context, objects []any, enco
 
 // GetKeysJSONAtPipeline retrieves multiple objects from Redis using JSON.GET with a custom decoder.
 // It allows specifying an optional JSON path. If no path is provided, it defaults to the root path.
-func (s *service) GetKeysJSONAtPipeline(ctx context.Context, ids []string, decoder JSONDecoder, path ...string) ([]any, error) {
+func (s *service) GetKeysJSONAtPipeline(ctx context.Context, objects []any, decoder JSONDecoder, keyFunc KeyFunc, path ...string) ([]any, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -90,44 +91,51 @@ func (s *service) GetKeysJSONAtPipeline(ctx context.Context, ids []string, decod
 		jsonPath = path[0]
 	}
 
-	cmds := make([]*redis.Cmd, len(ids))
+	var cmds []*redis.Cmd
 
-	for i, id := range ids {
-		cmds[i] = pipe.Do(ctx, "JSON.GET", id, jsonPath)
+	for _, obj := range objects {
+		keys, err := keyFunc(obj)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get keys: %w", err)
+		}
+
+		for _, key := range keys {
+			cmds = append(cmds, pipe.Do(ctx, "JSON.GET", key, jsonPath))
+		}
 	}
 
 	if _, err := pipe.Exec(ctx); err != nil {
 		return nil, fmt.Errorf("pipeline execution failed: %w", err)
 	}
 
-	var objects []any
+	var results []any
 	for i, cmd := range cmds {
 		result, err := cmd.Result()
 		if err != nil {
 			if err == redis.Nil {
 				continue // Key not found, skip
 			}
-			return nil, fmt.Errorf("error getting key '%s': %w", ids[i], err)
+			return nil, fmt.Errorf("error getting key '%s': %w", objects[i], err)
 		}
 
 		data, ok := result.([]byte)
 		if !ok {
-			return nil, fmt.Errorf("unexpected type for key '%s'", ids[i])
+			return nil, fmt.Errorf("unexpected type for key '%s'", objects[i])
 		}
 
 		var obj any
 		if err := decoder(data, &obj); err != nil {
 			return nil, fmt.Errorf("failed to decode object: %w", err)
 		}
-		objects = append(objects, obj)
+		results = append(results, obj)
 	}
 
-	return objects, nil
+	return results, nil
 }
 
 // GetRawJSONAtPipeline retrieves multiple JSON objects from Redis without decoding them.
 // It allows specifying an optional JSON path. If no path is provided, it defaults to the root path.
-func (s *service) GetRawJSONAtPipeline(ctx context.Context, ids []string, path ...string) (map[string][]byte, error) {
+func (s *service) GetRawJSONAtPipeline(ctx context.Context, objects []any, keyFunc KeyFunc, path ...string) (map[string][]byte, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -146,10 +154,20 @@ func (s *service) GetRawJSONAtPipeline(ctx context.Context, ids []string, path .
 		jsonPath = path[0]
 	}
 
-	cmds := make([]*redis.Cmd, len(ids))
+	var cmds []*redis.Cmd
+	keyIndex := make(map[int]string)
 
-	for i, id := range ids {
-		cmds[i] = pipe.Do(ctx, "JSON.GET", id, jsonPath)
+	for _, obj := range objects {
+		keys, err := keyFunc(obj)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get keys: %w", err)
+		}
+
+		for _, key := range keys {
+			cmdIndex := len(cmds)
+			cmds = append(cmds, pipe.Do(ctx, "JSON.GET", key, jsonPath))
+			keyIndex[cmdIndex] = key
+		}
 	}
 
 	if _, err := pipe.Exec(ctx); err != nil {
@@ -163,15 +181,15 @@ func (s *service) GetRawJSONAtPipeline(ctx context.Context, ids []string, path .
 			if err == redis.Nil {
 				continue // Key not found, skip
 			}
-			return nil, fmt.Errorf("error getting key '%s': %w", ids[i], err)
+			return nil, fmt.Errorf("error getting key '%s': %w", keyIndex[i], err)
 		}
 
 		data, ok := result.([]byte)
 		if !ok {
-			return nil, fmt.Errorf("unexpected type for key '%s'", ids[i])
+			return nil, fmt.Errorf("unexpected type for key '%s'", keyIndex[i])
 		}
 
-		results[ids[i]] = data
+		results[keyIndex[i]] = data
 	}
 
 	return results, nil
@@ -179,7 +197,7 @@ func (s *service) GetRawJSONAtPipeline(ctx context.Context, ids []string, path .
 
 // DelKeysJSONAtPipeline deletes JSON objects from Redis using JSON.DEL.
 // It allows specifying an optional JSON path. If no path is provided, it defaults to the root path.
-func (s *service) DelKeysJSONAtPipeline(ctx context.Context, ids []string, path ...string) error {
+func (s *service) DelKeysJSONAtPipeline(ctx context.Context, objects []any, keyFunc KeyFunc, path ...string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -197,8 +215,15 @@ func (s *service) DelKeysJSONAtPipeline(ctx context.Context, ids []string, path 
 		jsonPath = path[0]
 	}
 
-	for _, id := range ids {
-		pipe.Do(ctx, "JSON.DEL", id, jsonPath)
+	for _, obj := range objects {
+		keys, err := keyFunc(obj)
+		if err != nil {
+			return fmt.Errorf("failed to get keys: %w", err)
+		}
+
+		for _, key := range keys {
+			pipe.Do(ctx, "JSON.DEL", key, jsonPath)
+		}
 	}
 
 	if _, err := pipe.Exec(ctx); err != nil {
