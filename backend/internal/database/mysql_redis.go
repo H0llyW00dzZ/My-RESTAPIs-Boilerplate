@@ -256,6 +256,9 @@ type Service interface {
 	//
 	// Note: Ensure your Redis instance has the RedisJSON module enabled.
 	// For more efficiency with simple string values, consider using [GetKeysAtPipeline].
+	//
+	// TODO: Switch to generics [T] or implement this specifically for generics [T] ?
+	// This change will elevate it to a top-level function if you know how to handle it.
 	GetKeysJSONAtPipeline(ctx context.Context, objects []any, decoder JSONDecoder, keyFunc KeyFunc, path ...string) ([]any, error)
 
 	// SetKeysJSONAtPipeline stores multiple objects in Redis using JSON.SET with a custom encoder and key extractor.
@@ -263,6 +266,9 @@ type Service interface {
 	//
 	// Note: Ensure your Redis instance has the RedisJSON module enabled.
 	// For more efficiency with simple string values, consider using [SetKeysAtPipeline].
+	//
+	// TODO: Switch to generics [T] or implement this specifically for generics [T] ?
+	// This change will elevate it to a top-level function if you know how to handle it.
 	SetKeysJSONAtPipeline(ctx context.Context, objects []any, encoder JSONEncoder, keyFunc KeyFunc, path ...string) error
 
 	// GetRawJSONAtPipeline retrieves multiple JSON objects from Redis without decoding them.
@@ -271,10 +277,16 @@ type Service interface {
 	//
 	// Note: Ensure your Redis instance has the RedisJSON module enabled.
 	// For more efficiency with simple string values, consider using [GetKeysAtPipeline].
+	//
+	// TODO: Switch to generics [T] or implement this specifically for generics [T] ?
+	// This change will elevate it to a top-level function if you know how to handle it.
 	GetRawJSONAtPipeline(ctx context.Context, objects []any, keyFunc KeyFunc, path ...string) (map[string][]byte, error)
 
 	// DelKeysJSONAtPipeline removes JSON objects from Redis using the JSON.DEL command.
 	// It utilizes pipelining to efficiently delete multiple keys in a single network call.
+	//
+	// TODO: Switch to generics [T] or implement this specifically for generics [T] ?
+	// This change will elevate it to a top-level function if you know how to handle it.
 	DelKeysJSONAtPipeline(ctx context.Context, objects []any, keyFunc KeyFunc, path ...string) error
 }
 

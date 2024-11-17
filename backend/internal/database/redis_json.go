@@ -18,12 +18,21 @@ import (
 //
 // Note: Currently, this implementation uses the default JSON encoder/decoder from the standard library or other libraries like Sonic.
 // Encoding with indentation (e.g., MarshalIndent) is not supported, as it's generally unnecessary for this use case.
+//
+// TODO: Switch to generics [T] or implement this specifically for generics [T] ?
+// This change will elevate it to a top-level function if you know how to handle it.
 type JSONEncoder func(v any) ([]byte, error)
 
 // JSONDecoder is a function type for decoding JSON data into an object.
+//
+// TODO: Switch to generics [T] or implement this specifically for generics [T] ?
+// This change will elevate it to a top-level function if you know how to handle it.
 type JSONDecoder func(data []byte, v any) error
 
 // KeyFunc is a function type for extracting one or more keys from an object.
+//
+// TODO: Switch to generics [T] or implement this specifically for generics [T] ?
+// This change will elevate it to a top-level function if you know how to handle it.
 type KeyFunc func(v any) ([]string, error)
 
 // SetKeysJSONAtPipeline stores multiple objects in Redis using JSON.SET with a custom encoder and key extractor.
