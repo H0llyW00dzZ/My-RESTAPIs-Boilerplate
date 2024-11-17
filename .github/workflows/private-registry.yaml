@@ -59,7 +59,7 @@ jobs:
           context: .
           push: true
           # Note: By default, the architecture is linux/amd64,linux/arm64 because Sonic JSON requires amd64,arm64 (see https://github.com/bytedance/sonic).
-          # Tip: If your cloud provider supports multi-architecture nodes for your cluster, it will be great for smooth sailing ⛵☸ (HPA + Cluster Autoscaling/Autopilot).
+          # Tip: If your cloud provider supports multi-architecture nodes for your cluster, it will be great for smooth sailing ⛵ ☸ (HPA + Cluster Autoscaling/Autopilot).
           platforms: linux/amd64,linux/arm64
           # Note: Don't forget to modify "example.com"
           tags: |
