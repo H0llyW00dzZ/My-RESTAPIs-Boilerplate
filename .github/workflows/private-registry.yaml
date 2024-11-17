@@ -36,6 +36,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+        # Note: QEMU is optional unless you want to experiment with other architectures. The default is linux/amd64.
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -54,6 +58,8 @@ jobs:
         with:
           context: .
           push: true
+          # Note: By default, the architecture is linux/amd64 because Sonic JSON requires amd64.
+          platforms: linux/amd64
           # Note: Don't forget to modify "example.com"
           tags: |
             example.com/${{ secrets.REPO_NAME }}/${{ secrets.IMAGE_NAME }}:${{ github.ref_name }}
