@@ -413,6 +413,9 @@ func (s *service) Close() error {
 
 // Health checks the health of the database and Redis connections.
 // It returns a map with keys indicating various health statistics.
+//
+// Note: For MySQL, it will always show 1 connection because it's not an actual pool of goroutines;
+// it's a pool of pods k8s. However, for Redis, it will show multiple connections due to goroutine usage.
 func (s *service) Health(filter string) map[string]string {
 	ctx, cancel := context.WithTimeout(context.Background(), DefaultCtxTimeout)
 	defer cancel()
