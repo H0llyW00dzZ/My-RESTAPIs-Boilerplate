@@ -10,7 +10,7 @@
 # It also supports any private registry implementation. For example, if you want to manage your own private registry, it is supported.
 #
 # For multiple build architectures, this CI/CD is stable only with KVM, not HVM.
-# Using HVM can cause significant overhead. For example, on HVM with 16 vCPUs and 32GB RAM, the build could take over an hour or 1 years maybe ?
+# Using HVM can cause significant overhead. For example, on HVM with 16 vCPUs and 32GB RAM, the build could take over an hour or 1 year maybe ?
 # However, on a lower-spec HVM with 4 vCPUs and 4GB RAM, it only took 10 minutes.
 #
 # Tips:
