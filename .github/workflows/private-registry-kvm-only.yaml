@@ -43,7 +43,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-        # Note: QEMU is optional unless you want to experiment with other architectures. The default is linux/amd64,linux/arm64.
+        # Note: QEMU is optional unless you want to experiment with other architectures.
+        # The default architectures are linux/amd64 and linux/arm64 (multi-architecture).
+        # Multi-architecture builds work properly only on KVM. On HVM, it can cause significant overhead during building 
+        # (e.g., builds might take 1 year hahaha).
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
