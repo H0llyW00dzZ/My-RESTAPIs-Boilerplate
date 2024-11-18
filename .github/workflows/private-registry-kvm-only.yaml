@@ -13,6 +13,11 @@
 # Using HVM can cause significant overhead. For example, on HVM with 16 vCPUs and 32GB RAM, the build could take over an hour or 1 year maybe ?
 # However, on a lower-spec HVM with 4 vCPUs and 4GB RAM, it only took 10 minutes.
 #
+# Additionally, for manual builds with multiple architectures (non-CI/CD):
+# On Windows with the Hyper-V hypervisor + WSL 2, it is considered stable.
+# It took 9 minutes for ARM64 and 53 seconds for AMD64, unlike on HVM, where the overhead is high even on high-spec systems.
+# Tested on an Intel(R) Core(TM) i9-10980HK CPU @ 2.40GHz (Laptop) without overclocking.
+#
 # Tips:
 # For runners on Kubernetes, you need to build the container from this repository: https://git.b0zal.io/H0llyW00dzZ/act_runner (a mirror of https://gitea.com/gitea/act_runner.git).
 # If you're unsure how to build the container for the runner, it's better to use a VM/KVM. If you're on bare metal, it's recommended to use a VM/KVM as well.
