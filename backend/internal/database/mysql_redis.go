@@ -331,7 +331,8 @@ var (
 //
 // Additionally, this improvement supports scaling up to 100+ pods. For even larger scalability (HPA),
 // consider multiple deployments to support up to 1,000 pods, ideally with multi-architecture (AMD64 x ARM64) support.
-// The recommended ratio is 10 deployments for every 1,000 pods (e.g., 50 deployment its 5,0000 pods, 100 deployment its 10,0000 pods).
+// The recommended ratio is 10 deployments for every 1,000 pods (e.g., 50 deployments for 5,000 pods, 100 deployments for 10,000 pods).
+// Note that this calculation is for HPA (stateless) and is based on deployment ratios for scalability. For stateful setups, predictability based on demand is not feasible hahaha.
 //
 // It also improves connection stability for MySQL, reducing occasional drops. For Redis, it enhances latency due to the use of a pool of goroutines.
 func New() Service {
