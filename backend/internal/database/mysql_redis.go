@@ -22,9 +22,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/charmbracelet/bubbles/spinner"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
 
@@ -321,6 +318,7 @@ var (
 	mysqltlsCAs          = os.Getenv(env.MYSQLCERTTLS)
 	redistlsCAs          = os.Getenv(env.REDISCERTTLS)
 	dbInstance           *service
+	initOnce             sync.Once
 )
 
 // New creates a new instance of the Service interface.
@@ -330,66 +328,12 @@ var (
 // Note: For better connection establishment, it's recommended to put this in the "func init()"
 // so that it will initialize before the "func main()" runs. This is because the connection will be
 // shared across the entire codebase (sharing is caring), even if the codebase grows to billions of lines of Go code (e.g, Senior Golang).
+//
+// Additionally, this improvement supports scaling up to 100+ pods. For even larger scalability (HPA),
+// consider multiple deployments to support up to 1,000 pods, ideally with multi-architecture (AMD64 x ARM64) support.
+// The recommended ratio is 10 deployments for every 1,000 pods.
 func New() Service {
-	if dbInstance != nil {
-		return dbInstance
-	}
-
-	// Create new spinner models
-	// Note: For the best experience, use a terminal that supports ANSI escape sequences, such as zsh (e.g., in a priv8 Unix server) or bash.
-	// Also note that this won't work and will fail if this repo is running on a cloud service such as Heroku because it requires "/dev/tty" (see docs https://en.wikipedia.org/wiki/Tty_(Unix)).
-	// And I won't fix it, because the issue is related to the cloud provider, not the Go code here.
-	// Update:
-	// List of OS that support this Spinner Bubble Tea:
-	// - Windows 11 cmd (latest version) (used for development of this repo, because for better compatibility/support, it needed to be developed on Windows instead of Unix/Unix-like/Linux)
-	// - Unix/Unix-like/Linux should be supported, especially Unix systems that have TTY by default.
-	dotSpinner := spinner.New()
-	dotSpinner.Spinner = spinner.Dot
-	dotSpinner.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
-
-	meterSpinner := spinner.New()
-	meterSpinner.Spinner = spinner.Meter
-	meterSpinner.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
-
-	pointsSpinner := spinner.New()
-	pointsSpinner.Spinner = spinner.Points
-	pointsSpinner.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("15"))
-
-	// Initialize the Bubble Tea model
-	m := model{
-		dotSpinner:    dotSpinner,
-		meterSpinner:  meterSpinner,
-		pointsSpinner: pointsSpinner,
-		quitting:      false,
-		done:          false,
-	}
-
-	// Remove the real-time timestamp because a fake-time is already used for the shake running in the TTY, which is used by goroutines for emulation.
-	timeFormatter := func(t time.Time) string {
-		return ""
-	}
-
-	// Start the Bubble Tea program
-	// Note: This may still require a TTY, and there's no guarantee it will work properly (e.g., when running in a cloud provider that doesn't allow TTY).
-	// If it's related to a cloud provider issue, I won't fix it, because the issue is related to the cloud provider, not the Go code here.
-	// For example, in Heroku, this still won't work. It works with `tea.WithInput(nil)`, but it won't render anything and will just be blank.
-	//
-	// TODO: Remove the Bubble Tea Spinner. It may cause rendering issues in the terminal due to concurrent MySQL backups,
-	// and it no longer works with the old method for better rendering.
-	p := tea.NewProgram(
-		m,
-		tea.WithOutput(log.NewLogWriter(os.Stdout, timeFormatter)), // Reuse from custom logger.
-	)
-
-	// Make a channel to signal when the initialization is done
-	done := make(chan struct{})
-
-	// Run the Bubble Tea program and initializations in a separate goroutine
-	// Note: This is a cheap operation in terms of CPU usage, unlike other languages that do not support synchronization in this manner (hahaha).
-	//
-	// TODO: Remove the Bubble Tea Spinner. It may cause rendering issues in the terminal due to concurrent MySQL backups,
-	// and it no longer works with the old method for better rendering.
-	go func() {
+	initOnce.Do(func() {
 		// Initialize the Redis client
 		redisClient, err := initializeRedisClient()
 		if err != nil {
@@ -439,26 +383,7 @@ func New() Service {
 			// So Redis is perfect for connection pooling because the most important factor for interacting with it is the connection itself.
 			auth: NewServiceAuth(db, redisStorage, bchash),
 		}
-
-		// Signal that the initialization is done to the main goroutine.
-		m.done = true
-		p.Quit()
-		close(done)
-	}()
-
-	// Run the Bubble Tea program
-	if finalModel, err := p.Run(); err != nil {
-		log.LogFatal("Failed to run spinner:", err)
-
-		// TODO: Is this type assertion needed, or can it be removed?
-		_ = finalModel.(model)
-	}
-
-	// Wait for the initializations to finish
-	<-done
-
-	// Print the final state of the spinners
-	fmt.Print(m.View())
+	})
 
 	return dbInstance
 }

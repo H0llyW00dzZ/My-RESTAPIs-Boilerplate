@@ -411,8 +411,7 @@ func initializeMySQLDB() (*sql.DB, error) {
 
 // model represents the Bubble Tea model for the spinners.
 //
-// TODO: Remove the Bubble Tea Spinner. It may cause rendering issues in the terminal due to concurrent MySQL backups,
-// and it no longer works with the old method for better rendering.
+// Deprecated: This is no longer used as it is incompatible with the old method for better rendering.
 type model struct {
 	dotSpinner    spinner.Model
 	meterSpinner  spinner.Model
@@ -424,16 +423,14 @@ type model struct {
 
 // Init initializes the model.
 //
-// TODO: Remove the Bubble Tea Spinner. It may cause rendering issues in the terminal due to concurrent MySQL backups,
-// and it no longer works with the old method for better rendering.
+// Deprecated: This is no longer used as it is incompatible with the old method for better rendering.
 func (m model) Init() tea.Cmd {
 	return tea.Batch(m.dotSpinner.Tick, m.meterSpinner.Tick, m.pointsSpinner.Tick)
 }
 
 // Update updates the model based on the received message.
 //
-// TODO: Remove the Bubble Tea Spinner. It may cause rendering issues in the terminal due to concurrent MySQL backups,
-// and it no longer works with the old method for better rendering.
+// Deprecated: This is no longer used as it is incompatible with the old method for better rendering.
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case spinner.TickMsg:
@@ -466,8 +463,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // View renders the spinners.
 //
-// TODO: Remove the Bubble Tea Spinner. It may cause rendering issues in the terminal due to concurrent MySQL backups,
-// and it no longer works with the old method for better rendering.
+// Deprecated: This is no longer used as it is incompatible with the old method for better rendering.
 func (m model) View() string {
 	// Apply the color style to the spinner frames
 	styledDotSpinner := m.dotSpinner.Style.Render(m.dotSpinner.View())
