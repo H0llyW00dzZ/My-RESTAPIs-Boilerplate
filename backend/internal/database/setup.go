@@ -208,7 +208,7 @@ func (config *RedisClientConfig) InitializeRedisClient() (*redis.Client, error) 
 // Best Practice: Remove Default CAs in the Image (Include Public (Trusted) CAs), then put 1 Private Root CAs.
 //
 // TODO: Consider improving this by using a pool of goroutines. However, it's not necessary right now
-// because having too many connections for MySQL can lead to bottlenecks. For now, the current setup
+// because having too many connections for MySQL can lead to bottlenecks (MySQL bottlenecks). For now, the current setup
 // is sufficient, as Redis will handle most of the connection pooling.
 func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
 	rootCAs, err := loadMySQLRootCA()
