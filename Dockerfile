@@ -73,6 +73,22 @@ COPY --from=builder /restapis .
 # Copy the frontend assets (e.g., js, css, other static files such as png, jpeg) to the image.
 
 
+# Label for improved versioning
+#
+# TODO: Add a description based on the latest commits (e.g., 100+ commits), if possible, without using "run" commands in CI/CD.
+# Using "run" commands for this can indicate poor GitOps, DevOps, and DevSecOps practices.
+ARG VENDOR
+ARG REPO
+ARG VERSION
+ARG TARGETPLATFORM
+ARG SHA
+
+LABEL vendor="${VENDOR}"
+LABEL repo="${REPO}"
+LABEL version="${VERSION}"
+LABEL platform="${TARGETPLATFORM}"
+LABEL sha="${SHA}"
+
 # Expose port 8080 to the outside world.
 # This can be modified.
 EXPOSE 8080

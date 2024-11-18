@@ -82,3 +82,7 @@ jobs:
             example.com/${{ secrets.REPO_NAME }}/${{ secrets.IMAGE_NAME }}:latest
           build-args: |
             TAG=${{ vars.TAG }}
+            VENDOR=${{ github.repository_owner }}
+            REPO=${{ github.repository }}
+            VERSION=${{ github.ref_name }}
+            SHA=${{ github.sha }}
