@@ -535,6 +535,15 @@ git clone https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate.git
 >
 > It is also more faster with the new load balancer, even when using a VPN (`e.g., VPN in Singapore, Indonesia, Malaysia, and other APAC regions`), and this improvement applies to both `mobile devices and desktops`, which incorporate [`Elliptic Curve Cryptography (ECC)`](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography) for `HTTPS/TLS`.
 
+# Supported Architectures
+
+Due to the use of [Sonic JSON](https://github.com/bytedance/sonic) for encoding/decoding, this boilerplate supports only the following architectures:
+- `AMD64`
+- `ARM64`
+
+> [!NOTE]
+> It can also be ideal for `multi-architecture` workloads.
+
 ## License
 
 This project is dual-licensed under the BSD 3-Clause License and the MIT License - see the [LICENSE](LICENSE) file for details.
