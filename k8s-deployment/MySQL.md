@@ -105,7 +105,7 @@ To connect to the MySQL server, you can use the domain name `database.example.co
    The output will display the external IP or domain name for the MySQL service.
 
 > [!NOTE]
-> Since the [MySQL deployment template](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/k8s-deployment/mysql-deploy.yaml) uses `kind: Deployment`, it doesn't matter if you switch to `StatefulSet` or keep it as `Deployment`. As long as the deployment has an attached disk bound to `datadir` (see [ConfigMap](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/k8s-deployment/mysql-deploy.yaml)), it will remain stable.
+> Since the [MySQL deployment template](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/k8s-deployment/mysql-deploy.yaml) uses `kind: Deployment`, it doesn't matter if you switch to `StatefulSet` or keep it as `Deployment`. As long as the deployment has an attached disk bound to `datadir` (see [ConfigMap](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/k8s-deployment/mysql-deploy.yaml)) and uses `Vertical Pod Autoscaler (VPA)`, it will remain stable. This is because MySQL primarily uses disk storage, and the network is stable since it has its own load balancer.
 
 > [!TIP]
 > For the `attached disk`, it's better to use storage classes with the `retain` policy.
