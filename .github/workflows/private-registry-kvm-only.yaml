@@ -5,7 +5,7 @@
 # which means you must monitor the build until it completes. If you terminate the process during a build using "gcloud-builds.yaml", it will cancel the build.
 #
 # Compatibility:
-# This supports any Git code hosting platform. For example, it works with Gitea, which I personally use for GitOps, DevOps, and DevSecOps on my Kubernetes cluster.
+# This supports any Git code hosting platform. For example, it works with Gitea, which I personally use for GitOps, DevOps, and DevSecOps on my Kubernetes cluster (e.g., https://git.b0zal.io).
 # However, if you are using GitHub with a private repository, you need to modify this CI/CD process by removing the cache after building.
 # It also supports any private registry implementation. For example, if you want to manage your own private registry, it is supported.
 #
@@ -81,7 +81,7 @@ jobs:
           # Tip: If your cloud provider supports multi-architecture nodes for your cluster, it will be great for smooth sailing ⛵ ☸ (HPA + Cluster Autoscaling/Autopilot).
           platforms: linux/amd64,linux/arm64
           # Note: Don't forget to modify "example.com", also "build-args" This is part of Variables Management, which is also supported in Gitea.
-          # Other build-args (e.g., ${{ github.repository_owner }}) are also supported in Gitea. I've personally used them for end-to-end testing, sandbox development, and production on my Kubernetes cluster ⛵ ☸.
+          # Other build-args (e.g., ${{ github.repository_owner }}) are also supported in Gitea. I've personally used them for end-to-end testing, sandbox development, and production on my Kubernetes cluster ⛵ ☸ (e.g., https://git.b0zal.io).
           tags: |
             example.com/${{ secrets.REPO_NAME }}/${{ secrets.IMAGE_NAME }}:${{ github.ref_name }}
             example.com/${{ secrets.REPO_NAME }}/${{ secrets.IMAGE_NAME }}:latest
