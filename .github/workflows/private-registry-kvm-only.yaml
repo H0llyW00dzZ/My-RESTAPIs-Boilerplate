@@ -36,6 +36,8 @@
 #
 # Warning:
 # Never modify this CI/CD boilerplate with hardcoded commands using "run" Hardcoding in CI/CD indicates poor GitOps, DevOps, and DevSecOps practices.
+# The reason is that this CI/CD uses QEMU, which is most stable with KVM. Modifying it with hardcoded commands can complicate customizing "runs-on: ubuntu-latest".
+# For example, hardcoded commands might not be compatible with other operating systems.
 name: Build and Push Docker Image to Private Registry
 
 on:
