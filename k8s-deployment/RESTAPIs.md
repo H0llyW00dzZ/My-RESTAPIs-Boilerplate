@@ -531,7 +531,7 @@ To prevent Out of Memory (OOM) errors in Kubernetes, especially when using `Hori
    - Optimize your applications to use memory efficiently. Sometimes, OOM errors are due to memory leaks or inefficient memory usage in the application code.
 
 > [!NOTE]
-> The mention of GCC and Go seems unrelated to OOM errors in Kubernetes. Typically, OOM errors in Kubernetes are more about resource allocation and management rather than compilation settings. Ensure your applications are built with appropriate settings, but focus on Kubernetes resource configurations to handle OOM issues.
+> The mention of GCC and Go (Go Garbage Collector) seems unrelated to OOM errors in Kubernetes. Typically, OOM errors in Kubernetes are more about resource allocation and management rather than compilation settings. Ensure your applications are built with appropriate settings, but focus on Kubernetes resource configurations to handle OOM issues.
 
 ## Compatibility
 
