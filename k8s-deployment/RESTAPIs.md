@@ -510,6 +510,29 @@ graph TD;
 
 There are no limitations; it can be used across a large codebase with synchronization. The only limitation might be whether the CPU is capable of handling a large number of workers.
 
+### Prevent OOM Errors with HPA When There Are Many Pods on a Node (Rare Issue)
+
+To prevent Out of Memory (OOM) errors in Kubernetes, especially when using `Horizontal Pod Autoscaler (HPA)`, consider the following strategies:
+
+1. **Node Sizing and Node Pools**: 
+   - Ensure your nodes have sufficient memory to handle the maximum number of pods expected. This can involve creating a node pool with larger nodes or more nodes to distribute the load.
+   - For specific cloud providers like `DigitalOcean Kubernetes Service (DOKS)`, you can configure node pools to match your workload needs.
+
+2. **GKE Autopilot**:
+   - In `Google Kubernetes Engine (GKE)`, using `GKE Autopilot` can help manage resources automatically, optimizing for both cost and performance. Autopilot handles node provisioning and scaling, which can help mitigate OOM issues.
+
+3. **Resource Requests and Limits**:
+   - Properly set resource requests and limits for your pods. This ensures that Kubernetes schedules pods on nodes with enough available resources and prevents a single pod from consuming all resources on a node.
+
+4. **Monitoring and Alerts**:
+   - Implement monitoring and alerting to detect OOM events or high memory usage early. Tools like Prometheus and Grafana can help visualize and alert on resource usage.
+
+5. **Application Optimization**:
+   - Optimize your applications to use memory efficiently. Sometimes, OOM errors are due to memory leaks or inefficient memory usage in the application code.
+
+> [!NOTE]
+> The mention of GCC and Go seems unrelated to OOM errors in Kubernetes. Typically, OOM errors in Kubernetes are more about resource allocation and management rather than compilation settings. Ensure your applications are built with appropriate settings, but focus on Kubernetes resource configurations to handle OOM issues.
+
 ## Compatibility
 
 Since this boilerplate uses the [`Fiber Framework`](https://gofiber.io/), it's important to note that not all configurations in `ingress-nginx` are supported. For example, if you set `annotations` in the ingress service of this boilerplate, such as the following YAML:
