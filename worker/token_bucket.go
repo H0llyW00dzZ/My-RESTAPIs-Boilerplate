@@ -13,8 +13,10 @@ import (
 // TokenBucket controls the rate of job processing.
 //
 // Note: The TokenBucket algorithm is widely used for rate limiting.
-// In Kubernetes, it can be enhanced for use with Ingress Nginx while handling
-// multiple pods, particularly in scenarios involving Horizontal Pod Autoscaling (HPA).
+// In Kubernetes, it can be enhanced for use with Ingress Nginx while managing
+// multiple pods, especially in scenarios involving Horizontal Pod Autoscaling (HPA).
+// It can also help save bandwidth costs. For example, in a setup with 50+ pods handling many concurrent requests from ingress,
+// it won't affect other pods during node recycling or draining (e.g., manually managing the lifecycle), even if the pod running this repo is on a node being deleted (Stable on Ingress Nginx).
 type TokenBucket struct {
 	tokens       int           // Current number of tokens available
 	maxTokens    int           // Maximum number of tokens the bucket can hold
