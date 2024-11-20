@@ -140,12 +140,18 @@ func TestPool_StartStopLoopZ(t *testing.T) {
 		worker.WithIdleCheckInterval[string](defaultSleepTime),
 	)
 
-	// Register a test job that takes some time to execute
-	pool.RegisterJob("testJob", func(c *fiber.Ctx) worker.Job[string] {
+	// Register a test job that takes some time to execute.
+	// Note: The function signature is set to "func(_ any)" when pool.Submit is explicitly called with nil.
+	// However, avoid using this in production, as reflection won't work reliably. It works with specific functions like "func(c *fiber.Ctx)".
+	pool.RegisterJob("testJob", func(_ any) worker.Job[string] {
 		return &MockJob[string]{result: "test result", sleepTime: time.Millisecond * 50}
 	})
 
-	// Submit & Start Job the pool
+	// Submit and start the job in the pool.
+	// If the job is defined as "func(c *fiber.Ctx)", pass the "*fiber.Ctx" pointer to Submit.
+	// Reflection works dynamically (unlike statically), adapting resource usage (e.g., memory) based on the function implementation.
+	// It can efficiently handle high workloads in HPA (e.g., 100+ Pods), even if the network is unstable (typical in load balancer or ingress struggles when reached 100+ pods).
+	// This can be combined with a token bucket for synchronization (e.g., save bandwidth, ingress).
 	pool.Submit(nil, "testJob")
 
 	// Verify that the pool is running
