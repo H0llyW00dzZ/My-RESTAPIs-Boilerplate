@@ -69,6 +69,4 @@ func (tb *TokenBucket) Take() bool {
 }
 
 // Stop stops the refill ticker, effectively halting the token refill process.
-func (tb *TokenBucket) Stop() {
-	tb.ticker.Stop()
-}
+func (tb *TokenBucket) Stop() { tb.ticker.Stop() }
