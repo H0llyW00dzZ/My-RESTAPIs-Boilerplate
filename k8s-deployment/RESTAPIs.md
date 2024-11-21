@@ -535,6 +535,8 @@ To prevent Out of Memory (OOM) errors in Kubernetes, especially when using `Hori
 
 ## Compatibility
 
+### Ingress Nginx Session/Cookie:
+
 Since this boilerplate uses the [`Fiber Framework`](https://gofiber.io/), it's important to note that not all configurations in `ingress-nginx` are supported. For example, if you set `annotations` in the ingress service of this boilerplate, such as the following YAML:
 
 ```yaml
@@ -555,6 +557,30 @@ The annotations `nginx.ingress.kubernetes.io/session-cookie-max-age`, `nginx.ing
 > [!WARNING]
 > While this boilerplate uses the [`Fiber Framework`](https://gofiber.io/), it is compatible with `HPA` (Horizontal Pod Autoscaling) for large-scale applications and multiple sites in a single deployment. 
 > Do not switch the deployment to `stateful (bad)`, as `stateful (bad)` deployments limit your ability to leverage Kubernetes features and experimental solutions for addressing critical infrastructure issues.
+
+### Ingress Nginx Service Upstream
+
+This boilerplate supports Ingress Nginx Service Upstream (e.g., `nginx.ingress.kubernetes.io/service-upstream`). However, when using service upstream for multiple pods with HPA (e.g., handling high workloads in combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker)), resources in each pod might become unusable. For example:
+
+```bash
+b0zal@Linux:~$ kubectl get pods
+NAME                                   CPU(cores)   MEMORY(bytes)
+senior-golang-worker-59d75b6884-2s4d7   145m         21Mi
+senior-golang-worker-59d75b6884-5nhjn   70m          19Mi
+senior-golang-worker-59d75b6884-82df8   151m         24Mi
+senior-golang-worker-59d75b6884-9g7g2   69m          20Mi
+```
+
+Without service upstream:
+
+```bash
+b0zal@Linux:~$ kubectl get pods
+NAME                                   CPU(cores)   MEMORY(bytes)
+senior-golang-worker-59d75b6884-2s4d7   145m         21Mi
+senior-golang-worker-59d75b6884-5nhjn   170m         19Mi
+senior-golang-worker-59d75b6884-82df8   151m         24Mi
+senior-golang-worker-59d75b6884-9g7g2   169m         20Mi
+```
 
 ## Compliance
 
