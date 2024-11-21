@@ -558,7 +558,7 @@ The annotations `nginx.ingress.kubernetes.io/session-cookie-max-age`, `nginx.ing
 > While this boilerplate uses the [`Fiber Framework`](https://gofiber.io/), it is compatible with `HPA` (Horizontal Pod Autoscaling) for large-scale applications and multiple sites in a single deployment. 
 > Do not switch the deployment to `stateful (bad)`, as `stateful (bad)` deployments limit your ability to leverage Kubernetes features and experimental solutions for addressing critical infrastructure issues.
 
-### Ingress Nginx Service Upstream
+### Ingress Nginx Service Upstream:
 
 This boilerplate supports Ingress Nginx Service Upstream (e.g., `nginx.ingress.kubernetes.io/service-upstream`). However, when using service upstream for multiple pods with HPA (e.g., handling high workloads in combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker)), resources in each pod might become unusable. For example:
 
