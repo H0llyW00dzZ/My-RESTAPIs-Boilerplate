@@ -535,7 +535,7 @@ To prevent Out of Memory (OOM) errors in Kubernetes, especially when using `Hori
 
 ### Setup HTTPS/TLS Certificate Without [cert-manager.io](https://cert-manager.io/)
 
-To set up an `HTTPS/TLS` certificate without using [cert-manager.io](https://cert-manager.io/), you may need a [cert chain resolver](https://github.com/zakjan/cert-chain-resolver.git) after issuing the certificate. Then, create a [TLS Secret](https://kubernetes.io/docs/reference/kubectl/generated/kubectl_create/kubectl_create_secret_tls/).
+To set up an `HTTPS/TLS certificate` without using [cert-manager.io](https://cert-manager.io/), you may need a [cert chain resolver](https://github.com/zakjan/cert-chain-resolver.git) after issuing the certificate. Then, create a [TLS Secret](https://kubernetes.io/docs/reference/kubectl/generated/kubectl_create/kubectl_create_secret_tls/).
 
 
 ## Compatibility
