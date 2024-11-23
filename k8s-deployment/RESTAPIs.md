@@ -533,6 +533,11 @@ To prevent Out of Memory (OOM) errors in Kubernetes, especially when using `Hori
 > [!NOTE]
 > The mention of GCC and Go (Go Garbage Collector) seems unrelated to OOM errors in Kubernetes. Typically, OOM errors in Kubernetes are more about resource allocation and management rather than compilation settings. Ensure your applications are built with appropriate settings, but focus on Kubernetes resource configurations to handle OOM issues.
 
+### Setup HTTPS/TLS Certificate Without [cert-manager.io](https://cert-manager.io/)
+
+To set up an `HTTPS/TLS` certificate without using [cert-manager.io](https://cert-manager.io/), you may need a [cert chain resolver](https://github.com/zakjan/cert-chain-resolver.git) after issuing the certificate. Then, create a [TLS Secret](https://kubernetes.io/docs/reference/kubectl/generated/kubectl_create/kubectl_create_secret_tls/).
+
+
 ## Compatibility
 
 ### Ingress Nginx Session/Cookie:
