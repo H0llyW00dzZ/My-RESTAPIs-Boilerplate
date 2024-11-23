@@ -148,4 +148,6 @@
 //   - The primary focus of this worker package is on CPU usage.
 //   - If function has a small memory footprint, the allocation will be minimal.
 //   - CPU usage is influenced by the number of workers you configure.
+//   - Additionally, dynamic memory allocation depends on the CPU architecture as well.
+//     For more efficient memory usage, consider using AMD processors, not Intel, as they are stable even for configurations with 100+ vCPUs.
 package worker
