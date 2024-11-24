@@ -2,6 +2,7 @@
 
 <p align="center">
    <img src="https://kubernetes.io/images/kubernetes.png" alt="fully-managed-and-isolated-by-k8s" width="80">
+   <img src="https://i.imgur.com/wGetVaj.png" alt="The-Black-Pearl" width="80">
 </p>
 
 This repository contains Kubernetes (K8s) deployment files for a REST API boilerplate application. The deployment includes configurations for the REST API service, Ingress controller, and Horizontal Pod Autoscaler (HPA).
