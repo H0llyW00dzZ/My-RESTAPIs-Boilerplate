@@ -142,7 +142,7 @@ The `cpu: 78%/80%` going `up/down` and `REPLICAS 22` are `dynamic` (depending on
 
 Adjust the HPA configuration in the `restapis-deploy.yaml` file to suit your application's scaling requirements.
 
-- **Average CPU (on AMD) and Memory Usage When Idle (as viewed on Grafana):**
+- **Average CPU (on AMD EPYC CPUs) and Memory Usage When Idle (as viewed on Grafana):**
 
 <p align="center">
    <img src="https://i.imgur.com/y9Ky3xZ.png" alt="fully-managed-and-isolated-by-k8s">
@@ -154,7 +154,7 @@ Adjust the HPA configuration in the `restapis-deploy.yaml` file to suit your app
 > The `Average CPU and Memory Usage When Idle` refers to the state when no jobs are being processed by the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker).
 > This also reflects the average usage of a typical Fiber application, as Fiber is designed with zero memory allocation in mind.
 
-- **Average CPU (on AMD) and Memory Usage During Smooth Sailing ⛵ ☸ in Combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) (as viewed on Grafana):**
+- **Average CPU (on AMD EPYC CPUs) and Memory Usage During Smooth Sailing ⛵ ☸ in Combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) (as viewed on Grafana):**
 
 <p align="center">
    <img src="https://i.imgur.com/4UWge7d.png" alt="fiber-framework-stable-at-scale-k8s">
@@ -184,7 +184,7 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
 > [!NOTE]
 > Note that the network `In`/`Out` usage has been very stable, with no drops or issues. Everything is well established ⛵.
 
-- **Average CPU (on AMD) and Memory Usage During Smooth Sailing ⛵ ☸ in Combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) & [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go) (as viewed on Grafana):**
+- **Average CPU (on AMD EPYC CPUs) and Memory Usage During Smooth Sailing ⛵ ☸ in Combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) & [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go) (as viewed on Grafana):**
 
 <p align="center">
    <img src="https://i.imgur.com/ylNz70L.png" alt="small-memory-footprint">
@@ -193,7 +193,7 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
 > [!NOTE]
 > The average CPU and memory usage on AMD during smooth sailing ⛵ ☸, in combination with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and the [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go), shows small memory usage compared to the new [`Unique`](https://pkg.go.dev/unique) package, which consumes significantly more memory.
 
-- **Average CPU (on AMD) and Memory Usage When Idle & [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go) (as viewed on Grafana):**
+- **Average CPU (on AMD EPYC CPUs) and Memory Usage When Idle & [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go) (as viewed on Grafana):**
 
 <p align="center">
    <img src="https://i.imgur.com/xCNqzUY.png" alt="fully-managed-and-isolated-by-k8s">
@@ -203,10 +203,10 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
 </p>
 
 > [!NOTE]
-> The `Average CPU (on AMD) and Memory Usage When Idle & Immutable Tag` refers to the state when no jobs are being processed by the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker).
+> The `Average CPU (on AMD EPYC CPUs) and Memory Usage When Idle & Immutable Tag` refers to the state when no jobs are being processed by the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker).
 > When comparing `Average CPU (on AMD) and Memory Usage When Idle (as viewed on Grafana)`, the primary difference is in `Memory Usage (Cache)`.
 
-- **Average CPU (on AMD) and Memory Usage During Smooth Sailing ⛵ ☸ with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go) for `24/7 Operation Zero Downtime` (as viewed on Grafana):**
+- **Average CPU (on AMD EPYC CPUs) and Memory Usage During Smooth Sailing ⛵ ☸ with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go) for `24/7 Operation Zero Downtime` (as viewed on Grafana):**
 
 <p align="center">
    <img src="https://i.imgur.com/RxBn1ID.png" alt="zero-downtime">
@@ -215,7 +215,7 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
 </p>
 
 > [!NOTE]
-> The average CPU (on AMD) and memory usage remains stable during continuous operation (Smooth Sailing ⛵ ☸) with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go).
+> The average CPU (on AMD EPYC CPUs) and memory usage remains stable during continuous operation (Smooth Sailing ⛵ ☸) with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go).
 > Unlike `stateful configurations`, which can sometimes encounter `OOM` errors due to the need for `explicit node selectors` and `single pod deployment`, `stateless architectures are more stable`. This is the reason why using `stateful architectures` for web services is not recommended (bad); mastering Kubernetes involves leveraging stateless designs (good).
 >
 > Also note that `stateful architectures` are not as scalable (not possible 🤪) as stateless ones because they are typically stable only on a single node and cannot easily scale across multiple nodes.
@@ -233,6 +233,17 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
 > The phrase `Stable Handling of 1 Million+ Keys (1 Million+ data) in Redis (as shown in Redis Insight and my Custom Redis Stats mechanism)` refers to a setup where MySQL stores important, persistent data, while Redis is used for temporary storage. The process works simply: if there's a cache miss in Redis, the data is queried from MySQL and then stored in Redis with a TTL (time-to-live). This way, subsequent requests can retrieve the data directly from Redis if it's available, avoiding repeated queries to MySQL.
 >
 > It's important to note that in a `stateful architecture`, achieving this level of scalability might not be possible 🤪. However, with a `stateless architecture` and `Horizontal Pod Autoscaling (HPA)`, it remains stable without `significant latency`.
+
+- **Average CPU (on AMD EPYC CPUs) and Memory Usage During Smooth Sailing ⛵ ☸ with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go) running `per 1.48 vCPU request` (as viewed on Grafana):**
+
+<p align="center">
+   <img src="https://i.imgur.com/kdgXH7C.png" alt="fiber-framework-stable-at-scale-k8s">
+   <img src="https://i.imgur.com/UMqrlYW.png" alt="fiber-framework-stable-at-scale-k8s">
+   <img src="https://i.imgur.com/rMV8L0q.png" alt="fiber-framework-stable-at-scale-k8s">
+</p>
+
+> [!NOTE]
+> The average CPU and memory usage (on AMD EPYC CPUs) during smooth sailing ⛵ ☸ with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go) running `per 1.48 vCPU request` includes stable network `In`/`Out` usage with no drops or issues. Everything is well established ⛵ ☸ , and memory usage is dynamic.
 
 ## Customization
 
