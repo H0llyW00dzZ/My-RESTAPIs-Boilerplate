@@ -1,0 +1,22 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ingress-nginx-hpa
+  namespace: ingress-nginx
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ingress-nginx-controller
+  minReplicas: 1
+  # Note: Adjust the maxReplicas based on your needs. For example, setting maxReplicas to 30 may be suitable for regional deployments,
+  # as it can handle traffic for an entire country (e.g., Singapore). Additionally, ensure your deployment is stable,
+  # considering factors such as network concurrency and other potential issues.
+  maxReplicas: 30
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
