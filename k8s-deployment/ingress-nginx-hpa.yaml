@@ -12,6 +12,8 @@ spec:
   # Note: Adjust the maxReplicas based on your needs. For example, setting maxReplicas to 30 may be suitable for regional deployments,
   # as it can handle traffic for an entire country (e.g., Singapore). Additionally, ensure your deployment is stable,
   # considering factors such as network concurrency and other potential issues. If your deployment is not stable for handling ingress-nginx-hpa, consider switching to ingress-nginx-vpa.
+  #
+  # For This REST API boilerplate is stable, allowing you to switch from REST-APIs HPA to REST-APIs VPA while keeping the ingress NGINX on HPA.
   maxReplicas: 30
   metrics:
     - type: Resource
