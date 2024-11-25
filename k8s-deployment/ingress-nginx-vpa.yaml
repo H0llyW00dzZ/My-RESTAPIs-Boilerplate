@@ -1,0 +1,23 @@
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: ingress-nginx-vpa
+  namespace: ingress-nginx
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ingress-nginx-controller
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: "ingress-nginx-controller"
+    # Note: This is more stable compared to HPA, which may not be as reliable.
+      minAllowed:
+        cpu: 50m
+        memory: 50Mi
+      maxAllowed:
+        cpu: 2
+        memory: 2Gi
+      controlledResources: ["cpu", "memory"]
