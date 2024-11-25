@@ -550,6 +550,16 @@ To prevent Out of Memory (OOM) errors in Kubernetes, especially when using `Hori
 
 To set up an `HTTPS/TLS certificate` without using [cert-manager.io](https://cert-manager.io/), you may need a [cert chain resolver](https://github.com/zakjan/cert-chain-resolver.git) after issuing the certificate. Then, create a [TLS Secret](https://kubernetes.io/docs/reference/kubectl/generated/kubectl_create/kubectl_create_secret_tls/).
 
+### Enhance Ingress NGINX for Large Scalability (e.g., Handling Many Nodes)
+
+To enhance Ingress NGINX for large scalability, especially when managing this REST APIs with HPA, follow these guidelines. If you have the capacity of a `single rack server` (`e.g., single/multi-tenant`), deploy Ingress NGINX on a node that isn't `heavily loaded—ideally`, a node running only Kubernetes components.
+
+**Ratio for Ingress NGINX to Handle High Workloads:**
+
+A single node with 4 vCPUs can efficiently manage 8 nodes, each with an average of 4 vCPUs.
+
+> [!NOTE]
+> It is stable and has been tested on AMD EPYC CPUs.
 
 ## Compatibility
 
