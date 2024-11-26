@@ -1,0 +1,7 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: ingress-nginx-blackpearl-quartermaster
+value: 95000
+globalDefault: false
+description: "Priority for NGINX Ingress - The Black Pearl's quartermaster, ensuring smooth and efficient traffic flow across the Kubernetes seas! 🏴‍☠️⛵️"
