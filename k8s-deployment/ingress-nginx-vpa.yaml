@@ -15,7 +15,8 @@ spec:
     - containerName: "ingress-nginx-controller"
     # Note: This is more stable compared to HPA, which may not be as reliable.
     # Additionally, this approach helps reduce latency for ingress-nginx (same as ingress-nginx-hpa) and is more effective in preventing NGINX bottlenecks.
-    # When NGINX becomes a bottleneck, its memory usage increases, indicating that the target deployment (not the NGINX deployment) cannot handle high traffic or a large number of requests.
+    # When NGINX becomes a bottleneck, its memory usage increases (e.g., average usage between 500 MiB ~ 1 GiB++). If the memory usage is under 500 MiB (e.g., average usage between 500 MiB ~ 250MiB or lower) , it is considered stable.
+    # This indicates that the target deployment (not the NGINX deployment) cannot handle high traffic or a large number of requests.
       minAllowed:
         cpu: 50m
         memory: 50Mi
