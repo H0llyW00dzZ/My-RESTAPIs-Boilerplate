@@ -22,6 +22,9 @@ spec:
         memory: 50Mi
       maxAllowed:
     # When the CPU usage in VPA reaches 2000m ~ 3000m, the average vCPU usage on pods should be around 700m ~ 1000m, indicating stability at a large scale if memory usage is under 500 MiB.
+    # Ratio:
+    # An average of 400m ~ 600m on pods (with VPA reaching 920m) is stable for handling 5 nodes (each with an average of 4 vCPUs) without latency issues, such as high response times or timeouts,
+    # which can affect other deployments and those using HPA.
         cpu: 4
         memory: 2Gi
       controlledResources: ["cpu", "memory"]
