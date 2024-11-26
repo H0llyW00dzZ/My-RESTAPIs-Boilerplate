@@ -225,11 +225,12 @@ func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
 	//
 	// Best Practice: Never set the parameter to "?tls=skip-verify" or disable certificate verification, as it compromises security.
 	// Always ensure proper certificate verification is in place to maintain a secure connection.
-	if err = mysql.RegisterTLSConfig("custom", &tls.Config{
-		RootCAs:    rootCAs,
-		MaxVersion: tls.VersionTLS13,
-		MinVersion: tls.VersionTLS13,
-	}); err != nil {
+	if err = mysql.RegisterTLSConfig("custom",
+		&tls.Config{
+			RootCAs:    rootCAs,
+			MaxVersion: tls.VersionTLS13,
+			MinVersion: tls.VersionTLS13,
+		}); err != nil {
 		return nil, err
 	}
 
