@@ -5,6 +5,14 @@
 # Also note that when switching the deployment from Stateless -> Stateful, you can't leverage k8s power (e.g., Autopilot, cluster updates, etc.),
 # and when using Fiber's in-memory storage, consider using VPA instead of HPA.
 #
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: blackpearl-priority
+value: 100000
+globalDefault: false
+description: "Aarrr! Priority for the Black Pearl ⚓️🏴‍☠️ - Faster than a kraken on coffee!"
+---
 # Note: This will automatically create the namespace if it doesn't exist. If the namespace already exists, it won't be affected.
 apiVersion: v1
 kind: Namespace
@@ -27,6 +35,7 @@ spec:
       labels:
         app: restapis
     spec:
+      priorityClassName: blackpearl-priority
       containers:
       - name: restapis
         image: <IMAGE_HERE> # Put Image related to this repository here
