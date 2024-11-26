@@ -21,8 +21,7 @@ func ReadResponseBody(resp *http.Response) (string, error) {
 	}()
 
 	// Copy the response body into the buffer.
-	_, err := buf.ReadFrom(resp.Body)
-	if err != nil {
+	if _, err := buf.ReadFrom(resp.Body); err != nil {
 		return "", err
 	}
 

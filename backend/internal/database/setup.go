@@ -225,12 +225,11 @@ func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
 	//
 	// Best Practice: Never set the parameter to "?tls=skip-verify" or disable certificate verification, as it compromises security.
 	// Always ensure proper certificate verification is in place to maintain a secure connection.
-	err = mysql.RegisterTLSConfig("custom", &tls.Config{
+	if err = mysql.RegisterTLSConfig("custom", &tls.Config{
 		RootCAs:    rootCAs,
 		MaxVersion: tls.VersionTLS13,
 		MinVersion: tls.VersionTLS13,
-	})
-	if err != nil {
+	}); err != nil {
 		return nil, err
 	}
 
@@ -261,8 +260,7 @@ func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
 	db.SetMaxIdleConns(50) // Maximum number of connections in the idle connection pool.
 	db.SetMaxOpenConns(50) // Maximum number of open connections to the database.
 
-	err = db.Ping()
-	if err != nil {
+	if err = db.Ping(); err != nil {
 		return nil, err
 	}
 	return db, nil
