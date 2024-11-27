@@ -482,8 +482,11 @@ frontend/
 │   ├── README.md
 │   ├── REDIS.md
 │   ├── RESTAPIs.md
-│   ├── create_k8s_secret.sh
-│   ├── ingress-nginx-configmap.yaml
+│   ├── component
+│   │   ├── coredns
+│   │   │   └── coredns-hpa.yaml
+│   │   └── secrets
+│   │       └── create_k8s_secret.sh
 │   ├── mysql-deploy-cpu-boost.yaml
 │   ├── mysql-deploy.yaml
 │   ├── mysql-storage-eks.yaml
@@ -492,7 +495,13 @@ frontend/
 │   ├── prometheus_portable_rules_record.yaml
 │   ├── redis-insight.yaml
 │   ├── restapis-deploy.yaml
-│   └── restapis-ingress.yaml
+│   ├── restapis-ingress.yaml
+│   └── traffic
+│       └── nginx
+│           ├── ingress-nginx-configmap.yaml
+│           ├── ingress-nginx-hpa.yaml
+│           ├── ingress-nginx-priority.yaml
+│           └── ingress-nginx-vpa.yaml
 ├── tailwind.config.js
 ├── translate.json
 └── worker
@@ -503,7 +512,7 @@ frontend/
     ├── token_bucket.go
     └── worker_test.go
 
-67 directories, 226 files
+72 directories, 230 files
 ```
 
 > [!NOTE]
