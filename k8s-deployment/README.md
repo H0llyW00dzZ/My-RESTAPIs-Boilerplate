@@ -2,6 +2,7 @@
 
 <p align="center">
    <img src="https://kubernetes.io/images/kubernetes.png" alt="sailing-with-k8s" width="80">
+   <img src="https://i.imgur.com/wGetVaj.png" alt="The-Black-Pearl" width="80">
 </p>
 
 This repository provides Kubernetes deployment files for a REST API boilerplate application. The primary focus is on leveraging Kubernetes to address critical infrastructure issues, enabling seamless scaling, and offering freedom from overpaying for licensing or other drama (e.g., bad competitors). Kubernetes allows you to pay primarily for direct hardware resources such as CPU, RAM, and disk, giving you the flexibility and efficiency needed for modern applications.
