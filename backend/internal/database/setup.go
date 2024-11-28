@@ -141,12 +141,7 @@ func (config *RedisClientConfig) InitializeRedisClient() (*redis.Client, error) 
 			ClientCAs:  rootCAs,
 			MaxVersion: tls.VersionTLS13,
 			MinVersion: tls.VersionTLS13,
-			CurvePreferences: []tls.CurveID{
-				tls.X25519,
-				tls.CurveP256,
-				tls.CurveP384,
-				tls.CurveP521,
-			},
+			// Note: Explicitly setting CurvePreferences is disabled by default to ensure future compatibility with X25519MLKEM768.
 		},
 		PoolTimeout:           config.PoolTimeout,           // PoolTimeout should already be a time.Duration
 		PoolSize:              config.PoolSize,              // adding back this for default.
@@ -293,12 +288,7 @@ func (config *FiberRedisClientConfig) InitializeRedisStorage() (fiber.Storage, e
 			ClientCAs:  rootCAs,
 			MaxVersion: tls.VersionTLS13,
 			MinVersion: tls.VersionTLS13,
-			CurvePreferences: []tls.CurveID{
-				tls.X25519,
-				tls.CurveP256,
-				tls.CurveP384,
-				tls.CurveP521,
-			},
+			// Note: Explicitly setting CurvePreferences is disabled by default to ensure future compatibility with X25519MLKEM768.
 		},
 		PoolSize: config.PoolSize, // Adjust the pool size as necessary.
 	})
