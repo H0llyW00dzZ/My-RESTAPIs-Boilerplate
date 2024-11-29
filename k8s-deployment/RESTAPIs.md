@@ -256,7 +256,7 @@ The provided deployment files are designed to be customizable. You can modify th
 > Ensure each deployment is set to the "rolling update" strategy to manage the odds of rolling dice 🎲 effectively.
 > This also helps prevent potential bottlenecks caused by resource overcommitted on a single node (e.g., a node reaching 100% or more usage of memory/CPU) through cluster autoscaling/autopilot.
 >
-> For example, if pods are evicted, new pods will be created but may enter a pending state. When pods are pending, the cluster autoscaler or Autopilot will add new nodes to accommodate the demand. Once the new nodes are available, the pending pods will start creating containers and be scheduled on the new nodes.
+> For example, if pods are evicted, new pods (the ones that were evicted) will be created but may enter a pending state. When pods are pending, the cluster autoscaler or Autopilot will add new nodes to accommodate the demand. Once the new nodes are available, the pending pods will start creating containers and be scheduled on the new nodes.
 > 
 > Without the logic of `PriorityClass`, the cluster autoscaler or Autopilot may not effectively prevent potential bottlenecks. Therefore, it's important to use `PriorityClass` wisely.
 
