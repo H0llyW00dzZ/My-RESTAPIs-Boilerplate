@@ -1,5 +1,10 @@
 # Note: When using CoreDNS with HPA, it is not recommended to use DNS local caching.
 # Misconfiguration DNS local caching can lead to significant issues (e.g., can lead to stale DNS entries and connectivity problems).
+# Additionally, this can improve latency, as it can be synchronized with other HPA deployments (e.g., this repo REST APIs).
+# Average latency (regional):
+# ;; Query time: 30msec ~ ;; Query time: 10msec
+#
+# Note that achieving average latency across multiple regions (global) is possible, but it is quite complex.
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
