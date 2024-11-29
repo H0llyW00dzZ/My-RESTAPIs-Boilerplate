@@ -262,6 +262,9 @@ The provided deployment files are designed to be customizable. You can modify th
 >
 > Note that `critical infrastructure issues related to scaling` (`e.g., bottlenecks`) can be more severe than security concerns (`e.g., vulnerabilities`) because, in Kubernetes, security becomes manageable (easy 🤪) once mastered (captain k8s).
 
+> [!TIP]
+> To boost the effectiveness of `PriorityClass` (`scheduling.k8s.io/v1`), unleash the power of this watchful bird, [Falco 🦅](https://falco.org/), to alert you when pods are evicted.
+
 ## Tips
 
 ### K8S Network Performance
