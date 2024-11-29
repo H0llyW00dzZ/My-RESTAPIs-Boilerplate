@@ -250,6 +250,9 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
 
 The provided deployment files are designed to be customizable. You can modify the resource limits, environment variables, and other configurations according to your application's needs. Additionally, you can adjust the Ingress configuration to match your desired routing rules and TLS settings.
 
+> [!NOTE]
+> For `PriorityClass` (`scheduling.k8s.io/v1`) in the current deployment template, it's like rolling dice 🎲 and requires cluster autoscaling/autopilot as it scales up. There is no guarantee that other pods won't be evicted (whether they have a `PriorityClass` or not). Ensure each deployment is set to the "rolling update" strategy to manage the odds of rolling dice 🎲 effectively.
+
 ## Tips
 
 ### K8S Network Performance
