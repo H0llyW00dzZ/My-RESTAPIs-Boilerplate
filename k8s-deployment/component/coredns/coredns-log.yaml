@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sailor-journal
+  namespace: kube-system
+data:
+  # Note: These logs are not forwarded to other DNS servers, so they will only be shown within the cluster.
+  log.override: |
+    log
