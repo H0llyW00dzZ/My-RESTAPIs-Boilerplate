@@ -1,6 +1,7 @@
 # Note: When using CoreDNS with HPA, it is not recommended to use DNS local caching.
 # Misconfiguration DNS local caching can lead to significant issues (e.g., can lead to stale DNS entries and connectivity problems).
-# Additionally, this can improve latency, as it can be synchronized with other HPA deployments (e.g., this repo REST APIs).
+# CoreDNS scales better with HPA because it is primarily CPU-bound and can be effective when multiple HPAs are in use, not just in this repository.
+# Additionally, this can improve latency as it synchronizes with other HPA deployments (e.g., REST APIs in this repo), including the stable ingress-nginx VPA.
 # Average latency (regional):
 # ;; Query time: 30msec ~ ;; Query time: 10msec
 #
