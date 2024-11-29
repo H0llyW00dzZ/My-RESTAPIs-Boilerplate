@@ -251,14 +251,16 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
 The provided deployment files are designed to be customizable. You can modify the resource limits, environment variables, and other configurations according to your application's needs. Additionally, you can adjust the Ingress configuration to match your desired routing rules and TLS settings.
 
 > [!NOTE]
-> For `PriorityClass` (`scheduling.k8s.io/v1`) in the current deployment template, it's like rolling dice 🎲 and requires cluster autoscaling/autopilot as it scales up.
+> For `PriorityClass` (`scheduling.k8s.io/v1`) in the current deployment template, it's like rolling dice 🎲 and requires cluster autoscaler or autopilot as it scales up.
 > There is no guarantee that other pods won't be evicted (whether they have a `PriorityClass` or not). 
 > Ensure each deployment is set to the "rolling update" strategy to manage the odds of rolling dice 🎲 effectively.
-> This also helps prevent potential bottlenecks caused by resource overcommitted on a single node (e.g., a node reaching 100% or more usage of memory/CPU) through cluster autoscaling/autopilot.
+> This also helps prevent potential bottlenecks (`critical infrastructure issues related to scaling`) caused by resource overcommitted on a single node (`e.g., a node reaching 100% or more usage of memory/CPU`) through cluster autoscaler or autopilot.
 >
 > For example, if pods are evicted, new pods (the ones that were evicted) will be created but may enter a pending state. When pods are pending, the cluster autoscaler or Autopilot will add new nodes to accommodate the demand. Once the new nodes are available, the pending pods will start creating containers and be scheduled on the new nodes.
 > 
-> Without the logic of `PriorityClass`, the cluster autoscaler or Autopilot may not effectively prevent potential bottlenecks. Therefore, it's important to use `PriorityClass` wisely.
+> Without the logic of `PriorityClass`, the cluster autoscaler or Autopilot may not effectively prevent potential bottlenecks (`critical infrastructure issues related to scaling`). Therefore, it's important to use `PriorityClass` wisely.
+>
+> Note that `critical infrastructure issues related to scaling` (`e.g., bottlenecks`) can be more severe than security concerns (`e.g., vulnerabilities`) because, in Kubernetes, security becomes manageable (easy 🤪) once mastered (captain k8s).
 
 ## Tips
 
