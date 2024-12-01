@@ -148,6 +148,8 @@ The provided deployment files are designed to be customizable. You can modify th
 > Without the logic of `PriorityClass`, the cluster autoscaler or Autopilot may not effectively prevent potential bottlenecks (`critical infrastructure issues related to scaling`). Therefore, it's important to use `PriorityClass` wisely.
 >
 > Note that `critical infrastructure issues related to scaling` (`e.g., bottlenecks`) can be more severe than security concerns (`e.g., vulnerabilities`) because, in Kubernetes, security becomes manageable (easy 🤪) once mastered (captain k8s).
+>
+> Additionally, the effectiveness of combining `PriorityClass` with a `cluster autoscaler` depends on the cloud provider's implementation. If the provider has a robust implementation, it can achieve zero downtime and operate smoothly, like sailing a ship ⛵. However, with a standard implementation, there might be downtime of around 1 ~ 2 minutes.
 
 > [!TIP]
 > To boost the effectiveness of `PriorityClass` (`scheduling.k8s.io/v1`), unleash the power of this watchful bird, [Falco 🦅](https://falco.org/), to alert you when pods are evicted.
