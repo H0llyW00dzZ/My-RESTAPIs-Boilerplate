@@ -484,7 +484,8 @@ frontend/
 │   ├── RESTAPIs.md
 │   ├── component
 │   │   ├── coredns
-│   │   │   └── coredns-hpa.yaml
+│   │   │   ├── coredns-custom-resource.yaml
+│   │   │   └── coredns-log.yaml
 │   │   └── secrets
 │   │       └── create_k8s_secret.sh
 │   ├── mysql-deploy-cpu-boost.yaml
@@ -512,7 +513,7 @@ frontend/
     ├── token_bucket.go
     └── worker_test.go
 
-72 directories, 230 files
+72 directories, 231 files
 ```
 
 > [!NOTE]
