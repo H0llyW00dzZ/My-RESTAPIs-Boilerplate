@@ -10,7 +10,7 @@ spec:
       - name: coredns
         resources:
           requests:
-            # Note: The default CoreDNS used by Kubernetes sets the maximum request to 100m for CPU and 70Mi for memory. However, this custom resource is set to 250m for HPA.
+            # Note: The default CoreDNS used by Kubernetes sets the maximum request to 100m for CPU and 70Mi for memory. However, this custom resource is set to 358m for HPA.
             # Since CoreDNS is primarily CPU-bound, it's better to use HPA for CPU-bound deployments rather than VPA.
             cpu: 358m
             memory: 70Mi
