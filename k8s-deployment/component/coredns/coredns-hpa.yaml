@@ -17,10 +17,10 @@ spec:
     kind: Deployment
     name: coredns
   minReplicas: 2
-  # Note: Adjust as needed; however, a maxReplicas of 6 with avg 80% is usually sufficient.
+  # Note: Adjust as needed; however, a maxReplicas of 50 with avg 80% is usually sufficient (e.g., for 10+ node).
   # For nodes dedicated to critical Kubernetes components with a capacity of 8 to 16 CPUs or more, 
   # it is recommended to adjust the settings to 50 ~ 100 or max (e.g., 99999999999999).
-  maxReplicas: 6
+  maxReplicas: 50
   metrics:
   - type: Resource
     resource:
