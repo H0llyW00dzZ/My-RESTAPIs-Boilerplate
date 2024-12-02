@@ -1,7 +1,8 @@
 # K8s Deployment for REST API Boilerplate - MySQL
 
 <p align="center">
-   <img src="https://kubernetes.io/images/kubernetes.png" alt="fully-managed-and-isolated-by-k8s" width="80">
+   <img src="https://kubernetes.io/images/kubernetes.png" alt="sailing-with-k8s" width="80">
+   <img src="https://i.imgur.com/wGetVaj.png" alt="The-Black-Pearl" width="80">
 </p>
 
 This repository contains Kubernetes (K8s) deployment files for a MySQL database service. The deployment includes configurations for MySQL, and Vertical Pod Autoscaler (VPA).
