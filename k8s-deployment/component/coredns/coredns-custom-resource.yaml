@@ -1,3 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coredns
+  namespace: kube-system
+spec:
+  template:
+    spec:
+      containers:
+      - name: coredns
+        resources:
+          requests:
+            # Note: The default CoreDNS used by Kubernetes sets the maximum request to 100m for CPU and 70Mi for memory. However, this custom resource is set to 250m for HPA.
+            # Since CoreDNS is primarily CPU-bound, it's better to use HPA for CPU-bound deployments rather than VPA.
+            cpu: 358m
+            memory: 70Mi
+          # This is the default CoreDNS used by Kubernetes. It's better not to edit the default, but you can increase the request for HPA.
+          limits:
+            memory: 170Mi
+---
 # Note: When using CoreDNS with HPA, it is not recommended to use DNS local caching.
 # Misconfiguration DNS local caching can lead to significant issues (e.g., can lead to stale DNS entries and connectivity problems).
 # CoreDNS scales better with HPA because it is primarily CPU-bound and can be effective when multiple HPAs are in use, not just in this repository.
