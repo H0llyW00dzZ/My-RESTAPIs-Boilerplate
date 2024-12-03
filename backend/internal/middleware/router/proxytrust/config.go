@@ -5,7 +5,9 @@
 
 package proxytrust
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+)
 
 // Config defines the configuration options for the proxy middleware.
 type Config struct {
