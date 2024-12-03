@@ -18,6 +18,9 @@ const (
 	// The configuration may vary based on the cloud provider. If the provider supports CIDR pooling for Kubernetes,
 	// it can be beneficial. CIDR pooling (e.g., CIDR pooling for node) allows securing the network by restricting external access and
 	// optimizing network performance (e.g., consistent latency within regions).
+	//
+	// Additionally, if using pod IPs, ensure the CIDR ranges are accurate and predictable for the pool size, such as for 100 pods.
+	// Accurate and predictable CIDR ranges can optimize network performance as well (e.g., consistently low latency, like in my cluster, the Black Pearl).
 	// Default: "0.0.0.0/0", allowing all IPs.
 	TRUSTEDPROXIES = "TRUSTED_PROXIES" // A list of IP addresses or CIDR ranges that are considered trusted proxies (default: "0.0.0.0/0").
 	TIMEFORMAT     = "TIME_FORMAT"     // The format for logging timestamps (default: "unix").
