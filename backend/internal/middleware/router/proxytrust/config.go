@@ -16,9 +16,15 @@ type Config struct {
 	// will skip its logic and pass the request to the next handler.
 	// Default is nil, meaning no requests will be skipped.
 	Next func(*fiber.Ctx) bool
+
+	// StatusCode is the HTTP status code returned when a request fails the
+	// proxy trust check. The default is [fiber.StatusGatewayTimeout], indicating
+	// that the request cannot be processed due to a proxy issue.
+	StatusCode int
 }
 
 // DefaultConfig is the default configuration for the proxy middleware.
 var DefaultConfig = Config{
-	Next: nil,
+	Next:       nil,
+	StatusCode: fiber.StatusGatewayTimeout,
 }

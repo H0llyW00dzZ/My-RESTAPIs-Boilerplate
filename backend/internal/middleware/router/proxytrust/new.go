@@ -26,6 +26,9 @@ func New(config ...Config) fiber.Handler {
 		if config[0].Next != nil {
 			cfg.Next = config[0].Next
 		}
+		if config[0].StatusCode != DefaultConfig.StatusCode {
+			cfg.StatusCode = config[0].StatusCode
+		}
 	}
 
 	return func(c *fiber.Ctx) error {
@@ -40,7 +43,7 @@ func New(config ...Config) fiber.Handler {
 			// as it allows the error to be handled by the caller somewhere else in the codebase,
 			// especially when the codebase grows larger.
 			// Additionally, this is preferable to returning a status of 'forbidden'.
-			return fiber.NewError(fiber.StatusGatewayTimeout)
+			return fiber.NewError(cfg.StatusCode)
 		}
 
 		// Proceed to the next middleware/handler
