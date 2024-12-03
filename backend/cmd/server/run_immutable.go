@@ -9,7 +9,11 @@
 package main
 
 import (
+	log "h0llyw00dz-template/backend/internal/logger"
+	"h0llyw00dz-template/backend/pkg/network/cidr"
 	"time"
+
+	"h0llyw00dz-template/env"
 
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
@@ -30,6 +34,12 @@ type Config struct {
 // It sets up the JSON encoder/decoder, case sensitivity, and strict routing,
 // and applies the application name to the server headers.
 func setupFiber(config Config) *fiber.App {
+	// Validate and parse trusted proxies
+	trustedProxies, err := cidr.ValidateAndParseIPs(env.TRUSTEDPROXIES, "0.0.0.0/0")
+	if err != nil {
+		log.LogFatal(err)
+	}
+
 	// TODO: Implement a server startup message mechanism similar to "Fiber" ASCII art,
 	// with animation (e.g., similar to a streaming/bubble tea spinner) for multiple sites or large codebases.
 	// The current static "Fiber" ASCII art only shows one site when there are multiple, which isn't ideal.
@@ -55,7 +65,7 @@ func setupFiber(config Config) *fiber.App {
 		EnableTrustedProxyCheck: true,
 		// By default, it is set to 0.0.0.0/0 for local development; however, it can be bound to an ingress controller/proxy.
 		// This can be a private IP range (e.g., 10.0.0.0/8).
-		TrustedProxies: []string{"0.0.0.0/0"},
+		TrustedProxies: trustedProxies,
 		// Trust X-Forwarded-For headers. This can be customized if using an ingress controller or proxy, especially Ingress NGINX.
 		//
 		// Note: X-Forwarded-* or any * (wildcard header) from a reverse proxy don't work with Kubernetes Ingress NGINX.

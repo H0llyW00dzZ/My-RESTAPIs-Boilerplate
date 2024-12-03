@@ -11,6 +11,7 @@ package main
 import (
 	"fmt"
 	setupTLS "h0llyw00dz-template/backend/internal/middleware/authentication/crypto/tls"
+	"h0llyw00dz-template/backend/pkg/network/cidr"
 	"time"
 
 	"github.com/bytedance/sonic"
@@ -44,6 +45,9 @@ func main() {
 	// Retrieve configuration from environment variables
 	config := getConfig()
 
+	// Initialize logging with the application name and time format
+	log.InitializeLogger(config.AppName, config.TimeFormat)
+
 	// Set up the Fiber application with the retrieved configuration
 	app := setupFiber(config)
 
@@ -68,6 +72,12 @@ func getConfig() Config {
 // It sets up the JSON encoder/decoder, case sensitivity, and strict routing,
 // and applies the application name to the server headers.
 func setupFiber(config Config) *fiber.App {
+	// Validate and parse trusted proxies
+	trustedProxies, err := cidr.ValidateAndParseIPs(env.TRUSTEDPROXIES, "0.0.0.0/0")
+	if err != nil {
+		log.LogFatal(err)
+	}
+
 	// TODO: Implement a server startup message mechanism similar to "Fiber" ASCII art,
 	// with animation (e.g., similar to a streaming/bubble tea spinner) for multiple sites or large codebases.
 	// The current static "Fiber" ASCII art only shows one site when there are multiple, which isn't ideal.
@@ -93,7 +103,7 @@ func setupFiber(config Config) *fiber.App {
 		EnableTrustedProxyCheck: true,
 		// By default, it is set to 0.0.0.0/0 for local development; however, it can be bound to an ingress controller/proxy.
 		// This can be a private IP range (e.g., 10.0.0.0/8).
-		TrustedProxies: []string{"0.0.0.0/0"},
+		TrustedProxies: trustedProxies,
 		// Trust X-Forwarded-For headers. This can be customized if using an ingress controller or proxy, especially Ingress NGINX.
 		//
 		// Note: X-Forwarded-* or any * (wildcard header) from a reverse proxy don't work with Kubernetes Ingress NGINX.
@@ -124,9 +134,6 @@ func setupFiber(config Config) *fiber.App {
 // Make sure the certificate is correctly configured as well (e.g., the certificate chain, which is easy to handle in Go for chaining certificates).
 // If the certificate is valid and properly configured, the server will run; otherwise, it won't run.
 func startServer(app *fiber.App, config Config) {
-	// Initialize logging with the application name and time format
-	log.InitializeLogger(config.AppName, config.TimeFormat)
-
 	// Define the server address using the specified port
 	addr := fmt.Sprintf(":%s", config.Port)
 
