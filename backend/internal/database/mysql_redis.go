@@ -285,6 +285,12 @@ type Service interface {
 	// TODO: Switch to generics [T] or implement this specifically for generics [T] ?
 	// This change will elevate it to a top-level function if you know how to handle it.
 	DelKeysJSONAtPipeline(ctx context.Context, objects []any, keyFunc KeyFunc, path ...string) error
+
+	// StreamRows executes a given query and streams the rows, allowing for efficient iteration over large datasets.
+	//
+	// Note: The caller is responsible for ensuring SQL injection protection when using StreamRows.
+	// This method is suitable for syncing MySQL with Redis if implemented correctly.
+	StreamRows(ctx context.Context, query string, args ...any) (*sql.Rows, error)
 }
 
 // service is a concrete implementation of the Service interface.
@@ -1057,4 +1063,23 @@ func (s *service) PingDB(ctx context.Context) bool {
 
 	// Return true if both MySQL and Redis are reachable.
 	return true
+}
+
+// StreamRows executes a given query and streams the rows, allowing for efficient iteration over large datasets.
+func (s *service) StreamRows(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
+	// Prepare the context with a timeout to prevent hanging indefinitely
+	//
+	// This is compatible/supported with Fiber's context (c.Context()), but it's recommended to use context.Background() if you're familiar with handling contexts.
+	// By default, this explicitly uses "context.WithTimeout".
+	ctx, cancel := context.WithTimeout(ctx, DefaultCtxTimeout)
+	defer cancel()
+
+	// Execute the query with the provided arguments
+	rows, err := s.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		log.LogErrorf("Failed to stream rows: %v", err)
+		return nil, fmt.Errorf("failed to stream rows: %w", err)
+	}
+
+	return rows, nil
 }
