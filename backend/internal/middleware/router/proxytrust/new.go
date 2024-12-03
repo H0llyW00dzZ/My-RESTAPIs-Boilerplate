@@ -39,6 +39,7 @@ func New(config ...Config) fiber.Handler {
 			// Note: Returning a new error is a better approach instead of returning directly,
 			// as it allows the error to be handled by the caller somewhere else in the codebase,
 			// especially when the codebase grows larger.
+			// Additionally, this is preferable to returning a status of 'forbidden'.
 			return fiber.NewError(fiber.StatusGatewayTimeout)
 		}
 
