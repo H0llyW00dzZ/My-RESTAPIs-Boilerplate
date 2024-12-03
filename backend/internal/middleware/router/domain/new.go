@@ -26,7 +26,7 @@ import (
 // Enhancement:
 //
 //   - This enhancement addresses, for example, security improvements that are not feasible in Kubernetes or non-Kubernetes environments when directly using IP addresses.
-//     For instance, in Kubernetes, it is not possible to directly access a pod using its IP with commands like "curl http://10.0.0.8" or "curl -k https://10.0.0.8".
+//     For instance, in Kubernetes, it is not possible to directly access a pod using its IP with commands like "curl http://10.0.0.8:8080" or "curl -k https://10.0.0.8:8080".
 //     Note that "10.0.0.8" represents a pod's IP, and even at the ingress level, it will return a 503 error (root router).
 //
 // Example public wildcard CAs that can be used for an ingress or directly:
