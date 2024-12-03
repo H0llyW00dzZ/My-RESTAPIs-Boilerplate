@@ -12,7 +12,7 @@ const (
 	MONITORPATH = "MONITOR_PATH" // The path for the server monitoring endpoint (default: "/monitor").
 	// TRUSTEDPROXIES is used to specify a list of IP addresses or CIDR ranges considered as trusted proxies.
 	// Note: For environments using ingress controllers like NGINX or services with a load balancer,
-	// the trusted proxies should include the IP addresses of these load balancers.
+	// the trusted proxies should include the IP addresses of these load balancers (not a pods ip).
 	// It's recommended to also include any other relevant load balancers (e.g., MySQL load balancers).
 	// If there are multiple IPs, specify each IP with a /32 suffix for precision.
 	// The configuration may vary based on the cloud provider. If the provider supports CIDR pooling for Kubernetes,
