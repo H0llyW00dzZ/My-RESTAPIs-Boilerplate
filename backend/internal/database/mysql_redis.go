@@ -1067,13 +1067,6 @@ func (s *service) PingDB(ctx context.Context) bool {
 
 // StreamRows executes a given query and streams the rows, allowing for efficient iteration over large datasets.
 func (s *service) StreamRows(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
-	// Prepare the context with a timeout to prevent hanging indefinitely
-	//
-	// This is compatible/supported with Fiber's context (c.Context()), but it's recommended to use context.Background() if you're familiar with handling contexts.
-	// By default, this explicitly uses "context.WithTimeout".
-	ctx, cancel := context.WithTimeout(ctx, DefaultCtxTimeout)
-	defer cancel()
-
 	// Execute the query with the provided arguments
 	rows, err := s.db.QueryContext(ctx, query, args...)
 	if err != nil {
