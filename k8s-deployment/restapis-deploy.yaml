@@ -220,6 +220,23 @@ spec:
         #     defaultMode: 420
         #     secretName: restapis-api-tls-secret
 ---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: compass-cove
+  namespace: restapis
+spec:
+  podSelector:
+    matchLabels:
+      app: restapis
+  ingress:
+  - from:
+    - ipBlock:
+      # Note: This allows up to 128 IPs, which means 128 pods.
+      # It can be used for trusted proxies (fiber configuration), however this is optional as it depends on how the cloud provider configures Kubernetes.
+      # Unlike Node CIDR pooling, which can effectively restrict external network access.
+        cidr: <YOUR_POD_IP>/25
+---
 # Note: When using nginx-ingress for expose service it's better keep like this
 apiVersion: v1
 kind: Service
