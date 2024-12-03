@@ -320,7 +320,7 @@ func (s *service) dumpTableData(ctx context.Context, w io.Writer, tableName stri
 	}
 
 	query := fmt.Sprintf("SELECT * FROM `%s`", tableName)
-	rows, err := s.db.QueryContext(ctx, query)
+	rows, err := s.StreamRows(ctx, query)
 	if err != nil {
 		return fmt.Errorf("failed to query table data: %w", err)
 	}
