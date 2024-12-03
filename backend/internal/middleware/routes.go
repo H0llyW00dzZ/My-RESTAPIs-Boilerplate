@@ -140,6 +140,8 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 				"statusCodeSkip":     statusCodeSkip,
 			}),
 		),
+		// Note: When there are multiple cache middleware instances for different sites, setting the "WithCacheHeader" to the same value (e.g., "X-Go-Frontend") won't cause duplication or conflict.
+		// Ensure that cacheKeyGen values are different to avoid confusion. This can effectively prevent attack surfaces by manipulating the same frontend header. I have personally used this approach, even for request IDs.
 		WithCacheHeader("X-Go-Frontend"),
 	)
 
