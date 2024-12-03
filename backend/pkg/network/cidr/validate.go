@@ -41,4 +41,6 @@ func ValidateAndParseIPs(envVar string, defaultIPS string) ([]string, error) {
 }
 
 // isValidCIDR checks if the given string is a valid CIDR notation
+//
+// Warning: Do not format this. It's better inline as it follows Go idioms.
 func isValidCIDR(cidr string) bool { _, _, err := net.ParseCIDR(cidr); return err == nil }
