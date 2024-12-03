@@ -9,8 +9,12 @@
 package middleware
 
 import (
+	log "h0llyw00dz-template/backend/internal/logger"
+	"h0llyw00dz-template/backend/pkg/network/cidr"
+
 	"h0llyw00dz-template/backend/internal/database"
 	"h0llyw00dz-template/backend/internal/middleware/router/domain"
+	"h0llyw00dz-template/env"
 
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
@@ -23,6 +27,12 @@ import (
 // They operate independently. Also note that as the codebase grows, the routing structure
 // may become a binary tree (see https://en.wikipedia.org/wiki/Binary_tree), which is considered one of the best art in Go programming.
 func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Service) {
+	// Validate and parse trusted proxies
+	trustedProxies, err := cidr.ValidateAndParseIPs(env.TRUSTEDPROXIES, "0.0.0.0/0")
+	if err != nil {
+		log.LogFatal(err)
+	}
+
 	// Hosts
 	hosts := map[string]*fiber.App{}
 
@@ -53,7 +63,7 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 		EnableTrustedProxyCheck: true,
 		// By default, it is set to 0.0.0.0/0 for local development; however, it can be bound to an ingress controller/proxy.
 		// This can be a private IP range (e.g., 10.0.0.0/8).
-		TrustedProxies: []string{"0.0.0.0/0"},
+		TrustedProxies: trustedProxies,
 		// Trust X-Forwarded-For headers. This can be customized if using an ingress controller or proxy, especially Ingress NGINX.
 		//
 		// Note: X-Forwarded-* or any * (wildcard header) from a reverse proxy don't work with Kubernetes Ingress NGINX.
@@ -93,7 +103,7 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 		EnableTrustedProxyCheck: true,
 		// By default, it is set to 0.0.0.0/0 for local development; however, it can be bound to an ingress controller/proxy.
 		// This can be a private IP range (e.g., 10.0.0.0/8).
-		TrustedProxies: []string{"0.0.0.0/0"},
+		TrustedProxies: trustedProxies,
 		// Trust X-Forwarded-For headers. This can be customized if using an ingress controller or proxy, especially Ingress NGINX.
 		//
 		// Note: X-Forwarded-* or any * (wildcard header) from a reverse proxy don't work with Kubernetes Ingress NGINX.

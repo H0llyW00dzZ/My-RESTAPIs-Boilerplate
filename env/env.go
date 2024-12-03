@@ -7,10 +7,11 @@ package env
 
 // Application Configuration
 const (
-	APPNAME     = "APP_NAME"     // The name of the application (default: "Gopher").
-	PORT        = "PORT"         // The port number on which the server will listen (default: "8080").
-	MONITORPATH = "MONITOR_PATH" // The path for the server monitoring endpoint (default: "/monitor").
-	TIMEFORMAT  = "TIME_FORMAT"  // The format for logging timestamps (default: "unix").
+	APPNAME        = "APP_NAME"        // The name of the application (default: "Gopher").
+	PORT           = "PORT"            // The port number on which the server will listen (default: "8080").
+	MONITORPATH    = "MONITOR_PATH"    // The path for the server monitoring endpoint (default: "/monitor").
+	TRUSTEDPROXIES = "TRUSTED_PROXIES" // A list of IP addresses or CIDR ranges that are considered trusted proxies (default: "0.0.0.0/0").
+	TIMEFORMAT     = "TIME_FORMAT"     // The format for logging timestamps (default: "unix").
 	//     Available options:
 	//   - "unix": Unix timestamp format (e.g., [1713355079]).
 	//   - "default": Default timestamp format (e.g., 2024/04/17 15:04:05).
