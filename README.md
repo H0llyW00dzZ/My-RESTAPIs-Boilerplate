@@ -345,9 +345,13 @@ frontend/
 │   │   │   │   ├── config.go
 │   │   │   │   └── new.go
 │   │   │   ├── router
-│   │   │   │   └── domain
+│   │   │   │   ├── domain
+│   │   │   │   │   ├── config.go
+│   │   │   │   │   └── new.go
+│   │   │   │   └── proxytrust
 │   │   │   │       ├── config.go
-│   │   │   │       └── new.go
+│   │   │   │       ├── new.go
+│   │   │   │       └── proxytrust_test.go
 │   │   │   ├── routes.go
 │   │   │   ├── routes_immutable.go
 │   │   │   ├── routes_non_immutable.go
@@ -517,7 +521,7 @@ frontend/
     ├── token_bucket.go
     └── worker_test.go
 
-74 directories, 233 files
+75 directories, 236 files
 ```
 
 > [!NOTE]
