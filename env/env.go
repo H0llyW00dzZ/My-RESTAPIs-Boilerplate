@@ -7,9 +7,18 @@ package env
 
 // Application Configuration
 const (
-	APPNAME        = "APP_NAME"        // The name of the application (default: "Gopher").
-	PORT           = "PORT"            // The port number on which the server will listen (default: "8080").
-	MONITORPATH    = "MONITOR_PATH"    // The path for the server monitoring endpoint (default: "/monitor").
+	APPNAME     = "APP_NAME"     // The name of the application (default: "Gopher").
+	PORT        = "PORT"         // The port number on which the server will listen (default: "8080").
+	MONITORPATH = "MONITOR_PATH" // The path for the server monitoring endpoint (default: "/monitor").
+	// TRUSTEDPROXIES is used to specify a list of IP addresses or CIDR ranges considered as trusted proxies.
+	// Note: For environments using ingress controllers like NGINX or services with a load balancer,
+	// the trusted proxies should include the IP addresses of these load balancers.
+	// It's recommended to also include any other relevant load balancers (e.g., MySQL load balancers).
+	// If there are multiple IPs, specify each IP with a /32 suffix for precision.
+	// The configuration may vary based on the cloud provider. If the provider supports CIDR pooling for Kubernetes,
+	// it can be beneficial. CIDR pooling (e.g., CIDR pooling for node) allows securing the network by restricting external access and
+	// optimizing network performance (e.g., consistent latency within regions).
+	// Default: "0.0.0.0/0", allowing all IPs.
 	TRUSTEDPROXIES = "TRUSTED_PROXIES" // A list of IP addresses or CIDR ranges that are considered trusted proxies (default: "0.0.0.0/0").
 	TIMEFORMAT     = "TIME_FORMAT"     // The format for logging timestamps (default: "unix").
 	//     Available options:
