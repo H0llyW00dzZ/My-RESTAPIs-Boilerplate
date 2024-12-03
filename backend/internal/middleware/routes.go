@@ -76,7 +76,7 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 	)
 	// Note: This is just an example. It should work with SHA-256 for the key, however it may not properly bind to a UUID.
 	cacheKeyGen := keyidentifier.New(keyidentifier.Config{
-		Prefix: "go_frontend:",
+		Prefix: "go_root_router_frontend:",
 	})
 	// Speed depends of database connection as well.
 	gopherstorage := db.FiberStorage()
@@ -113,6 +113,14 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 		fiber.StatusPermanentRedirect,
 		fiber.StatusTemporaryRedirect,
 	)
+	// Skip Hostname Router for Frontend & REST APIs
+	//
+	// Note: It's important that registerRouteConfigMiddleware is on the Root Router; otherwise, it will return a 503 error.
+	// This is effective for handling wildcard domains (*.example.com) and specific domains (example.com) that are not registered
+	// in DomainRouter (see RegisterRoutes.go). It can also be used internally for routing/gateway by combining CoreDNS on K8s.
+	// When skipHostnameRouter is bound to this cacheMiddleware for the Root Router, it's possible to implement it in the frontend
+	// and then apply skipHostnameRouter for apiSubdomain to avoid duplication (not a conflict).
+	skipHostnameRouter := CustomNextHostName(apiSubdomain, frontendDomain)
 	cacheMiddleware := NewCacheMiddleware(
 		WithCacheStorage(gopherstorage),
 		WithCacheKeyGenerator(cacheKeyGen.GenerateCacheKey),
@@ -127,8 +135,9 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 			// Also, note that if it doesn't work, the browser would display a blank page
 			// because it hits the cache, not an unreachable cache. If the cache is unreachable, it will redirect that mean works.
 			CustomNextStack(map[string]func(*fiber.Ctx) bool{
-				"contentTypeSkip": contentTypeSkip,
-				"statusCodeSkip":  statusCodeSkip,
+				"skipHostnameRouter": skipHostnameRouter,
+				"contentTypeSkip":    contentTypeSkip,
+				"statusCodeSkip":     statusCodeSkip,
 			}),
 		),
 		WithCacheHeader("X-Go-Frontend"),
