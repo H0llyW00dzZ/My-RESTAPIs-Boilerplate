@@ -23,6 +23,12 @@ import (
 //     If using a wildcard/advanced certificate, it is recommended to deploy the application in a cloud environment such as Kubernetes, where you can easily control the ingress controller (e.g., implement your own, such as Universe).
 //     Also note that regarding known bugs, it is not caused by this repository; it is an issue with Heroku's router.
 //
+// Enhancement:
+//
+//   - This enhancement addresses, for example, security improvements that are not feasible in Kubernetes or non-Kubernetes environments when directly using IP addresses.
+//     For instance, in Kubernetes, it is not possible to directly access a pod using its IP with commands like "curl http://10.0.0.8" or "curl -k https://10.0.0.8".
+//     Note that "10.0.0.8" represents a pod's IP, and even at the ingress level, it will return a 503 error (root router).
+//
 // Example public wildcard CAs that can be used for an ingress or directly:
 //
 //   - https://crt.sh/?q=a8bc9093e1f4ba202fc769b8818b8a279a5f70c91bee458d29d6ad3c5ac5e88c
