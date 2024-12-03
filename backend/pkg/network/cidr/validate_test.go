@@ -49,6 +49,27 @@ func TestValidateAndParseIPs(t *testing.T) {
 			expectError: true,
 		},
 		{
+			name:        "Invalid CIDR",
+			envVarValue: "999.999.999.999/999",
+			defaultIPS:  "0.0.0.0/0",
+			expected:    nil,
+			expectError: true,
+		},
+		{
+			name:        "Multiple invalid entries",
+			envVarValue: "999.999.999.999, 999.999.999.999/999",
+			defaultIPS:  "0.0.0.0/0",
+			expected:    nil,
+			expectError: true,
+		},
+		{
+			name:        "Multiple invalid entries, expected one valid",
+			envVarValue: "999.999.999.999, 999.999.999.999/999, 192.168.1.1",
+			defaultIPS:  "0.0.0.0/0",
+			expected:    []string{"192.168.1.1"},
+			expectError: true,
+		},
+		{
 			name:        "Default value used",
 			envVarValue: "0.0.0.0/0",
 			defaultIPS:  "0.0.0.0/0",
