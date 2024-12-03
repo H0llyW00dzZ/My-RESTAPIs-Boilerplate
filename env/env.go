@@ -20,7 +20,7 @@ const (
 	// optimizing network performance (e.g., consistent latency within regions).
 	//
 	// Additionally, if using pod IPs, ensure the CIDR ranges are accurate and predictable for the pool size, such as for 100 pods.
-	// Accurate and predictable CIDR ranges can optimize network performance as well (e.g., consistently low latency, like in my cluster, the Black Pearl).
+	// Accurate and predictable CIDR ranges can optimize network performance as well (e.g., consistently low latency, like in my cluster, the Black Pearl ☸️ ⛵).
 	// Default: "0.0.0.0/0", allowing all IPs.
 	TRUSTEDPROXIES = "TRUSTED_PROXIES" // A list of IP addresses or CIDR ranges that are considered trusted proxies (default: "0.0.0.0/0").
 	TIMEFORMAT     = "TIME_FORMAT"     // The format for logging timestamps (default: "unix").
