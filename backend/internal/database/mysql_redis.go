@@ -289,7 +289,7 @@ type Service interface {
 	// StreamRows executes a given query and streams the rows, allowing for efficient iteration over large datasets.
 	//
 	// Note: The caller is responsible for ensuring SQL injection protection when using StreamRows.
-	// This method is suitable for syncing MySQL with Redis if implemented correctly.
+	// This method is suitable for syncing MySQL x Redis if implemented correctly (easy 🤪).
 	StreamRows(ctx context.Context, query string, args ...any) (*sql.Rows, error)
 }
 
