@@ -23,12 +23,12 @@ func TestMiddleware(t *testing.T) {
 		expectedStatus int
 	}{
 		{
-			name:           "Fiber App with 0.0.0.0 as trusted proxy",
+			name:           "Test Fiber App with 0.0.0.0 as trusted proxy",
 			trustedProxies: []string{"0.0.0.0"},
 			expectedStatus: fiber.StatusOK,
 		},
 		{
-			name:           "Fiber App with 10.0.0.2 as untrusted proxy",
+			name:           "Test Fiber App with 10.0.0.2 as untrusted proxy",
 			trustedProxies: []string{"10.0.0.2"},
 			expectedStatus: fiber.StatusGatewayTimeout,
 		},
@@ -38,6 +38,7 @@ func TestMiddleware(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Create a new Fiber app with specific trusted proxies
 			app := fiber.New(fiber.Config{
+				AppName:                 tt.name,
 				EnableIPValidation:      true,
 				TrustedProxies:          tt.trustedProxies,
 				EnableTrustedProxyCheck: true,
