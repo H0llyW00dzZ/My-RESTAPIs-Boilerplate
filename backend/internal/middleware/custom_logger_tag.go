@@ -20,22 +20,39 @@ import (
 //
 // Note: Ignore the warning about unused parameters. Once it is bound to [WithLoggerCustomTags], the warning will disappear from the IDE.
 func appNameTag(output logger.Buffer, c *fiber.Ctx, data *logger.Data, extraParam string) (int, error) {
-	appName := c.App().Config().AppName
-	return output.WriteString(appName)
+	if c.App().Config().AppName == "" {
+		return output.WriteString("-")
+	}
+	return output.WriteString(c.App().Config().AppName)
 }
 
 // unixTimeTag is a fiber logger custom tag function that returns the current Unix timestamp.
 //
 // Note: Ignore the warning about unused parameters. Once it is bound to [WithLoggerCustomTags], the warning will disappear from the IDE.
 func unixTimeTag(output logger.Buffer, c *fiber.Ctx, data *logger.Data, extraParam string) (int, error) {
-	unixTime := strconv.FormatInt(time.Now().Unix(), 10)
-	return output.WriteString(unixTime)
+	return output.WriteString(strconv.FormatInt(time.Now().Unix(), 10))
 }
 
 // hostNameTag is a fiber logger custom tag function that returns the current Hostname.
 //
 // Note: Ignore the warning about unused parameters. Once it is bound to [WithLoggerCustomTags], the warning will disappear from the IDE.
 func hostNameTag(output logger.Buffer, c *fiber.Ctx, data *logger.Data, extraParam string) (int, error) {
-	hostName := utils.CopyString(c.Hostname())
-	return output.WriteString(hostName)
+	return output.WriteString(utils.CopyString(c.Hostname()))
+}
+
+// userAgentTag is a Fiber logger custom tag function that retrieves the User-Agent string from the incoming HTTP request.
+func userAgentTag(output logger.Buffer, c *fiber.Ctx, data *logger.Data, extraParam string) (int, error) {
+	if userAgent := c.Context().UserAgent(); userAgent != nil {
+		return output.Write(userAgent)
+	}
+	return output.WriteString("-")
+}
+
+// proxyTag is a Fiber logger custom tag function that retrieves the remote IP address
+// if the trusted proxy check is enabled.
+func proxyTag(output logger.Buffer, c *fiber.Ctx, data *logger.Data, extraParam string) (int, error) {
+	if c.App().Config().EnableTrustedProxyCheck {
+		return output.WriteString(c.Context().RemoteIP().String())
+	}
+	return output.WriteString("-")
 }

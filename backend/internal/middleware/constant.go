@@ -29,6 +29,9 @@ const (
 )
 
 const (
-	loggerFormat     = "${time} [${blue}${appName}${reset}] [${green}INFO${reset}] | [${protocol} - ${hostName} - ${status}] | ${latency} - ${unixTime} | [${ip} - ${locals:visitor_uuid}] | ${method} | ${path} | ${error}\n"
+	loggerFormat = "${time} [${blue}${appName}${reset}] [${green}INFO${reset}] | " +
+		"[${cyan}${proxy}${reset} - ${protocol} - ${hostName} - ${status}] | ${latency} - ${unixTime} | " +
+		"[${ip} - ${locals:visitor_uuid}] | ${method} | ${path} | ${userAgent} | ${error}\n"
+
 	loggerFormatTime = "2006/01/02 15:04:05"
 )
