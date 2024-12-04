@@ -48,8 +48,7 @@ func userAgentTag(output logger.Buffer, c *fiber.Ctx, data *logger.Data, extraPa
 	return output.WriteString("-")
 }
 
-// proxyTag is a Fiber logger custom tag function that retrieves the remote IP address
-// if the trusted proxy check is enabled.
+// proxyTag is a Fiber logger custom tag function that retrieves the remote IP address if the trusted proxy check is enabled.
 func proxyTag(output logger.Buffer, c *fiber.Ctx, data *logger.Data, extraParam string) (int, error) {
 	if c.App().Config().EnableTrustedProxyCheck {
 		return output.WriteString(c.Context().RemoteIP().String())
