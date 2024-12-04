@@ -166,9 +166,11 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 	httpLogg := NewLogger(
 		// Register the custom tag functions
 		WithLoggerCustomTags(map[string]logger.LogFunc{
-			"appName":  appNameTag,
-			"unixTime": unixTimeTag,
-			"hostName": hostNameTag,
+			"appName":   appNameTag,
+			"unixTime":  unixTimeTag,
+			"hostName":  hostNameTag,
+			"userAgent": userAgentTag,
+			"proxy":     proxyTag,
 		}),
 		WithLoggerFormat(loggerFormat),
 		WithLoggerTimeFormat(loggerFormatTime),
