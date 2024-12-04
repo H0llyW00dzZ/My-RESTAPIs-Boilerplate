@@ -179,6 +179,13 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 
 // registerRootRouter sets up the root router for the application.
 // It registers static file serving and applies the favicon middleware.
+//
+// Note: The registerRouteConfigMiddleware and registerRootRouter are root routers.
+// Ensure not to put specific HTTP routes such as GET, POST, etc., here.
+// The root router applies to all routes (e.g., frontend routes, REST API routes),
+// so it's better used for security mechanisms (e.g.,. proxytrust)
+// The root router will be hidden when there are many sites or REST APIs,
+// but security mechanisms like proxytrust will still apply and work for all.
 func registerRootRouter(app *fiber.App) {
 	// Register static file serving
 	app.Static("/styles/", "./frontend/public/assets", fiber.Static{
