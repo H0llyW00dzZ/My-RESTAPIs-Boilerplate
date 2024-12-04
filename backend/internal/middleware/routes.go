@@ -17,6 +17,7 @@ import (
 	"h0llyw00dz-template/backend/internal/database"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/keyidentifier"
+	"h0llyw00dz-template/backend/internal/middleware/router/proxytrust"
 	"h0llyw00dz-template/backend/pkg/mime"
 	"h0llyw00dz-template/env"
 	htmx "h0llyw00dz-template/frontend/htmx/error_page_handler"
@@ -194,5 +195,13 @@ func registerRootRouter(app *fiber.App) {
 		WithFaviconURL("/favicon.ico"),
 	)
 
-	app.Use(favicon)
+	// Note: It's better to place the proxy trust configuration here. Ensure that the HTTP error code is also implemented.
+	// If not specified, such as [fiber.StatusGatewayTimeout], it will default to a 500 Internal Server Error.
+	proxy := proxytrust.New(
+		proxytrust.Config{
+			StatusCode: fiber.StatusServiceUnavailable,
+		},
+	)
+
+	app.Use(favicon, proxy)
 }
