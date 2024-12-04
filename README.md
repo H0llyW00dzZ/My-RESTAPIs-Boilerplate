@@ -434,8 +434,12 @@ frontend/
 │   │   │   ├── 404_templ.go
 │   │   │   ├── 500.templ
 │   │   │   ├── 500_templ.go
+│   │   │   ├── 502.templ
+│   │   │   ├── 502_templ.go
 │   │   │   ├── 503.templ
 │   │   │   ├── 503_templ.go
+│   │   │   ├── 504.templ
+│   │   │   ├── 504_templ.go
 │   │   │   ├── base.templ
 │   │   │   ├── base_templ.go
 │   │   │   ├── page_handler.go
@@ -521,7 +525,7 @@ frontend/
     ├── token_bucket.go
     └── worker_test.go
 
-75 directories, 236 files
+75 directories, 240 files
 ```
 
 > [!NOTE]
