@@ -64,7 +64,7 @@ func TestValidateAndParseIPs(t *testing.T) {
 		},
 		{
 			name:        "Multiple invalid entries, expected one valid",
-			envVarValue: "999.999.999.999, 999.999.999.999/999, 192.168.1.1",
+			envVarValue: "999.999.999.999, 999.999.999.999/999, 192.168.1.1, 100.100.100.100, 100.100.100.100/100",
 			defaultIPS:  "0.0.0.0/0",
 			expected:    []string{"192.168.1.1"},
 			expectError: true,
