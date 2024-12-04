@@ -235,6 +235,9 @@ spec:
       # Note: This allows up to 128 IPs, which means 128 pods.
       # It can be used for trusted proxies (fiber configuration), however this is optional as it depends on how the cloud provider configures Kubernetes.
       # Unlike Node CIDR pooling, which can effectively restrict external network access.
+      # For example, Node CIDR pooling occurs when the cluster autoscaler/auto pilot assigns nodes within the same CIDR range 
+      # (e.g., for three nodes, the public IPs might be 127.0.0.1, 127.0.0.2, 127.0.0.3).
+      # That can effectively secure the network by restricting external access, allowing only pods/cluster access to the load balancer, as shown in the MySQL documentation for DOKS.
         cidr: <YOUR_POD_IP>/25
 ---
 # Note: When using nginx-ingress for expose service it's better keep like this
