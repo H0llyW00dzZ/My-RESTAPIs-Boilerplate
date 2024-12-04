@@ -54,6 +54,12 @@ func handleError(c *fiber.Ctx, e *fiber.Error, vd *viewData) error {
 	case fiber.StatusBadRequest:
 		vd.title = fiber.ErrBadRequest.Message + " - " + c.App().Config().AppName
 		return vd.PageBadRequestHandler(c)
+	case fiber.StatusGatewayTimeout:
+		vd.title = fiber.ErrGatewayTimeout.Message + " - " + c.App().Config().AppName
+		return vd.PageGatewayTimeoutHandler(c)
+	case fiber.StatusBadGateway:
+		vd.title = fiber.ErrBadGateway.Message + " - " + c.App().Config().AppName
+		return vd.PageBadGatewayHandler(c)
 	default:
 		vd.title = PageInternalServerError + " - " + c.App().Config().AppName
 		return vd.Page500InternalServerHandler(c)
@@ -109,6 +115,18 @@ func (v *viewData) PageUnauthorizeHandler(c *fiber.Ctx) error {
 func (v *viewData) PageBadRequestHandler(c *fiber.Ctx) error {
 	component := PageBadRequest400(*v) // magic pointer.
 	return v.renderAndSend(c, fiber.StatusBadRequest, component)
+}
+
+// PageGatewayTimeoutHandler handles 504 Gateway Timeout
+func (v *viewData) PageGatewayTimeoutHandler(c *fiber.Ctx) error {
+	component := PageGatewayTimeout504(*v) // magic pointer.
+	return v.renderAndSend(c, fiber.StatusGatewayTimeout, component)
+}
+
+// PageBadGatewayHandler handles 502 Bad Gateway
+func (v *viewData) PageBadGatewayHandler(c *fiber.Ctx) error {
+	component := PageBadGateway502(*v) // magic pointer.
+	return v.renderAndSend(c, fiber.StatusBadGateway, component)
 }
 
 // GenericErrorInternalServerHandler handles Generic 500 Internal Server errors.
