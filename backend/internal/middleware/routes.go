@@ -208,7 +208,7 @@ func registerRootRouter(app *fiber.App) {
 	// If not specified, such as [fiber.StatusGatewayTimeout], it will default to a 500 Internal Server Error.
 	proxy := proxytrust.New(
 		proxytrust.Config{
-			StatusCode: fiber.StatusServiceUnavailable,
+			StatusCode: fiber.StatusBadGateway,
 		},
 	)
 
