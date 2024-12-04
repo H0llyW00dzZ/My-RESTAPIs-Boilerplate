@@ -7,6 +7,7 @@ package proxytrust
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 // New creates a new middleware handler for checking trusted proxies.
@@ -32,6 +33,13 @@ func New(config ...Config) fiber.Handler {
 	}
 
 	return func(c *fiber.Ctx) error {
+		// Check if the trusted proxy check is enabled
+		if !c.App().Config().EnableTrustedProxyCheck {
+			// Skip if it is not enabled
+			log.Warn("[Router] [ProxyTrust]: EnableTrustedProxyCheck is not enabled, skipping...")
+			return c.Next()
+		}
+
 		// Check if the request should be skipped
 		if cfg.Next != nil && cfg.Next(c) {
 			return c.Next()
