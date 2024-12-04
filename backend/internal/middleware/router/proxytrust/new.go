@@ -36,7 +36,7 @@ func New(config ...Config) fiber.Handler {
 		// Check if the trusted proxy check is enabled
 		if !c.App().Config().EnableTrustedProxyCheck {
 			// Skip if it is not enabled
-			log.Warn("EnableTrustedProxyCheck is not enabled, skipping...")
+			log.Warn("[Router] [ProxyTrust]: EnableTrustedProxyCheck is not enabled, skipping...")
 			return c.Next()
 		}
 
