@@ -246,6 +246,18 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
 > [!NOTE]
 > The average CPU and memory usage (on AMD EPYC CPUs) during smooth sailing ⛵ ☸ with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go) running `per 1.48 vCPU request` includes stable network `In`/`Out` usage with no drops or issues. Everything is well established ⛵ ☸ , and memory usage is dynamic.
 
+- **Stability on AMD EPYC CPUs with the Latest Version of Go (1.23.4):**
+
+<p align="center">
+   <img src="https://i.imgur.com/PDC2RsZ.png" alt="fiber-framework-stable-at-scale-k8s">
+   <img src="https://i.imgur.com/5DS9On8.png" alt="fiber-framework-stable-at-scale-k8s">
+   <img src="https://i.imgur.com/q05eymN.png" alt="fiber-framework-stable-at-scale-k8s">
+</p>
+
+> [!NOTE]
+> The stability on AMD EPYC CPUs with Go 1.23.4 includes the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go). It maintains low latency (easy mastering k8s) even at high scale (many nodes).
+
+
 ## Customization
 
 The provided deployment files are designed to be customizable. You can modify the resource limits, environment variables, and other configurations according to your application's needs. Additionally, you can adjust the Ingress configuration to match your desired routing rules and TLS settings.
