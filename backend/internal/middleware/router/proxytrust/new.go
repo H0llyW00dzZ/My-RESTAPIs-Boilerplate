@@ -31,6 +31,7 @@ func New(config ...Config) fiber.Handler {
 			cfg.StatusCode = config[0].StatusCode
 		}
 	}
+
 	return func(c *fiber.Ctx) error {
 		// Check if the trusted proxy check is enabled
 		if !c.App().Config().EnableTrustedProxyCheck {
