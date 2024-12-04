@@ -18,19 +18,29 @@ import (
 func TestMiddleware(t *testing.T) {
 	// Define test cases for different trusted proxies
 	tests := []struct {
-		name           string
-		trustedProxies []string
-		expectedStatus int
+		name                    string
+		trustedProxies          []string
+		expectedStatus          int
+		enableTrustedProxyCheck bool
 	}{
 		{
-			name:           "Test Fiber App with 0.0.0.0 as trusted proxy",
-			trustedProxies: []string{"0.0.0.0"},
-			expectedStatus: fiber.StatusOK,
+			name:                    "Test Fiber App with 0.0.0.0 as trusted proxy",
+			trustedProxies:          []string{"0.0.0.0"},
+			expectedStatus:          fiber.StatusOK,
+			enableTrustedProxyCheck: true,
 		},
 		{
-			name:           "Test Fiber App with 10.0.0.2 as untrusted proxy",
-			trustedProxies: []string{"10.0.0.2"},
-			expectedStatus: fiber.StatusGatewayTimeout,
+			name:                    "Test Fiber App with 10.0.0.2 as untrusted proxy",
+			trustedProxies:          []string{"10.0.0.2"},
+			expectedStatus:          fiber.StatusGatewayTimeout,
+			enableTrustedProxyCheck: true,
+		},
+
+		{
+			name:                    "Test Fiber App with EnableTrustedProxyCheck false",
+			trustedProxies:          []string{"0.0.0.0"},
+			expectedStatus:          fiber.StatusOK,
+			enableTrustedProxyCheck: false,
 		},
 	}
 
@@ -41,7 +51,7 @@ func TestMiddleware(t *testing.T) {
 				AppName:                 tt.name,
 				EnableIPValidation:      true,
 				TrustedProxies:          tt.trustedProxies,
-				EnableTrustedProxyCheck: true,
+				EnableTrustedProxyCheck: tt.enableTrustedProxyCheck,
 			})
 
 			// Use the proxy middleware with default config
