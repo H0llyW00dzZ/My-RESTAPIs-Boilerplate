@@ -880,6 +880,8 @@ func NewProxying(options ...any) fiber.Handler {
 // Note: The logger supports forwarding log HTTP/HTTPS request traffic over the network (e.g., using the Done or Output functions in real time).
 // Ensure the receiver is nearby to avoid increased latency, as forwarding to distant receivers, such as outside a Kubernetes cluster, can be inefficient.
 // Within Kubernetes, it's easier to forward to nearby receivers internally (e.g., from pod to pod via IP or a domain/host bound to CoreDNS).
+//
+// The Done function works well with various services, not just Slack (e.g., it also supports Discord, Telegram, webhooks, IoT, Email, and APIs).
 func NewLogger(options ...any) fiber.Handler {
 	// Create a new logger middleware configuration.
 	config := logger.Config{}
