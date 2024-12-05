@@ -874,8 +874,12 @@ func NewProxying(options ...any) fiber.Handler {
 
 // NewLogger creates a new Logger middleware for the Fiber web framework.
 //
-// The Logger middleware is used to log HTTP request and response details.
+// The Logger middleware is used to log HTTP/HTTPS request and response details.
 // It provides visibility into the incoming requests and helps with debugging and monitoring.
+//
+// Note: The logger supports forwarding log HTTP/HTTPS request traffic over the network (e.g., using the Done or Output functions in real time).
+// Ensure the receiver is nearby to avoid increased latency, as forwarding to distant receivers, such as outside a Kubernetes cluster, can be inefficient.
+// Within Kubernetes, it's easier to forward to nearby receivers internally (e.g., from pod to pod via IP or a domain/host bound to CoreDNS).
 func NewLogger(options ...any) fiber.Handler {
 	// Create a new logger middleware configuration.
 	config := logger.Config{}
