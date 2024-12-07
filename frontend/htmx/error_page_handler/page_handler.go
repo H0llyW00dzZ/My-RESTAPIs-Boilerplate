@@ -44,8 +44,6 @@ const (
 // and provides a custom error response.
 func NewErrorHandler(c *fiber.Ctx) error {
 	timeYearNow := time.Now().Year()
-	// Get xRequestID Where it was generated.
-	xRequestID := c.Locals(XRequestID)
 	vd := &viewData{
 		views: &views{},
 	}
@@ -58,13 +56,13 @@ func NewErrorHandler(c *fiber.Ctx) error {
 	cloudflareRayID := c.Get(CloudflareRayIDHeader)
 	if cloudflareRayID != "" {
 		vd.cfheader = cloudflareRayID
-	} else if xRequestID != nil {
+		// Get xRequestID Where it was generated.
+	} else if xRequestID := c.Locals(XRequestID); xRequestID != nil {
 		vd.xRequestID = xRequestID.(string)
 	}
 
 	// Get cspRandom Where it was generated.
-	cspRandom := c.Locals(cspRandom)
-	if cspRandom != nil {
+	if cspRandom := c.Locals(cspRandom); cspRandom != nil {
 		vd.cspRandom = cspRandom.(string)
 	}
 
