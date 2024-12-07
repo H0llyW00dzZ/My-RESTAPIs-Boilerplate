@@ -163,6 +163,10 @@ func registerRouteConfigMiddleware(app *fiber.App, db database.Service) {
 	})
 
 	etagMiddleware := NewETagMiddleware()
+
+	// Note: This is a boilerplate example. Ensure it is configured correctly.
+	// When set up properly, chainPathError will display error information (e.g., any caught errors include crash).
+	// It works well with Fiber's recovery middleware in case of a crash in production.
 	httpLogg := NewLogger(
 		// Register the custom tag functions
 		WithLoggerCustomTags(map[string]logger.LogFunc{
