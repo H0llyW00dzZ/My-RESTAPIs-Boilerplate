@@ -53,8 +53,7 @@ func NewErrorHandler(c *fiber.Ctx) error {
 	// Get Application name
 	vd.appName = c.App().Config().AppName
 
-	cloudflareRayID := c.Get(CloudflareRayIDHeader)
-	if cloudflareRayID != "" {
+	if cloudflareRayID := c.Get(CloudflareRayIDHeader); cloudflareRayID != "" {
 		vd.cfheader = cloudflareRayID
 		// Get xRequestID Where it was generated.
 	} else if xRequestID := c.Locals(XRequestID); xRequestID != nil {
