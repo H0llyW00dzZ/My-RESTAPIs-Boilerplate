@@ -42,6 +42,7 @@ func NewStaticHandleVersionedAPIError(c *fiber.Ctx, e *fiber.Error) error {
 	// Convert the integer httpStatusCode to a string
 	if e.Code != fiber.StatusOK {
 		vd.httpStatus = strconv.Itoa(e.Code)
+		c.Locals("error", e.Error())
 	}
 
 	return handleError(c, e, vd)
@@ -77,6 +78,7 @@ func NewStaticHandleFrontendError(c *fiber.Ctx, e *fiber.Error) error {
 	// Convert the integer httpStatusCode to a string
 	if e.Code != fiber.StatusOK {
 		vd.httpStatus = strconv.Itoa(e.Code)
+		c.Locals("error", e.Error())
 	}
 	return handleError(c, e, vd)
 }

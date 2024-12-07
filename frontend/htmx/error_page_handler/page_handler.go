@@ -71,6 +71,7 @@ func NewErrorHandler(c *fiber.Ctx) error {
 	// Call the next route handler and catch any errors
 	if err := c.Next(); err != nil {
 		isAPI := c.Hostname() == os.Getenv(env.APISUBDOMAIN)
+		c.Locals("error", err)
 		return errorHandler(c, err, vd, isAPI)
 	}
 
