@@ -55,3 +55,18 @@ func proxyTag(output logger.Buffer, c *fiber.Ctx, data *logger.Data, extraParam 
 	}
 	return output.WriteString("-")
 }
+
+// chainPathError logs the current request path along with any error message stored in the context.
+//
+// This function is intended to be used as a custom logger function in a Fiber application.
+// It retrieves an error message from the context's local storage and appends it to the request path
+// for logging purposes.
+//
+// Note: Unlike the "${error}" tag, this function is suitable for custom error handling in Fiber.
+func chainPathError(output logger.Buffer, c *fiber.Ctx, data *logger.Data, extraParam string) (int, error) {
+	// Retrieve the error from the c.Locals
+	if err, ok := c.Locals("error").(string); ok && err != "" {
+		return output.WriteString(c.Path() + " - " + err)
+	}
+	return output.WriteString(c.Path())
+}
