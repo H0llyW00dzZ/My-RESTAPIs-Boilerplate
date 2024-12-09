@@ -26,7 +26,7 @@ require (
 	github.com/prometheus/client_golang v1.20.5
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/valyala/bytebufferpool v1.0.0
-	github.com/valyala/fasthttp v1.57.0
+	github.com/valyala/fasthttp v1.58.0
 	golang.org/x/crypto v0.30.0
 )
 
@@ -124,7 +124,7 @@ require (
 	go.mongodb.org/mongo-driver v1.16.1 // indirect
 	golang.org/x/arch v0.9.0 // indirect
 	golang.org/x/exp v0.0.0-20240808152545-0cdaa3abc0fa // indirect
-	golang.org/x/net v0.30.0 // indirect
+	golang.org/x/net v0.31.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
