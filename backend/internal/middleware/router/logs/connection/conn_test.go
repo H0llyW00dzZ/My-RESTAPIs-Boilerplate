@@ -6,7 +6,6 @@
 package connectionlogger_test
 
 import (
-	"bytes"
 	"fmt"
 	"net/http/httptest"
 	"strings"
@@ -23,8 +22,11 @@ import (
 func TestConnectionLoggerMiddleware(t *testing.T) {
 	app := fiber.New()
 
-	// Buffer to capture log output
-	var buf bytes.Buffer
+	// Buffer to capture log output.
+	//
+	// Use [strings.Builder] to reduce memory usage.
+	// Allow the processor to handle concurrency efficiently in the wilds.
+	var buf strings.Builder
 
 	// Initialize middleware with the app
 	middleware := connectionlogger.New()
