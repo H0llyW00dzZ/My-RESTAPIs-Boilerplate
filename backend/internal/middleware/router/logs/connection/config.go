@@ -23,6 +23,8 @@ type Config struct {
 
 // DefaultConfig provides default settings for the connection logger middleware.
 var DefaultConfig = Config{
-	Next:                 nil,
+	Next: nil,
+	// TODO: There might be another way to get Fiber's concurrency configuration.
+	// Currently, it uses the global variable [fiber.DefaultConcurrency], which depends on the concurrency setting (number of goroutines).
 	BufferedChannelCount: fiber.DefaultConcurrency,
 }

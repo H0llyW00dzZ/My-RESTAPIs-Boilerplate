@@ -32,6 +32,11 @@ func New(config ...Config) fiber.Handler {
 	//
 	// Note: This implementation works well on AMD EPYC™ processors. Performance on other processors may vary.
 	initTrackActiveConnections.Do(func() {
+		// TODO: There might be another way to get Fiber's concurrency configuration.
+		// Currently, it uses the global variable [fiber.DefaultConcurrency], which depends on the concurrency setting (number of goroutines).
+		//
+		// Note: In [return func(c *fiber.Ctx) error], there's no need to spawn another goroutine
+		// because the channel is already being managed by Fiber's built-in goroutine (concurrency).
 		connChan = make(chan bool, cfg.BufferedChannelCount)
 		go func() {
 			for increment := range connChan {
