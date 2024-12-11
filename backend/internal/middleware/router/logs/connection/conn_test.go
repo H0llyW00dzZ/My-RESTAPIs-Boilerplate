@@ -42,8 +42,12 @@ func TestConnectionLoggerMiddleware(t *testing.T) {
 	// Define a simple handler
 	app.Get("/", func(c *fiber.Ctx) error {
 		// Simulate some processing time, let's say keep-alive concurrently
+		//
+		// Note: This depends on the processor. If there are more than 1K concurrent requests,
+		// it might need to increase the time.Sleep duration or adjust the Fiber configuration.
 		time.Sleep(100 * time.Millisecond)
 		return c.SendString("Hello, World!")
+
 	})
 
 	// Test the middleware
