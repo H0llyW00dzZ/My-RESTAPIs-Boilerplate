@@ -47,7 +47,7 @@ func TestConnectionLoggerMiddleware(t *testing.T) {
 
 	// Test the middleware
 	t.Run("Check active connections with concurrency", func(t *testing.T) {
-		// Note: ingress-nginx might become a bottleneck with 10K ~ 1 million requests.
+		// Note: ingress-nginx might become a bottleneck with 10K ~ 1 million requests at same-time.
 		// However, this middleware can handle effectively.
 		concurrentRequests := 1000
 		start := make(chan struct{})
