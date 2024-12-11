@@ -1,3 +1,7 @@
+# Note: This primarily depends on the cloud provider. If you modify the resource, it may roll back, but this doesn't apply to HPA (won't roll back).
+# CoreDNS HPA is effective on node pools with the same processor type. For example, if all 10 nodes in a single cluster use "AMD EPYC™ processors."
+# If CoreDNS HPA is applied to node pools with different processors in a single cluster, it may degrade performance, leading to increased latency.
+# This is because CoreDNS requires more scaling for web applications that Stable with HPA, while Ingress-nginx is mostly stable with VPA for web applications.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
