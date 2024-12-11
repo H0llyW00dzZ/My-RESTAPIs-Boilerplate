@@ -16,6 +16,11 @@ import (
 
 // Tracks the number of active connections.
 var (
+	// TODO: Use Fiber's storage mechanism to store "activeConnections" for full effectiveness with both HPA and VPA.
+	// This will also allow the implementation of custom metrics when both are effective.
+	// Currently, it is only effective for VPA.
+	// For Fiber storage, a stream with Redis might be suitable, as other options (e.g., MySQL, other, in Fiber storage) may not be ideal.
+	// Other storage solutions might increase latency, which is not desirable 🤪.
 	activeConnections          int64
 	connChan                   chan bool
 	initTrackActiveConnections sync.Once
