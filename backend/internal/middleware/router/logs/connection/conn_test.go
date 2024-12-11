@@ -7,6 +7,7 @@ package connectionlogger_test
 
 import (
 	"bytes"
+	"fmt"
 	"net/http/httptest"
 	"strings"
 	"sync"
@@ -32,7 +33,7 @@ func TestConnectionLoggerMiddleware(t *testing.T) {
 		CustomTags: map[string]logger.LogFunc{
 			"testLog": connectionlogger.GetActiveConnections,
 		},
-		Format: "${testLog}",
+		Format: "${testLog}\n",
 	})
 
 	// Add middleware to the app
@@ -77,8 +78,8 @@ func TestConnectionLoggerMiddleware(t *testing.T) {
 		logOutput := buf.String()
 
 		// Check for expected log output
-		if !strings.Contains(logOutput, "1000 Active Connections") {
-			t.Errorf("Expected log output to contain '3 Active Connections', got '%s'", logOutput)
+		if !strings.Contains(logOutput, fmt.Sprintf("%d Active Connections", concurrentRequests)) {
+			t.Errorf("Expected log output to contain '%d Active Connections', got '%s'", concurrentRequests, logOutput)
 		}
 	})
 }
