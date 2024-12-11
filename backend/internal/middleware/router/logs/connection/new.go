@@ -58,6 +58,8 @@ func New(config ...Config) fiber.Handler {
 		// Increment the active connection count
 		//
 		// Note: This is safe for concurrent use. However, using a mutex can decrease performance, so it's not recommended (too bad using mutex).
+		// For example, using a mutex can reduce performance, making it slower and increasing latency, especially on
+		// enterprise-grade processors that handle high workloads (e.g., AMD EPYC™ processors, which are the best processors for Go concurrency).
 		//
 		// Additionally, if issues arise in a Kubernetes environment, they might be due to ingress configurations (e.g., some ingress-nginx configuration causing slowness)
 		// leading to inefficiencies or resource constraints. Consider using the Vertical Pod Autoscaler (VPA) if necessary.
