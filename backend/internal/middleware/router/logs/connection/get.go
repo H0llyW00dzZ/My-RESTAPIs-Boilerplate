@@ -7,6 +7,7 @@ package connectionlogger
 
 import (
 	"fmt"
+	"sync"
 	"sync/atomic"
 
 	"github.com/gofiber/fiber/v2"
@@ -14,7 +15,11 @@ import (
 )
 
 // Tracks the number of active connections.
-var activeConnections int64
+var (
+	activeConnections          int64
+	connChan                   chan bool
+	initTrackActiveConnections sync.Once
+)
 
 // GetActiveConnections returns the current active connection count.
 //

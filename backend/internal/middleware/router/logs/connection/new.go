@@ -23,7 +23,26 @@ func New(config ...Config) fiber.Handler {
 		if config[0].Next != nil {
 			cfg.Next = config[0].Next
 		}
+		if config[0].BufferedChannelCount != DefaultConfig.BufferedChannelCount {
+			cfg.BufferedChannelCount = config[0].BufferedChannelCount
+		}
 	}
+
+	// Initialize the channel and start the goroutine once
+	//
+	// Note: This implementation works well on AMD EPYC™ processors. Performance on other processors may vary.
+	initTrackActiveConnections.Do(func() {
+		connChan = make(chan bool, cfg.BufferedChannelCount)
+		go func() {
+			for increment := range connChan {
+				if increment {
+					atomic.AddInt64(&activeConnections, 1)
+				} else {
+					atomic.AddInt64(&activeConnections, -1)
+				}
+			}
+		}()
+	})
 
 	return func(c *fiber.Ctx) error {
 		// Check if the request should be skipped
@@ -34,10 +53,14 @@ func New(config ...Config) fiber.Handler {
 		// Increment the active connection count
 		//
 		// Note: This is safe for concurrent use. However, using a mutex can decrease performance, so it's not recommended (too bad using mutex).
-		atomic.AddInt64(&activeConnections, 1)
+		//
+		// Additionally, if issues arise in a Kubernetes environment, they might be due to ingress configurations (e.g., some ingress-nginx configuration causing slowness)
+		// leading to inefficiencies or resource constraints. Consider using the Vertical Pod Autoscaler (VPA) if necessary.
+		// Also Ensure CoreDNS is adequately scaled, which may require the Horizontal Pod Autoscaler (HPA) for optimal performance (e.g., reduce latency).
+		connChan <- true
 		defer func() {
 			// Decrement the active connection count when the request is done
-			atomic.AddInt64(&activeConnections, -1)
+			connChan <- false
 		}()
 
 		// Process the request
