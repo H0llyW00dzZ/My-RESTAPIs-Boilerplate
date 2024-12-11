@@ -47,7 +47,9 @@ func TestConnectionLoggerMiddleware(t *testing.T) {
 
 	// Test the middleware
 	t.Run("Check active connections with concurrency", func(t *testing.T) {
-		concurrentRequests := 3
+		// Note: ingress-nginx might become a bottleneck with 10K ~ 1 million requests.
+		// However, this middleware can handle effectively.
+		concurrentRequests := 1000
 		start := make(chan struct{})
 		var wg sync.WaitGroup
 
@@ -75,7 +77,7 @@ func TestConnectionLoggerMiddleware(t *testing.T) {
 		logOutput := buf.String()
 
 		// Check for expected log output
-		if !strings.Contains(logOutput, "3 Active Connections") {
+		if !strings.Contains(logOutput, "1000 Active Connections") {
 			t.Errorf("Expected log output to contain '3 Active Connections', got '%s'", logOutput)
 		}
 	})
