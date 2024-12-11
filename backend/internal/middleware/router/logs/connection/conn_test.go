@@ -7,6 +7,7 @@ package connectionlogger_test
 
 import (
 	"bytes"
+	"fmt"
 	"net/http/httptest"
 	"strings"
 	"sync"
@@ -32,7 +33,7 @@ func TestConnectionLoggerMiddleware(t *testing.T) {
 		CustomTags: map[string]logger.LogFunc{
 			"testLog": connectionlogger.GetActiveConnections,
 		},
-		Format: "${testLog}",
+		Format: "${testLog}\n",
 	})
 
 	// Add middleware to the app
@@ -41,8 +42,12 @@ func TestConnectionLoggerMiddleware(t *testing.T) {
 	// Define a simple handler
 	app.Get("/", func(c *fiber.Ctx) error {
 		// Simulate some processing time, let's say keep-alive concurrently
+		//
+		// Note: This depends on the processor. If there are more than 1K concurrent requests,
+		// it might need to increase the time.Sleep duration or adjust the Fiber configuration.
 		time.Sleep(100 * time.Millisecond)
 		return c.SendString("Hello, World!")
+
 	})
 
 	// Test the middleware
@@ -77,8 +82,8 @@ func TestConnectionLoggerMiddleware(t *testing.T) {
 		logOutput := buf.String()
 
 		// Check for expected log output
-		if !strings.Contains(logOutput, "1000 Active Connections") {
-			t.Errorf("Expected log output to contain '3 Active Connections', got '%s'", logOutput)
+		if !strings.Contains(logOutput, fmt.Sprintf("%d Active Connections", concurrentRequests)) {
+			t.Errorf("Expected log output to contain '%d Active Connections', got '%s'", concurrentRequests, logOutput)
 		}
 	})
 }
