@@ -27,7 +27,7 @@ require (
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/valyala/bytebufferpool v1.0.0
 	github.com/valyala/fasthttp v1.58.0
-	golang.org/x/crypto v0.30.0
+	golang.org/x/crypto v0.31.0
 )
 
 require (
