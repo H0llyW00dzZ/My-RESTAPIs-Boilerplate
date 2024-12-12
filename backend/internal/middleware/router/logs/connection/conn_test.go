@@ -56,7 +56,12 @@ func TestConnectionLoggerMiddleware(t *testing.T) {
 	t.Run("Check active connections with concurrency", func(t *testing.T) {
 		// Note: ingress-nginx might become a bottleneck with 10K ~ 1 million requests at same-time.
 		// However, this middleware can handle effectively.
-		concurrentRequests := 5000
+		//
+		// Additionally, this implementation isn't perfect yet. There are currently no storage mechanisms,
+		// and the BufferedChannelCount is not bound to Fiber's context concurrency.
+		// If storage mechanisms are implemented and BufferedChannelCount is aligned with Fiber's context concurrency,
+		// it could perfectly manage high concurrency.
+		concurrentRequests := 5555 // This is the max concurrent requests on my laptop without overclocking. It depends on the processor.
 		start := make(chan struct{})
 		var wg sync.WaitGroup
 
@@ -131,7 +136,12 @@ func TestConnectionLoggerMiddlewareImmutable(t *testing.T) {
 	t.Run("[Immutable] Check active connections with concurrency", func(t *testing.T) {
 		// Note: ingress-nginx might become a bottleneck with 10K ~ 1 million requests at same-time.
 		// However, this middleware can handle effectively.
-		concurrentRequests := 5000
+		//
+		// Additionally, this implementation isn't perfect yet. There are currently no storage mechanisms,
+		// and the BufferedChannelCount is not bound to Fiber's context concurrency.
+		// If storage mechanisms are implemented and BufferedChannelCount is aligned with Fiber's context concurrency,
+		// it could perfectly manage high concurrency.
+		concurrentRequests := 5555 // This is the max concurrent requests on my laptop without overclocking. It depends on the processor.
 		start := make(chan struct{})
 		var wg sync.WaitGroup
 
