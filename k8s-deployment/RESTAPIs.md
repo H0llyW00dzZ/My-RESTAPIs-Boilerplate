@@ -648,7 +648,7 @@ This boilerplate requires a wildcard certificate for effective multi-site and RE
 ### Avoid Switching Deployment to Stateful:
 
 This boilerplate uses the [Fiber framework](https://gofiber.io/) as its `core engine`, which is compatible with `HPA (Horizontal Pod Autoscaling)`.
-It is important not to switch the deployment to a `StatefulSet`. If you need to bind additional resources, such as a storage disk,
+It is important not to switch the deployment to a `StatefulSet`. If you need to bound additional resources, such as a storage disk,
 consider using a `Vertical Pod Autoscaler (VPA)` instead. 
 
 > [!NOTE]
