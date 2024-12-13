@@ -582,7 +582,7 @@ To prevent Out of Memory (OOM) errors in Kubernetes, especially when using `Hori
 To set up an `HTTPS/TLS certificate` without using [cert-manager.io](https://cert-manager.io/), you may need a [cert chain resolver](https://github.com/zakjan/cert-chain-resolver.git) after issuing the certificate. Then, create a [TLS Secret](https://kubernetes.io/docs/reference/kubectl/generated/kubectl_create/kubectl_create_secret_tls/).
 
 > [!NOTE]
-> The [cert chain resolver](https://github.com/zakjan/cert-chain-resolver.git) is effective for use in browsers and other protocols like mTLS, gRPC to HTTPS, MySQL Protocol, and Curl.
+> The [cert chain resolver](https://github.com/zakjan/cert-chain-resolver.git) is effective for use in browsers and other protocols like mTLS, gRPC (as Backend Protocol) to HTTPS (as Frontend Protocol), MySQL Protocol, and Curl.
 > Sometimes, when you issue an HTTPS/TLS certificate from a trusted public certificate service, they provide the certificate without the full chain. 
 > That tool helps resolve that by combining the necessary certificate chain.
 >
