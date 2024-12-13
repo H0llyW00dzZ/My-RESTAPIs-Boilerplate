@@ -586,7 +586,7 @@ To set up an `HTTPS/TLS certificate` without using [cert-manager.io](https://cer
 > Sometimes, when you issue an HTTPS/TLS certificate from a trusted public certificate service, they provide the certificate without the full chain. 
 > That tool helps resolve that by combining the necessary certificate chain.
 >
-> It's also worth noting that if you issue an HTTPS/TLS certificate from a trusted public certificate service, they may provide the certificate without the full chain, consider it bad practice 👎. 
+> It's also worth noting that if you issue an HTTPS/TLS certificate from a trusted public certificate service, they may provide the certificate without the full chain, consider it bad practice for them 👎. 
 > Be aware that some trusted public certificate services might not handle PKI operations optimally, regardless of their trust level.
 
 ### Enhance Ingress NGINX for Large Scalability (e.g., Handling Many Nodes)
