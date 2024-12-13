@@ -643,7 +643,8 @@ senior-golang-worker-59d75b6884-9g7g2   169m         20Mi
 
 ### HTTPS/TLS Certificate Requirement for Wildcards:
 
-This boilerplate requires a wildcard certificate for effective multi-site and REST API support, even when using ingress-nginx. Without a wildcard HTTPS/TLS certificate, it not meet compatibility requirements, regardless of the type of certificate you have 🤪 (e.g., business, etc.).
+This boilerplate requires a wildcard certificate for effective multi-site and REST API support, even when using ingress-nginx. Without a wildcard HTTPS/TLS certificate,
+it not meet compatibility requirements, regardless of the type of certificate you have 🤪 (`e.g., Trusted Public CA Issued By DigiCert, Sectigo (Formerly Comodo), Google Trust Service, Let's Encrypt, etc.`).
 
 ### Avoid Switching Deployment to Stateful:
 
