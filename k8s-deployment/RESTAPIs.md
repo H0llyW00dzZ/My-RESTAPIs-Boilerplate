@@ -180,6 +180,7 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
    <img src="https://i.imgur.com/Vc7JqnK.png" alt="network-concurrency-stable">
    <img src="https://i.imgur.com/3IylZN2.png" alt="network-concurrency-stable">
    <img src="https://i.imgur.com/ejZeM7n.png" alt="network-concurrency-stable">
+   <img src="https://i.imgur.com/LZ1XdHn.png" alt="network-concurrency-stable">
 </p>
 
 > [!NOTE]
