@@ -645,6 +645,16 @@ senior-golang-worker-59d75b6884-9g7g2   169m         20Mi
 
 This boilerplate requires a wildcard certificate for effective multi-site and REST API support, even when using ingress-nginx. Without a wildcard HTTPS/TLS certificate, it not meet compatibility requirements, regardless of the type of certificate you have 🤪 (e.g., business, etc.).
 
+### Avoid Switching Deployment to Stateful:
+
+This boilerplate uses the [Fiber framework](https://gofiber.io/) as its `core engine`, which is compatible with `HPA (Horizontal Pod Autoscaling)`.
+It is important not to switch the deployment to a `StatefulSet`. If you need to bound additional resources, such as a storage disk,
+consider using a `Vertical Pod Autoscaler (VPA)` instead. 
+
+> [!NOTE]
+> Switching to a `StatefulSet` for `non-Kubernetes components` is considered a `bad practice` 🤪. StatefulSets are more suitable for `Kubernetes components` themselves.
+> For `regular services`, it's best to keep them as `Deployments`.
+
 ## Compliance
 
 This boilerplate is compliant with autoscaling features in various cloud providers. For example:
