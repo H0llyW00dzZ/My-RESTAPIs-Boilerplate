@@ -652,7 +652,7 @@ It is important not to switch the deployment to a `StatefulSet`. If you need to 
 consider using a `Vertical Pod Autoscaler (VPA)` instead. 
 
 > [!NOTE]
-> Switching to a `StatefulSet` for `non-Kubernetes components` is considered a `bad practice`. StatefulSets are more suitable for `Kubernetes components` themselves.
+> Switching to a `StatefulSet` for `non-Kubernetes components` is considered a `bad practice` 🤪. StatefulSets are more suitable for `Kubernetes components` themselves.
 > For `regular services`, it's best to keep them as `Deployments`.
 
 ## Compliance
