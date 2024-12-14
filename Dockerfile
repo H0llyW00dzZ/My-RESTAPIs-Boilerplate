@@ -58,8 +58,16 @@ FROM alpine:latest
 # the only thing to focus on is writing the code for this repository.
 RUN apk --no-cache add ca-certificates
 
-# This is a safe way
-WORKDIR /root/
+# Create a non-root user and group with specific UID and GID
+#
+# Note: Choosing to run as root or non-root and modifying the UID and GID is optional, 
+# as this repository generally doesn't depend on the operating system.
+# The base image is minimal and typically doesn't include a shell; if it does, it's usually busybox.
+# If it's still risky, consider building your own base image that doesn't rely on the operating system.
+RUN addgroup -S -g 9999 box && adduser -S -u 9999 -G box gopher
+
+# This is a safe way for serving static files the front-end site
+WORKDIR /root/box/
 
 # Copy the pre-built binary file from the previous stage.
 COPY --from=builder /restapis .
@@ -72,6 +80,12 @@ COPY --from=builder /restapis .
 #
 # Copy the frontend assets (e.g., js, css, other static files such as png, jpeg) to the image.
 
+
+# Change ownership of the files to the new user
+RUN chown -R gopher:box /root/box
+
+# Switch to the non-root user
+USER gopher
 
 # Label for improved versioning
 #

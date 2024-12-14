@@ -53,6 +53,10 @@ spec:
           allowPrivilegeEscalation: false
           capabilities:
             drop: ["NET_RAW"]
+          # Use the UID of the non-root user created in Dockerfile
+          runAsUser: 9999
+          # Use the GID of the non-root group created in Dockerfile
+          runAsGroup: 9999
         ports:
         - containerPort: 8080
         resources:
