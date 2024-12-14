@@ -61,7 +61,7 @@ func New(config ...Config) fiber.Handler {
 		// For example, using a mutex can reduce performance, making it slower and increasing latency, especially on
 		// enterprise-grade processors that handle high workloads (e.g., AMD EPYC™ processors, which are the best processors for Go concurrency).
 		// It is also important to note that the channel should not be closed (e.g., put close channel in defer or initTrackActiveConnections), as it is part of a pool.
-		// Closing the channel might can lead to a crash due to attempts to send to a closed channel in long-running operations.
+		// Closing the channel can lead to a crash if there are attempts to send to a closed channel during long-running operations (zero downtime), until the Unix timestamp approaches its maximum 64-bit value.
 		//
 		// Additionally, if issues arise in a Kubernetes environment, they might be due to ingress configurations (e.g., some ingress-nginx configuration causing slowness)
 		// leading to inefficiencies or resource constraints. Consider using the Vertical Pod Autoscaler (VPA) if necessary.
