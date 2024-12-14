@@ -590,7 +590,7 @@ To set up an `HTTPS/TLS certificate` without using [cert-manager.io](https://cer
 > Be aware that some trusted public certificate services might not handle PKI operations optimally, regardless of their trust level.
 
 > [!WARNING]
-> Avoid manually chaining `HTTPS/TLS certificates` using methods like hardcoding with `Bash` or using the `cat` command. It's best to use tools written in Go, such as the [cert chain resolver](https://github.com/zakjan/cert-chain-resolver.git). Manually chaining certificates can lead to `invalid/miss configurations`.
+> Avoid manually chaining `HTTPS/TLS certificates` using methods like hardcoding with `Bash` or using the `cat` command. It's best to use tools written in Go, such as the [cert chain resolver](https://github.com/zakjan/cert-chain-resolver.git). Manually chaining certificates can lead to `invalid/misconfigurations`.
 
 ### Enhance Ingress NGINX for Large Scalability (e.g., Handling Many Nodes)
 
