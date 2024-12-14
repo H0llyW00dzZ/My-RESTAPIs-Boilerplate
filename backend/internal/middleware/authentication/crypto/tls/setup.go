@@ -39,6 +39,9 @@ var (
 )
 
 // LoadConfig loads TLS configuration based on environment variables.
+//
+// TODO: Implement an explicit crash if the HTTPS/TLS certificate is not a wildcard.
+// This ensures effectiveness, especially in quantum advances later.
 func LoadConfig() (*tls.Config, error) {
 	if tlsCertFile != "" && tlsKeyFile != "" {
 		// Note: Fiber uses ECC is significantly faster compared to Nginx uses ECC, which struggles to handle a billion concurrent requests.
