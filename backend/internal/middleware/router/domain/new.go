@@ -34,6 +34,7 @@ import (
 //   - https://crt.sh/?q=a8bc9093e1f4ba202fc769b8818b8a279a5f70c91bee458d29d6ad3c5ac5e88c
 func New(config Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		// TODO: Implement support for routing "www." to the appropriate frontend domain.
 		host := config.Hosts[c.Hostname()]
 		if host == nil {
 			// Note: Returning a new error is a better approach instead of returning directly,
