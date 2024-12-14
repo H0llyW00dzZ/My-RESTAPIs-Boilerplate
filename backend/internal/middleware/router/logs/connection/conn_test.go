@@ -21,6 +21,8 @@ import (
 
 var (
 	// This is the max concurrent requests on my laptop without overclocking. It depends on the processor.
+	//
+	// Note: If the test fails, it indicates that the processor can't handle up to 5555 concurrent requests, as it depends on the processor.
 	concurrentRequests = 5555
 )
 
