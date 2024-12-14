@@ -19,6 +19,11 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
+var (
+	// This is the max concurrent requests on my laptop without overclocking. It depends on the processor.
+	concurrentRequests = 5555
+)
+
 func TestConnectionLoggerMiddleware(t *testing.T) {
 	app := fiber.New()
 
@@ -61,7 +66,6 @@ func TestConnectionLoggerMiddleware(t *testing.T) {
 		// and the BufferedChannelCount is not bound to Fiber's context concurrency.
 		// If storage mechanisms are implemented and BufferedChannelCount is aligned with Fiber's context concurrency,
 		// it could perfectly manage high concurrency.
-		concurrentRequests := 5555 // This is the max concurrent requests on my laptop without overclocking. It depends on the processor.
 		start := make(chan struct{})
 		var wg sync.WaitGroup
 
@@ -141,7 +145,6 @@ func TestConnectionLoggerMiddlewareImmutable(t *testing.T) {
 		// and the BufferedChannelCount is not bound to Fiber's context concurrency.
 		// If storage mechanisms are implemented and BufferedChannelCount is aligned with Fiber's context concurrency,
 		// it could perfectly manage high concurrency.
-		concurrentRequests := 5555 // This is the max concurrent requests on my laptop without overclocking. It depends on the processor.
 		start := make(chan struct{})
 		var wg sync.WaitGroup
 
