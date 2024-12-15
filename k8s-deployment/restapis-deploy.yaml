@@ -50,7 +50,10 @@ spec:
         #
         # Note: This should be work, and it wont causing container error.
         securityContext:
+          # It's important to note in Kubernetes that when deploying applications, whether it's a StatefulSet or a Deployment (preferred),
+          # you should set "allowPrivilegeEscalation: false". This affects not only security mechanisms but can also impact resources (e.g., bottlenecks).
           allowPrivilegeEscalation: false
+          # This depends on the framework (as its core engine). Some Go frameworks for web apps, like Gin, do not support dropping "NET_RAW".
           capabilities:
             drop: ["NET_RAW"]
           # Use the UID of the non-root user created in Dockerfile
