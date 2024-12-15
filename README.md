@@ -544,7 +544,8 @@ frontend/
 
 - ![gitea](https://git.b0zal.io/assets/img/logo.svg) [My REST APIs Boilerplate](https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate.git)
 
-#### 💻 >_ Shell:
+#### 💻 >_ Shell (git protocol https):
+
 ```sh
 git clone https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate.git
 ```
@@ -557,9 +558,9 @@ git clone https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate.git
 > **Server Management and Isolation by Kubernetes:**
 > - The `Storage` is secure and fully encrypted (`end-to-end`), designed with flexibility in mind. It is suitable for `automated attach/detach` processes within a `cluster`.
 > - The `Network` utilizes a `network load balancer` controlled by `Ingress Nginx`, optimizing latency for the `APAC` region, ensuring smooth sailing ⛵ ☸.
-> - The `Git SSH` should function properly as it utilizes the `TCP Service Nginx`. It is `fully secured`, making it resistant to `brute-force attacks` and `exploits` due to its `underlying logic`, which incorporates [`Elliptic Curve Cryptography (ECC)`](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography).
+> - The `Git Protocol SSH` should function properly as it utilizes the `TCP Service Nginx`. It is `fully secured`, making it resistant to `brute-force attacks` and `exploits` due to its `underlying logic`, which incorporates [`Elliptic Curve Cryptography (ECC)`](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography).
 >
-> Note that The `Git SSH` is currently disabled because the new load balancer is not functioning properly with the TCP service in ingress-nginx. Rest assured, the git mirror is secure and respects privacy (100%), as it runs on my cluster (very secure) used for development, sandbox, and production. You can explore other repositories [here](https://git.b0zal.io/explore/repos).
+> Note that The `Git Protocol SSH` is currently disabled because the new load balancer is not functioning properly with the TCP service in ingress-nginx (not security issues related CVE vulnerabilities). Rest assured, the git mirror is secure and respects privacy (100%), as it runs on my cluster (very secure) used for development, sandbox, and production. You can explore other repositories [here](https://git.b0zal.io/explore/repos).
 
 > [!TIP]
 > For those in `Indonesia`, if you are unable to clone repositories (e.g., using `git clone`) from the [`Git Mirror (Auto Synced)`](https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate.git), try using a VPN. This issue may be related to the new load balancer, which could be blocked (by internet provider) or filtered by my firewall mechanism.
