@@ -348,6 +348,12 @@ frontend/
 │   │   │   │   ├── domain
 │   │   │   │   │   ├── config.go
 │   │   │   │   │   └── new.go
+│   │   │   │   ├── logs
+│   │   │   │   │   └── connection
+│   │   │   │   │       ├── config.go
+│   │   │   │   │       ├── conn_test.go
+│   │   │   │   │       ├── get.go
+│   │   │   │   │       └── new.go
 │   │   │   │   └── proxytrust
 │   │   │   │       ├── config.go
 │   │   │   │       ├── new.go
@@ -525,7 +531,7 @@ frontend/
     ├── token_bucket.go
     └── worker_test.go
 
-75 directories, 240 files
+77 directories, 244 files
 ```
 
 > [!NOTE]
