@@ -544,7 +544,8 @@ frontend/
 
 - ![gitea](https://git.b0zal.io/assets/img/logo.svg) [My REST APIs Boilerplate](https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate.git)
 
-#### 💻 >_ Shell:
+#### 💻 >_ Shell (git protocol https):
+
 ```sh
 git clone https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate.git
 ```
