@@ -7,7 +7,7 @@ require (
 	github.com/ProtonMail/gopenpgp/v2 v2.8.1
 	github.com/a-h/templ v0.2.793
 	github.com/ansrivas/fiberprometheus/v2 v2.7.0
-	github.com/bytedance/sonic v1.12.5
+	github.com/bytedance/sonic v1.12.6
 	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.2.4
 	github.com/ethereum/go-ethereum v1.14.12
