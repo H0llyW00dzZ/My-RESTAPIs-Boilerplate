@@ -42,7 +42,7 @@ var (
 // Server defines the interface for a server that can be started, shut down, and clean up its database.
 type Server interface {
 	Start(addr, monitorPath string, tlsConfig *tls.Config, streamListener net.Listener)
-	Shutdown(ctx context.Context) error
+	Shutdown(ctx context.Context, shutdownTimeout time.Duration) error
 	CleanupDB() error
 	Mount(prefix string, app any)
 	MountPath(path string, handler any)
@@ -169,8 +169,13 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 
 }
 
-// Shutdown gracefully stops the Fiber server using the provided context.
-func (s *FiberServer) Shutdown(ctx context.Context) error {
+// Shutdown gracefully stops the Fiber server using the provided timeout and context for the HTTP insecure server.
+//
+// Note: This enhances the handling of long-running and keep-alive HTTP/HTTPS connections.
+// It remains stable with HPA, but bandwidth usage might increase due to keep-alive connections (e.g., 10 Pods with an average of 1MB/s each).
+// Memory leaks could occur if the network in the ingress becomes unstable, such as bottlenecks in ingress-nginx caused by complex configurations.
+// For bandwidth considerations, consider hosting in a cost-effective cloud environment (e.g., DOKS).
+func (s *FiberServer) Shutdown(ctx context.Context, shutdownTimeout time.Duration) error {
 	// http server (insecure) it will be first
 	if s.httpServer != nil {
 		if err := s.httpServer.Shutdown(ctx); err != nil {
@@ -178,7 +183,11 @@ func (s *FiberServer) Shutdown(ctx context.Context) error {
 			return err
 		}
 	}
-	return s.App.ShutdownWithContext(ctx)
+	if err := s.App.ShutdownWithTimeout(shutdownTimeout); err != nil {
+		log.LogErrorf("Error during server shutdown: %v", err)
+		return err
+	}
+	return nil
 }
 
 // CleanupDB closes the database connection and Redis client, then logs the outcome.
@@ -260,7 +269,7 @@ func waitForShutdownSignal(shutdownTimeout time.Duration, server Server) {
 	// shutdown activities to proceed.
 	go func() {
 		defer cancel() // Cancel the context when this goroutine completes.
-		if err := server.Shutdown(ctx); err != nil {
+		if err := server.Shutdown(ctx, shutdownTimeout); err != nil {
 			// Handle shutdown error.
 			log.LogErrorf(MsgErrorDuringShutdown, err)
 		}
