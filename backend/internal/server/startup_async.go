@@ -171,7 +171,7 @@ func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, str
 
 // Shutdown gracefully stops the Fiber server using the provided timeout and context for the HTTP insecure server.
 //
-// Note: This enhances the handling of long-running and keep-alive HTTP connections.
+// Note: This enhances the handling of long-running and keep-alive HTTP/HTTPS connections.
 // It remains stable with HPA, but bandwidth usage might increase due to keep-alive connections (e.g., 10 Pods with an average of 1MB/s each).
 // Memory leaks could occur if the network in the ingress becomes unstable, such as bottlenecks in ingress-nginx caused by complex configurations.
 // For bandwidth considerations, consider hosting in a cost-effective cloud environment (e.g., DOKS).
