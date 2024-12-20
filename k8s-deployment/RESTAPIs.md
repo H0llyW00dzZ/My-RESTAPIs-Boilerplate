@@ -667,6 +667,20 @@ consider using a `Vertical Pod Autoscaler (VPA)` instead.
 > Switching to a `StatefulSet` for `non-Kubernetes components` is considered a `bad practice` 🤪. StatefulSets are more suitable for `Kubernetes components` themselves.
 > For `regular services`, it's best to keep them as `Deployments`.
 
+### Ingress Nginx SSL Passthrough:
+
+When using `SSL Passthrough` in ingress-nginx, it essentially bypasses nginx and does not utilize its features. To improve performance and take advantage of nginx's capabilities, you might need to turn off SSL Passthrough while keeping the backend protocol set to HTTPS. This is because nginx supports `HTTP/2`, which can enhance performance when proxying through HTTPS compared to HTTP.
+
+However, if the Fiber framework fully supports HTTP/2, you may not need to use ingress-nginx at all. In that case, you can directly use a load balancer to route traffic to your application. This approach can provide better performance and simplify your deployment architecture.
+
+Consider the following factors when deciding whether to use `SSL Passthrough` or not:
+
+1. If your application requires specific nginx features or benefits from HTTP/2 support, disable SSL Passthrough and configure ingress-nginx to proxy traffic using HTTPS.
+
+2. If your application can handle HTTPS traffic directly and fully supports HTTP/2, you can bypass ingress-nginx or do not use ingress and use a load balancer to route traffic directly to your application.
+
+Evaluate your application's requirements and the capabilities of the Fiber framework to determine the most suitable approach for your deployment.
+
 ## Compliance
 
 This boilerplate is compliant with autoscaling features in various cloud providers. For example:
