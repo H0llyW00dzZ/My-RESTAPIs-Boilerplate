@@ -10,6 +10,7 @@ package middleware
 
 import (
 	log "h0llyw00dz-template/backend/internal/logger"
+	"h0llyw00dz-template/backend/pkg/convert"
 	"h0llyw00dz-template/backend/pkg/network/cidr"
 
 	"h0llyw00dz-template/backend/internal/database"
@@ -29,6 +30,12 @@ import (
 func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Service) {
 	// Validate and parse trusted proxies
 	trustedProxies, err := cidr.ValidateAndParseIPs(env.TRUSTEDPROXIES, "0.0.0.0/0")
+	if err != nil {
+		log.LogFatal(err)
+	}
+
+	// Validate and parse size body limit
+	sizeBodyLimit, err := convert.ToBytes(env.GetEnv(env.SIZEBODYLIMIT, "4MiB"))
 	if err != nil {
 		log.LogFatal(err)
 	}
@@ -72,6 +79,11 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 		// This immutable setting is more efficient and cost-effective than the standard library's new package.
 		// It is also safe to use in combination with the worker package for concurrency.
 		Immutable: true,
+		// Note: The body limit should be adjusted based on the application's requirements.
+		// For optimal performance in a concurrent environment, ensure that the body limit is set appropriately.
+		// When the concurrency configuration is well-tuned and matches the Horizontal Pod Autoscaler (HPA) settings in Kubernetes,
+		// it can result in a highly stable and scalable system for large-scale deployments (as demonstrated through extensive testing with multiple nodes until stability was consistently achieved).
+		BodyLimit: sizeBodyLimit,
 	})
 	registerRESTAPIsRoutes(api, db)
 	hosts[apiSubdomain] = api
@@ -112,6 +124,11 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 		// This immutable setting is more efficient and cost-effective than the standard library's new package.
 		// It is also safe to use in combination with the worker package for concurrency.
 		Immutable: true,
+		// Note: The body limit should be adjusted based on the application's requirements.
+		// For optimal performance in a concurrent environment, ensure that the body limit is set appropriately.
+		// When the concurrency configuration is well-tuned and matches the Horizontal Pod Autoscaler (HPA) settings in Kubernetes,
+		// it can result in a highly stable and scalable system for large-scale deployments (as demonstrated through extensive testing with multiple nodes until stability was consistently achieved).
+		BodyLimit: sizeBodyLimit,
 	})
 	registerStaticFrontendRoutes(frontend, appName, db)
 	hosts[frontendDomain] = frontend
