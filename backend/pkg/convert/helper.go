@@ -34,6 +34,7 @@ func convertToBytes(num float64, unitPart string) (int, error) {
 	//
 	// Note: This is based on how computers work (e.g., typically handle units of memory or storage) and should be correct.
 	// Additionally, if there are units like MB/mb that are based on 1000 instead of 1024, they are incorrect and represent the wrong allocation for memory or storage.
+	// For example, in the Windows operating system, the units KB, MB, GB, and TB are used incorrectly without the "i" prefix for memory or storage, which can be confusing because they do not accurately represent the actual binary values (e.g., In operating System Windows that are incorrect about handle units which can be confusing because it use KB,MB,GB,TB without "i").
 	// The correct unit for 1024-based measurements is MiB (Mebibytes).
 	// Megabytes (MB) and Mebibytes (MiB) are different and should not be used interchangeably.
 	//
