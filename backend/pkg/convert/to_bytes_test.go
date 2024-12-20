@@ -39,6 +39,9 @@ func TestToBytes(t *testing.T) {
 		{"10,KiB", 0, true},
 		{"10KiBMiBGiBTiB", 0, true},
 		{"10kibmibgibtib", 0, true},
+		{"0123456789kmgtKMGTibIB", 0, true},
+		{"23456789.10kmgtKMGTibIB", 0, true},
+		{"1234567890kmgtKMGTibIB", 0, true},
 		// This is proof that it will never return negative values.
 		// The current implementation should be correct as it is based on how computers work
 		// (e.g., typically handle units of memory or storage).
