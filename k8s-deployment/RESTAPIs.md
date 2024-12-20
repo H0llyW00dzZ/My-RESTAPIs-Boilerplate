@@ -684,7 +684,11 @@ Evaluate your application's requirements and the capabilities of the Fiber frame
 > [!NOTE]
 > When using a load balancer without ingress (direct load balancer) or with Ingress Nginx SSL Passthrough enabled, the behavior and capabilities depend on the cloud provider. Not all load balancers are the same across different platforms.
 >
-> For example, in `Google Kubernetes Engine (GKE)`, you have the flexibility to create your own routes and networks supporting various protocols. It has been tested with the `SSH protocol` for Git code hosting powered by `Gitea` Using TCP Service Ingress-nginx.
+> For example, in `Google Kubernetes Engine (GKE)`, you have the flexibility to create your own routes and networks supporting various protocols. It has been tested with the `SSH protocol` for Git code hosting powered by `Gitea` using TCP Service Ingress-nginx.
+> It is also much more secure and safer to use the `SSH Protocol` through a load balancer handled by TCP Service Ingress-nginx, unlike exposing the `SSH Protocol Directly on Port 22 (Average VPS)`. However, you have to ensure that you obtain the real client IP address as well.
+> If you incorrectly configure the `SSH Protocol` through the load balancer handled by TCP Service Ingress-nginx, the client IP will become the IP of the Pods (Private IP). However, if you are skilled (Captain K8s), you can easily manipulate the configuration to defend against the attack surface.
+> This is because when you open a port like `SSH Protocol Directly on Port 22 (Average VPS)` or through a load balancer handled by TCP Service Ingress-nginx (`acting as SSH Protocol Directly on Port 22 (Average VPS)`), there are many `Bot Scanners (not Crawlers)` trying to `brute force the connection`. However, they won't succeed because the `SSH Protocol` is handled through the load balancer by TCP Service Ingress-nginx,
+> unlike exposing the `SSH Protocol Directly on Port 22 (Average VPS)`.
 >
 > If your focus is solely on `HTTP/HTTPS protocols`, `DigitalOcean Kubernetes Service (DOKS)` is a suitable choice. It has been tested and proven to work well for these protocols.
 >
