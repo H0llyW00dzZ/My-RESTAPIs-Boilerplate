@@ -116,6 +116,10 @@ var maxConnections = 2 * runtime.NumCPU()
 // Also Ensure that HTTPS/TLS is configured and set the BACKEND protocol to HTTPS along with the annotation nginx.ingress.kubernetes.io/ssl-passthrough: "true".
 // This is because NGINX Ingress struggles to handle a large number of concurrent requests, including ECC (Elliptic Curve Cryptography), when performing HTTPS/TLS termination.
 // So Let Fiber handle the HTTPS/TLS termination, as NGINX is better suited for handling TCP/UDP services.
+//
+// Note: This value might need to be reduced. It can be problematic in HPA (Horizontal Pod Autoscaler) scenarios,
+// for example, if the number of Pods reaches 10,000. The high number of goroutines in the pool can cause
+// latency issues due to the increased overhead of managing and scheduling them.
 var defaultFiberMaxConnections = redisStorage.ConfigDefault.PoolSize
 
 // InitializeRedisClient initializes and returns a new Redis client.
