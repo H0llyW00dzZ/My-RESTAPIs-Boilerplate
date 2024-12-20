@@ -23,7 +23,7 @@ import (
 //
 // The function returns an error if the input string has an invalid format or an unsupported unit.
 //
-// TODO: Switch to []string{} instead of string to allow bulk operations?
+// TODO: Switch to []string instead of string to allow bulk operations?
 func ToBytes(size string) (int, error) {
 	size = strings.TrimSpace(size)
 
