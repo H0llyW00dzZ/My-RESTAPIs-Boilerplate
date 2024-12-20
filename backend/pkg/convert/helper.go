@@ -37,6 +37,8 @@ func convertToBytes(num float64, unitPart string) (int, error) {
 	// For example, in the Windows operating system, the units KB, MB, GB, and TB are used incorrectly without the "i" prefix for memory or storage, which can be confusing because they do not accurately represent the actual binary values (e.g., In operating System Windows that are incorrect about handle units which can be confusing because it use KB,MB,GB,TB without "i").
 	// The correct unit for 1024-based measurements is MiB (Mebibytes).
 	// Megabytes (MB) and Mebibytes (MiB) are different and should not be used interchangeably.
+	// Using incorrect units that represent the wrong allocation for memory or storage can lead to data corruption, not only in storage but also in the motherboard.
+	// So, if data corruption occurs For example, in the Windows operating system, it's no wonder because of the incorrect use of units.
 	//
 	// However, when it comes to network bandwidth and data transfer rates, Megabytes (MB) and Megabits (Mb) are commonly used.
 	// In this context, Mbps (Megabits per second) is used to measure the speed of data transmission over a network,
