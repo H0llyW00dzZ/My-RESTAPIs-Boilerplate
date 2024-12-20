@@ -33,6 +33,17 @@ func convertToBytes(num float64, unitPart string) (int, error) {
 	// Define the conversion factors for each unit
 	//
 	// Note: This is based on how computers work (e.g., typically handle units of memory or storage) and should be correct.
+	// Additionally, if there are units like MB/mb that are based on 1000 instead of 1024, they are incorrect and represent the wrong allocation for memory or storage.
+	// The correct unit for 1024-based measurements is MiB (Mebibytes).
+	// Megabytes (MB) and Mebibytes (MiB) are different and should not be used interchangeably.
+	//
+	// However, when it comes to network bandwidth and data transfer rates, Megabytes (MB) and Megabits (Mb) are commonly used.
+	// In this context, Mbps (Megabits per second) is used to measure the speed of data transmission over a network,
+	// while MBps (Megabytes per second) is used to measure the actual data transfer speed.
+	// For example, a 100 Mbps Ethernet connection means it can transfer data at a rate of 100 megabits per second,
+	// which translates to a theoretical maximum transfer speed of 12.5 MBps (100 Mbps / 8 bits per byte).
+	// Similarly, when referring to file sizes in a network context, such as downloading files from the internet,
+	// the units MB (Megabytes) and GB (Gigabytes) are commonly used.
 	factors := map[string]int{
 		"":    1,
 		"k":   1024,
