@@ -15,7 +15,7 @@ import (
 //
 // Example usage:
 //
-//	bytes, err := ToBytes("10KiB")
+//	bytes, err := convert.ToBytes("10KiB")
 //	if err != nil {
 //	    // Handle the error you poggers
 //	}
