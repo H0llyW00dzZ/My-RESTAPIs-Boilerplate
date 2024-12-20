@@ -39,6 +39,22 @@ func TestToBytes(t *testing.T) {
 		{"10,KiB", 0, true},
 		{"10KiBMiBGiBTiB", 0, true},
 		{"10kibmibgibtib", 0, true},
+		// This is proof that it will never return negative values.
+		// The current implementation should be correct as it is based on how computers work
+		// (e.g., typically handle units of memory or storage).
+		{"-1024B", 0, true},
+		{"-1024b", 0, true},
+		{"-10KiB", 0, true},
+		{"-5.2MiB", 0, true},
+		{"-3GiB", 0, true},
+		{"-1.5TiB", 0, true},
+		{"-2.7GB", 0, true},
+		{"-500MB", 0, true},
+		{"-1000B", 0, true},
+		{"-1.5KB", 0, true},
+		{"-2.5MB", 0, true},
+		{"-3.5GB", 0, true},
+		{"-4.5TB", 0, true},
 	}
 
 	for _, tc := range testCases {
