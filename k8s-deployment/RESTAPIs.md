@@ -681,6 +681,15 @@ Consider the following factors when deciding whether to use `SSL Passthrough` or
 
 Evaluate your application's requirements and the capabilities of the Fiber framework to determine the most suitable approach for your deployment.
 
+> [!NOTE]
+> When using a load balancer without ingress (direct load balancer) or with Ingress Nginx SSL Passthrough enabled, the behavior and capabilities depend on the cloud provider. Not all load balancers are the same across different platforms.
+>
+> For example, in `Google Kubernetes Engine (GKE)`, you have the flexibility to create your own routes and networks supporting various protocols. It has been tested with the `SSH protocol` for Git code hosting powered by `Gitea` Using TCP Service Ingress-nginx.
+>
+> If your focus is solely on `HTTP/HTTPS protocols`, `DigitalOcean Kubernetes Service (DOKS)` is a suitable choice. It has been tested and proven to work well for these protocols.
+>
+> However, for other cloud providers, I don't have extensive experience or knowledge to provide specific insights.
+
 ## Compliance
 
 This boilerplate is compliant with autoscaling features in various cloud providers. For example:
