@@ -11,6 +11,7 @@ package main
 import (
 	"fmt"
 	setupTLS "h0llyw00dz-template/backend/internal/middleware/authentication/crypto/tls"
+	"h0llyw00dz-template/backend/pkg/convert"
 	"h0llyw00dz-template/backend/pkg/network/cidr"
 	"time"
 
@@ -78,6 +79,12 @@ func setupFiber(config Config) *fiber.App {
 		log.LogFatal(err)
 	}
 
+	// Validate and parse size body limit
+	sizeBodyLimit, err := convert.ToBytes(env.GetEnv(env.SIZEBODYLIMIT, "4MiB"))
+	if err != nil {
+		log.LogFatal(err)
+	}
+
 	// TODO: Implement a server startup message mechanism similar to "Fiber" ASCII art,
 	// with animation (e.g., similar to a streaming/bubble tea spinner) for multiple sites or large codebases.
 	// The current static "Fiber" ASCII art only shows one site when there are multiple, which isn't ideal.
@@ -109,6 +116,11 @@ func setupFiber(config Config) *fiber.App {
 		// Note: X-Forwarded-* or any * (wildcard header) from a reverse proxy don't work with Kubernetes Ingress NGINX.
 		// It's better to explicitly use X-Forwarded-For or other specific headers without * (wildcard header).
 		ProxyHeader: fiber.HeaderXForwardedFor, // Fix where * (wildcard header) doesn't work in some kubernetes ingress eco-system
+		// Note: The body limit should be adjusted based on the application's requirements.
+		// For optimal performance in a concurrent environment, ensure that the body limit is set appropriately.
+		// When the concurrency configuration is well-tuned and matches the Horizontal Pod Autoscaler (HPA) settings in Kubernetes,
+		// it can result in a highly stable and scalable system for large-scale deployments (as demonstrated through extensive testing with multiple nodes until stability was consistently achieved).
+		BodyLimit: sizeBodyLimit,
 	})
 }
 

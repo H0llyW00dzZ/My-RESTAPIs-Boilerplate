@@ -36,6 +36,11 @@ const (
 	SHUTDOWNTIMEOUT = "SHUTDOWN_TIMEOUT" // The maximum duration to wait for active connections to finish during server shutdown (default: "5s").
 )
 
+// App/Server Capacity Configuration
+const (
+	SIZEBODYLIMIT = "SIZE_BODY_LIMIT" // The maximum size limit for the request body (default: "4MiB" (equivalent to 4 * 1024 * 1024 bytes)).
+)
+
 // MySQL Database Configuration
 const (
 	DBHOST     = "DB_HOST"     // The hostname or IP address of the MySQL database server (required).

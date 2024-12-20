@@ -12,6 +12,7 @@ import (
 	"h0llyw00dz-template/backend/internal/database"
 	log "h0llyw00dz-template/backend/internal/logger"
 	"h0llyw00dz-template/backend/internal/middleware/router/domain"
+	"h0llyw00dz-template/backend/pkg/convert"
 	"h0llyw00dz-template/backend/pkg/network/cidr"
 	"h0llyw00dz-template/env"
 
@@ -28,6 +29,12 @@ import (
 func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Service) {
 	// Validate and parse trusted proxies
 	trustedProxies, err := cidr.ValidateAndParseIPs(env.TRUSTEDPROXIES, "0.0.0.0/0")
+	if err != nil {
+		log.LogFatal(err)
+	}
+
+	// Validate and parse size body limit
+	sizeBodyLimit, err := convert.ToBytes(env.GetEnv(env.SIZEBODYLIMIT, "4MiB"))
 	if err != nil {
 		log.LogFatal(err)
 	}
@@ -68,6 +75,11 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 		// Note: X-Forwarded-* or any * (wildcard header) from a reverse proxy don't work with Kubernetes Ingress NGINX.
 		// It's better to explicitly use X-Forwarded-For or other specific headers without * (wildcard header).
 		ProxyHeader: fiber.HeaderXForwardedFor, // Fix where * (wildcard header) doesn't work in some kubernetes ingress eco-system
+		// Note: The body limit should be adjusted based on the application's requirements.
+		// For optimal performance in a concurrent environment, ensure that the body limit is set appropriately.
+		// When the concurrency configuration is well-tuned and matches the Horizontal Pod Autoscaler (HPA) settings in Kubernetes,
+		// it can result in a highly stable and scalable system for large-scale deployments (as demonstrated through extensive testing with multiple nodes until stability was consistently achieved).
+		BodyLimit: sizeBodyLimit,
 	})
 	registerRESTAPIsRoutes(api, db)
 	hosts[apiSubdomain] = api
@@ -105,6 +117,11 @@ func RegisterRoutes(app *fiber.App, appName, monitorPath string, db database.Ser
 		// Note: X-Forwarded-* or any * (wildcard header) from a reverse proxy don't work with Kubernetes Ingress NGINX.
 		// It's better to explicitly use X-Forwarded-For or other specific headers without * (wildcard header).
 		ProxyHeader: fiber.HeaderXForwardedFor, // Fix where * (wildcard header) doesn't work in some kubernetes ingress eco-system
+		// Note: The body limit should be adjusted based on the application's requirements.
+		// For optimal performance in a concurrent environment, ensure that the body limit is set appropriately.
+		// When the concurrency configuration is well-tuned and matches the Horizontal Pod Autoscaler (HPA) settings in Kubernetes,
+		// it can result in a highly stable and scalable system for large-scale deployments (as demonstrated through extensive testing with multiple nodes until stability was consistently achieved).
+		BodyLimit: sizeBodyLimit,
 	})
 	registerStaticFrontendRoutes(frontend, appName, db)
 	hosts[frontendDomain] = frontend
