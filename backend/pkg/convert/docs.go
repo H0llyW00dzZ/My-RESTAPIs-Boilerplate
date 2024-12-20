@@ -20,6 +20,8 @@
 //   - Gigabytes (GB) and Gibibytes (GiB)
 //   - Terabytes (TB) and Tebibytes (TiB)
 //
+// Note that the binary-based units (KiB, MiB, GiB, TiB) are the same as Ki, Mi, Gi, Ti.
+//
 // # Limitations
 //
 //   - Exabytes (EB) and larger units are currently not supported as they might cause integer overflow on 32-bit or 64-bit architectures.
