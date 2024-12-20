@@ -32,7 +32,7 @@ func parseNumericPart(numericPart string) (float64, error) {
 func convertToBytes(num float64, unitPart string) (int, error) {
 	// Define the conversion factors for each unit
 	//
-	// Note: This is based on how computers work (e.g., typically handle units of memory and storage) and should be correct.
+	// Note: This is based on how computers work (e.g., typically handle units of memory or storage) and should be correct.
 	factors := map[string]int{
 		"":    1,
 		"k":   1024,
