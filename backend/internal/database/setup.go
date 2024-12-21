@@ -57,70 +57,17 @@ type MySQLConfig struct {
 	Database string
 }
 
-// Calculate the maximum number of connections based on the number of CPUs
+// Note: This is balanced for VPA or HPA. However, for HPA, the maximum CPU request should be "555m" without a limit in the deployment.
+// HPA doesn't require a large CPU request, and it should be used without a limit. For memory in HPA, it depends on the usage.
+// For example, if Fiber storage are used with Redis, it can be implemented to optimize data storage, such as using Fiber cache or rate limiter.
+// This can achieve low memory usage because the storage in Fiber cache or rate limiter doesn't allocate memory again when data is already stored in Redis.
+// The data is then sent to the client (without allocating memory again), and it can be connected with MySQL when MySQL is streaming.
+// In this case, MySQL data can be streamed to Fiber storage, which can then put the data into Redis as a stream as well.
 //
-// Note: This Redis configuration is better for starters and provides stability.
-//
-// Tested on Node Spec:
-//   - 2x vCPU
-//   - 4x ~ 8x Compute
-//   - 1 GB RAM
-//
-// Redis RAM Spec:
-//   - 2 GB total
-//   - 1 GB for master, known as "primary node" or "master node"
-//   - 1 GB for slave, known as "replica node" or "slave node" (automated synchronization replica)
-//
-// Tested Env Configuration:
-//   - RDB_POOL_TIMEOUT: 5m
-//   - REDIS_MAXCONN_IDLE_TIME: 30m
-//   - REDIS_MAXCONN_LIFE_TIME: 1h
-//
-// Important: This configuration needs adjustments when hosting Redis on machines
-// with higher specifications. Ensure that the maximum number of connections
-// (maxConnections) is balanced with the Redis server's resources (CPU, memory,
-// network). An excessively SMALL connection pool (as currently implemented)
-// on a powerful Redis instance (higher specifications) can lead to POOL EXHAUSTION
-// (e.g, Small Pool: You have a powerful Redis server, but the connection pool size (maxConnections) is small),
-// where the application cannot obtain connections from the pool fast enough, limiting throughput,
-// even if there is ample free memory on the Redis server.
-//
-// Best Practice: Maintaining a pool utilization of around 70% is generally considered healthy.
-// This balance helps ensure enough available connections while minimizing idle and stale connections.
-// For Example, a Healthy Pool:
-//
-//	{
-//	    "redis_health": {
-//	        "status": "up",
-//	        "message": "It's healthy",
-//	        "stats": {
-//	            "version": "7.2.4",
-//	            "mode": "standalone",
-//	            "connected_clients": "8",
-//	            "memory": { "used": { "mb": "85.64", "gb": "0.08" }, "peak": { "mb": "111.48", "gb": "0.11" }, "free": { "mb": "5120.00", "gb": "5.00" }, "percentage": "1.67%" },
-//	            "uptime": [{ "day": "6", "hour": "3", "minute": "55", "second": "20" }, { "stats": "6 days, 3 hours, 55 minutes, 20 seconds" }],
-//	            "pooling": { "figures": { "hits": "16559", "misses": "4", "timeouts": "0", "total": "5", "stale": "95", "idle": "5", "active": "0", "percentage": "50.00%" }, "observed_total": "16663" }
-//	        }
-//	    }
-//	}
-//
-// "connected_clients" is 8; however, the hits indicate that 8 goroutines in the pool are handling 10k++ hits.
-//
-// TODO: Improve this dynamically based on available resources by implementing a helper function that can be suitable in a cloud environment,
-// such as auto-pilot Kubernetes, to enhance [Zer0 Downtime].
-//
-// Note: Currently unused, might be removed later.
-var maxConnections = 2 * runtime.NumCPU()
-
-// Use the default Fiber configuration for improved efficiency and latency when used with HPA (Horizontal Pod Autoscaling) and the worker.
-// Also Ensure that HTTPS/TLS is configured and set the BACKEND protocol to HTTPS along with the annotation nginx.ingress.kubernetes.io/ssl-passthrough: "true".
-// This is because NGINX Ingress struggles to handle a large number of concurrent requests, including ECC (Elliptic Curve Cryptography), when performing HTTPS/TLS termination.
-// So Let Fiber handle the HTTPS/TLS termination, as NGINX is better suited for handling TCP/UDP services.
-//
-// Note: This value might need to be reduced. It can be problematic in HPA (Horizontal Pod Autoscaler) scenarios,
-// for example, if the number of Pods reaches 10,000. The high number of goroutines in the pool can cause
-// latency issues due to the increased overhead of managing and scheduling them.
-var defaultFiberMaxConnections = redisStorage.ConfigDefault.PoolSize
+// Additionally, for VPA, the Fiber framework is fully stable even for cases where low memory usage is not achieved by combining MySQL streaming and Redis for optimized data storage without allocating memory again.
+// The average memory usage for VPA in cases where low memory usage is not achieved by combining MySQL streaming and Redis is not static (stuck at around 50MiB++).
+// It will go up and down depending on how the garbage collector is recycling. If immutable is set to false, it can go down to 10MiB or 5MiB when idle.
+var defaultFiberMaxConnections = 5 * runtime.GOMAXPROCS(0)
 
 // InitializeRedisClient initializes and returns a new Redis client.
 func (config *RedisClientConfig) InitializeRedisClient() (*redis.Client, error) {
