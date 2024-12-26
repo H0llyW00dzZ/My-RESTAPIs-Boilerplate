@@ -27,6 +27,10 @@ import (
 //			// Handle error you poggers
 //		}
 //	}()
+//
+// Note: Due to the streaming nature of the archiving process and its ability to connect with code that writes files using streaming mechanisms,
+// ensure that the document or log file is properly closed when it is no longer writable. Additionally, this archiving mechanism has zero memory allocation overhead
+// because it utilizes streaming methods.
 func Do(docFile, archiveDir string, configs ...Config) error {
 	config := DefaultConfig()
 	if len(configs) > 0 {
