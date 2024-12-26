@@ -34,6 +34,13 @@
 //   - S3 (Bucket) storage: The package can be used with S3 or S3-compatible storage buckets through Kubernetes.
 //     The specific storage implementation depends on the CSI driver.
 //
+// List of supported CSI-Driver S3 or S3-compatible storage (preferred) in Kubernetes:
+//
+//   - https://github.com/yandex-cloud/k8s-csi-s3 (Tested and works well with own and IaaS on Sandbox)
+//   - AWS S3 (Should be supported even without testing on Sandbox)
+//
+// Note: For S3-compatible storage (preferred), you have the ability to implement your own S3 storage mechanism for infrastructure that doesn't actually use the service, such as IaaS (Infrastructure as Service).
+//
 // Integration with Fiber Middleware Logs:
 //
 // The package can be seamlessly integrated with Fiber middleware logs for archiving purposes. It supports archiving Fiber middleware logs stored in the following locations:
