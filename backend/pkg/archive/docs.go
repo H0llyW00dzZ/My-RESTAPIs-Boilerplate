@@ -40,6 +40,8 @@
 //   - AWS S3 (Should be supported even without testing on Sandbox)
 //
 // Note: For S3-compatible storage (preferred), you have the ability to implement your own S3 storage mechanism for infrastructure that doesn't actually use the service, such as IaaS (Infrastructure as Service).
+// It's also worth noting that for local disk storage in Kubernetes, it depends on the CSI driver provided by the cloud provider (by attaching external storage not overlay storage such as ephemeral storage).
+// However, it's recommended to use a better storage mechanism and driver for reliability, security, and high performance (not slow like HDD).
 //
 // Integration with Fiber Middleware Logs:
 //
