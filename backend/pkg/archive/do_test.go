@@ -19,8 +19,7 @@ func TestMonitorAndArchiveLog(t *testing.T) {
 	maxSize := int64(1024) // 1KiB for testing purposes
 
 	// Create a sample log file
-	err := createSampleLogFile(logFile, 2048) // 2KiB log file
-	if err != nil {
+	if err := createSampleLogFile(logFile, 2048); err != nil { // 2KiB log file
 		t.Fatalf("error creating sample log file: %v", err)
 	}
 	defer os.Remove(logFile)
