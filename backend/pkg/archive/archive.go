@@ -31,7 +31,7 @@ func archiveDoc(docFile, archiveDir string) (err error) {
 		// In case an error occurs during file closure, this Trick Go deferred function
 		// captures the error and assigns it to the named return value "err".
 		if closeErr := file.Close(); closeErr != nil {
-			err = closeErr
+			err = fmt.Errorf("error closing document file: %v", closeErr)
 		}
 	}()
 
