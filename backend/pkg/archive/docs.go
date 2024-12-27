@@ -72,8 +72,8 @@
 // Note that Regarding the deployment type, it is generally considered a bad practice to set it to "Stateful" even when external storage or multiple external storage options are attached.
 // This applies to various roles such as Developers, DevOps, DevSecOps, or any other similar positions, unless you are specifically focusing on Kubernetes components like drivers or other specialized areas.
 //
-// Even for gaming servers running on Kubernetes using this boilerplate for interacting with the cluster and setting up the gaming server, it is not recommended to set the deployment type to "Stateful".
-// In Kubernetes, it is possible to run gaming servers and other deployments, such as AI, without using stateful deployments.
+// Even for game servers running on Kubernetes using this boilerplate for interacting with the cluster and setting up the game server, it is not recommended to set the deployment type to "Stateful".
+// In Kubernetes, it is possible to run game servers and other deployments, such as AI, without using stateful deployments.
 //
 // The reason behind this recommendation is that stateful deployments introduce additional complexity and management overhead compared to stateless deployments.
 // Stateless deployments are generally more scalable, easier to manage, and provide better flexibility in terms of resource allocation and scaling.
