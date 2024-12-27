@@ -69,6 +69,21 @@
 // The package is primarily designed to be stable with Vertical Pod Autoscaling (VPA) rather than Horizontal Pod Autoscaling (HPA).
 // It is recommended to use VPA for scaling the deployment based on resource requirements.
 //
+// Note that Regarding the deployment type, it is generally considered a bad practice to set it to "Stateful" even when external storage or multiple external storage options are attached.
+// This applies to various roles such as Developers, DevOps, DevSecOps, or any other similar positions, unless you are specifically focusing on Kubernetes components like drivers or other specialized areas.
+//
+// Even for gaming servers running on Kubernetes using this boilerplate for interacting with the cluster and setting up the gaming server, it is not recommended to set the deployment type to "Stateful".
+// In Kubernetes, it is possible to run gaming servers and other deployments, such as AI, without using stateful deployments.
+//
+// The reason behind this recommendation is that stateful deployments introduce additional complexity and management overhead compared to stateless deployments.
+// Stateless deployments are generally more scalable, easier to manage, and provide better flexibility in terms of resource allocation and scaling.
+//
+// However, there may be specific scenarios where stateful deployments are necessary, such as when dealing with persistent data that requires strict consistency and ordering guarantees.
+// It's worth noting that even for databases like MySQL, it is still possible to run them stably as stateless deployments by attaching external storage + VPA. Such cases are relatively rare.
+// If stateful deployments are required, careful consideration and design are necessary to ensure the proper handling of stateful components within the Kubernetes environment.
+//
+// It's important to evaluate the specific requirements and characteristics of your application and determine the most appropriate deployment strategy based on those factors.
+//
 // # Security Considerations
 //
 // In Kubernetes, the security risk is relatively low because you have control over the permissions. However, if your deployment uses a minimal image that does not fully interact with the operating system,
