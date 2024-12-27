@@ -17,7 +17,7 @@ import (
 
 // archiveDoc archives the specified document file by compressing it into a tar.gz archive.
 // It creates a new archive file with a timestamp appended to the filename.
-func archiveDoc(docFile, archiveDir string) error {
+func archiveDoc(docFile, archiveDir string) (err error) {
 	// Generate the archive filename with a timestamp.
 	archiveFileName := fmt.Sprintf("%s_%s.tar.gz", filepath.Base(docFile), time.Now().Format("20060102150405"))
 	archiveFilePath := filepath.Join(archiveDir, archiveFileName)
@@ -27,7 +27,13 @@ func archiveDoc(docFile, archiveDir string) error {
 	if err != nil {
 		return fmt.Errorf("error opening document file: %v", err)
 	}
-	defer file.Close()
+	defer func() {
+		// In case an error occurs during file closure, this Trick Go deferred function
+		// captures the error and assigns it to the named return value "err".
+		if closeErr := file.Close(); closeErr != nil {
+			err = closeErr
+		}
+	}()
 
 	// Get the file information of the document file.
 	fileInfo, err := file.Stat()
@@ -73,11 +79,6 @@ func archiveDoc(docFile, archiveDir string) error {
 	// Copy the document file contents to the tar writer.
 	if _, err := io.Copy(tarWriter, file); err != nil {
 		return fmt.Errorf("error writing document file to archive: %v", err)
-	}
-
-	// Close the document file.
-	if err := file.Close(); err != nil {
-		return fmt.Errorf("error closing document file: %v", err)
 	}
 
 	// Truncate the document file to start fresh.
