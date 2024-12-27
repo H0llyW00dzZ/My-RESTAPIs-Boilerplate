@@ -52,6 +52,11 @@
 //   - Choose the appropriate storage class based on the performance characteristics and features required by your application (e.g., SSD vs. HDD, replication, snapshots).
 //   - Consider the scalability and cost implications of using multiple storage options, as different storage solutions may have different pricing models and scalability limitations.
 //
+// How Multiple Storage in Kubernetes Works:
+//
+// When you attach external storage for multiple storage options, it is mounted from the path where it is bound (e.g., /home/storage1, /home/storage2). When multiple storage options are attached, avoid setting the path with "." (e.g., ./home/storage1).
+// If you use "." when you already have multiple storage options attached, it will use the storage overlay (e.g., ephemeral storage) from the container instead of the actual multiple storage options that are attached.
+//
 // Integration with Fiber Middleware Logs:
 //
 // The package can be seamlessly integrated with Fiber middleware logs for archiving purposes. It supports archiving Fiber middleware logs stored in the following locations:
@@ -63,6 +68,24 @@
 //
 // The package is primarily designed to be stable with Vertical Pod Autoscaling (VPA) rather than Horizontal Pod Autoscaling (HPA).
 // It is recommended to use VPA for scaling the deployment based on resource requirements.
+//
+// # Security Considerations
+//
+// In Kubernetes, the security risk is relatively low because you have control over the permissions. However, if your deployment uses a minimal image that does not fully interact with the operating system,
+// it is generally safe to run as root, as long as the image is minimal and has limited capabilities.
+//
+// When running containers with minimal images, consider the following security best practices:
+//
+//   - Use a minimal base image that includes only the necessary dependencies and libraries required by your application.
+//   - Avoid installing unnecessary packages or tools that could potentially introduce security vulnerabilities.
+//   - Ensure that the container runtime has limited access to the host system resources and follows the principle of least privilege.
+//   - Regularly scan and update the minimal image for any known security vulnerabilities and apply the latest security patches.
+//   - Implement proper network segmentation and access controls to limit the potential impact of a compromised container.
+//
+// It's important to note that running containers as root should still be approached with caution and only when absolutely necessary.
+// Whenever possible, it is recommended to run containers with a non-root user and grant only the specific permissions required by the application.
+//
+// By following these security considerations and best practices, you can mitigate the risks associated with running containers as root in a minimal image environment.
 //
 // # Usage
 //
