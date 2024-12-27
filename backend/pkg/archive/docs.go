@@ -43,6 +43,15 @@
 // It's also worth noting that for local disk storage in Kubernetes, it depends on the CSI driver provided by the cloud provider (by attaching external storage not overlay storage such as ephemeral storage).
 // However, it's recommended to use a better storage mechanism and driver for reliability, security, and high performance (not slow like HDD).
 //
+// Supported Multiple Storage in Kubernetes:
+//
+// In a Kubernetes deployment, you can attach multiple storage options using different CSI drivers or storage classes. This allows for flexibility in data persistence and storage performance, enabling you to choose the appropriate storage solution based on your application requirements.
+//
+// When attaching multiple storage options to a Kubernetes deployment, consider the following:
+//   - Use CSI drivers that integrate with durable storage solutions like cloud-provider-specific block storage (e.g., AWS EBS, GCP Persistent Disk) or distributed file systems (e.g., Ceph, GlusterFS) for reliable and persistent storage.
+//   - Choose the appropriate storage class based on the performance characteristics and features required by your application (e.g., SSD vs. HDD, replication, snapshots).
+//   - Consider the scalability and cost implications of using multiple storage options, as different storage solutions may have different pricing models and scalability limitations.
+//
 // Integration with Fiber Middleware Logs:
 //
 // The package can be seamlessly integrated with Fiber middleware logs for archiving purposes. It supports archiving Fiber middleware logs stored in the following locations:
