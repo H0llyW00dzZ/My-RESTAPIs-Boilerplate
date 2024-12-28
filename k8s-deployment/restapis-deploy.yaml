@@ -238,6 +238,11 @@ spec:
         #   secret:
         #     defaultMode: 420
         #     secretName: restapis-api-tls-secret
+        #
+        # Note: You now need to request a PersistentVolumeClaim (PVC) to attach external storage for pandorabox-storage.
+        # - name: pandorabox-storage
+        #   persistentVolumeClaim:
+        #     claimName: pandorabox-storage
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
