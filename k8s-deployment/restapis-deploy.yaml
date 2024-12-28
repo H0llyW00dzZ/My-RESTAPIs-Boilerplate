@@ -36,6 +36,11 @@ spec:
         app: restapis
     spec:
       priorityClassName: blackpearl-priority
+      # Note: This example container runs as a non-root user, which can be used with an external storage in Kubernetes, unlike the overlay storage that comes from Docker.
+      # initContainers:
+      # - name: chown
+      #   image: busybox
+      #   command: ["chown", "-R", "9999:9999", "/pandorabox"]
       containers:
       - name: restapis
         image: <IMAGE_HERE> # Put Image related to this repository here
@@ -94,6 +99,13 @@ spec:
         # volumeMounts:
         # - mountPath: /etc/tls
         #   name: https-tls
+        #
+        # Note: Once the initContainer has been applied to "pandorabox",
+        # the mountPath depends on the container's workdir. For example, if the workdir is "/root/box/", then set the mountPath to "/root/box/pandorabox/".
+        # This ensures that the "pandorabox" directory is not using overlay storage, while other directories will still use overlay storage.
+        # volumeMounts:
+        # - mountPath: /root/box/pandorabox/
+        #   name: pandorabox-storage
         env:
         # - name: TLS_CERT_FILE
         #   value: /etc/tls/tls.crt
