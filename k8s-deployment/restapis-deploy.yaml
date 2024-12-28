@@ -240,6 +240,9 @@ spec:
         #     secretName: restapis-api-tls-secret
         #
         # Note: You now need to request a PersistentVolumeClaim (PVC) to attach external storage for pandorabox-storage.
+        # It also note that When using external storage, you need to switch from Horizontal Pod Autoscaler (HPA) to Vertical Pod Autoscaler (VPA),
+        # because HPA does not support attached external storage.
+        # By switching to VPA, you gain the ability to attach multiple storage volumes. For example, you can attach 99999 PVCs for a treasure.
         # - name: pandorabox-storage
         #   persistentVolumeClaim:
         #     claimName: pandorabox-storage
