@@ -75,6 +75,11 @@
 // Even for game servers running on Kubernetes using this boilerplate for interacting with the cluster and setting up the game server, it is not recommended to set the deployment type to "Stateful".
 // In Kubernetes, it is possible to run game servers and other deployments, such as AI, without using stateful deployments.
 //
+// For example, when running game servers on Kubernetes:
+//
+// It will essentially become a game panel. When comparing it with other game panels that are closed source and require licensing (e.g., you have to pay to use their game panel), an open-source solution provides significant advantages (closedsource vs opensource = you win as opensource).
+// Regarding the game panel functionality, it depends on your specific requirements. You can create a league server similar to FACEIT, and when comparing with FACEIT, you actually have an advantage (you win again).
+//
 // The reason behind this recommendation is that stateful deployments introduce additional complexity and management overhead compared to stateless deployments.
 // Stateless deployments are generally more scalable, easier to manage, and provide better flexibility in terms of resource allocation and scaling.
 //
