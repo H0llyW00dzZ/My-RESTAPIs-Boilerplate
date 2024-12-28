@@ -240,9 +240,13 @@ spec:
         #     secretName: restapis-api-tls-secret
         #
         # Note: You now need to request a PersistentVolumeClaim (PVC) to attach external storage for pandorabox-storage.
-        # It also note that When using external storage, you need to switch from Horizontal Pod Autoscaler (HPA) to Vertical Pod Autoscaler (VPA),
+        # It's important to note when using external storage, you need to switch from Horizontal Pod Autoscaler (HPA) to Vertical Pod Autoscaler (VPA),
         # because HPA does not support attached external storage.
         # By switching to VPA, you gain the ability to attach multiple storage volumes. For example, you can attach 99999 PVCs for a treasure.
+        #
+        # Security Considerations: what additional measures do you expect when Kubernetes is already considered secure? However, when running on non-Kubernetes environments, such as a Virtual Private Server (VPS),
+        # it can be risky even when running as a non-root user.
+        #
         # - name: pandorabox-storage
         #   persistentVolumeClaim:
         #     claimName: pandorabox-storage
