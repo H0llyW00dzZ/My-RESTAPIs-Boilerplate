@@ -667,7 +667,7 @@ Using a boilerplate for a game panel in Kubernetes is `indeed possible` and can 
 
 ### Example of Success:
 
-- You can create multiple game servers on a single high-spec node and connect them through one load balancer using different ports, similar to how a TCP service with NGINX ingress works.
+- You can create multiple game servers on a single high-spec node (e.g., 5 pods in 1 node) and connect them through one load balancer using different ports, similar to how a TCP service with NGINX ingress works.
 - If the game for dedicated servers (e.g., [Counter-Strike 2](https://www.counter-strike.net/cs2)) supports custom plugin mechanisms (e.g., for networking such as HTTP), you can enhance the experience for your players (e.g., league).
 
 ## Compatibility
