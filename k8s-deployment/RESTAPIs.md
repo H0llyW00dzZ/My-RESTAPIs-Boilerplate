@@ -655,11 +655,11 @@ A single node with 4 vCPUs can efficiently manage 8 nodes, each with an average 
 
 ### Using Boilerplate for Game Panel in Kubernetes
 
-Using a boilerplate for a game panel in Kubernetes is `indeed possible` and can be effective if you have a `deep understanding of Kubernetes`. The success of this approach can depend on your cloud provider's capabilities to host Kubernetes clusters.
+Using a boilerplate for a game panel in Kubernetes is **indeed possible** and can be effective if you have a **deep understanding of Kubernetes**. The success of this approach can depend on your cloud provider's capabilities to host Kubernetes clusters.
 
 #### Key Considerations for Game Panel in Kubernetes
 
-- **Load Balancer**: 
+- **Load Balancer**
   Ensure that the load balancer provided by your cloud provider supports both Layer 4 (transport layer) and Layer 7 (application layer) to efficiently manage traffic to your game servers.
 
 > [!NOTE]
@@ -667,8 +667,13 @@ Using a boilerplate for a game panel in Kubernetes is `indeed possible` and can 
 
 #### Example of Success:
 
-- You can create multiple game servers on a single high-spec node (e.g., 5 pods in 1 node) and connect them through one load balancer using different ports, similar to how a TCP service with NGINX ingress works.
+- You can create multiple game servers on a single high-spec node (e.g., 5 pods in 1 node) and connect them through one load balancer using different ports, similar to how a TCP or UDP service with NGINX ingress works. For games like [Counter-Strike 2](https://www.counter-strike.net/cs2), it is also possible to use both TCP and UDP services with NGINX Ingress, provided that your cloud provider's load balancer supports these protocols. For example, GKE has been tested before and works well for SSH.
+  
 - If the game for dedicated servers (e.g., [Counter-Strike 2](https://www.counter-strike.net/cs2)) supports custom plugin mechanisms (e.g., for networking such as HTTP), you can enhance the experience for your players (e.g., league).
+
+> [!NOTE]  
+> If it is not possible or something goes wrong, your cloud provider may lack the capabilities needed for running games in Kubernetes. If it works, then that's great!
+
 
 ## Compatibility
 
