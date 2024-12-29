@@ -653,6 +653,18 @@ A single node with 4 vCPUs can efficiently manage 8 nodes, each with an average 
 > [!NOTE]
 > It is stable and has been tested on AMD EPYC CPUs.
 
+### Using Boilerplate for Game Panel in Kubernetes
+
+Using a boilerplate for a game panel in Kubernetes is `indeed possible` and can be effective if you have a `deep understanding of Kubernetes`. The success of this approach can depend on your cloud provider's capabilities to host Kubernetes clusters.
+
+#### Key Considerations for Game Panel in Kubernetes
+
+- **Load Balancer**: 
+  Ensure that the load balancer provided by your cloud provider supports both Layer 4 (transport layer) and Layer 7 (application layer) to efficiently manage traffic to your game servers.
+
+> [!NOTE]
+> These approach has been tested with [Counter-Strike 2](https://www.counter-strike.net/cs2), and it enhances stability due to the load balancer. Managing resources such as memory, CPU, and disk for game servers becomes easier, even without using stateful sets.
+
 ## Compatibility
 
 ### Ingress Nginx Session/Cookie:
