@@ -383,6 +383,17 @@ frontend/
 │   │   └── translate
 │   │       └── language.go
 │   └── pkg
+│       ├── archive
+│       │   ├── archive.go
+│       │   ├── config.go
+│       │   ├── do.go
+│       │   ├── do_test.go
+│       │   └── docs.go
+│       ├── convert
+│       │   ├── docs.go
+│       │   ├── helper.go
+│       │   ├── to_bytes.go
+│       │   └── to_bytes_test.go
 │       ├── gc
 │       │   ├── docs.go
 │       │   ├── reduce_http_client_overhead.go
@@ -531,7 +542,7 @@ frontend/
     ├── token_bucket.go
     └── worker_test.go
 
-77 directories, 244 files
+79 directories, 253 files
 ```
 
 > [!NOTE]
