@@ -260,28 +260,6 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
 > [!NOTE]
 > The stability on AMD EPYC CPUs with Go 1.23.4 includes the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go). It maintains low latency (easy mastering k8s) even at high scale (many nodes).
 
-
-## Customization
-
-The provided deployment files are designed to be customizable. You can modify the resource limits, environment variables, and other configurations according to your application's needs. Additionally, you can adjust the Ingress configuration to match your desired routing rules and TLS settings.
-
-> [!NOTE]
-> For `PriorityClass` (`scheduling.k8s.io/v1`) in the current deployment template, it's like rolling dice 🎲 and requires cluster autoscaler or autopilot as it scales up.
-> There is no guarantee that other pods won't be evicted (whether they have a `PriorityClass` or not). 
-> Ensure each deployment is set to the "rolling update" strategy to manage the odds of rolling dice 🎲 effectively.
-> This also helps prevent potential bottlenecks (`critical infrastructure issues related to scaling`) caused by resource overcommitted on a single node (`e.g., a node reaching 100% or more usage of memory/CPU`) through cluster autoscaler or autopilot.
->
-> For example, if pods are evicted, new pods (the ones that were evicted) will be created but may enter a pending state. When pods are pending, the cluster autoscaler or Autopilot will add new nodes to accommodate the demand. Once the new nodes are available, the pending pods will start creating containers and be scheduled on the new nodes.
-> 
-> Without the logic of `PriorityClass`, the cluster autoscaler or Autopilot may not effectively prevent potential bottlenecks (`critical infrastructure issues related to scaling`). Therefore, it's important to use `PriorityClass` wisely.
->
-> Note that `critical infrastructure issues related to scaling` (`e.g., bottlenecks`) can be more severe than security concerns (`e.g., vulnerabilities`) because, in Kubernetes, security becomes manageable (easy 🤪) once mastered (captain k8s).
->
-> Additionally, the effectiveness of combining `PriorityClass` with a `cluster autoscaler` depends on the cloud provider's implementation. If the provider has a robust implementation, it can achieve zero downtime and operate smoothly, like sailing a ship ⛵. However, with a standard implementation, there might be downtime of around 1 ~ 2 minutes.
-
-> [!TIP]
-> To boost the effectiveness of `PriorityClass` (`scheduling.k8s.io/v1`), unleash the power of this watchful bird, [Falco 🦅](https://falco.org/), to alert you when pods are evicted.
-
 ### Vertical Pod Autoscaler (VPA)
 
 The deployment also supports Vertical Pod Autoscaler (VPA) for automatic adjustment of CPU and memory requests and limits based on the usage of the pods. VPA helps ensure that the pods have the right amount of resources allocated to them, preventing over-provisioning or under-provisioning.
@@ -330,6 +308,27 @@ kubectl describe vpa restapis-vpa -n restapis
 > [!NOTE]
 > These average resource usage metrics include attached storage on `AMD EPYC CPUs` with `I/O Streaming` running `24/7 nonstop for long durations`.
 > The memory request and limit are not specified in the Deployments but are automatically adjusted by the Vertical Pod Autoscaler (VPA).
+
+## Customization
+
+The provided deployment files are designed to be customizable. You can modify the resource limits, environment variables, and other configurations according to your application's needs. Additionally, you can adjust the Ingress configuration to match your desired routing rules and TLS settings.
+
+> [!NOTE]
+> For `PriorityClass` (`scheduling.k8s.io/v1`) in the current deployment template, it's like rolling dice 🎲 and requires cluster autoscaler or autopilot as it scales up.
+> There is no guarantee that other pods won't be evicted (whether they have a `PriorityClass` or not). 
+> Ensure each deployment is set to the "rolling update" strategy to manage the odds of rolling dice 🎲 effectively.
+> This also helps prevent potential bottlenecks (`critical infrastructure issues related to scaling`) caused by resource overcommitted on a single node (`e.g., a node reaching 100% or more usage of memory/CPU`) through cluster autoscaler or autopilot.
+>
+> For example, if pods are evicted, new pods (the ones that were evicted) will be created but may enter a pending state. When pods are pending, the cluster autoscaler or Autopilot will add new nodes to accommodate the demand. Once the new nodes are available, the pending pods will start creating containers and be scheduled on the new nodes.
+> 
+> Without the logic of `PriorityClass`, the cluster autoscaler or Autopilot may not effectively prevent potential bottlenecks (`critical infrastructure issues related to scaling`). Therefore, it's important to use `PriorityClass` wisely.
+>
+> Note that `critical infrastructure issues related to scaling` (`e.g., bottlenecks`) can be more severe than security concerns (`e.g., vulnerabilities`) because, in Kubernetes, security becomes manageable (easy 🤪) once mastered (captain k8s).
+>
+> Additionally, the effectiveness of combining `PriorityClass` with a `cluster autoscaler` depends on the cloud provider's implementation. If the provider has a robust implementation, it can achieve zero downtime and operate smoothly, like sailing a ship ⛵. However, with a standard implementation, there might be downtime of around 1 ~ 2 minutes.
+
+> [!TIP]
+> To boost the effectiveness of `PriorityClass` (`scheduling.k8s.io/v1`), unleash the power of this watchful bird, [Falco 🦅](https://falco.org/), to alert you when pods are evicted.
 
 ## Tips
 
