@@ -61,6 +61,8 @@ To deploy the REST API boilerplate application using the provided K8s deployment
 
 ## Monitoring and Scaling
 
+### Horizontal Pod Autoscaler (HPA)
+
 The provided deployment includes a Horizontal Pod Autoscaler (HPA) configuration that automatically scales the number of replicas based on CPU and memory utilization. You can monitor the HPA and the deployment using the following commands:
 
 ```bash
@@ -258,6 +260,54 @@ As you can see, the memory usage is dynamic yet `stable and predictable`, unlike
 > [!NOTE]
 > The stability on AMD EPYC CPUs with Go 1.23.4 includes the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go). It maintains low latency (easy mastering k8s) even at high scale (many nodes).
 
+### Vertical Pod Autoscaler (VPA)
+
+The deployment also supports Vertical Pod Autoscaler (VPA) for automatic adjustment of CPU and memory requests and limits based on the usage of the pods. VPA helps ensure that the pods have the right amount of resources allocated to them, preventing over-provisioning or under-provisioning.
+
+You can create a VPA resource for the deployment using the following YAML configuration:
+
+```yaml
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: restapis-vpa
+  namespace: restapis
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: Deployment
+    name: restapis
+  updatePolicy:
+    updateMode: "Auto"
+```
+
+Apply the VPA configuration using the following command:
+
+```bash
+kubectl apply -f restapis-vpa.yaml
+```
+
+You can monitor the VPA recommendations and the pods' resource usage using the following command:
+
+```bash
+kubectl describe vpa restapis-vpa -n restapis
+```
+
+> [!NOTE]
+> This example shows how `Vertical Pod Autoscaler (HPA)` works properly:
+
+- **Average Resource Usage with the [`worker package`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/tree/master/worker) and [Immutable Tag](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/backend/cmd/server/run_immutable.go):**
+
+<p align="center">
+   <img src="https://i.imgur.com/kioQU85.png" alt="fiber-framework-stable-at-scale-k8s">
+   <img src="https://i.imgur.com/JfIpxge.png" alt="fiber-framework-stable-at-scale-k8s">
+   <img src="https://i.imgur.com/nwOS1bS.png" alt="fiber-framework-stable-at-scale-k8s">
+   <img src="https://i.imgur.com/3aZP4i6.png" alt="fiber-framework-stable-at-scale-k8s">
+</p>
+
+> [!NOTE]
+> These average resource usage metrics include attached external storage (PVC) on `AMD EPYC CPUs` with `I/O Streaming` running `24/7 nonstop for long durations`.
+> The memory request and limit are not specified in the Deployments but are automatically adjusted by the Vertical Pod Autoscaler (VPA).
 
 ## Customization
 
