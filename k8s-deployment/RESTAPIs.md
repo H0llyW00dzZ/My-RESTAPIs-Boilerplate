@@ -306,7 +306,7 @@ kubectl describe vpa restapis-vpa -n restapis
 </p>
 
 > [!NOTE]
-> These average resource usage metrics include attached storage on `AMD EPYC CPUs` with `I/O Streaming` running `24/7 nonstop for long durations`.
+> These average resource usage metrics include attached external storage on `AMD EPYC CPUs` with `I/O Streaming` running `24/7 nonstop for long durations`.
 > The memory request and limit are not specified in the Deployments but are automatically adjusted by the Vertical Pod Autoscaler (VPA).
 
 ## Customization
