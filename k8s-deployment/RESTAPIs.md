@@ -674,7 +674,6 @@ Using a boilerplate for a game panel in Kubernetes is **indeed possible** and ca
 > [!NOTE]  
 > If it is not possible or something goes wrong, your cloud provider may lack the capabilities needed for running games in Kubernetes. If it works, then that's great!
 
-
 ## Compatibility
 
 ### Ingress Nginx Session/Cookie:
