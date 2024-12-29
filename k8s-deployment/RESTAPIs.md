@@ -665,6 +665,11 @@ Using a boilerplate for a game panel in Kubernetes is `indeed possible` and can 
 > [!NOTE]
 > These approach has been tested with [Counter-Strike 2](https://www.counter-strike.net/cs2), and it enhances stability due to the load balancer. Managing resources such as memory, CPU, and disk for game servers becomes easier, even without using stateful sets.
 
+### Example of Success:
+
+- You can create multiple game servers on a single high-spec node and connect them through one load balancer using different ports, similar to how a TCP service with NGINX ingress works.
+- If the game for dedicated servers (e.g., [Counter-Strike 2](https://www.counter-strike.net/cs2)) supports custom plugin mechanisms (e.g., for networking such as HTTP), you can enhance the experience for your players (e.g., league).
+
 ## Compatibility
 
 ### Ingress Nginx Session/Cookie:
