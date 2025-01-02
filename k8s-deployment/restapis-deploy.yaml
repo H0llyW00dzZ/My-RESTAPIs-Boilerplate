@@ -42,9 +42,11 @@ spec:
       #   image: busybox
       #   command: ["chown", "-R", "9999:9999", "/pandorabox"]
       #
-      # Note: This is just in case an init container error occurs. However, later the terminal (shell) will come from initContainers, not in the container when you try to exec -- sh.
+      # Note: This is just in case an init container error occurs. However, later the terminal (shell) will come from initContainers, not in the container when you try to exec -- sh via kubectl.
       # This is because the image from the container is minimal and does not include terminal (shell) mechanisms. Later, you have the ability to write in Go. For example, you can store temporary data in the overlay storage that comes from Docker.
       # For important data, you can store it in external Kubernetes storage (PVC).
+      # It's also worth noting that for Security Considerations, what additional measures do you expect when Kubernetes is already considered secure? However, when running on non-Kubernetes environments, such as a Virtual Private Server (VPS),
+      # it can be risky even when running as a non-root user. Also, when you try to exec -- sh via kubectl to the pods in this deployment, it will run as a non-root user, not root, so it's safe even if the terminal (shell) comes from initContainers.
       # volumeMounts:
       #   - mountPath: /pandorabox
       #     name: pandorabox-storage
