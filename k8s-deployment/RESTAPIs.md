@@ -668,11 +668,15 @@ Using a boilerplate for a game panel in Kubernetes is **indeed possible** and ca
 #### Example of Success:
 
 - You can create multiple game servers on a single high-spec node (e.g., 5 pods in 1 node) and connect them through one load balancer using different ports, similar to how a TCP or UDP service with NGINX ingress works. For games like [Counter-Strike 2](https://www.counter-strike.net/cs2), it is also possible to use both TCP and UDP services with NGINX Ingress, provided that your cloud provider's load balancer supports these protocols. For example, GKE has been tested before and works well for SSH.
-  
-- If the game for dedicated servers (e.g., [Counter-Strike 2](https://www.counter-strike.net/cs2)) supports custom plugin mechanisms (e.g., for networking such as HTTP), you can enhance the experience for your players (e.g., league).
+- If the game for dedicated servers (e.g., [Counter-Strike 2](https://www.counter-strike.net/cs2)) supports custom plugin mechanisms (e.g., for networking such as HTTP(s)), you can enhance the experience for your players (e.g., league).
+- If a game for dedicated servers (e.g., [Counter-Strike 2](https://www.counter-strike.net/cs2)) supports container mechanisms, it should be possible to run it in Kubernetes. However, it also depends on the `Load Balancer` for exposing the service (e.g., most games use TCP and UDP; for example, [Counter-Strike 2](https://www.counter-strike.net/cs2) uses both `TCP` and `UDP`).
 
 > [!NOTE]  
 > If it is not possible or something goes wrong, your cloud provider may lack the capabilities needed for running games in Kubernetes. If it works, then that's great!
+>
+> For example, if the game for dedicated servers (e.g., [Counter-Strike 2](https://www.counter-strike.net/cs2)) supports custom plugin mechanisms:
+>
+> - It may have built-in support for Sourcemod (e.g., https://www.sourcemod.net/)
 
 ## Compatibility
 
