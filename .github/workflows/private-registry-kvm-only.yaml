@@ -79,9 +79,9 @@ jobs:
         with:
           context: .
           push: true
-          # Note: By default, the architecture is linux/amd64,linux/arm64 because Sonic JSON requires amd64,arm64 (see https://github.com/bytedance/sonic).
-          # Tip: If your cloud provider supports multi-architecture nodes for your cluster, it will be great for smooth sailing ⛵ ☸ (HPA + Cluster Autoscaling/Autopilot).
-          platforms: linux/amd64,linux/arm64
+          # Note: By default, the architecture uses the platforms variable for customization. For Sonic multi-architecture, use the format "linux/amd64,linux/arm64" because Sonic JSON requires both amd64 and arm64 architectures (see https://github.com/bytedance/sonic).
+          # Tip: If your cloud provider supports multi-architecture nodes for your cluster, it will be beneficial for smooth operation ⛵ ☸ (HPA/VPA + Cluster Autoscaling/Autopilot).
+          platforms: ${{ vars.PLATFORMS }}
           # Note: Don't forget to modify "example.com", also "build-args" This is part of Variables Management, which is also supported in Gitea.
           # Other build-args (e.g., ${{ github.repository_owner }}) are also supported in Gitea. I've personally used them for end-to-end testing, sandbox development, and production on my Kubernetes cluster ⛵ ☸ (e.g., https://git.b0zal.io).
           tags: |
