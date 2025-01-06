@@ -69,6 +69,7 @@ jobs:
         uses: docker/login-action@v2
         with:
           # Note: Don't forget to modify "example.com"
+          # TODO: Do we need to use secrets or variables for the private registry?
           registry: example.com
           # Note: The username depends on the private registry implementation. It can be a username or an email.
           username: ${{ secrets.ACC_EMAIL }}
