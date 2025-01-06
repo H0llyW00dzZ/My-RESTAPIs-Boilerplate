@@ -47,7 +47,7 @@ on:
 
 jobs:
   build:
-    name: (Container Builder) Build & Push
+    name: '[Container Builder]: Build & Push'
     # Note: With Gitea runners, you have the flexibility to customize "runs-on" allowing you to create a secure environment, unlike other CI/CD mechanisms.
     # For example, if you are using a custom OS like "Ubuntu Pro" rename it to "ubuntu-pro-latest".
     runs-on: ubuntu-latest
