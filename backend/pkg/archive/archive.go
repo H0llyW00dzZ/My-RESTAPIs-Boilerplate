@@ -17,14 +17,21 @@ import (
 )
 
 // truncateFile truncates the specified file to start fresh.
-func truncateFile(file string) error { return os.Truncate(file, 0) }
+func (a *Archiver) truncateFile(file string) error { return os.Truncate(file, 0) }
 
-// archiveDoc archives the specified document file by compressing it into a tar.gz archive.
-// It creates a new archive file with a timestamp appended to the filename.
+// ArchiveDoc archives the specified document file by compressing it into a tar.gz archive.
+// It creates a new archive file with a formatted filename based on the Archiver's fileNameFormat.
 // The function supports streaming and truncating the file while other callers are writing to it.
-func archiveDoc(docFile, archiveDir string) (err error) {
-	// Generate the archive filename with a timestamp.
-	archiveFileName := fmt.Sprintf("%s_%s.tar.gz", filepath.Base(docFile), time.Now().Format("20060102150405"))
+func (a *Archiver) ArchiveDoc(docFile, archiveDir string) (err error) {
+	var timestamp string
+	if a.timeFormat == "%d" {
+		timestamp = fmt.Sprintf("%d", time.Now().Unix())
+	} else {
+		timestamp = time.Now().Format(a.timeFormat)
+	}
+
+	// Generate the archive filename based on the fileNameFormat.
+	archiveFileName := fmt.Sprintf(a.fileNameFormat, filepath.Base(docFile), timestamp)
 	archiveFilePath := filepath.Join(archiveDir, archiveFileName)
 
 	// Create the archive directory if it doesn't exist.
@@ -99,7 +106,7 @@ func archiveDoc(docFile, archiveDir string) (err error) {
 	go func() {
 		defer wg.Done()
 		// Truncate the document file to start fresh.
-		if err := truncateFile(docFile); err != nil {
+		if err := a.truncateFile(docFile); err != nil {
 			err = fmt.Errorf("error truncating document file: %v", err)
 		}
 	}()
