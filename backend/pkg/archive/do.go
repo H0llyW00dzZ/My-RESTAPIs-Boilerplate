@@ -36,12 +36,14 @@ func Do(docFile, archiveDir string, configs ...Config) error {
 	if len(configs) > 0 {
 		config = configs[0]
 	}
-	config.docFile = docFile
-	config.archiveDir = archiveDir
+	config.DocFile = docFile
+	config.ArchiveDir = archiveDir
+
+	archive := NewArchiver(config)
 
 	for {
 		// Get the file information of the document file.
-		fileInfo, err := os.Stat(config.docFile)
+		fileInfo, err := os.Stat(config.DocFile)
 		if err != nil {
 			time.Sleep(config.CheckInterval)
 			return fmt.Errorf("error checking document file: %v", err)
@@ -49,7 +51,7 @@ func Do(docFile, archiveDir string, configs ...Config) error {
 
 		// Check if the document file size exceeds the maximum size.
 		if fileInfo.Size() >= config.MaxSize {
-			if err := archiveDoc(config.docFile, config.archiveDir); err != nil {
+			if err := archive.File(); err != nil {
 				return err
 			}
 		}
