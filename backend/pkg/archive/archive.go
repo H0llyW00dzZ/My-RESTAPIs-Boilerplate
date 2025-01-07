@@ -76,6 +76,7 @@ func archiveDoc(docFile, archiveDir string) (err error) {
 	}
 
 	// Create a wait group to synchronize the streaming and truncation.
+	//
 	// TODO: This still needs improvement. Might Must using the Context Mechanism.
 	var wg sync.WaitGroup
 	wg.Add(2)
