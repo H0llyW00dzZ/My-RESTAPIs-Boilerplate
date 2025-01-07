@@ -22,10 +22,10 @@ type Archiver struct{ *Config }
 // truncateFile truncates the specified file to start fresh.
 func (a *Archiver) truncateFile() error { return os.Truncate(a.Config.DocFile, 0) }
 
-// ArchiveDoc archives the specified document file by compressing it into a tar.gz archive.
+// File archives the specified document file by compressing it into a tar.gz archive.
 // It creates a new archive file with a formatted filename based on the Archiver's fileNameFormat.
 // The function supports streaming and truncating the file while other callers are writing to it.
-func (a *Archiver) ArchiveDoc() (err error) {
+func (a *Archiver) File() (err error) {
 	var timestamp string
 	if a.Config.TimeFormat == defaultTimeFormat {
 		timestamp = fmt.Sprintf(defaultTimeFormat, time.Now().Unix())

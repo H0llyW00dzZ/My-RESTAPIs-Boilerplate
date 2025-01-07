@@ -39,7 +39,7 @@ func Do(docFile, archiveDir string, configs ...Config) error {
 	config.DocFile = docFile
 	config.ArchiveDir = archiveDir
 
-	archiver := NewArchiver(config)
+	archive := NewArchiver(config)
 
 	for {
 		// Get the file information of the document file.
@@ -51,7 +51,7 @@ func Do(docFile, archiveDir string, configs ...Config) error {
 
 		// Check if the document file size exceeds the maximum size.
 		if fileInfo.Size() >= config.MaxSize {
-			if err := archiver.ArchiveDoc(); err != nil {
+			if err := archive.File(); err != nil {
 				return err
 			}
 		}
