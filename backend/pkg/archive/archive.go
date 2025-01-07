@@ -24,8 +24,8 @@ func (a *Archiver) truncateFile(file string) error { return os.Truncate(file, 0)
 // The function supports streaming and truncating the file while other callers are writing to it.
 func (a *Archiver) ArchiveDoc(docFile, archiveDir string) (err error) {
 	var timestamp string
-	if a.Config.TimeFormat == "%d" {
-		timestamp = fmt.Sprintf("%d", time.Now().Unix())
+	if a.Config.TimeFormat == defaultTimeFormat {
+		timestamp = fmt.Sprintf(defaultTimeFormat, time.Now().Unix())
 	} else {
 		timestamp = time.Now().Format(a.Config.TimeFormat)
 	}
