@@ -31,7 +31,7 @@ func (a *Archiver) ArchiveDoc(docFile, archiveDir string) (err error) {
 	}
 
 	// Generate the archive filename based on the fileNameFormat.
-	archiveFileName := fmt.Sprintf(a.fileNameFormat, filepath.Base(docFile), timestamp)
+	archiveFileName := fmt.Sprintf(a.fileNameFormat+".tar.gz", filepath.Base(docFile), timestamp)
 	archiveFilePath := filepath.Join(archiveDir, archiveFileName)
 
 	// Create the archive directory if it doesn't exist.

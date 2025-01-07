@@ -22,7 +22,7 @@ type Config struct {
 const (
 	defaultMaxSize        = 10 * 1024 * 1024 // 10 MiB
 	defaultInterval       = 5 * time.Minute  // Check every 5 minutes
-	defaultFileNameFormat = "%s_%s.tar.gz"   // Default archive filename format
+	defaultFileNameFormat = "%s_%s"          // Default archive filename format
 )
 
 // DefaultConfig returns a Config with default values.
