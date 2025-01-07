@@ -7,11 +7,6 @@ package archive
 
 import "strings"
 
-// Archiver represents the archiving functionality with customizable options.
-type Archiver struct {
-	*Config
-}
-
 // NewArchiver creates a new Archiver with the specified options.
 // If no options are provided, the default values from the Config struct will be used.
 func NewArchiver(configs ...Config) *Archiver {

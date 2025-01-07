@@ -16,6 +16,9 @@ import (
 	"time"
 )
 
+// Archiver represents the archiving functionality with customizable options.
+type Archiver struct{ *Config }
+
 // truncateFile truncates the specified file to start fresh.
 func (a *Archiver) truncateFile(file string) error { return os.Truncate(file, 0) }
 
