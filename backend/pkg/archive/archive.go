@@ -20,7 +20,7 @@ import (
 type Archiver struct{ *Config }
 
 // truncateFile truncates the specified file to start fresh.
-func (a *Archiver) truncateFile(file string) error { return os.Truncate(file, 0) }
+func (a *Archiver) truncateFile() error { return os.Truncate(a.Config.docFile, 0) }
 
 // ArchiveDoc archives the specified document file by compressing it into a tar.gz archive.
 // It creates a new archive file with a formatted filename based on the Archiver's fileNameFormat.
@@ -109,7 +109,7 @@ func (a *Archiver) ArchiveDoc() (err error) {
 	go func() {
 		defer wg.Done()
 		// Truncate the document file to start fresh.
-		if err := a.truncateFile(a.Config.docFile); err != nil {
+		if err := a.truncateFile(); err != nil {
 			err = fmt.Errorf("error truncating document file: %v", err)
 		}
 	}()
