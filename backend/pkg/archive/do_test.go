@@ -72,7 +72,7 @@ var initArchive sync.Once
 
 func TestArchiveOnce(t *testing.T) {
 	logFile := "./test.log"
-	archiveDir := "./archives"
+	archiveDir := "./archives-once"
 	maxSize := int64(1024) // 1KiB for testing purposes
 
 	// Create a sample log file
@@ -137,7 +137,7 @@ func getArchiveFileSize(file string) (int64, error) {
 // Note: This test is a simulation because testing goroutine synchronization mechanism is challenging, unlike in production.
 func TestStreamingAndMultipleArchiving(t *testing.T) {
 	logFile := "./test.log"
-	archiveDir := "./archives"
+	archiveDir := "./multiple-archives"
 	maxSize := int64(1024) // 1KiB for testing purposes
 
 	// Create a sample log file
