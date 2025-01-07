@@ -11,8 +11,8 @@ import (
 
 // Config represents the configuration for the archiving process.
 type Config struct {
-	docFile        string        // Path to the document file
-	archiveDir     string        // Directory to store the archived files
+	DocFile        string        // Path to the document file
+	ArchiveDir     string        // Directory to store the archived files
 	MaxSize        int64         // Maximum size of the document file before archiving
 	CheckInterval  time.Duration // Time interval for checking the document file size
 	FileNameFormat string        // Format string for the archive filename

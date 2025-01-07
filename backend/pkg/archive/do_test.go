@@ -214,3 +214,69 @@ func TestStreamingAndMultipleArchiving(t *testing.T) {
 	// Clean up the archive directory
 	os.RemoveAll(archiveDir)
 }
+
+func TestArchiveError(t *testing.T) {
+	tests := []struct {
+		name           string
+		logFile        string
+		archiveDir     string
+		maxSize        int64
+		docFile        string
+		expectedErrMsg string
+	}{
+		{
+			name:           "Empty DocFile",
+			logFile:        "./test.log",
+			archiveDir:     "./archives-error",
+			maxSize:        1024,
+			docFile:        "",
+			expectedErrMsg: "expected an error when DocFile is empty",
+		},
+		{
+			name:           "Empty ArchiveDir",
+			logFile:        "./test.log",
+			archiveDir:     "",
+			maxSize:        1024,
+			docFile:        "./test.log",
+			expectedErrMsg: "expected an error when ArchiveDir is empty",
+		},
+		{
+			name:           "Empty DocFile & ArchiveDir",
+			logFile:        "./test.log",
+			archiveDir:     "",
+			maxSize:        1024,
+			docFile:        "",
+			expectedErrMsg: "expected an error when DocFile & ArchiveDir is empty",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a sample log file
+			if err := createSampleLogFile(tt.logFile, 2048); err != nil { // 2KiB log file
+				t.Fatalf("error creating sample log file: %v", err)
+			}
+			defer os.Remove(tt.logFile)
+
+			// Configure the archiving process
+			config := archive.Config{
+				MaxSize:        tt.maxSize,
+				CheckInterval:  time.Second * 1, // Check every second for testing purposes
+				FileNameFormat: "%s_%s",
+				TimeFormat:     "%d",
+			}
+
+			// Perform the test
+			err := archive.Do(tt.docFile, tt.archiveDir, config)
+
+			if tt.expectedErrMsg != "" {
+				if err == nil {
+					t.Error(tt.expectedErrMsg)
+				}
+			}
+
+			// Clean up the archive directory
+			os.RemoveAll(tt.archiveDir)
+		})
+	}
+}

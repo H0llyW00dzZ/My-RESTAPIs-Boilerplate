@@ -20,7 +20,7 @@ import (
 type Archiver struct{ *Config }
 
 // truncateFile truncates the specified file to start fresh.
-func (a *Archiver) truncateFile() error { return os.Truncate(a.Config.docFile, 0) }
+func (a *Archiver) truncateFile() error { return os.Truncate(a.Config.DocFile, 0) }
 
 // ArchiveDoc archives the specified document file by compressing it into a tar.gz archive.
 // It creates a new archive file with a formatted filename based on the Archiver's fileNameFormat.
@@ -34,11 +34,11 @@ func (a *Archiver) ArchiveDoc() (err error) {
 	}
 
 	// Generate the archive filename based on the fileNameFormat.
-	archiveFileName := fmt.Sprintf(a.Config.FileNameFormat+".tar.gz", filepath.Base(a.Config.docFile), timestamp)
-	archiveFilePath := filepath.Join(a.Config.archiveDir, archiveFileName)
+	archiveFileName := fmt.Sprintf(a.Config.FileNameFormat+".tar.gz", filepath.Base(a.Config.DocFile), timestamp)
+	archiveFilePath := filepath.Join(a.Config.ArchiveDir, archiveFileName)
 
 	// Create the archive directory if it doesn't exist.
-	if err := os.MkdirAll(a.Config.archiveDir, os.ModePerm); err != nil {
+	if err := os.MkdirAll(a.Config.ArchiveDir, os.ModePerm); err != nil {
 		return fmt.Errorf("error creating archive directory: %v", err)
 	}
 
@@ -58,7 +58,7 @@ func (a *Archiver) ArchiveDoc() (err error) {
 	defer tarWriter.Close()
 
 	// Open the document file for reading.
-	file, err := os.Open(a.Config.docFile)
+	file, err := os.Open(a.Config.DocFile)
 	if err != nil {
 		return fmt.Errorf("error opening document file: %v", err)
 	}
@@ -81,7 +81,7 @@ func (a *Archiver) ArchiveDoc() (err error) {
 	// TODO: Do we need to consider adding more header fields for the tar archive?
 	//       (e.g., Additional header fields could include ownership, permissions, or other metadata.)
 	header := &tar.Header{
-		Name:    filepath.Base(a.Config.docFile),
+		Name:    filepath.Base(a.Config.DocFile),
 		Mode:    0600,
 		Size:    fileInfo.Size(),
 		ModTime: time.Now(),
