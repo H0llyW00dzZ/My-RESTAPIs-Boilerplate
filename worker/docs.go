@@ -150,4 +150,11 @@
 //   - CPU usage is influenced by the number of workers you configure.
 //   - Additionally, dynamic memory allocation depends on the CPU architecture as well.
 //     For more efficient memory usage, consider using AMD processors, not Intel, as they are stable even for configurations with 100+ vCPUs.
+//
+// # Best Practices for Using this Worker:
+//
+//   - Consider the function where it will be executed. It's better if the function has a small memory allocation, as this worker is optimized for high CPU usage. For example, it can handle up to 100 cores (vCPU/CPU) due to the large number of workers (e.g, in K8S with VPA/HPA), while memory usage remains around or under 100MiB.
+//   - Ensure that the functions executed by the worker have minimal memory footprint to optimize resource utilization.
+//   - Adjust the number of workers based on your specific requirements and the available CPU resources. The CPU usage is directly influenced by the number of workers you configure.
+//   - Keep in mind that dynamic memory allocation also depends on the CPU architecture. For more efficient memory usage, consider using AMD processors instead of Intel, as they provide better stability even for configurations with 100+ vCPUs.
 package worker
