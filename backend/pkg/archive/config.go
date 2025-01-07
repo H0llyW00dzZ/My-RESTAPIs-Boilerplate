@@ -29,8 +29,7 @@ const (
 // DefaultConfig returns a Config with default values.
 func DefaultConfig() Config {
 	return Config{
-		MaxSize:        defaultMaxSize,
-		CheckInterval:  defaultInterval,
-		FileNameFormat: defaultFileNameFormat,
+		MaxSize:       defaultMaxSize,
+		CheckInterval: defaultInterval,
 	}
 }
