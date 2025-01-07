@@ -25,7 +25,7 @@ func (a *Archiver) truncateFile(file string) error { return os.Truncate(file, 0)
 // ArchiveDoc archives the specified document file by compressing it into a tar.gz archive.
 // It creates a new archive file with a formatted filename based on the Archiver's fileNameFormat.
 // The function supports streaming and truncating the file while other callers are writing to it.
-func (a *Archiver) ArchiveDoc(docFile, archiveDir string) (err error) {
+func (a *Archiver) ArchiveDoc() (err error) {
 	var timestamp string
 	if a.Config.TimeFormat == defaultTimeFormat {
 		timestamp = fmt.Sprintf(defaultTimeFormat, time.Now().Unix())
@@ -34,11 +34,11 @@ func (a *Archiver) ArchiveDoc(docFile, archiveDir string) (err error) {
 	}
 
 	// Generate the archive filename based on the fileNameFormat.
-	archiveFileName := fmt.Sprintf(a.Config.FileNameFormat+".tar.gz", filepath.Base(docFile), timestamp)
-	archiveFilePath := filepath.Join(archiveDir, archiveFileName)
+	archiveFileName := fmt.Sprintf(a.Config.FileNameFormat+".tar.gz", filepath.Base(a.Config.docFile), timestamp)
+	archiveFilePath := filepath.Join(a.Config.archiveDir, archiveFileName)
 
 	// Create the archive directory if it doesn't exist.
-	if err := os.MkdirAll(archiveDir, os.ModePerm); err != nil {
+	if err := os.MkdirAll(a.Config.archiveDir, os.ModePerm); err != nil {
 		return fmt.Errorf("error creating archive directory: %v", err)
 	}
 
@@ -58,7 +58,7 @@ func (a *Archiver) ArchiveDoc(docFile, archiveDir string) (err error) {
 	defer tarWriter.Close()
 
 	// Open the document file for reading.
-	file, err := os.Open(docFile)
+	file, err := os.Open(a.Config.docFile)
 	if err != nil {
 		return fmt.Errorf("error opening document file: %v", err)
 	}
@@ -81,7 +81,7 @@ func (a *Archiver) ArchiveDoc(docFile, archiveDir string) (err error) {
 	// TODO: Do we need to consider adding more header fields for the tar archive?
 	//       (e.g., Additional header fields could include ownership, permissions, or other metadata.)
 	header := &tar.Header{
-		Name:    filepath.Base(docFile),
+		Name:    filepath.Base(a.Config.docFile),
 		Mode:    0600,
 		Size:    fileInfo.Size(),
 		ModTime: time.Now(),
@@ -109,7 +109,7 @@ func (a *Archiver) ArchiveDoc(docFile, archiveDir string) (err error) {
 	go func() {
 		defer wg.Done()
 		// Truncate the document file to start fresh.
-		if err := a.truncateFile(docFile); err != nil {
+		if err := a.truncateFile(a.Config.docFile); err != nil {
 			err = fmt.Errorf("error truncating document file: %v", err)
 		}
 	}()
