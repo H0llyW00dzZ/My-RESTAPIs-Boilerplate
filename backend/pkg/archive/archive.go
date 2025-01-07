@@ -52,7 +52,13 @@ func archiveDoc(docFile, archiveDir string) (err error) {
 	if err != nil {
 		return fmt.Errorf("error opening document file: %v", err)
 	}
-	defer file.Close()
+	defer func() {
+		// In case an error occurs during file closure, this Trick Go deferred function
+		// captures the error and assigns it to the named return value "err".
+		if closeErr := file.Close(); closeErr != nil {
+			err = fmt.Errorf("error closing document file: %v", closeErr)
+		}
+	}()
 
 	// Get the file information of the document file.
 	fileInfo, err := file.Stat()
