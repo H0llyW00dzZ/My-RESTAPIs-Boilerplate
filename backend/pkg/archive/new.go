@@ -21,6 +21,11 @@ func NewArchiver(configs ...Config) *Archiver {
 	if config.TimeFormat == "" {
 		config.TimeFormat = "%d" // Default to Unix timestamp format
 	}
+
+	// Note: If you're not familiar with the formatting logic, let me explain how it works for the file name and time.
+	// The file name format uses two placeholders: %s for the base file name and %s for the timestamp.
+	// For example, if the base file name is "example.log" and the timestamp is "20230608123456",
+	// the resulting file name will be "example.log_20230608123456.tar.gz".
 	if config.FileNameFormat == "" {
 		config.FileNameFormat = "%s_%s" // Default to %s_%s.tar.gz
 	}
