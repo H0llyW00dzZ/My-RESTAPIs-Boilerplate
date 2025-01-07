@@ -38,7 +38,13 @@ const (
 
 // App/Server Capacity Configuration
 const (
-	SIZEBODYLIMIT = "SIZE_BODY_LIMIT" // The maximum size limit for the request body (default: "4MiB" (equivalent to 4 * 1024 * 1024 bytes)).
+	// The maximum size limit for the request body (default: "4MiB", equivalent to 4 * 1024 * 1024 bytes).
+	//
+	// Note: For security reasons, you should be careful when setting the size of the request body. For example, if you set it to more than 4MiB (e.g., 100MiB),
+	// it can lead to resource exhaustion due to excessive memory consumption, which may cause a crash with an OOM (Out Of Memory) error on Kubernetes,
+	// especially when using the "immutable" tag. Therefore, if you need to handle large request bodies, such as for file uploads,
+	// you should use the Stream method to process the data in smaller chunks.
+	SIZEBODYLIMIT = "SIZE_BODY_LIMIT"
 )
 
 // MySQL Database Configuration
