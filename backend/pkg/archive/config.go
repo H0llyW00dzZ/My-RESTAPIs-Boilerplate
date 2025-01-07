@@ -23,6 +23,7 @@ const (
 	defaultMaxSize        = 10 * 1024 * 1024 // 10 MiB
 	defaultInterval       = 5 * time.Minute  // Check every 5 minutes
 	defaultFileNameFormat = "%s_%s"          // Default archive filename format
+	defaultTimeFormat     = "%d"             // Default to Unix timestamp format
 )
 
 // DefaultConfig returns a Config with default values.
