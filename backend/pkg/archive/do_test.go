@@ -266,11 +266,9 @@ func TestArchiveError(t *testing.T) {
 				TimeFormat:     "%d",
 			}
 
-			// Perform the test
-			err := archive.Do(tt.docFile, tt.archiveDir, config)
-
+			// Perform the tes
 			if tt.expectedErrMsg != "" {
-				if err == nil {
+				if err := archive.Do(tt.docFile, tt.archiveDir, config); err == nil {
 					t.Error(tt.expectedErrMsg)
 				}
 			}
