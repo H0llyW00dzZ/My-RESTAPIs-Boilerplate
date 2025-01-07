@@ -28,6 +28,9 @@ var (
 	concurrentRequests = 5555
 )
 
+// Note: This test might fail on some single-core machines because 5555 goroutines are considered a high number.
+// It may also fail on faster processors, such as AMD processors (e.g., RYZEN or EPYC) with a high number of cores (both single and multi-core),
+// because they are too fast to catch the goroutines. In such cases, the time.Sleep duration must be set to lower than 100ms for faster processors.
 func TestConnectionLoggerMiddleware(t *testing.T) {
 	app := fiber.New()
 
@@ -103,6 +106,9 @@ func TestConnectionLoggerMiddleware(t *testing.T) {
 	})
 }
 
+// Note: This test might fail on some single-core machines because 5555 goroutines are considered a high number.
+// It may also fail on faster processors, such as AMD processors (e.g., RYZEN or EPYC) with a high number of cores (both single and multi-core),
+// because they are too fast to catch the goroutines. In such cases, the time.Sleep duration must be set to lower than 100ms for faster processors.
 func TestConnectionLoggerMiddlewareImmutable(t *testing.T) {
 	app := fiber.New(
 		fiber.Config{
