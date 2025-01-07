@@ -83,8 +83,10 @@ func TestArchiveOnce(t *testing.T) {
 
 	// Configure the archiving process
 	config := archive.Config{
-		MaxSize:       maxSize,
-		CheckInterval: time.Second * 1, // Check every second for testing purposes
+		MaxSize:        maxSize,
+		CheckInterval:  time.Second * 1, // Check every second for testing purposes
+		FileNameFormat: "%s_%s",
+		TimeFormat:     "20060102150405",
 	}
 
 	// Start monitoring and archiving the log file using [sync.Once]

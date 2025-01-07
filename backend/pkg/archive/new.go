@@ -7,8 +7,7 @@ package archive
 
 // Archiver represents the archiving functionality with customizable options.
 type Archiver struct {
-	fileNameFormat string // Format string for the archive filename
-	timeFormat     string // Format string for the timestamp
+	*Config
 }
 
 // NewArchiver creates a new Archiver with the specified options.
@@ -22,9 +21,11 @@ func NewArchiver(configs ...Config) *Archiver {
 	if config.TimeFormat == "" {
 		config.TimeFormat = "%d" // Default to Unix timestamp format
 	}
+	if config.FileNameFormat == "" {
+		config.FileNameFormat = "%s_%s" // Default to %s_%s.tar.gz
+	}
 
 	return &Archiver{
-		fileNameFormat: config.FileNameFormat,
-		timeFormat:     config.TimeFormat,
+		Config: &config,
 	}
 }

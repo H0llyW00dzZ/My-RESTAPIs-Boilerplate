@@ -24,14 +24,14 @@ func (a *Archiver) truncateFile(file string) error { return os.Truncate(file, 0)
 // The function supports streaming and truncating the file while other callers are writing to it.
 func (a *Archiver) ArchiveDoc(docFile, archiveDir string) (err error) {
 	var timestamp string
-	if a.timeFormat == "%d" {
+	if a.Config.TimeFormat == "%d" {
 		timestamp = fmt.Sprintf("%d", time.Now().Unix())
 	} else {
-		timestamp = time.Now().Format(a.timeFormat)
+		timestamp = time.Now().Format(a.Config.TimeFormat)
 	}
 
 	// Generate the archive filename based on the fileNameFormat.
-	archiveFileName := fmt.Sprintf(a.fileNameFormat+".tar.gz", filepath.Base(docFile), timestamp)
+	archiveFileName := fmt.Sprintf(a.Config.FileNameFormat+".tar.gz", filepath.Base(docFile), timestamp)
 	archiveFilePath := filepath.Join(archiveDir, archiveFileName)
 
 	// Create the archive directory if it doesn't exist.
