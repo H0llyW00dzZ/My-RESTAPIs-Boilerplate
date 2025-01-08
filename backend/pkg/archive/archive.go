@@ -31,6 +31,15 @@ func (a *Archiver) truncateFile() error { return os.Truncate(a.Config.DocFile, 0
 // The compression ratio for tar.gz is such that if the file contains 10Gi, it will become approximately 1Gi in the tar.gz archive.
 // However, when extracting the archive, it will revert back to its original size of 10Gi.
 // Due to the streaming nature of the function, the speed depends on the disk. In production, archiving a 10Gi file typically takes only a few minute.
+//
+// Other Approximate Ratios:
+//
+//   - 1Gi ≈ 100MiB
+//   - 100Gi ≈ 10Gi
+//   - 1Ti ≈ 100Gi
+//
+// The archive won't be corrupted for large files when extracting it on Linux or using a custom implementation written in Go.
+// However, extraction on other operating systems hasn't been tested, and might there is no guarantee for other operating systems.
 func (a *Archiver) File() (err error) {
 	var timestamp string
 	if a.Config.TimeFormat == defaultTimeFormat {
