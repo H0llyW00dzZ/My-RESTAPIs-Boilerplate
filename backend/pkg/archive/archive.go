@@ -12,7 +12,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"sync"
 	"time"
 )
 
@@ -93,31 +92,28 @@ func (a *Archiver) File() (err error) {
 		return fmt.Errorf("error writing tar header: %v", err)
 	}
 
-	// Create a wait group to synchronize the streaming and truncation.
+	// Create a channel to signal when streaming is done.
 	//
 	// TODO: This still needs improvement. Might Must using the Context Mechanism.
-	var wg sync.WaitGroup
-	wg.Add(2)
+	done := make(chan error)
 
-	// Start a goroutine to stream the document file contents to the tar writer.
+	// Start another goroutine to stream the document file contents to the tar writer.
 	go func() {
-		defer wg.Done()
-		if _, err := io.Copy(tarWriter, file); err != nil {
-			err = fmt.Errorf("error writing document file to archive: %v", err)
-		}
+		// Using a channel for signaling completion might be better than using a context in this case.
+		// Due this requires another goroutine because it cannot directly interact with the caller's main goroutine in a non-blocking manner.
+		_, err := io.Copy(tarWriter, file)
+		done <- err
 	}()
 
-	// Start a goroutine to truncate the document file after reaching the maximum size.
-	go func() {
-		defer wg.Done()
-		// Truncate the document file to start fresh.
-		if err := a.truncateFile(); err != nil {
-			err = fmt.Errorf("error truncating document file: %v", err)
-		}
-	}()
+	// Wait for the streaming to complete.
+	if err := <-done; err != nil {
+		return fmt.Errorf("error writing document file to archive: %v", err)
+	}
 
-	// Wait for both goroutines to finish.
-	wg.Wait()
+	// Truncate the document file to start fresh.
+	if err := a.truncateFile(); err != nil {
+		return fmt.Errorf("error truncating document file: %v", err)
+	}
 
 	return err
 }
