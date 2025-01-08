@@ -151,7 +151,7 @@
 //   - Additionally, dynamic memory allocation depends on the CPU architecture as well.
 //     For more efficient memory usage, consider using AMD processors, not Intel, as they are stable even for configurations with 100+ vCPUs.
 //
-// # Best Practices for Using this Worker:
+// # Best Practices for Using this Worker ("Higher CPU/vCPU usage is better, not memory." - idiomatic Go):
 //
 //   - Consider the function where it will be executed. It's better if the function has a small memory allocation, as this worker is optimized for high CPU usage. For example, it can handle up to 100 cores (vCPU/CPU) due to the large number of workers (e.g, in K8S with VPA/HPA), while memory usage remains around or under 100MiB.
 //   - Ensure that the functions executed by the worker have minimal memory footprint to optimize resource utilization.
