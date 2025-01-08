@@ -39,7 +39,7 @@ func Do(docFile, archiveDir string, configs ...Config) error {
 	config.DocFile = docFile
 	config.ArchiveDir = archiveDir
 
-	archive := NewArchiver(config)
+	archive := New(config)
 
 	for {
 		// Get the file information of the document file.

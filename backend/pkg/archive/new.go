@@ -7,9 +7,9 @@ package archive
 
 import "strings"
 
-// NewArchiver creates a new Archiver with the specified options.
+// New creates a new Archiver with the specified options.
 // If no options are provided, the default values from the Config struct will be used.
-func NewArchiver(configs ...Config) *Archiver {
+func New(configs ...Config) *Archiver {
 	config := DefaultConfig()
 	if len(configs) > 0 {
 		config = configs[0]
