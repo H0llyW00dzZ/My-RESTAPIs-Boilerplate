@@ -24,6 +24,13 @@ func (a *Archiver) truncateFile() error { return os.Truncate(a.Config.DocFile, 0
 // File archives the specified document file by compressing it into a tar.gz archive.
 // It creates a new archive file with a formatted filename based on the Archiver's fileNameFormat.
 // The function supports streaming and truncating the file while other callers are writing to it.
+//
+// Note: For better performance, it depends on the disk. In Kubernetes, it also depends on the CSI driver storage.
+// If using a CSI driver storage with S3 or S3-compatible storage in Kubernetes, it might require running the container (this deployment) as root,
+// as it depends on the implementation of the CSI driver storage for S3 or S3-compatible storage.
+// The compression ratio for tar.gz is such that if the file contains 10Gi, it will become approximately 1Gi in the tar.gz archive.
+// However, when extracting the archive, it will revert back to its original size of 10Gi.
+// Due to the streaming nature of the function, the speed depends on the disk. In production, archiving a 10Gi file typically takes only a few minute.
 func (a *Archiver) File() (err error) {
 	var timestamp string
 	if a.Config.TimeFormat == defaultTimeFormat {
