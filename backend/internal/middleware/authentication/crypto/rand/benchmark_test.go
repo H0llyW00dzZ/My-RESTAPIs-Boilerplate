@@ -5,27 +5,45 @@
 
 // Test Benchmark on My Laptop
 // Result:
-// goos: windows
-// goarch: amd64
-// pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
-// cpu: Intel(R) Core(TM) i9-10980HK CPU @ 2.40GHz
-// BenchmarkFixedSize32Bytes-16    	 			 5556951	       224.1 ns/op	       0 B/op	       0 allocs/op
-// BenchmarkFixedSizeECDSA/P-256-16         	 5560414	       222.3 ns/op	       0 B/op	       0 allocs/op
-// BenchmarkFixedSizeECDSA/P-384-16         	 4748517	       257.8 ns/op	       0 B/op	       0 allocs/op
-// BenchmarkFixedSizeECDSA/P-521-16         	 4839511	       259.7 ns/op	       0 B/op	       0 allocs/op
+//
+//	goos: windows
+//	goarch: amd64
+//	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
+//	cpu: Intel(R) Core(TM) i9-10980HK CPU @ 2.40GHz
+//	BenchmarkFixedSize32Bytes-16    	 			 5556951	       224.1 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECDSA/P-256-16         	 5560414	       222.3 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECDSA/P-384-16         	 4748517	       257.8 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECDSA/P-521-16         	 4839511	       259.7 ns/op	       0 B/op	       0 allocs/op
 //
 // Note: These benchmarks were conducted without overclocking. If overclocked, the performance may reach goes crazy up to 1 billion operations.
 //
 // Additionally, the results shown here are from a semi-overclocked state (3 GHz):
 //
-// goos: windows
-// goarch: amd64
-// pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
-// cpu: Intel(R) Core(TM) i9-10980HK CPU @ 2.40GHz
-// BenchmarkFixedSize32Bytes-16    	 6492642	       191.1 ns/op	       0 B/op	       0 allocs/op
-// BenchmarkFixedSizeECDSA/P-256-16         	 6795412	       184.9 ns/op	       0 B/op	       0 allocs/op
-// BenchmarkFixedSizeECDSA/P-384-16         	 5626008	       214.1 ns/op	       0 B/op	       0 allocs/op
-// BenchmarkFixedSizeECDSA/P-521-16         	 5705864	       211.9 ns/op	       0 B/op	       0 allocs/op
+//	goos: windows
+//	goarch: amd64
+//	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
+//	cpu: Intel(R) Core(TM) i9-10980HK CPU @ 2.40GHz
+//	BenchmarkFixedSize32Bytes-16    	 6492642	       191.1 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECDSA/P-256-16         	 6795412	       184.9 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECDSA/P-384-16         	 5626008	       214.1 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECDSA/P-521-16         	 5705864	       211.9 ns/op	       0 B/op	       0 allocs/op
+//
+// On an old PC with a broken motherboard due to Windows (physical memory corruption), switched to Linux for freedom and privacy:
+//
+//	goos: linux
+//	goarch: amd64
+//	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
+//	cpu: AMD Ryzen 9 3900X 12-Core Processor
+//	BenchmarkFixedSize32Bytes-24    	 2482843	       505.0 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECDSA/P-256-24         	 2539428	       480.1 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECDSA/P-384-24         	 1914794	       628.2 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECDSA/P-521-24         	 1856566	       624.2 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECC/P-224-24           	 2471674	       501.2 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECC/P-256-24           	 2398852	       502.6 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECC/P-384-24           	 1923326	       648.6 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECC/P-521-24           	 1549710	       824.4 ns/op	       0 B/op	       0 allocs/op
+//
+// Note that the old PC runs on Ubuntu Pro with 16GiB of RAM and performs smoothly without issues on Linux, unlike Windows.
 
 package rand_test
 
