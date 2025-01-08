@@ -37,6 +37,27 @@ func (a *Archiver) File() (err error) {
 	archiveFileName := fmt.Sprintf(a.Config.FileNameFormat+".tar.gz", filepath.Base(a.Config.DocFile), timestamp)
 	archiveFilePath := filepath.Join(a.Config.ArchiveDir, archiveFileName)
 
+	// Open the document file for reading.
+	// This is the correct placement for both non-streaming and streaming.
+	// The previous commit was only for streaming when writing data to disk.
+	file, err := os.Open(a.Config.DocFile)
+	if err != nil {
+		return fmt.Errorf("error opening document file: %v", err)
+	}
+	defer func() {
+		// In case an error occurs during file closure, this Trick Go deferred function
+		// captures the error and assigns it to the named return value "err".
+		if closeErr := file.Close(); closeErr != nil {
+			err = fmt.Errorf("error closing document file: %v", closeErr)
+		}
+	}()
+
+	// Get the file information of the document file.
+	fileInfo, err := file.Stat()
+	if err != nil {
+		return fmt.Errorf("error getting document file info: %v", err)
+	}
+
 	// Create the archive directory if it doesn't exist.
 	if err := os.MkdirAll(a.Config.ArchiveDir, os.ModePerm); err != nil {
 		return fmt.Errorf("error creating archive directory: %v", err)
@@ -56,25 +77,6 @@ func (a *Archiver) File() (err error) {
 	// Create a tar writer to write the document file to the archive.
 	tarWriter := tar.NewWriter(gzipWriter)
 	defer tarWriter.Close()
-
-	// Open the document file for reading.
-	file, err := os.Open(a.Config.DocFile)
-	if err != nil {
-		return fmt.Errorf("error opening document file: %v", err)
-	}
-	defer func() {
-		// In case an error occurs during file closure, this Trick Go deferred function
-		// captures the error and assigns it to the named return value "err".
-		if closeErr := file.Close(); closeErr != nil {
-			err = fmt.Errorf("error closing document file: %v", closeErr)
-		}
-	}()
-
-	// Get the file information of the document file.
-	fileInfo, err := file.Stat()
-	if err != nil {
-		return fmt.Errorf("error getting document file info: %v", err)
-	}
 
 	// Write the tar header for the document file.
 	//
