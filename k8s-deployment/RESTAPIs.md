@@ -311,6 +311,62 @@ You can monitor the VPA recommendations and the pods' resource usage using the f
 ```bash
 kubectl describe vpa restapis-vpa -n restapis
 ```
+Example Output:
+
+```terminal
+Name:         restapis-vpa
+Namespace:    restapis
+Labels:       <none>
+Annotations:  <none>
+API Version:  autoscaling.k8s.io/v1
+Kind:         VerticalPodAutoscaler
+Metadata:
+  Creation Timestamp:  2025-01-09T17:56:48Z
+  Generation:          1
+  Resource Version:    xxxxxxxxx
+  UID:                 x-x-x-x-x
+Spec:
+  Resource Policy:
+    Container Policies:
+      Container Name:  restapis
+      Controlled Resources:
+        cpu
+        memory
+      Max Allowed:
+        Cpu:     2
+        Memory:  3Gi
+      Min Allowed:
+        Cpu:     50m
+        Memory:  50Mi
+  Target Ref:
+    API Version:  apps/v1
+    Kind:         Deployment
+    Name:         restapis
+  Update Policy:
+    Min Replicas:  1
+    Update Mode:   Auto
+Status:
+  Conditions:
+    Last Transition Time:  2025-01-09T17:57:13Z
+    Status:                True
+    Type:                  RecommendationProvided
+  Recommendation:
+    Container Recommendations:
+      Container Name:  restapis
+      Lower Bound:
+        Cpu:     50m
+        Memory:  262144k
+      Target:
+        Cpu:     920m
+        Memory:  587804717
+      Uncapped Target:
+        Cpu:     920m
+        Memory:  587804717
+      Upper Bound:
+        Cpu:     1206m
+        Memory:  780346738
+Events:          <none>
+```
 
 > [!NOTE]
 > This example shows how `Vertical Pod Autoscaler (HPA)` works properly:
