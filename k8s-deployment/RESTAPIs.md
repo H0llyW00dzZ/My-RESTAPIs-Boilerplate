@@ -277,7 +277,21 @@ spec:
     apiVersion: "apps/v1"
     kind: Deployment
     name: restapis
+  # Note: You may need to modify this based on requirements
+  resourcePolicy:
+    containerPolicies:
+      - containerName: "restapis"
+        minAllowed:
+          cpu: 100m
+          memory: 100Mi
+        maxAllowed:
+          cpu: 124
+          memory: 2Gi
+      # If you are focusing on CPU, remove memory
+        controlledResources: ["cpu", "memory"]
   updatePolicy:
+    # By default, VPA for global is 2
+    minReplicas: 1
     updateMode: "Auto"
 ```
 
