@@ -295,6 +295,11 @@ spec:
     updateMode: "Auto"
 ```
 
+> [!NOTE]
+> For `Vertical Pod Autoscaler (VPA)`, you may need to switch the `typeStrategy` to `rollingUpdate` for the `Deployment` just in case VPA is creating new pods.
+> If `typeStrategy` is set to `rollingUpdate` with attached external storage (PVC), you may need to use `ReadWriteMany (RWX)` because if you are using `ReadWriteOnce (RWO)` or `ReadWriteOncePod`,
+> it will cause an error while creating pods and attaching the storage.
+
 Apply the VPA configuration using the following command:
 
 ```bash
@@ -322,6 +327,11 @@ kubectl describe vpa restapis-vpa -n restapis
 > [!NOTE]
 > These average resource usage metrics include attached external storage (PVC) on `AMD EPYC CPUs` with `I/O Streaming` running `24/7 nonstop for long durations`.
 > The memory request and limit are not specified in the Deployments but are automatically adjusted by the Vertical Pod Autoscaler (VPA).
+
+#### Compatibility with Vertical Pod Autoscaler (VPA):
+
+The compatibility of Vertical Pod Autoscaler (VPA) mostly depends on the cloud provider because you need to install it manually. However, if you are using `GKE (Google Kubernetes Engine)`, you don't have to install it manually (just enable it in the GKE Configuration).
+VPA in GKE is more stable because the maintainers of GKE keep updating it. On other cloud providers, you have to install and update VPA manually, which can be less reliable and require more effort due to the laziness of most cloud providers.
 
 ## Customization
 
