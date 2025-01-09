@@ -300,6 +300,17 @@ spec:
 > If `typeStrategy` is set to `rollingUpdate` with attached external storage (PVC), you may need to use `ReadWriteMany (RWX)` because if you are using `ReadWriteOnce (RWO)` or `ReadWriteOncePod`,
 > it will cause an error while creating pods and attaching the storage.
 
+> [!TIP]
+> If `typeStrategy` is set to `rollingUpdate`, you may need to modify the `maxSurge` and `maxUnavailable` values with this configuration example:
+>
+> ```yaml
+>   strategy:
+>     rollingUpdate:
+>       maxSurge: 5%
+>       maxUnavailable: 1
+>     type: RollingUpdate
+> ```
+
 Apply the VPA configuration using the following command:
 
 ```bash
@@ -383,6 +394,35 @@ Events:          <none>
 > [!NOTE]
 > These average resource usage metrics include attached external storage (PVC) on `AMD EPYC CPUs` with `I/O Streaming` running `24/7 nonstop for long durations`.
 > The memory request and limit are not specified in the Deployments but are automatically adjusted by the Vertical Pod Autoscaler (VPA).
+
+#### Another Example of How VPA Actually Works:
+
+- **In Logs:**
+
+```terminal-linux
+I0109 21:53:50.091424       1 pods_eviction_restriction.go:219] overriding minReplicas from global 2 to per-VPA 1 for VPA restapis/restapis-vpa
+I0109 21:53:50.091441       1 update_priority_calculator.go:146] pod accepted for update restapis/restapis-xxxx-xxxx with priority 140.45742616653445 - processed recommendations:
+restapis: target: 587805k 864m; uncappedTarget: 587805k 864m;
+I0109 21:53:50.091462       1 updater.go:228] evicting pod restapis/restapis-xxxx-xxxx
+I0109 21:53:50.109893       1 event.go:298] Event(v1.ObjectReference{Kind:"Pod", Namespace:"restapis", Name:"restapis-xxxx-xxxx", UID:"x-x-x-x-x", APIVersion:"v1", ResourceVersion:"xxxxxxxxx", FieldPath:""}): type: 'Normal' reason: 'EvictedByVPA' Pod was evicted by VPA Updater to apply resource recommendation.
+```
+
+- **In Events:**
+
+```terminal-linux
+4m23s       Normal    EvictedByVPA             pod/restapis-xxxx-xxxx    Pod was evicted by VPA Updater to apply resource recommendation.
+4m23s       Normal    Killing                  pod/restapis-xxxx-xxxx    Stopping container restapis
+6m2s        Normal    SuccessfulCreate         replicaset/restapis-xxxx-xxxx   Created pod: restapis-xxxx-xxxx
+4m23s       Normal    SuccessfulCreate         replicaset/restapis-xxxx-xxxx  Created pod: restapis-xxxx-xxxx
+6m2s        Normal    Killing                  pod/restapis-xxxx-xxxx    Stopping container restapis
+6m2s        Normal    SuccessfulDelete         replicaset/restapis-xxxx-xxxx  Deleted pod: restapis-xxxx-xxxx
+6m2s        Normal    ScalingReplicaSet        deployment/restapis              Scaled up replica set restapis-xxxx-xxxx to 1
+6m2s        Normal    ScalingReplicaSet        deployment/restapis              Scaled down replica set restapis-xxxx-xxxx to 0 from 1
+```
+> [!NOTE]
+> If your VPA is not actually working like these examples, something is wrong when you installed VPA manually (typically non-GKE).
+> If you are literally paying a fee for a control panel or high availability that is non-GKE, you are getting fooled by the cloud provider.
+> Because for most cloud providers that host Kubernetes, you literally have to pay a fee, and regarding the `free control panel`, `it's bullshit`.
 
 #### Compatibility with Vertical Pod Autoscaler (VPA):
 
