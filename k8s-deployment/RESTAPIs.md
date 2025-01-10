@@ -429,6 +429,8 @@ I0109 21:53:50.109893       1 event.go:298] Event(v1.ObjectReference{Kind:"Pod",
 The compatibility of Vertical Pod Autoscaler (VPA) mostly depends on the cloud provider because you need to install it manually. However, if you are using `GKE (Google Kubernetes Engine)`, you don't have to install it manually (just enable it in the GKE Configuration).
 VPA in GKE is more stable because the maintainers of GKE keep updating it. On other cloud providers, you have to install and update VPA manually, which can be less reliable and require more effort due to the laziness of most cloud providers.
 
+Additionally, VPA is particularly suitable for nodes or clusters with attached GPUs (e.g., for AI workloads). In such environments, the specifications are generally higher (in terms of CPU and memory), which helps avoid performance issues. Conversely, splitting workloads across nodes with smaller specifications can lead to inefficiencies and degraded performance.
+
 ## Customization
 
 The provided deployment files are designed to be customizable. You can modify the resource limits, environment variables, and other configurations according to your application's needs. Additionally, you can adjust the Ingress configuration to match your desired routing rules and TLS settings.
