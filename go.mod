@@ -22,7 +22,7 @@ require (
 	github.com/hashicorp/vault/api/auth/approle v0.8.0
 	github.com/heroku/x v0.4.1
 	github.com/joho/godotenv v1.5.1
-	github.com/mattn/go-colorable v0.1.13
+	github.com/mattn/go-colorable v0.1.14
 	github.com/prometheus/client_golang v1.20.5
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/valyala/bytebufferpool v1.0.0
