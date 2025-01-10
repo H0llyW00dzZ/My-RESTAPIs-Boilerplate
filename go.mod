@@ -15,7 +15,7 @@ require (
 	github.com/go-webauthn/webauthn v0.11.2
 	github.com/gofiber/contrib/swagger v1.2.0
 	github.com/gofiber/fiber/v2 v2.52.6
-	github.com/gofiber/storage/cloudflarekv v0.1.1
+	github.com/gofiber/storage/cloudflarekv v0.1.2
 	github.com/gofiber/storage/redis/v3 v3.1.2
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/vault/api v1.15.0
