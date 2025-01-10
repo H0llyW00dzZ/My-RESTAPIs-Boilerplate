@@ -310,6 +310,7 @@ spec:
 >       maxUnavailable: 1
 >     type: RollingUpdate
 > ```
+> The `maxSurge` value of `5%` is usually sufficient for most applications written in Go, even considering health check mechanisms and startup times. This is in contrast to applications written in other languages, where you might need to wait much longer for the application to be ready, potentially even until the next year hahaha
 
 Apply the VPA configuration using the following command:
 
