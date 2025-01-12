@@ -172,7 +172,7 @@ spec:
   resourcePolicy:
    # This specification for the current deployment template (designed for dedicated MySQL)
    # is sufficient for small ~ medium projects or startups managed by Kubernetes.
-   # It is recommended not to switch it to stateful, as MySQL is stable in deployment mode.
+   # It is recommended not to switch it to stateful, as MySQL is stable in deployment mode by attaching external storage (PVC).
    # If performance is slow, it disk issue.
     containerPolicies:
       - containerName: "mysql"
