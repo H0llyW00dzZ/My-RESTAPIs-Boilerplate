@@ -167,7 +167,13 @@ spec:
     name: mysql
   updatePolicy:
     updateMode: "Auto"
+    # By default, the VPA for global is set to 2
+    minReplicas: 1
   resourcePolicy:
+   # This specification for the current deployment template (designed for dedicated MySQL)
+   # is sufficient for small ~ medium projects or startups managed by Kubernetes.
+   # It is recommended not to switch it to stateful, as MySQL is stable in deployment mode.
+   # If performance is slow, it disk issue.
     containerPolicies:
       - containerName: "mysql"
         minAllowed:
