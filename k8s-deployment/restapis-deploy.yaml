@@ -42,6 +42,16 @@ spec:
       #   image: busybox
       #   command: ["chown", "-R", "9999:9999", "/pandorabox"]
       #
+      # Another Example of multiple external storage (PVC) attached:
+      # initContainers:
+      # - command:
+      #   - sh
+      #   - -c
+      #   - chown -R 9999:9999 /pandorabox
+      #   - chown -R 9999:9999 /pandorabox-retain
+      #   image: busybox
+      #   name: chown
+      #
       # Note: This is just in case an init container error occurs. However, later the terminal (shell) will come from initContainers, not in the container when you try to exec -- sh via kubectl.
       # This is because the image from the container is minimal and does not include terminal (shell) mechanisms. Later, you have the ability to write in Go. For example, you can store temporary data in the overlay storage that comes from Docker.
       # For important data, you can store it in external Kubernetes storage (PVC).
@@ -50,6 +60,14 @@ spec:
       # volumeMounts:
       #   - mountPath: /pandorabox
       #     name: pandorabox-storage
+      #
+      # Another Example of multiple external storage (PVC) attached with volumeMounts:
+      # volumeMounts:
+      #   - mountPath: /pandorabox
+      #     name: pandorabox-storage
+      #   - mountPath: /pandorabox-retain
+      #     name: pandorabox-storage-retain
+      # Note: Don't forget to request a persistentVolumeClaim for "pandorabox-storage-retain" as well.
       containers:
       - name: restapis
         image: <IMAGE_HERE> # Put Image related to this repository here
