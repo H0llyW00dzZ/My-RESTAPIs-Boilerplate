@@ -43,7 +43,9 @@
 //	BenchmarkFixedSizeECC/P-384-24           	 1923326	       648.6 ns/op	       0 B/op	       0 allocs/op
 //	BenchmarkFixedSizeECC/P-521-24           	 1549710	       824.4 ns/op	       0 B/op	       0 allocs/op
 //
-// Note that the old PC runs on Ubuntu Pro with 16GiB of RAM and performs smoothly without issues on Linux, unlike Windows.
+// Note that the old PC runs on Ubuntu Pro with 16 GiB of RAM and performs smoothly without issues on Linux (it literally fixes what Windows can't), unlike Windows.
+// However, there is no chance of going back to Windows due to physical memory corruption issues that also damage the memory slots, which is why
+// the broken motherboard can't support more than 32 GiB++ of RAM (because Windows caused the damage).
 
 package rand_test
 
