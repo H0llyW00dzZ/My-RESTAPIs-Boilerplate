@@ -23,6 +23,8 @@ type (
 		// Note: This is optional and depends on your HTTPS/TLS configuration.
 		// If your certificate is a wildcard or explicitly includes "www.", this is suitable,
 		// even when using a proxy or Kubernetes Ingress.
+		//
+		// TODO: Use "[]string" to support multiple websites for better scalability.
 		MainDomain string
 	}
 )
