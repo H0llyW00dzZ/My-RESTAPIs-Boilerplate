@@ -19,6 +19,9 @@ type (
 		// Hosts is a map of subdomain or domain hosts to their corresponding Fiber application instances.
 		Hosts map[string]*fiber.App
 		// MainDomain is the primary domain to which www subdomains should be linked.
+		// Note: This is optional and depends on your HTTPS/TLS configuration.
+		// If your certificate is a wildcard or explicitly includes "www.", this is suitable,
+		// even when using a proxy or Kubernetes Ingress.
 		MainDomain string
 	}
 )
