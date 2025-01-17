@@ -18,5 +18,11 @@ type (
 	Config struct {
 		// Hosts is a map of subdomain or domain hosts to their corresponding Fiber application instances.
 		Hosts map[string]*fiber.App
+		// MainDomain is the primary domain to which www subdomains should be linked.
+		MainDomain string
 	}
+)
+
+const (
+	wwwDot = "www."
 )

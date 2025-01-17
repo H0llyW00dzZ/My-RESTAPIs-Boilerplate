@@ -34,8 +34,16 @@ import (
 //   - https://crt.sh/?q=a8bc9093e1f4ba202fc769b8818b8a279a5f70c91bee458d29d6ad3c5ac5e88c
 func New(config Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement support for routing "www." to the appropriate frontend domain.
-		host := config.Hosts[c.Hostname()]
+		hostname := c.Hostname()
+
+		// Check if the hostname is the www version of the main domain
+		if hostname == wwwDot+config.MainDomain {
+			// Forward to the main domain's app
+			hostname = config.MainDomain
+		}
+
+		// Find the corresponding app for the hostname
+		host := config.Hosts[hostname]
 		if host == nil {
 			// Note: Returning a new error is a better approach instead of returning directly,
 			// as it allows the error to be handled by the caller somewhere else in the codebase,
