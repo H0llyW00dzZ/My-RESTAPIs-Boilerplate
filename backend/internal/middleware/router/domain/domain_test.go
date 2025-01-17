@@ -32,8 +32,9 @@ func TestDomainRouter(t *testing.T) {
 	// Configure the domain router
 	config := domain.Config{
 		Hosts: map[string]*fiber.App{
+			// Note: It is optional to include "www.example.com" in Hosts for production,
+			// because MainDomain will link "www." to example.com (mainApp).
 			"example.com":     mainApp,
-			"www.example.com": mainApp,
 			"api.example.com": apiApp,
 		},
 		MainDomain: "example.com",
