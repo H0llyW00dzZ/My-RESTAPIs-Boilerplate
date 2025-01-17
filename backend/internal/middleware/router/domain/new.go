@@ -6,6 +6,8 @@
 package domain
 
 import (
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -36,8 +38,8 @@ func New(config Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		hostname := c.Hostname()
 
-		// Check if the hostname is the www version of the main domain
-		if hostname == wwwDot+config.MainDomain {
+		// Check if the hostname starts with "www." and is followed by the main domain
+		if strings.HasPrefix(hostname, wwwDot) && strings.TrimPrefix(hostname, wwwDot) == config.MainDomain {
 			// Forward to the main domain's app
 			hostname = config.MainDomain
 		}
