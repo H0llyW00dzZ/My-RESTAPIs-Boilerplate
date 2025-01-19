@@ -145,3 +145,188 @@ func BenchmarkFixedSizeECC(b *testing.B) {
 		})
 	}
 }
+
+// Results on an old PC with a broken motherboard. It still works fine & stable on Linux with only 16 GiB of RAM:
+//
+//	goos: linux
+//	goarch: amd64
+//	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
+//	cpu: AMD Ryzen 9 3900X 12-Core Processor
+//	BenchmarkGenerateTextWith10Length/Lowercase-24         	  152373	      7647 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/Uppercase-24         	  152648	      7674 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/Mixed-24             	  176691	      6617 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/Special-24           	  162062	      7199 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/MixedSpecial-24      	  136326	      8669 ns/op	     512 B/op	      32 allocs/op
+//	PASS
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	6.256s
+func BenchmarkGenerateTextWith10Length(b *testing.B) {
+	tests := []struct {
+		length   int
+		textCase rand.TextCase
+	}{
+		{10, rand.Lowercase},
+		{10, rand.Uppercase},
+		{10, rand.Mixed},
+		{10, rand.Special},
+		{10, rand.MixedSpecial},
+	}
+
+	for _, tt := range tests {
+		b.Run(textCaseToString(tt.textCase), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_, err := rand.GenerateText(tt.length, tt.textCase)
+				if err != nil {
+					b.Errorf("unexpected error: %v", err)
+				}
+			}
+		})
+	}
+}
+
+// Results on an old PC with a broken motherboard. It still works fine & stable on Linux with only 16 GiB of RAM:
+//
+//	goos: linux
+//	goarch: amd64
+//	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
+//	cpu: AMD Ryzen 9 3900X 12-Core Processor
+//	BenchmarkGenerateTextWith25Length/Lowercase-24         	   62334	     19020 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/Uppercase-24         	   62594	     18980 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/Mixed-24             	   72399	     16385 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/Special-24           	   66516	     17864 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/MixedSpecial-24      	   55254	     21464 ns/op	    1264 B/op	      77 allocs/op
+//	PASS
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	6.902s
+func BenchmarkGenerateTextWith25Length(b *testing.B) {
+	tests := []struct {
+		length   int
+		textCase rand.TextCase
+	}{
+		{25, rand.Lowercase},
+		{25, rand.Uppercase},
+		{25, rand.Mixed},
+		{25, rand.Special},
+		{25, rand.MixedSpecial},
+	}
+
+	for _, tt := range tests {
+		b.Run(textCaseToString(tt.textCase), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_, err := rand.GenerateText(tt.length, tt.textCase)
+				if err != nil {
+					b.Errorf("unexpected error: %v", err)
+				}
+			}
+		})
+	}
+}
+
+// Results on an old PC with a broken motherboard. It still works fine & stable on Linux with only 16 GiB of RAM:
+//
+//	goos: linux
+//	goarch: amd64
+//	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
+//	cpu: AMD Ryzen 9 3900X 12-Core Processor
+//	BenchmarkGenerateTextWith50Length/Lowercase-24         	   31390	     38097 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/Uppercase-24         	   31441	     37985 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/Mixed-24             	   36450	     32775 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/Special-24           	   33487	     35665 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/MixedSpecial-24      	   27771	     43050 ns/op	    2528 B/op	     152 allocs/op
+//	PASS
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	7.888s
+func BenchmarkGenerateTextWith50Length(b *testing.B) {
+	tests := []struct {
+		length   int
+		textCase rand.TextCase
+	}{
+		{50, rand.Lowercase},
+		{50, rand.Uppercase},
+		{50, rand.Mixed},
+		{50, rand.Special},
+		{50, rand.MixedSpecial},
+	}
+
+	for _, tt := range tests {
+		b.Run(textCaseToString(tt.textCase), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_, err := rand.GenerateText(tt.length, tt.textCase)
+				if err != nil {
+					b.Errorf("unexpected error: %v", err)
+				}
+			}
+		})
+	}
+}
+
+// Results on an old PC with a broken motherboard. It still works fine & stable on Linux with only 16 GiB of RAM:
+//
+//	goos: linux
+//	goarch: amd64
+//	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
+//	cpu: AMD Ryzen 9 3900X 12-Core Processor
+//	BenchmarkGenerateTextWith100Length/Lowercase-24         	   14958	     78638 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/Uppercase-24         	   15226	     78503 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/Mixed-24             	   17640	     67999 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/Special-24           	   16220	     73888 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/MixedSpecial-24      	   13552	     88412 ns/op	    5024 B/op	     302 allocs/op
+//	PASS
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	9.914s
+func BenchmarkGenerateTextWith100Length(b *testing.B) {
+	tests := []struct {
+		length   int
+		textCase rand.TextCase
+	}{
+		{100, rand.Lowercase},
+		{100, rand.Uppercase},
+		{100, rand.Mixed},
+		{100, rand.Special},
+		{100, rand.MixedSpecial},
+	}
+
+	for _, tt := range tests {
+		b.Run(textCaseToString(tt.textCase), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_, err := rand.GenerateText(tt.length, tt.textCase)
+				if err != nil {
+					b.Errorf("unexpected error: %v", err)
+				}
+			}
+		})
+	}
+}
+
+// Results on an old PC with a broken motherboard. It still works fine & stable on Linux with only 16 GiB of RAM:
+//
+//	goos: linux
+//	goarch: amd64
+//	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
+//	cpu: AMD Ryzen 9 3900X 12-Core Processor
+//	BenchmarkGenerateTextWith500Length/Lowercase-24         	    3056	    378141 ns/op	   25027 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/Uppercase-24         	    3061	    378357 ns/op	   25024 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/Mixed-24             	    3512	    326301 ns/op	   25024 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/Special-24           	    3286	    355469 ns/op	   25024 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/MixedSpecial-24      	    2696	    428179 ns/op	   25024 B/op	    1502 allocs/op
+//	PASS
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	5.987s
+func BenchmarkGenerateTextWith500Length(b *testing.B) {
+	tests := []struct {
+		length   int
+		textCase rand.TextCase
+	}{
+		{500, rand.Lowercase},
+		{500, rand.Uppercase},
+		{500, rand.Mixed},
+		{500, rand.Special},
+		{500, rand.MixedSpecial},
+	}
+
+	for _, tt := range tests {
+		b.Run(textCaseToString(tt.textCase), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_, err := rand.GenerateText(tt.length, tt.textCase)
+				if err != nil {
+					b.Errorf("unexpected error: %v", err)
+				}
+			}
+		})
+	}
+}
