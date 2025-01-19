@@ -274,6 +274,10 @@ func textCaseToString(tc rand.TextCase) string {
 	}
 }
 
+// Note: Avoid using hardcoded numbers directly as the textCase parameter (e.g., rand.GenerateText(10, 0)).
+// Instead, use predefined constants (e.g., rand.GenerateText(10, rand.Lowercase)).
+// This approach is considered idiomatic in Go for better readability and maintainability.
+// The constants are bound to the TextCase type.
 func TestGenerateRandomText(t *testing.T) {
 	tests := []struct {
 		length   int
@@ -304,6 +308,42 @@ func TestGenerateRandomText(t *testing.T) {
 			case rand.MixedSpecial:
 				assert.Regexp(t, "^[a-zA-Z0-9!@#$%^&*()\\-_=+\\[\\]{}|;:,.<>?/\\\\]+$", result)
 			}
+		})
+	}
+}
+
+func TestGenerateRandomTextInvalidInputs(t *testing.T) {
+	tests := []struct {
+		name     string
+		length   int
+		textCase rand.TextCase
+		expected string
+	}{
+		{
+			name:     "Negative Length",
+			length:   -1,
+			textCase: rand.Mixed,
+			expected: "length -1 must be greater than 0",
+		},
+		{
+			name:     "Invalid TextCase",
+			length:   10,
+			textCase: -1, // Assuming -1 is an invalid textCase
+			expected: rand.ErrorsGenerateText.Error(),
+		},
+		{
+			name:     "Negative Length and Invalid TextCase",
+			length:   -1,
+			textCase: -1,
+			expected: "length -1 must be greater than 0",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := rand.GenerateText(tt.length, tt.textCase)
+			assert.Error(t, err)
+			assert.Contains(t, err.Error(), tt.expected)
 		})
 	}
 }
