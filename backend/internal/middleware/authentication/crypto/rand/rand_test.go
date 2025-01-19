@@ -10,6 +10,8 @@ import (
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand"
 	"regexp"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // Note: If this function is not safe for concurrent use, it would lead to race conditions or produce the same result
@@ -252,5 +254,56 @@ func TestGenerateFixedUUID(t *testing.T) {
 
 	if uuid == uuid2 {
 		t.Error("expected different UUIDs, but got the same")
+	}
+}
+
+func textCaseToString(tc rand.TextCase) string {
+	switch tc {
+	case rand.Lowercase:
+		return "Lowercase"
+	case rand.Uppercase:
+		return "Uppercase"
+	case rand.Mixed:
+		return "Mixed"
+	case rand.Special:
+		return "Special"
+	case rand.MixedSpecial:
+		return "MixedSpecial"
+	default:
+		return "Unknown"
+	}
+}
+
+func TestGenerateRandomText(t *testing.T) {
+	tests := []struct {
+		length   int
+		textCase rand.TextCase
+	}{
+		{10, rand.Lowercase},
+		{10, rand.Uppercase},
+		{10, rand.Mixed},
+		{10, rand.Special},
+		{10, rand.MixedSpecial},
+	}
+
+	for _, tt := range tests {
+		t.Run(textCaseToString(tt.textCase), func(t *testing.T) {
+			result, err := rand.GenerateText(tt.length, tt.textCase)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.length, len(result))
+
+			switch tt.textCase {
+			case rand.Lowercase:
+				assert.Regexp(t, "^[a-z]+$", result)
+			case rand.Uppercase:
+				assert.Regexp(t, "^[A-Z]+$", result)
+			case rand.Mixed:
+				assert.Regexp(t, "^[a-zA-Z0-9]+$", result)
+			case rand.Special:
+				assert.Regexp(t, "^[!@#$%^&*()\\-_=+\\[\\]{}|;:,.<>?/\\\\]+$", result)
+			case rand.MixedSpecial:
+				assert.Regexp(t, "^[a-zA-Z0-9!@#$%^&*()\\-_=+\\[\\]{}|;:,.<>?/\\\\]+$", result)
+			}
+		})
 	}
 }
