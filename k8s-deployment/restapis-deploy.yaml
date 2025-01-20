@@ -68,6 +68,10 @@ spec:
       #   - mountPath: /pandorabox-retain
       #     name: pandorabox-storage-retain
       # Note: Don't forget to request a persistentVolumeClaim for "pandorabox-storage-retain" as well.
+      #
+      # Compatibility for Attaching External Storage (PVC):
+      # All storage classes are supported in Kubernetes. However, if you are using storage classes like S3 Bucket or S3 Compatible Bucket,
+      # you may need to run the container as root. This requires privileged/root access and can lead to security issues, especially if you are focusing on operating system (e.g., using an base image without minimal).
       containers:
       - name: restapis
         image: <IMAGE_HERE> # Put Image related to this repository here
