@@ -176,7 +176,7 @@ func BenchmarkGenerateTextWith10Length(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				_, err := rand.GenerateText(tt.length, tt.textCase)
 				if err != nil {
-					b.Errorf("unexpected error: %v", err)
+					b.Fatalf("unexpected error: %v", err)
 				}
 			}
 		})
@@ -213,7 +213,7 @@ func BenchmarkGenerateTextWith25Length(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				_, err := rand.GenerateText(tt.length, tt.textCase)
 				if err != nil {
-					b.Errorf("unexpected error: %v", err)
+					b.Fatalf("unexpected error: %v", err)
 				}
 			}
 		})
@@ -250,7 +250,7 @@ func BenchmarkGenerateTextWith50Length(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				_, err := rand.GenerateText(tt.length, tt.textCase)
 				if err != nil {
-					b.Errorf("unexpected error: %v", err)
+					b.Fatalf("unexpected error: %v", err)
 				}
 			}
 		})
@@ -287,7 +287,7 @@ func BenchmarkGenerateTextWith100Length(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				_, err := rand.GenerateText(tt.length, tt.textCase)
 				if err != nil {
-					b.Errorf("unexpected error: %v", err)
+					b.Fatalf("unexpected error: %v", err)
 				}
 			}
 		})
@@ -324,7 +324,7 @@ func BenchmarkGenerateTextWith500Length(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				_, err := rand.GenerateText(tt.length, tt.textCase)
 				if err != nil {
-					b.Errorf("unexpected error: %v", err)
+					b.Fatalf("unexpected error: %v", err)
 				}
 			}
 		})
