@@ -48,6 +48,42 @@ func GenerateText(length int, textCase TextCase) (string, error) {
 		return "", fmt.Errorf("crypto/rand: length %d must be greater than 0", length)
 	}
 
+	// Note: This implementation is optimized for performance.
+	// Another method could use a map for better organization, like this:
+	//
+	// 	var charsets = map[TextCase]string{
+	// 		Lowercase:    lowercaseCharset,
+	// 		Uppercase:    uppercaseCharset,
+	// 		Mixed:        mixedCharset,
+	// 		Special:      specialCharset,
+	// 		MixedSpecial: mixedSpecialCharset,
+	// 	}
+	//
+	// 	// GenerateText generates a random text string of the specified length and case.
+	// 	func GenerateText(length int, textCase TextCase) (string, error) {
+	// 		if length <= 0 {
+	// 			return "", fmt.Errorf("crypto/rand: length %d must be greater than 0", length)
+	// 		}
+	//
+	// 		charset, exists := charsets[textCase]
+	// 		if !exists {
+	// 			return "", ErrorsGenerateText
+	// 		}
+	//
+	// 		charsetLen := int64(len(charset))
+	// 		text := make([]byte, length)
+	// 		for i := range text {
+	// 			index, err := rand.Int(rand.Reader, big.NewInt(charsetLen))
+	// 			if err != nil {
+	// 				return "", fmt.Errorf("crypto/rand: failed to generate random text: %w", err)
+	// 			}
+	// 			text[i] = charset[index.Int64()]
+	// 		}
+	//
+	// 		return string(text), nil
+	// 	}
+	//
+	// However, using a map might slightly decrease performance due to additional lookups.
 	var charset string
 	switch textCase {
 	case Lowercase:
