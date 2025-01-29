@@ -82,5 +82,38 @@ import (
 //	// Process the file contents from the buffer
 //	processFileContents(buf.Bytes())
 //
-// Note: These examples can be used for various I/O operations, such as rendering HTML templates or reading files efficiently.
+// Example usage for handling HTTP requests and responses using the standard library net/http:
+//
+//	http.HandleFunc("/example", func(w http.ResponseWriter, r *http.Request) {
+//		// Get a buffer from the pool
+//		buf := gc.BufferPool.Get()
+//
+//		defer func() {
+//			buf.Reset()            // Reset the buffer to prevent data leaks
+//			gc.BufferPool.Put(buf) // Return the buffer to the pool for reuse
+//		}()
+//
+//		// Read request body into the buffer
+//		if _, err := buf.ReadFrom(r.Body); err != nil {
+//			http.Error(w, "Error reading request body", http.StatusInternalServerError)
+//			return
+//		}
+//
+//		// Process the request data
+//		processedData := processData(buf.Bytes())
+//
+//		// Set response headers
+//		w.Header().Set("Content-Type", "text/plain")
+//
+//		// Write the processed data as the response
+//		if _, err := w.Write(processedData); err != nil {
+//			fmt.Printf("Error writing response: %v\n", err)
+//		}
+//	})
+//
+//	http.ListenAndServe(":8080", nil)
+//
+// Note: These examples demonstrate various I/O operations, such as JSON responses, rendering HTML components, reading files, and handling HTTP requests.
+// Efficient memory usage is achieved by leveraging a buffer pool, which is especially beneficial in high-concurrency environments.
+// For example, using 8 cores while keeping memory usage under 100MiB maintains high CPU efficiency with low memory consumption it's better.
 var BufferPool = bytebufferpool.Pool{}
