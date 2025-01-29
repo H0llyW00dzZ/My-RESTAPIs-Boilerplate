@@ -152,13 +152,14 @@ func BenchmarkFixedSizeECC(b *testing.B) {
 //	goarch: amd64
 //	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
 //	cpu: AMD Ryzen 9 3900X 12-Core Processor
-//	BenchmarkGenerateTextWith10Length/Lowercase-24         	  152373	      7647 ns/op	     512 B/op	      32 allocs/op
-//	BenchmarkGenerateTextWith10Length/Uppercase-24         	  152648	      7674 ns/op	     512 B/op	      32 allocs/op
-//	BenchmarkGenerateTextWith10Length/Mixed-24             	  176691	      6617 ns/op	     512 B/op	      32 allocs/op
-//	BenchmarkGenerateTextWith10Length/Special-24           	  162062	      7199 ns/op	     512 B/op	      32 allocs/op
-//	BenchmarkGenerateTextWith10Length/MixedSpecial-24      	  136326	      8669 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/Lowercase-24         	  152569	      7684 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/Uppercase-24         	  153183	      7663 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/Mixed-24             	  176103	      6646 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/Special-24           	  163130	      7227 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/MixedSpecial-24      	  135039	      8666 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/Number-24            	  122524	      9646 ns/op	     512 B/op	      32 allocs/op
 //	PASS
-//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	6.256s
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	7.550s
 func BenchmarkGenerateTextWith10Length(b *testing.B) {
 	tests := []struct {
 		length   int
@@ -169,6 +170,7 @@ func BenchmarkGenerateTextWith10Length(b *testing.B) {
 		{10, rand.Mixed},
 		{10, rand.Special},
 		{10, rand.MixedSpecial},
+		{10, rand.Number},
 	}
 
 	for _, tt := range tests {
@@ -189,13 +191,14 @@ func BenchmarkGenerateTextWith10Length(b *testing.B) {
 //	goarch: amd64
 //	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
 //	cpu: AMD Ryzen 9 3900X 12-Core Processor
-//	BenchmarkGenerateTextWith25Length/Lowercase-24         	   62334	     19020 ns/op	    1264 B/op	      77 allocs/op
-//	BenchmarkGenerateTextWith25Length/Uppercase-24         	   62594	     18980 ns/op	    1264 B/op	      77 allocs/op
-//	BenchmarkGenerateTextWith25Length/Mixed-24             	   72399	     16385 ns/op	    1264 B/op	      77 allocs/op
-//	BenchmarkGenerateTextWith25Length/Special-24           	   66516	     17864 ns/op	    1264 B/op	      77 allocs/op
-//	BenchmarkGenerateTextWith25Length/MixedSpecial-24      	   55254	     21464 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/Lowercase-24         	   62409	     19039 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/Uppercase-24         	   62414	     19094 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/Mixed-24             	   71863	     16410 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/Special-24           	   66769	     17901 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/MixedSpecial-24      	   54975	     21632 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/Number-24            	   49626	     23905 ns/op	    1264 B/op	      77 allocs/op
 //	PASS
-//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	6.902s
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	8.347s
 func BenchmarkGenerateTextWith25Length(b *testing.B) {
 	tests := []struct {
 		length   int
@@ -206,6 +209,7 @@ func BenchmarkGenerateTextWith25Length(b *testing.B) {
 		{25, rand.Mixed},
 		{25, rand.Special},
 		{25, rand.MixedSpecial},
+		{25, rand.Number},
 	}
 
 	for _, tt := range tests {
@@ -226,13 +230,14 @@ func BenchmarkGenerateTextWith25Length(b *testing.B) {
 //	goarch: amd64
 //	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
 //	cpu: AMD Ryzen 9 3900X 12-Core Processor
-//	BenchmarkGenerateTextWith50Length/Lowercase-24         	   31390	     38097 ns/op	    2528 B/op	     152 allocs/op
-//	BenchmarkGenerateTextWith50Length/Uppercase-24         	   31441	     37985 ns/op	    2528 B/op	     152 allocs/op
-//	BenchmarkGenerateTextWith50Length/Mixed-24             	   36450	     32775 ns/op	    2528 B/op	     152 allocs/op
-//	BenchmarkGenerateTextWith50Length/Special-24           	   33487	     35665 ns/op	    2528 B/op	     152 allocs/op
-//	BenchmarkGenerateTextWith50Length/MixedSpecial-24      	   27771	     43050 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/Lowercase-24         	   31603	     38002 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/Uppercase-24         	   31491	     38100 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/Mixed-24             	   36438	     32906 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/Special-24           	   33471	     35800 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/MixedSpecial-24      	   27567	     42972 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/Number-24            	   25027	     48102 ns/op	    2528 B/op	     152 allocs/op
 //	PASS
-//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	7.888s
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	9.586s
 func BenchmarkGenerateTextWith50Length(b *testing.B) {
 	tests := []struct {
 		length   int
@@ -243,6 +248,7 @@ func BenchmarkGenerateTextWith50Length(b *testing.B) {
 		{50, rand.Mixed},
 		{50, rand.Special},
 		{50, rand.MixedSpecial},
+		{50, rand.Number},
 	}
 
 	for _, tt := range tests {
@@ -263,13 +269,14 @@ func BenchmarkGenerateTextWith50Length(b *testing.B) {
 //	goarch: amd64
 //	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
 //	cpu: AMD Ryzen 9 3900X 12-Core Processor
-//	BenchmarkGenerateTextWith100Length/Lowercase-24         	   14958	     78638 ns/op	    5024 B/op	     302 allocs/op
-//	BenchmarkGenerateTextWith100Length/Uppercase-24         	   15226	     78503 ns/op	    5024 B/op	     302 allocs/op
-//	BenchmarkGenerateTextWith100Length/Mixed-24             	   17640	     67999 ns/op	    5024 B/op	     302 allocs/op
-//	BenchmarkGenerateTextWith100Length/Special-24           	   16220	     73888 ns/op	    5024 B/op	     302 allocs/op
-//	BenchmarkGenerateTextWith100Length/MixedSpecial-24      	   13552	     88412 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/Lowercase-24         	   15736	     76019 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/Uppercase-24         	   15748	     76029 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/Mixed-24             	   18262	     65867 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/Special-24           	   16801	     71570 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/MixedSpecial-24      	   13963	     86205 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/Number-24            	   12474	     95632 ns/op	    5024 B/op	     302 allocs/op
 //	PASS
-//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	9.914s
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	11.974s
 func BenchmarkGenerateTextWith100Length(b *testing.B) {
 	tests := []struct {
 		length   int
@@ -280,6 +287,7 @@ func BenchmarkGenerateTextWith100Length(b *testing.B) {
 		{100, rand.Mixed},
 		{100, rand.Special},
 		{100, rand.MixedSpecial},
+		{100, rand.Number},
 	}
 
 	for _, tt := range tests {
@@ -300,13 +308,14 @@ func BenchmarkGenerateTextWith100Length(b *testing.B) {
 //	goarch: amd64
 //	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
 //	cpu: AMD Ryzen 9 3900X 12-Core Processor
-//	BenchmarkGenerateTextWith500Length/Lowercase-24         	    3056	    378141 ns/op	   25027 B/op	    1502 allocs/op
-//	BenchmarkGenerateTextWith500Length/Uppercase-24         	    3061	    378357 ns/op	   25024 B/op	    1502 allocs/op
-//	BenchmarkGenerateTextWith500Length/Mixed-24             	    3512	    326301 ns/op	   25024 B/op	    1502 allocs/op
-//	BenchmarkGenerateTextWith500Length/Special-24           	    3286	    355469 ns/op	   25024 B/op	    1502 allocs/op
-//	BenchmarkGenerateTextWith500Length/MixedSpecial-24      	    2696	    428179 ns/op	   25024 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/Lowercase-24         	    3074	    380179 ns/op	   25024 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/Uppercase-24         	    3069	    381277 ns/op	   25024 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/Mixed-24             	    3506	    327678 ns/op	   25024 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/Special-24           	    3254	    356761 ns/op	   25024 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/MixedSpecial-24      	    2700	    428901 ns/op	   25024 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/Number-24            	    2452	    476670 ns/op	   25024 B/op	    1502 allocs/op
 //	PASS
-//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	5.987s
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	7.232s
 func BenchmarkGenerateTextWith500Length(b *testing.B) {
 	tests := []struct {
 		length   int
@@ -317,6 +326,7 @@ func BenchmarkGenerateTextWith500Length(b *testing.B) {
 		{500, rand.Mixed},
 		{500, rand.Special},
 		{500, rand.MixedSpecial},
+		{500, rand.Number},
 	}
 
 	for _, tt := range tests {

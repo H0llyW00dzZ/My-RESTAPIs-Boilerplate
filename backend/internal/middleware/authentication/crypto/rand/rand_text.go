@@ -15,9 +15,10 @@ import (
 const (
 	lowercaseCharset    = "abcdefghijklmnopqrstuvwxyz"
 	uppercaseCharset    = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	mixedCharset        = lowercaseCharset + uppercaseCharset + "0123456789"
+	mixedCharset        = lowercaseCharset + uppercaseCharset + numberCharset
 	specialCharset      = "!@#$%^&*()-_=+[]{}|;:,.<>?/\\"
 	mixedSpecialCharset = mixedCharset + specialCharset
+	numberCharset       = "0123456789"
 )
 
 // TextCase defines the type for specifying text case.
@@ -34,6 +35,8 @@ const (
 	Special
 	// MixedSpecial generates text using a mix of lowercase, uppercase letters, numbers, and special characters.
 	MixedSpecial
+	// Number generates text using only numeric characters.
+	Number
 )
 
 var (
@@ -96,6 +99,8 @@ func GenerateText(length int, textCase TextCase) (string, error) {
 		charset = specialCharset
 	case MixedSpecial:
 		charset = mixedSpecialCharset
+	case Number:
+		charset = numberCharset
 	default:
 		return "", ErrorsGenerateText
 	}
