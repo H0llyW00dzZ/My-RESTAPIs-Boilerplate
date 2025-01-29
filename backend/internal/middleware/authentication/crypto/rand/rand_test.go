@@ -299,6 +299,9 @@ func TestGenerateRandomText(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, tt.length, len(result))
 
+			// Log the generated text
+			t.Logf("Generated text for %s: %s", textCaseToString(tt.textCase), result)
+
 			switch tt.textCase {
 			case rand.Lowercase:
 				assert.Regexp(t, "^[a-z]+$", result)
@@ -312,7 +315,6 @@ func TestGenerateRandomText(t *testing.T) {
 				assert.Regexp(t, "^[a-zA-Z0-9!@#$%^&*()\\-_=+\\[\\]{}|;:,.<>?/\\\\]+$", result)
 			case rand.Number:
 				assert.Regexp(t, "^[0-9]+$", result)
-
 			}
 		})
 	}
