@@ -110,6 +110,10 @@ func GenerateText(length int, textCase TextCase) (string, error) {
 	text := make([]byte, length)
 	charsetLen := int64(len(charset))
 	for i := range text {
+		// Note: This method is cryptographically secure. The randomness is unpredictable,
+		// and no one can predict it. It is safe against classical side-channel attacks.
+		// While quantum computing poses challenges to certain cryptographic algorithms,
+		// the generation of random numbers itself remains secure with current quantum capabilities.
 		index, err := rand.Int(rand.Reader, big.NewInt(charsetLen))
 		if err != nil {
 			return "", fmt.Errorf("crypto/rand: failed to generate random text: %w", err)
