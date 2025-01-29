@@ -49,6 +49,10 @@ var (
 //
 // TODO: Use a map for better organization and scalability when the complexity exceeds > 14 cases (currently 10).
 func GenerateText(length int, textCase TextCase) (string, error) {
+	// This is not explicitly enforced because if a length of 1 is predictable,
+	// it's generally not a security issue. The reason it's not explicitly set,
+	// for example, with a minimum greater than 5, is that this function is used
+	// not only for strong random generation (e.g., password generation) but for other purposes as well.
 	if length <= 0 {
 		return "", fmt.Errorf("crypto/rand: length %d must be greater than 0", length)
 	}
