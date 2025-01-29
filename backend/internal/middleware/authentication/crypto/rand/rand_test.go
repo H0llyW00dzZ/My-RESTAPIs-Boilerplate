@@ -269,6 +269,8 @@ func textCaseToString(tc rand.TextCase) string {
 		return "Special"
 	case rand.MixedSpecial:
 		return "MixedSpecial"
+	case rand.Number:
+		return "Number"
 	default:
 		return "Unknown"
 	}
@@ -288,6 +290,7 @@ func TestGenerateRandomText(t *testing.T) {
 		{10, rand.Mixed},
 		{10, rand.Special},
 		{10, rand.MixedSpecial},
+		{10, rand.Number},
 	}
 
 	for _, tt := range tests {
@@ -307,6 +310,9 @@ func TestGenerateRandomText(t *testing.T) {
 				assert.Regexp(t, "^[!@#$%^&*()\\-_=+\\[\\]{}|;:,.<>?/\\\\]+$", result)
 			case rand.MixedSpecial:
 				assert.Regexp(t, "^[a-zA-Z0-9!@#$%^&*()\\-_=+\\[\\]{}|;:,.<>?/\\\\]+$", result)
+			case rand.Number:
+				assert.Regexp(t, "^[0-9]+$", result)
+
 			}
 		})
 	}
