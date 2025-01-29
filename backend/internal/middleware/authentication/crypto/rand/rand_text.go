@@ -47,7 +47,7 @@ var (
 
 // GenerateText generates a random text string of the specified length and case.
 //
-// TODO: Use a map for better organization and scalability when the complexity exceeds 14 cases (currently 10).
+// TODO: Use a map for better organization and scalability when the complexity exceeds > 14 cases (currently 10).
 func GenerateText(length int, textCase TextCase) (string, error) {
 	if length <= 0 {
 		return "", fmt.Errorf("crypto/rand: length %d must be greater than 0", length)
