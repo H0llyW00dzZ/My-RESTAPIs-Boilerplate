@@ -108,8 +108,9 @@ func GenerateText(length int, textCase TextCase) (string, error) {
 	}
 
 	text := make([]byte, length)
+	charsetLen := int64(len(charset))
 	for i := range text {
-		index, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		index, err := rand.Int(rand.Reader, big.NewInt(charsetLen))
 		if err != nil {
 			return "", fmt.Errorf("crypto/rand: failed to generate random text: %w", err)
 		}
