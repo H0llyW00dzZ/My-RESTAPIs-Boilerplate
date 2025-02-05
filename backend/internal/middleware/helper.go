@@ -1061,13 +1061,6 @@ func WithPrometheusMetricsNext(next func(c *fiber.Ctx) bool) func(*monitor.Prome
 	}
 }
 
-// WithPrometheusCacheKey is an option function for NewPrometheus that sets the cache key.
-func WithPrometheusCacheKey(cacheKey string) func(*monitor.PrometheusConfig) {
-	return func(config *monitor.PrometheusConfig) {
-		config.CacheKey = cacheKey
-	}
-}
-
 // WithRestimeHeaderName is an option function for ResponseTime that sets the header name.
 func WithRestimeHeaderName(headerName string) func(*restime.Config) {
 	return func(config *restime.Config) {

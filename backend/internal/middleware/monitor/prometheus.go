@@ -41,12 +41,6 @@ type PrometheusConfig struct {
 	// The middleware will be skipped if this function returns true.
 	// Optional. Default is nil.
 	Next func(c *fiber.Ctx) bool
-
-	// CacheKey is the cache key used for caching the Prometheus metrics.
-	// Optional. Default is an empty string.
-	//
-	// TODO: Enhance the Prometheus Portable middleware to support multiple headers for logging instead of a single header like "X-Cache".
-	CacheKey string
 }
 
 // DefaultPrometheusConfig represents the default configuration options for the Prometheus middleware.
@@ -83,10 +77,6 @@ func NewPrometheus(config ...PrometheusConfig) fiber.Handler {
 
 	if len(cfg.SkipPaths) > 0 {
 		prometheus.SetSkipPaths(cfg.SkipPaths)
-	}
-
-	if cfg.CacheKey != "" {
-		prometheus.CustomCacheKey(cfg.CacheKey)
 	}
 
 	return func(c *fiber.Ctx) error {

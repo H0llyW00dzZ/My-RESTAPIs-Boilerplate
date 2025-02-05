@@ -109,7 +109,6 @@ func registerRESTAPIsRoutes(api fiber.Router, db database.Service) {
 			// Ideally, the data should be stored in storage (e.g., disk) instead of memory. If this doesn't work, then use Next.
 			"/favicon.ico",
 		}),
-		WithPrometheusCacheKey("X-Go-Frontend"),
 		WithPrometheusMetricsPaths("/v1/server/metrics"),
 	)
 
