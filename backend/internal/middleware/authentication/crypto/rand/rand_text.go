@@ -45,23 +45,26 @@ var (
 	ErrorsGenerateText = errors.New("crypto/rand: invalid text case")
 )
 
-// charsets maps each TextCase to its corresponding character set.
-// This allows GenerateText to select the appropriate characters
-// based on the specified textCase, ensuring flexibility in generating
-// different types of random strings (e.g., lowercase, uppercase, mixed, etc.).
+// charsets is a slice that maps each TextCase to its corresponding character set.
+// This allows GenerateText to select the appropriate characters based on the specified
+// textCase, ensuring flexibility in generating different types of random strings
+// (e.g., lowercase, uppercase, mixed, etc.).
 //
-// Note: There is a trade-off in performance. Previously, using many switch cases
-// could lead to complexity issues, especially when adding more character sets.
-// However, using a map reduces complexity and improves maintainability, organization, and scalability.
-// Although there might be a slight performance decrease during benchmarking,
-// the benefits of avoiding excessive if-else or switch statements outweigh it.
-var charsets = map[TextCase]string{
-	Lowercase:    lowercaseCharset,
-	Uppercase:    uppercaseCharset,
-	Mixed:        mixedCharset,
-	Special:      specialCharset,
-	MixedSpecial: mixedSpecialCharset,
-	Number:       numberCharset,
+// Note: A slice is used here instead of a map for better performance and simplicity.
+// Since the TextCase values are small, fixed, and sequential integers (starting from 0),
+// accessing the slice by index is a constant-time operation (O(1)) and more memory-efficient
+// than a map. Additionally, the bounds check ensures safety by preventing out-of-bounds access.
+//
+// This approach avoids the complexity of using many switch or if-else statements, while
+// maintaining high performance and clear organization. It is well-suited for cases where
+// the number of TextCase values is small and fixed.
+var charsets = []string{
+	lowercaseCharset,    // Lowercase
+	uppercaseCharset,    // Uppercase
+	mixedCharset,        // Mixed
+	specialCharset,      // Special
+	mixedSpecialCharset, // MixedSpecial
+	numberCharset,       // Number
 }
 
 // GenerateText generates a random text string of the specified length and case.
@@ -74,11 +77,12 @@ func GenerateText(length int, textCase TextCase) (string, error) {
 		return "", fmt.Errorf("crypto/rand: length %d must be greater than 0", length)
 	}
 
-	charset, exists := charsets[textCase]
-	if !exists {
+	// Ensure the textCase is within bounds
+	if int(textCase) < 0 || int(textCase) >= len(charsets) {
 		return "", ErrorsGenerateText
 	}
 
+	charset := charsets[textCase]
 	text := make([]byte, length)
 	charsetLen := int64(len(charset))
 	for i := range text {
