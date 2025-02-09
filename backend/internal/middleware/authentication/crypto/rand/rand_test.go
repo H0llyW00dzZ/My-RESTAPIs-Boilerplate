@@ -345,6 +345,12 @@ func TestGenerateRandomTextInvalidInputs(t *testing.T) {
 			textCase: -1,
 			expected: "length -1 must be greater than 0",
 		},
+		{
+			name:     "Invalid TextCase (999999999999999999)",
+			length:   10,
+			textCase: 999999999999999999, // Assuming 999999999999999999 is an invalid textCase
+			expected: rand.ErrorsGenerateText.Error(),
+		},
 	}
 
 	for _, tt := range tests {
