@@ -12,16 +12,27 @@ import (
 	"math/big"
 )
 
+// Note: If these character sets are used for generating passwords or tokens, such as session tokens,
+// it is recommended to use a length of 10 to 20 characters or more. Lengths below 10 are not
+// considered secure for password or token generation.
+// For random numbers used in activation codes via email or SMS (e.g., mobile phone), a length of 10 to 20 characters
+// or more is also recommended.
+// Additionally, for activation codes sent via email or SMS (e.g., mobile phone), consider using methods similar to
+// those in 2FA (Two-Factor Authentication). The logic used in 2FA can also be applied to activation
+// codes, not just for securing logins where a 2FA code is required after entering credentials
+// like email and password or username and password.
 const (
-	lowercaseCharset    = "abcdefghijklmnopqrstuvwxyz"
-	uppercaseCharset    = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	mixedCharset        = lowercaseCharset + uppercaseCharset + numberCharset
-	specialCharset      = "!@#$%^&*()-_=+[]{}|;:,.<>?/\\"
-	mixedSpecialCharset = mixedCharset + specialCharset
-	numberCharset       = "0123456789"
-	uppernumcaseCharset = uppercaseCharset + numberCharset
-	lowernumcaseCharset = lowercaseCharset + numberCharset
-	numspecialCharset   = specialCharset + numberCharset
+	lowercaseCharset        = "abcdefghijklmnopqrstuvwxyz"
+	uppercaseCharset        = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	mixedCharset            = lowercaseCharset + uppercaseCharset + numberCharset
+	specialCharset          = "!@#$%^&*()-_=+[]{}|;:,.<>?/\\"
+	mixedSpecialCharset     = mixedCharset + specialCharset
+	numberCharset           = "0123456789"
+	uppernumcaseCharset     = uppercaseCharset + numberCharset
+	lowernumcaseCharset     = lowercaseCharset + numberCharset
+	numspecialCharset       = specialCharset + numberCharset
+	lowercasespecialCharset = lowercaseCharset + specialCharset
+	uppercasespecialCharset = uppercaseCharset + specialCharset
 )
 
 // TextCase defines the type for specifying text case.
@@ -46,6 +57,10 @@ const (
 	LowerNumCase
 	// NumSpecial generates text using a mix of numbers and special characters.
 	NumSpecial
+	// LowerCaseSpecial generates text using a mix of lowercase letters and special characters.
+	LowerCaseSpecial
+	// UpperCaseSpecial generates text using a mix of uppercase letters and special characters.
+	UpperCaseSpecial
 )
 
 var (
@@ -68,15 +83,17 @@ var (
 // maintaining high performance and clear organization. It is well-suited for cases where
 // the number of TextCase values is small and fixed.
 var charsets = []string{
-	lowercaseCharset,    // Lowercase
-	uppercaseCharset,    // Uppercase
-	mixedCharset,        // Mixed
-	specialCharset,      // Special
-	mixedSpecialCharset, // MixedSpecial
-	numberCharset,       // Number
-	uppernumcaseCharset, // UpperNumCase
-	lowernumcaseCharset, // LowerNumCase
-	numspecialCharset,   // NumSpecial
+	lowercaseCharset,        // Lowercase
+	uppercaseCharset,        // Uppercase
+	mixedCharset,            // Mixed
+	specialCharset,          // Special
+	mixedSpecialCharset,     // MixedSpecial
+	numberCharset,           // Number
+	uppernumcaseCharset,     // UpperNumCase
+	lowernumcaseCharset,     // LowerNumCase
+	numspecialCharset,       // NumSpecial
+	lowercasespecialCharset, // LowerCaseSpecial
+	uppercasespecialCharset, // UpperCaseSpecial
 }
 
 // GenerateText generates a random text string of the specified length and case.
