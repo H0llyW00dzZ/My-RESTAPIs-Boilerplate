@@ -21,6 +21,7 @@ const (
 	numberCharset       = "0123456789"
 	uppernumcaseCharset = uppercaseCharset + numberCharset
 	lowernumcaseCharset = lowercaseCharset + numberCharset
+	numspecialCharset   = specialCharset + numberCharset
 )
 
 // TextCase defines the type for specifying text case.
@@ -43,6 +44,8 @@ const (
 	UpperNumCase
 	// LowerNumCase generates text using a mix of lowercase letters and numbers.
 	LowerNumCase
+	// NumSpecial generates text using a mix of numbers and special characters.
+	NumSpecial
 )
 
 var (
@@ -73,6 +76,7 @@ var charsets = []string{
 	numberCharset,       // Number
 	uppernumcaseCharset, // UpperNumCase
 	lowernumcaseCharset, // LowerNumCase
+	numspecialCharset,   // NumSpecial
 }
 
 // GenerateText generates a random text string of the specified length and case.
