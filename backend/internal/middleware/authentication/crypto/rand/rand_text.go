@@ -57,10 +57,10 @@ const (
 	LowerNumCase
 	// NumSpecial generates text using a mix of numbers and special characters.
 	NumSpecial
-	// LowerCaseSpecial generates text using a mix of lowercase letters and special characters.
-	LowerCaseSpecial
-	// UpperCaseSpecial generates text using a mix of uppercase letters and special characters.
-	UpperCaseSpecial
+	// LowercaseSpecial generates text using a mix of lowercase letters and special characters.
+	LowercaseSpecial
+	// UppercaseSpecial generates text using a mix of uppercase letters and special characters.
+	UppercaseSpecial
 )
 
 var (
@@ -92,8 +92,8 @@ var charsets = []string{
 	uppernumcaseCharset,     // UpperNumCase
 	lowernumcaseCharset,     // LowerNumCase
 	numspecialCharset,       // NumSpecial
-	lowercasespecialCharset, // LowerCaseSpecial
-	uppercasespecialCharset, // UpperCaseSpecial
+	lowercasespecialCharset, // LowercaseSpecial
+	uppercasespecialCharset, // UppercaseSpecial
 }
 
 // GenerateText generates a random text string of the specified length and case.

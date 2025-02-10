@@ -277,10 +277,10 @@ func textCaseToString(tc rand.TextCase) string {
 		return "LowerNumCase"
 	case rand.NumSpecial:
 		return "NumSpecial"
-	case rand.LowerCaseSpecial:
-		return "LowerCaseSpecial"
-	case rand.UpperCaseSpecial:
-		return "UpperCaseSpecial"
+	case rand.LowercaseSpecial:
+		return "LowercaseSpecial"
+	case rand.UppercaseSpecial:
+		return "UppercaseSpecial"
 	default:
 		return "Unknown"
 	}
@@ -304,8 +304,8 @@ func TestGenerateRandomText(t *testing.T) {
 		{10, rand.UpperNumCase},
 		{10, rand.LowerNumCase},
 		{10, rand.NumSpecial},
-		{10, rand.LowerCaseSpecial},
-		{10, rand.UpperCaseSpecial},
+		{10, rand.LowercaseSpecial},
+		{10, rand.UppercaseSpecial},
 	}
 
 	for _, tt := range tests {
@@ -336,9 +336,9 @@ func TestGenerateRandomText(t *testing.T) {
 				assert.Regexp(t, "^[a-z0-9]+$", result)
 			case rand.NumSpecial:
 				assert.Regexp(t, "^[0-9!@#$%^&*()\\-_=+\\[\\]{}|;:,.<>?/\\\\]+$", result)
-			case rand.LowerCaseSpecial:
+			case rand.LowercaseSpecial:
 				assert.Regexp(t, "^[a-z!@#$%^&*()\\-_=+\\[\\]{}|;:,.<>?/\\\\]+$", result)
-			case rand.UpperCaseSpecial:
+			case rand.UppercaseSpecial:
 				assert.Regexp(t, "^[A-Z!@#$%^&*()\\-_=+\\[\\]{}|;:,.<>?/\\\\]+$", result)
 			}
 		})
