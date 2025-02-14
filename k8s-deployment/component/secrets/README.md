@@ -2,7 +2,7 @@
 
 <p align="center">
    <img src="https://kubernetes.io/images/kubernetes.png" alt="sailing-with-k8s" width="80">
-   <img src="https://raw.githubusercontent.com/kubernetes/community/refs/heads/master/icons/png/resources/labeled/secret-128.png" alt="The-Black-Pearl" width="80">
+   <img src="https://raw.githubusercontent.com/kubernetes/community/refs/heads/master/icons/png/resources/labeled/secret-128.png" alt="The-Black-Pearl-Tool-Secret" width="80">
 </p>
 
 A simple Bash script to generate Kubernetes secrets from a file containing `key=value` pairs. This tool automates the creation of Kubernetes secrets, encoding values with `base64` (automatically handled by `kubectl`) and ensuring compatibility with Kubernetes clusters that support Hardware Security Modules (HSM).
