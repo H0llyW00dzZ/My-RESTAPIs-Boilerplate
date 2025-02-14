@@ -801,6 +801,200 @@ Using a boilerplate for a game panel in Kubernetes is **indeed possible** and ca
 >
 > - It may have built-in support for Sourcemod (e.g., https://www.sourcemod.net/)
 
+
+### Attach Storage for Logs with Fiber Middleware Logger in Kubernetes
+
+When deploying this boilerplate with a fiber middleware logger in Kubernetes, and you plan to store logs in files backed by attached storage, here are some essential tips to ensure scalability, reliability, and proper configuration:
+
+---
+
+#### **1. Use `ReadWriteMany` (RWX) Storage Class**
+- Ensure the attached storage supports **ReadWriteMany (RWX)** access mode. This is crucial when running multiple replicas (pods) of your application, as all pods need to write logs to the same shared storage.
+- Most cloud providers offer storage classes with RWX support, such as **NFS** or **GlusterFS**.
+
+#### **2. Ensure Unique Log File Names**
+- When running multiple pods, each pod should write to a unique log file to avoid conflicts. You can achieve this by including a unique identifier in the log file name, such as:
+  - A **UUID** generated at runtime.
+  - The **Pod Name** retrieved from the Kubernetes Downward API.
+  - A **Timestamp** appended to the log file name.
+
+##### Example for Fiber Middleware Logger:
+```go
+diskStorageFiberLog := fmt.Sprintf("%s/app_%s.log", diskStorageFiberLogDir, utils.UUIDv4())
+```
+
+Alternatively, you can use the pod name:
+```go
+podName := os.Getenv("POD_NAME") // Set via Kubernetes Downward API
+diskStorageFiberLog := fmt.Sprintf("%s/app_%s.log", diskStorageFiberLogDir, podName)
+```
+
+#### **3. Configure Persistent Volume and Persistent Volume Claim**
+- Use a **Persistent Volume (PV)** and **Persistent Volume Claim (PVC)** to attach storage to your pods. Ensure the PV supports RWX mode.
+
+##### Example PVC Configuration:
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: logs-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: nfs-storage
+```
+
+##### Example Pod Volume Mount:
+```yaml
+spec:
+  containers:
+  - name: restapis-app
+    image: your-restapis-app-image
+    volumeMounts:
+    - name: logs-volume
+      mountPath: /var/log/app
+  volumes:
+  - name: logs-volume
+    persistentVolumeClaim:
+      claimName: logs-pvc
+```
+
+---
+
+#### **4. Archive Old Logs**
+- Use a log archiving mechanism to prevent the log directory from filling up. For example:
+  - Monitor log file size and archive it when it exceeds a certain threshold.
+  - Move archived logs to a separate directory for long-term storage.
+
+##### Example Archiving Configuration:
+- Define a maximum log file size and check interval, as implemented in your Fiber middleware logger:
+```go
+configArchive := archive.Config{
+    MaxSize:       10 * 1024 * 1024, // 10MB
+    CheckInterval: 1 * time.Minute,
+}
+archive.Do(file.Name(), "/var/log/app/archives", configArchive)
+```
+
+---
+
+#### **5. Use Kubernetes Downward API for Metadata**
+- Use Kubernetes Downward API to inject pod-specific metadata (e.g., pod name, namespace) into the application. This can help identify which pod generated a specific log file.
+
+##### Example Deployment with Downward API:
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: restapis-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: restapis-app
+  template:
+    metadata:
+      labels:
+        app: restapis-app
+    spec:
+      containers:
+      - name: restapis-app
+        image: your-restapis-app-image
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        volumeMounts:
+        - name: logs-volume
+          mountPath: /var/log/app
+      volumes:
+      - name: logs-volume
+        persistentVolumeClaim:
+          claimName: logs-pvc
+```
+
+---
+
+#### **6. Monitor and Rotate Logs**
+- Implement log rotation to prevent excessive disk usage. Use tools like `logrotate` or configure the application to handle log rotation programmatically.
+- Example: Use Fiber logger middleware with a custom log rotation mechanism (as shown in your implementation).
+
+---
+
+#### **7. Alternative: Centralized Logging**
+- If managing log files in shared storage becomes complex, consider using a centralized logging solution like **ELK Stack (Elasticsearch, Logstash, Kibana)** or **Loki + Grafana**. These solutions collect logs from all pods and store them in a centralized location, eliminating the need for shared storage.
+
+---
+
+#### **8. Example: Complete Log Storage Setup**
+Below is a complete example of setting up attached storage for logs in a Kubernetes deployment:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: restapis-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: restapis-app
+  template:
+    metadata:
+      labels:
+        app: restapis-app
+    spec:
+      containers:
+      - name: restapis-app
+        image: your-restapis-app-image
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        volumeMounts:
+        - name: logs-volume
+          mountPath: /var/log/app
+      volumes:
+      - name: logs-volume
+        persistentVolumeClaim:
+          claimName: logs-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: logs-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: nfs-storage
+```
+
+---
+
+### Key Considerations:
+- **ReadWriteMany (RWX) Storage**: Ensure the storage backend supports RWX (e.g., NFS, GlusterFS).
+- **Unique Log File Names**: Use UUIDs, pod names, or timestamps to ensure unique log files.
+- **Log Rotation and Archiving**: Implement log rotation to manage storage usage.
+- **Centralized Logging (Optional)**: Consider centralized logging for large-scale deployments.
+
+By following these tips, you can effectively manage logs in a Kubernetes environment, navigating your fleet of pods like the best sailors. This setup ensures scalability, reliability, and efficient log management for this REST APIs application.
+
 ## Compatibility
 
 ### Ingress Nginx Session/Cookie:
