@@ -14,14 +14,17 @@
 #                        also note that it cannot be fixed with regular expressions due it bash problem (even it's possible, it just too complex), It might work-wells in unix-shellz.
 
 echo "$(tput setaf 4)
-    _  __     _                          _            
-   | |/ /    | |                        | |           
-   | ' /_   _| |__   ___ _ __ _ __   ___| |_ ___  ___ 
-   |  <| | | | '_ \ / _ \ '__| '_ \ / _ \ __/ _ \/ __|
-   | . \ |_| | |_) |  __/ |  | | | |  __/ ||  __/\__ \\
-   |_|\_\__,_|_.__/ \___|_|  |_| |_|\___|\__\___||___/
-                                       
-              $(tput sgr0) A Secret Tools Generator by H0llyW00dz
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣼⣧⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠺⣦⣀⣠⣴⡿⠟⠛⣻⣟⠛⠻⢿⣦⣀⣀⡴⠗⠀⠀⠀⠀⠀ _  __     _                          _            
+⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣯⡀⠀⠀⣿⣿⠀⠀⢀⣽⣿⣿⠀⠀⠀⠀⠀⠀⠀| |/ /    | |                        | |           
+⠀⠀⠀⠀⠀⠀⠀⣸⡿⠁⠙⢿⣷⣤⣿⣿⣤⣾⡿⠋⠈⢿⣇⠀⠀⠀⠀⠀⠀| ' /_   _| |__   ___ _ __ _ __   ___| |_ ___  ___ 
+⠀⠀⠀⠀⠀⠀⠀⣿⡇⠀⢀⣀⣿⣿⠉⠉⣿⣿⣀⡀⠀⢸⣿⠀⠀⠀⠀⠀⠀|  <| | | | '_ \ / _ \ '__| '_ \ / _ \ __/ _ \/ __|
+⠀⠀⠀⠀⣀⣀⣤⣿⣿⠿⠿⠟⠻⣿⣶⣶⣿⠟⠻⠿⠿⣿⣿⣤⣀⣀⠀⠀⠀| . \ |_| | |_) |  __/ |  | | | |  __/ ||  __/\__ \\
+⠀⠀⠀⠀⠉⠁⠀⠘⣿⣆⠀⠀⣰⣿⠏⠙⣿⣆⠀⠀⣰⣿⠃⠀⠈⠉⠀⠀⠀|_|\_\__,_|_.__/ \___|_|  |_| |_|\___|\__\___||___/
+⠀⠀⠀⠀⠀⠀⠀⠀⠈⢿⣷⣤⣿⠃⠀⠀⠘⣿⣦⣾⡿⠃⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡿⠿⠿⣷⣾⠿⠿⢿⡁⠀⠀⠀⠀⠀⠀⠀⠀⠀ $(tput sgr0)A Secret Tools Generator by H0llyW00dz
+$(tput setaf 4)⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⠁⠀⠀⠀⠀⠀⠀⠈⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀$(tput sgr0)
 
 $(tput setaf 3)  Note: The format must be like 'key=value' in the secret file (e.g., .env). Run it where kubectl is installed.
         When your Kubernetes cluster has an HSM, it will be encrypted as well. Also note that regarding capabilities,
