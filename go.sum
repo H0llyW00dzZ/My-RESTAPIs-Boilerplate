@@ -199,8 +199,8 @@ github.com/hashicorp/vault/api v1.16.0 h1:nbEYGJiAPGzT9U4oWgaaB0g+Rj8E59QuHKyA5L
 github.com/hashicorp/vault/api v1.16.0/go.mod h1:KhuUhzOD8lDSk29AtzNjgAu2kxRA9jL9NAbkFlqvkBA=
 github.com/hashicorp/vault/api/auth/approle v0.9.0 h1:FdpspwGVWnGiWmAxd5L1Yd+T+fX2kYnyAIvI5oGdvNs=
 github.com/hashicorp/vault/api/auth/approle v0.9.0/go.mod h1:fvtJhBs3AYMs2fXk4U5+u+7unhUGuboiKzFpLPpIazw=
-github.com/heroku/x v0.4.1 h1:pndIhWqkqQ1e3qnpPz8+I7hNW5Yoge4llpOenhIJSm0=
-github.com/heroku/x v0.4.1/go.mod h1:3Ji2zMA37qO4BK/4yzXvjlDIUdeXJvArUm2PB0ZEW5g=
+github.com/heroku/x v0.4.3 h1:HF1P4Mu79BKDVk4pt+oRDpcOSTRTpHq28RYAOkuJmds=
+github.com/heroku/x v0.4.3/go.mod h1:htQnSDQPP7rNbrOQ8rczL7tbdNtQHXCPoSxYomu+eI8=
 github.com/holiman/billy v0.0.0-20240216141850-2abb0c79d3c4 h1:X4egAf/gcS1zATw6wn4Ej8vjuVGxeHdan+bRb2ebyv4=
 github.com/holiman/billy v0.0.0-20240216141850-2abb0c79d3c4/go.mod h1:5GuXa7vkL8u9FkFuWdVvfR5ix8hRB7DbOAaYULamFpc=
 github.com/holiman/bloomfilter/v2 v2.0.3 h1:73e0e/V0tCydx14a0SCYS/EWCxgwLZ18CZcZKVu0fao=
