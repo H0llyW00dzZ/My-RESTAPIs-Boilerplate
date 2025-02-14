@@ -34,7 +34,7 @@ A simple Bash script to generate Kubernetes secrets from a file containing `key=
    chmod +x create_k8s_secret.sh
    ```
 
-2. (Optional) Install `dos2unix` to ensure the script has proper Unix line endings:
+2. (Optional) Install `dos2unix` to ensure the script and input files have proper Unix line endings:
    ```bash
    sudo apt update
    sudo apt install dos2unix
@@ -61,13 +61,15 @@ A simple Bash script to generate Kubernetes secrets from a file containing `key=
 
 ## Input File Format
 
-The input file must be formatted as `key=value` pairs, one per line. For example:
+The input file must be formatted as `key=value` pairs, one per line, using **LF (Unix-style)** line endings. For example:
 
 ```env
 DATABASE_URL=postgres://user:password@host:5432/dbname
 API_KEY=your-api-key
 SECRET_TOKEN=your-secret-token
 ```
+
+If your file uses **CRLF (Windows-style)** line endings, you must convert it to LF using a tool like `dos2unix` before running the script. See the **Troubleshooting** section for more details.
 
 ---
 
@@ -104,7 +106,7 @@ SECRET_TOKEN=your-secret-token
 
 - **Unsupported Value Formats**: Certain complex value formats (e.g., `key=value-value:value%!@value`) may cause issues due to Bash limitations.
 - **Empty Lines**: Empty lines in the input file are skipped.
-- **Windows Line Endings**: If the script was created or edited on Windows, ensure it has Unix-style line endings using `dos2unix`.
+- **Windows Line Endings**: If the input file was created or edited on Windows, ensure it uses Unix-style line endings (`LF`) instead of Windows-style (`CRLF`).
 
 ---
 
@@ -122,3 +124,25 @@ Ensure `kubectl` is installed and configured:
 sudo apt install -y kubectl
 kubectl config view
 ```
+
+### Incorrect Secret Values or Newline Issues
+If the secret values in your Kubernetes secret contain unintended newlines or the script fails to process the input file correctly, verify that the input file uses **LF (Unix-style)** line endings. Files created or edited on Windows often use **CRLF (Windows-style)** line endings, which can cause issues.
+
+To convert the file to LF, use the `dos2unix` tool:
+```bash
+dos2unix .env
+```
+
+After conversion, ensure the file looks correct:
+```bash
+cat -e .env
+```
+
+The output should show `$` at the end of each line, indicating proper LF line endings. For example:
+```bash
+DB_USER=admin$
+DB_PASSWORD=supersecret$
+API_TOKEN=abcdef123456$
+```
+
+If you still encounter issues, check for unintended newlines in the values and remove them using `tr` or similar tools.
