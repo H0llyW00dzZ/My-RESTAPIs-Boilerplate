@@ -19,7 +19,7 @@ require (
 	github.com/gofiber/storage/redis/v3 v3.1.3
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/vault/api v1.16.0
-	github.com/hashicorp/vault/api/auth/approle v0.8.0
+	github.com/hashicorp/vault/api/auth/approle v0.9.0
 	github.com/heroku/x v0.4.1
 	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-colorable v0.1.14
