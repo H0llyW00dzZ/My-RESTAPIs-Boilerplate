@@ -1086,6 +1086,25 @@ Evaluate your application's requirements and the capabilities of the Fiber frame
 >
 > However, for other cloud providers, I don't have extensive experience or knowledge to provide specific insights.
 
+### Kubernetes Version:
+
+> [!IMPORTANT]
+> Always use the latest version of Kubernetes. Older versions may cause issues such as container runtime failures (dead), leading to pods not initializing correctly or other unexpected behavior.
+> For example:
+>
+> ```terminal
+> h0llyw00dzz@ubuntu-pro:~/Workspace$ kubectl get pods
+> NAME                     READY   STATUS            RESTARTS   AGE
+> b0zal-5767679986-hx4c4   0/1     PodInitializing   0          5s
+> h0llyw00dzz@ubuntu-pro:~/Workspace$ kubectl get pods
+> NAME                     READY   STATUS    RESTARTS   AGE
+> b0zal-5767679986-hx4c4   1/1     Running   0          9s
+> h0llyw00dzz@ubuntu-pro:~/Workspace$ kubectl logs b0zal-5767679986-hx4c4 
+> Defaulted container "b0zal" out of: b0zal, chown (init)
+> h0llyw00dzz@ubuntu-pro:~/Workspace$ 
+> ```
+> It didn't show anything. However, when run locally, whether in a container or not, it works properly. If you encounter this issue, you might need to rebuild the cluster.
+
 ## Compliance
 
 This boilerplate is compliant with autoscaling features in various cloud providers. For example:
