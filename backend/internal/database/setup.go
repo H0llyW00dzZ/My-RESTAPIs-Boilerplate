@@ -9,6 +9,7 @@
 package database
 
 import (
+	"context"
 	"crypto/tls"
 	"database/sql"
 	"fmt"
@@ -207,7 +208,14 @@ func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
 	db.SetMaxIdleConns(50) // Maximum number of connections in the idle connection pool.
 	db.SetMaxOpenConns(50) // Maximum number of open connections to the database.
 
-	if err = db.Ping(); err != nil {
+	// Set a timeout for the Ping operation.
+	//
+	// TODO: Use an environment variable to customize the timeout (e.g., "10*time.Second").
+	// For now, explicitly setting it to 10 seconds should be sufficient, as it is only used during initialization to avoid runtime confusion.
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err = db.PingContext(ctx); err != nil {
 		return nil, err
 	}
 	return db, nil
