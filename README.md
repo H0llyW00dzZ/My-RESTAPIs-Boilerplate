@@ -574,9 +574,9 @@ git clone https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate.git
 > Note that The `Git Protocol SSH` is currently disabled because the new load balancer is not functioning properly with the TCP service in ingress-nginx (not security issues related CVE vulnerabilities). Rest assured, the git mirror is secure and respects privacy (100%), as it runs on my cluster (very secure) used for development, sandbox, and production. You can explore other repositories [here](https://git.b0zal.io/explore/repos).
 
 > [!TIP]
-> For those in `Indonesia`, if you are unable to clone repositories (e.g., using `git clone`) from the [`Git Mirror (Auto Synced)`](https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate.git), try using a VPN. This issue may be related to the new load balancer, which could be blocked (by internet provider) or filtered by my firewall mechanism.
+> For those in `Indonesia`, you should now be able to clone repositories (e.g., using `git clone`) from the [`Git Mirror (Auto Synced)`](https://git.b0zal.io/H0llyW00dzZ/My-RESTAPIs-Boilerplate.git) without needing a VPN. The issue has been fixed, ensuring seamless access.
 >
-> It is also more faster + latency never going high (average `5ms ~ 30ms` for Country `ID, MY, SG`) with the new load balancer, even when using a VPN (`e.g., VPN in Singapore, Indonesia, Malaysia, and other APAC regions`), and this improvement applies to both `mobile devices and desktops`, which incorporate [`Elliptic Curve Cryptography (ECC)`](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography) for `HTTPS/TLS`.
+> The new load balancer provides faster speeds and low latency (average `5ms ~ 30ms` for countries like `ID, MY, SG`). This improvement applies to both `mobile devices and desktops`, utilizing [`Elliptic Curve Cryptography (ECC)`](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography) for `HTTPS/TLS`.
 
 # Supported Architectures
 
