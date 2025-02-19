@@ -926,6 +926,8 @@ spec:
         persistentVolumeClaim:
           claimName: logs-pvc
 ```
+> [!TIP]
+> In Kubernetes, you can leverage the Downward API for Go applications. I've personally used this to sync with my container (over 1,000+++ Go files (full-stack), with memory usage under 400 MiB) for web backend/REST APIs (e.g., health check mechanisms and managing traffic, etc).
 
 ---
 
