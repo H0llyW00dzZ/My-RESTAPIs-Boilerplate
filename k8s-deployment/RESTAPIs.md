@@ -812,6 +812,8 @@ When deploying this boilerplate with a fiber middleware logger in Kubernetes, an
 - Ensure the attached storage supports **ReadWriteMany (RWX)** access mode. This is crucial when running multiple replicas (pods) of your application, as all pods need to write logs to the same shared storage.
 - Most cloud providers offer storage classes with RWX support, such as **NFS** or **GlusterFS**.
 
+---
+
 #### **2. Ensure Unique Log File Names**
 - When running multiple pods, each pod should write to a unique log file to avoid conflicts. You can achieve this by including a unique identifier in the log file name, such as:
   - A **UUID** generated at runtime.
@@ -828,6 +830,7 @@ Alternatively, you can use the pod name:
 podName := os.Getenv("POD_NAME") // Set via Kubernetes Downward API
 diskStorageFiberLog := fmt.Sprintf("%s/app_%s.log", diskStorageFiberLogDir, podName)
 ```
+---
 
 #### **3. Configure Persistent Volume and Persistent Volume Claim**
 - Use a **Persistent Volume (PV)** and **Persistent Volume Claim (PVC)** to attach storage to your pods. Ensure the PV supports RWX mode.
