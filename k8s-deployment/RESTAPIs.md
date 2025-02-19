@@ -862,6 +862,9 @@ spec:
       claimName: logs-pvc
 ```
 
+> [!NOTE]
+> The configuration of Persistent Volumes and Persistent Volume Claims depends on the cloud provider. The above example is for demonstration purposes only and should not be used in production, as it utilizes ephemeral storage (temporary storage). For instance, if your Kubernetes is hosted on `GKE` or `AKS`, which I have personally tested before, they offer storage resources that support `ReadWriteMany (RWX)`. However, some providers, like `DOKS`, do not support the `ReadWriteMany (RWX)` storage class. When your cloud provider supports `ReadWriteMany (RWX)` storage, you can request storage using a `PersistentVolumeClaim` YAML file.
+
 ---
 
 #### **4. Archive Old Logs**
