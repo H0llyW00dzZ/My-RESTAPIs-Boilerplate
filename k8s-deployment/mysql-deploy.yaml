@@ -23,6 +23,12 @@ data:
   # Note: This can be customized, and you can also replace the data directory (see "datadir=/gopher/mysql/data", "/gopher/mysql/data/general.log",
   # "/gopher/mysql/data/slow.log", /gopher/mysql/error.log) Also, the MySQL Logger is not stored in ephemeral storage; it is stored in a PVC (Persistent Volume Claim)
   # for security and safety from compromise.
+  #
+  # Regarding MySQLTLS and "certificate.cer", it is the server leaf certificate without chaining.
+  # In MySQL for SSL/TLS (referred to as MySQLTLS because MySQL uses its own protocol for TLS, not SSL, as TLS and SSL are different),
+  # it won't work with TLS certificates typically used for HTTPS (full chain). So, it must be split into two parts: one leaf certificate
+  # and the other, "ECC.crt", as the CA certificate (used for issuing the leaf certificate) with the chaining root CA (used for issuing the CA certificate).
+  # The ECC "ECC.crt" certificate is the CA certificate issued by the Root CA.
   mysql-args.conf: |
     [mysqld]
     ssl-cert=/etc/mysql/tls/certificate.cer
