@@ -152,12 +152,12 @@ func BenchmarkFixedSizeECC(b *testing.B) {
 //	goarch: amd64
 //	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
 //	cpu: AMD Ryzen 9 3900X 12-Core Processor
-//	BenchmarkGenerateTextWith10Length/Lowercase-24         	  152569	      7684 ns/op	     512 B/op	      32 allocs/op
-//	BenchmarkGenerateTextWith10Length/Uppercase-24         	  153183	      7663 ns/op	     512 B/op	      32 allocs/op
-//	BenchmarkGenerateTextWith10Length/Mixed-24             	  176103	      6646 ns/op	     512 B/op	      32 allocs/op
-//	BenchmarkGenerateTextWith10Length/Special-24           	  163130	      7227 ns/op	     512 B/op	      32 allocs/op
-//	BenchmarkGenerateTextWith10Length/MixedSpecial-24      	  135039	      8666 ns/op	     512 B/op	      32 allocs/op
-//	BenchmarkGenerateTextWith10Length/Number-24            	  122524	      9646 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/Lowercase-24         	  641248	      1639 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/Uppercase-24         	  726758	      1634 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/Mixed-24             	  778693	      1518 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/Special-24           	  709845	      1592 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/MixedSpecial-24      	  620727	      1747 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/Number-24            	  604453	      1859 ns/op	     512 B/op	      32 allocs/op
 //	PASS
 //	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	7.550s
 func BenchmarkGenerateTextWith10Length(b *testing.B) {
@@ -175,9 +175,8 @@ func BenchmarkGenerateTextWith10Length(b *testing.B) {
 
 	for _, tt := range tests {
 		b.Run(textCaseToString(tt.textCase), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				_, err := rand.GenerateText(tt.length, tt.textCase)
-				if err != nil {
+			for b.Loop() {
+				if _, err := rand.GenerateText(tt.length, tt.textCase); err != nil {
 					b.Fatalf("unexpected error: %v", err)
 				}
 			}
@@ -191,12 +190,12 @@ func BenchmarkGenerateTextWith10Length(b *testing.B) {
 //	goarch: amd64
 //	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
 //	cpu: AMD Ryzen 9 3900X 12-Core Processor
-//	BenchmarkGenerateTextWith25Length/Lowercase-24         	   62409	     19039 ns/op	    1264 B/op	      77 allocs/op
-//	BenchmarkGenerateTextWith25Length/Uppercase-24         	   62414	     19094 ns/op	    1264 B/op	      77 allocs/op
-//	BenchmarkGenerateTextWith25Length/Mixed-24             	   71863	     16410 ns/op	    1264 B/op	      77 allocs/op
-//	BenchmarkGenerateTextWith25Length/Special-24           	   66769	     17901 ns/op	    1264 B/op	      77 allocs/op
-//	BenchmarkGenerateTextWith25Length/MixedSpecial-24      	   54975	     21632 ns/op	    1264 B/op	      77 allocs/op
-//	BenchmarkGenerateTextWith25Length/Number-24            	   49626	     23905 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/Lowercase-24         	  275292	      4071 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/Uppercase-24         	  297151	      4043 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/Mixed-24             	  319545	      3739 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/Special-24           	  302397	      3921 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/MixedSpecial-24      	  272220	      4332 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/Number-24            	  256512	      4630 ns/op	    1264 B/op	      77 allocs/op
 //	PASS
 //	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	8.347s
 func BenchmarkGenerateTextWith25Length(b *testing.B) {
@@ -214,9 +213,8 @@ func BenchmarkGenerateTextWith25Length(b *testing.B) {
 
 	for _, tt := range tests {
 		b.Run(textCaseToString(tt.textCase), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				_, err := rand.GenerateText(tt.length, tt.textCase)
-				if err != nil {
+			for b.Loop() {
+				if _, err := rand.GenerateText(tt.length, tt.textCase); err != nil {
 					b.Fatalf("unexpected error: %v", err)
 				}
 			}
@@ -230,12 +228,12 @@ func BenchmarkGenerateTextWith25Length(b *testing.B) {
 //	goarch: amd64
 //	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
 //	cpu: AMD Ryzen 9 3900X 12-Core Processor
-//	BenchmarkGenerateTextWith50Length/Lowercase-24         	   31603	     38002 ns/op	    2528 B/op	     152 allocs/op
-//	BenchmarkGenerateTextWith50Length/Uppercase-24         	   31491	     38100 ns/op	    2528 B/op	     152 allocs/op
-//	BenchmarkGenerateTextWith50Length/Mixed-24             	   36438	     32906 ns/op	    2528 B/op	     152 allocs/op
-//	BenchmarkGenerateTextWith50Length/Special-24           	   33471	     35800 ns/op	    2528 B/op	     152 allocs/op
-//	BenchmarkGenerateTextWith50Length/MixedSpecial-24      	   27567	     42972 ns/op	    2528 B/op	     152 allocs/op
-//	BenchmarkGenerateTextWith50Length/Number-24            	   25027	     48102 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/Lowercase-24         	  145754	      8023 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/Uppercase-24         	  147306	      8034 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/Mixed-24             	  159758	      7436 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/Special-24           	  152212	      7763 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/MixedSpecial-24      	  139192	      8579 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/Number-24            	  131802	      9084 ns/op	    2528 B/op	     152 allocs/op
 //	PASS
 //	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	9.586s
 func BenchmarkGenerateTextWith50Length(b *testing.B) {
@@ -253,9 +251,8 @@ func BenchmarkGenerateTextWith50Length(b *testing.B) {
 
 	for _, tt := range tests {
 		b.Run(textCaseToString(tt.textCase), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				_, err := rand.GenerateText(tt.length, tt.textCase)
-				if err != nil {
+			for b.Loop() {
+				if _, err := rand.GenerateText(tt.length, tt.textCase); err != nil {
 					b.Fatalf("unexpected error: %v", err)
 				}
 			}
@@ -269,12 +266,12 @@ func BenchmarkGenerateTextWith50Length(b *testing.B) {
 //	goarch: amd64
 //	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
 //	cpu: AMD Ryzen 9 3900X 12-Core Processor
-//	BenchmarkGenerateTextWith100Length/Lowercase-24         	   15736	     76019 ns/op	    5024 B/op	     302 allocs/op
-//	BenchmarkGenerateTextWith100Length/Uppercase-24         	   15748	     76029 ns/op	    5024 B/op	     302 allocs/op
-//	BenchmarkGenerateTextWith100Length/Mixed-24             	   18262	     65867 ns/op	    5024 B/op	     302 allocs/op
-//	BenchmarkGenerateTextWith100Length/Special-24           	   16801	     71570 ns/op	    5024 B/op	     302 allocs/op
-//	BenchmarkGenerateTextWith100Length/MixedSpecial-24      	   13963	     86205 ns/op	    5024 B/op	     302 allocs/op
-//	BenchmarkGenerateTextWith100Length/Number-24            	   12474	     95632 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/Lowercase-24         	   73147	     16147 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/Uppercase-24         	   74023	     16136 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/Mixed-24             	   80100	     14843 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/Special-24           	   76915	     15583 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/MixedSpecial-24      	   68668	     17290 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/Number-24            	   64477	     18476 ns/op	    5024 B/op	     302 allocs/op
 //	PASS
 //	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	11.974s
 func BenchmarkGenerateTextWith100Length(b *testing.B) {
@@ -292,9 +289,8 @@ func BenchmarkGenerateTextWith100Length(b *testing.B) {
 
 	for _, tt := range tests {
 		b.Run(textCaseToString(tt.textCase), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				_, err := rand.GenerateText(tt.length, tt.textCase)
-				if err != nil {
+			for b.Loop() {
+				if _, err := rand.GenerateText(tt.length, tt.textCase); err != nil {
 					b.Fatalf("unexpected error: %v", err)
 				}
 			}
@@ -308,12 +304,12 @@ func BenchmarkGenerateTextWith100Length(b *testing.B) {
 //	goarch: amd64
 //	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
 //	cpu: AMD Ryzen 9 3900X 12-Core Processor
-//	BenchmarkGenerateTextWith500Length/Lowercase-24         	    3074	    380179 ns/op	   25024 B/op	    1502 allocs/op
-//	BenchmarkGenerateTextWith500Length/Uppercase-24         	    3069	    381277 ns/op	   25024 B/op	    1502 allocs/op
-//	BenchmarkGenerateTextWith500Length/Mixed-24             	    3506	    327678 ns/op	   25024 B/op	    1502 allocs/op
-//	BenchmarkGenerateTextWith500Length/Special-24           	    3254	    356761 ns/op	   25024 B/op	    1502 allocs/op
-//	BenchmarkGenerateTextWith500Length/MixedSpecial-24      	    2700	    428901 ns/op	   25024 B/op	    1502 allocs/op
-//	BenchmarkGenerateTextWith500Length/Number-24            	    2452	    476670 ns/op	   25024 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/Lowercase-24         	   15006	     79826 ns/op	   25025 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/Uppercase-24         	   15014	     79825 ns/op	   25024 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/Mixed-24             	   16274	     73732 ns/op	   25024 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/Special-24           	   15488	     77354 ns/op	   25024 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/MixedSpecial-24      	   14090	     85175 ns/op	   25024 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/Number-24            	   13257	     90534 ns/op	   25024 B/op	    1502 allocs/op
 //	PASS
 //	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	7.232s
 func BenchmarkGenerateTextWith500Length(b *testing.B) {
@@ -331,9 +327,8 @@ func BenchmarkGenerateTextWith500Length(b *testing.B) {
 
 	for _, tt := range tests {
 		b.Run(textCaseToString(tt.textCase), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				_, err := rand.GenerateText(tt.length, tt.textCase)
-				if err != nil {
+			for b.Loop() {
+				if _, err := rand.GenerateText(tt.length, tt.textCase); err != nil {
 					b.Fatalf("unexpected error: %v", err)
 				}
 			}
