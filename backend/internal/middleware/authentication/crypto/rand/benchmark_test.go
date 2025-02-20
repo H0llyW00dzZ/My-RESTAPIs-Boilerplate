@@ -59,8 +59,7 @@ func BenchmarkFixedSize32Bytes(b *testing.B) {
 	reader := rand.FixedSize32Bytes()
 	buf := make([]byte, 32)
 
-	b.ResetTimer() // Reset the timer to exclude setup time
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		if _, err := reader.Read(buf); err != nil {
 			b.Fatal(err)
 		}
@@ -83,8 +82,7 @@ func BenchmarkFixedSizeECDSA(b *testing.B) {
 			}
 			buf := make([]byte, expectedSize)
 
-			b.ResetTimer() // Reset the timer to exclude setup time
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				if _, err := reader.Read(buf); err != nil {
 					b.Fatal(err)
 				}
@@ -136,8 +134,7 @@ func BenchmarkFixedSizeECC(b *testing.B) {
 			byteSize := (curve.Params().BitSize + 7) / 8
 			buf := make([]byte, byteSize)
 
-			b.ResetTimer() // Reset the timer to exclude setup time
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				if _, err := reader.Read(buf); err != nil {
 					b.Fatal(err)
 				}
