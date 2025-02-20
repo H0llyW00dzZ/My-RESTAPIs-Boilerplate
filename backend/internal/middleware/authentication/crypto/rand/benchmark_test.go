@@ -23,7 +23,7 @@
 //	goarch: amd64
 //	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
 //	cpu: Intel(R) Core(TM) i9-10980HK CPU @ 2.40GHz
-//	BenchmarkFixedSize32Bytes-16    	 6492642	       191.1 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSize32Bytes-16		    	 6492642	       191.1 ns/op	       0 B/op	       0 allocs/op
 //	BenchmarkFixedSizeECDSA/P-256-16         	 6795412	       184.9 ns/op	       0 B/op	       0 allocs/op
 //	BenchmarkFixedSizeECDSA/P-384-16         	 5626008	       214.1 ns/op	       0 B/op	       0 allocs/op
 //	BenchmarkFixedSizeECDSA/P-521-16         	 5705864	       211.9 ns/op	       0 B/op	       0 allocs/op
@@ -34,7 +34,7 @@
 //	goarch: amd64
 //	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
 //	cpu: AMD Ryzen 9 3900X 12-Core Processor
-//	BenchmarkFixedSize32Bytes-24    	11736326	       101.4 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSize32Bytes-24    			11736326	       101.4 ns/op	       0 B/op	       0 allocs/op
 //	BenchmarkFixedSizeECDSA/P-256-24         	11798857	       101.7 ns/op	       0 B/op	       0 allocs/op
 //	BenchmarkFixedSizeECDSA/P-384-24         	 8896884	       134.1 ns/op	       0 B/op	       0 allocs/op
 //	BenchmarkFixedSizeECDSA/P-521-24         	 8884756	       134.3 ns/op	       0 B/op	       0 allocs/op
