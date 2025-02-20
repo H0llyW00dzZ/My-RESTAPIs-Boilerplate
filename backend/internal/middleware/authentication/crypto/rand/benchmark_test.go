@@ -34,18 +34,20 @@
 //	goarch: amd64
 //	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
 //	cpu: AMD Ryzen 9 3900X 12-Core Processor
-//	BenchmarkFixedSize32Bytes-24    	 2482843	       505.0 ns/op	       0 B/op	       0 allocs/op
-//	BenchmarkFixedSizeECDSA/P-256-24         	 2539428	       480.1 ns/op	       0 B/op	       0 allocs/op
-//	BenchmarkFixedSizeECDSA/P-384-24         	 1914794	       628.2 ns/op	       0 B/op	       0 allocs/op
-//	BenchmarkFixedSizeECDSA/P-521-24         	 1856566	       624.2 ns/op	       0 B/op	       0 allocs/op
-//	BenchmarkFixedSizeECC/P-224-24           	 2471674	       501.2 ns/op	       0 B/op	       0 allocs/op
-//	BenchmarkFixedSizeECC/P-256-24           	 2398852	       502.6 ns/op	       0 B/op	       0 allocs/op
-//	BenchmarkFixedSizeECC/P-384-24           	 1923326	       648.6 ns/op	       0 B/op	       0 allocs/op
-//	BenchmarkFixedSizeECC/P-521-24           	 1549710	       824.4 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSize32Bytes-24    	11736326	       101.4 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECDSA/P-256-24         	11798857	       101.7 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECDSA/P-384-24         	 8896884	       134.1 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECDSA/P-521-24         	 8884756	       134.3 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECC/P-224-24         		12967860	        92.56 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECC/P-256-24         		11932174	       100.4 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECC/P-384-24	         	 9008350	       132.9 ns/op	       0 B/op	       0 allocs/op
+//	BenchmarkFixedSizeECC/P-521-24	         	 6845301	       173.9 ns/op	       0 B/op	       0 allocs/op
 //
 // Note that the old PC runs on Ubuntu Pro with 16 GiB of RAM and performs smoothly without issues on Linux (it literally fixes what Windows can't), unlike Windows.
 // However, there is no chance of going back to Windows due to physical memory corruption issues that also damage the memory slots, which is why
 // the broken motherboard can't support more than 32 GiB++ of RAM (because Windows caused the damage).
+//
+// Additionally, these benchmarks have been updated. The power of AMD has returned, and it remains powerful even on a broken PC. So, get good, get AMD.
 
 package rand_test
 
