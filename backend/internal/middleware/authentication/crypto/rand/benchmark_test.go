@@ -158,8 +158,13 @@ func BenchmarkFixedSizeECC(b *testing.B) {
 //	BenchmarkGenerateTextWith10Length/Special-24           	  709845	      1592 ns/op	     512 B/op	      32 allocs/op
 //	BenchmarkGenerateTextWith10Length/MixedSpecial-24      	  620727	      1747 ns/op	     512 B/op	      32 allocs/op
 //	BenchmarkGenerateTextWith10Length/Number-24            	  604453	      1859 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/NumSpecial-24        	  596522	      1939 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/LowercaseSpecial-24  	  719533	      1637 ns/op	     512 B/op	      32 allocs/op
+//	BenchmarkGenerateTextWith10Length/UppercaseSpecial-24  	  703129	      1637 ns/op	     512 B/op	      32 allocs/op
 //	PASS
 //	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	7.550s
+//
+// Note: These benchmarks are updated. The power of AMD has returned, and it remains powerful even on a broken PC. So, get good, get AMD.
 func BenchmarkGenerateTextWith10Length(b *testing.B) {
 	tests := []struct {
 		length   int
@@ -171,6 +176,9 @@ func BenchmarkGenerateTextWith10Length(b *testing.B) {
 		{10, rand.Special},
 		{10, rand.MixedSpecial},
 		{10, rand.Number},
+		{10, rand.NumSpecial},
+		{10, rand.LowercaseSpecial},
+		{10, rand.UppercaseSpecial},
 	}
 
 	for _, tt := range tests {
@@ -196,8 +204,13 @@ func BenchmarkGenerateTextWith10Length(b *testing.B) {
 //	BenchmarkGenerateTextWith25Length/Special-24           	  302397	      3921 ns/op	    1264 B/op	      77 allocs/op
 //	BenchmarkGenerateTextWith25Length/MixedSpecial-24      	  272220	      4332 ns/op	    1264 B/op	      77 allocs/op
 //	BenchmarkGenerateTextWith25Length/Number-24            	  256512	      4630 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/NumSpecial-24        	  238528	      4987 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/LowercaseSpecial-24  	  297484	      3985 ns/op	    1264 B/op	      77 allocs/op
+//	BenchmarkGenerateTextWith25Length/UppercaseSpecial-24  	  295318	      3987 ns/op	    1264 B/op	      77 allocs/op
 //	PASS
 //	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	8.347s
+//
+// Note: These benchmarks are updated. The power of AMD has returned, and it remains powerful even on a broken PC. So, get good, get AMD.
 func BenchmarkGenerateTextWith25Length(b *testing.B) {
 	tests := []struct {
 		length   int
@@ -209,6 +222,9 @@ func BenchmarkGenerateTextWith25Length(b *testing.B) {
 		{25, rand.Special},
 		{25, rand.MixedSpecial},
 		{25, rand.Number},
+		{25, rand.NumSpecial},
+		{25, rand.LowercaseSpecial},
+		{25, rand.UppercaseSpecial},
 	}
 
 	for _, tt := range tests {
@@ -234,8 +250,13 @@ func BenchmarkGenerateTextWith25Length(b *testing.B) {
 //	BenchmarkGenerateTextWith50Length/Special-24           	  152212	      7763 ns/op	    2528 B/op	     152 allocs/op
 //	BenchmarkGenerateTextWith50Length/MixedSpecial-24      	  139192	      8579 ns/op	    2528 B/op	     152 allocs/op
 //	BenchmarkGenerateTextWith50Length/Number-24            	  131802	      9084 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/NumSpecial-24        	  125325	      9435 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/LowercaseSpecial-24  	  149457	      7966 ns/op	    2528 B/op	     152 allocs/op
+//	BenchmarkGenerateTextWith50Length/UppercaseSpecial-24  	  149586	      7952 ns/op	    2528 B/op	     152 allocs/op
 //	PASS
 //	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	9.586s
+//
+// Note: These benchmarks are updated. The power of AMD has returned, and it remains powerful even on a broken PC. So, get good, get AMD.
 func BenchmarkGenerateTextWith50Length(b *testing.B) {
 	tests := []struct {
 		length   int
@@ -247,6 +268,9 @@ func BenchmarkGenerateTextWith50Length(b *testing.B) {
 		{50, rand.Special},
 		{50, rand.MixedSpecial},
 		{50, rand.Number},
+		{50, rand.NumSpecial},
+		{50, rand.LowercaseSpecial},
+		{50, rand.UppercaseSpecial},
 	}
 
 	for _, tt := range tests {
@@ -272,8 +296,13 @@ func BenchmarkGenerateTextWith50Length(b *testing.B) {
 //	BenchmarkGenerateTextWith100Length/Special-24           	   76915	     15583 ns/op	    5024 B/op	     302 allocs/op
 //	BenchmarkGenerateTextWith100Length/MixedSpecial-24      	   68668	     17290 ns/op	    5024 B/op	     302 allocs/op
 //	BenchmarkGenerateTextWith100Length/Number-24            	   64477	     18476 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/NumSpecial-24        	   62823	     18901 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/LowercaseSpecial-24  	   74540	     15975 ns/op	    5024 B/op	     302 allocs/op
+//	BenchmarkGenerateTextWith100Length/UppercaseSpecial-24  	   75105	     15830 ns/op	    5024 B/op	     302 allocs/op
 //	PASS
 //	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	11.974s
+//
+// Note: These benchmarks are updated. The power of AMD has returned, and it remains powerful even on a broken PC. So, get good, get AMD.
 func BenchmarkGenerateTextWith100Length(b *testing.B) {
 	tests := []struct {
 		length   int
@@ -285,6 +314,9 @@ func BenchmarkGenerateTextWith100Length(b *testing.B) {
 		{100, rand.Special},
 		{100, rand.MixedSpecial},
 		{100, rand.Number},
+		{100, rand.NumSpecial},
+		{100, rand.LowercaseSpecial},
+		{100, rand.UppercaseSpecial},
 	}
 
 	for _, tt := range tests {
@@ -310,8 +342,13 @@ func BenchmarkGenerateTextWith100Length(b *testing.B) {
 //	BenchmarkGenerateTextWith500Length/Special-24           	   15488	     77354 ns/op	   25024 B/op	    1502 allocs/op
 //	BenchmarkGenerateTextWith500Length/MixedSpecial-24      	   14090	     85175 ns/op	   25024 B/op	    1502 allocs/op
 //	BenchmarkGenerateTextWith500Length/Number-24            	   13257	     90534 ns/op	   25024 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/NumSpecial-24        	   12939	     92687 ns/op	   25024 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/LowercaseSpecial-24  	   15104	     79776 ns/op	   25024 B/op	    1502 allocs/op
+//	BenchmarkGenerateTextWith500Length/UppercaseSpecial-24  	   15072	     79801 ns/op	   25024 B/op	    1502 allocs/op
 //	PASS
 //	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	7.232s
+//
+// Note: These benchmarks are updated. The power of AMD has returned, and it remains powerful even on a broken PC. So, get good, get AMD.
 func BenchmarkGenerateTextWith500Length(b *testing.B) {
 	tests := []struct {
 		length   int
@@ -323,6 +360,9 @@ func BenchmarkGenerateTextWith500Length(b *testing.B) {
 		{500, rand.Special},
 		{500, rand.MixedSpecial},
 		{500, rand.Number},
+		{500, rand.NumSpecial},
+		{500, rand.LowercaseSpecial},
+		{500, rand.UppercaseSpecial},
 	}
 
 	for _, tt := range tests {
