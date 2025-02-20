@@ -372,3 +372,20 @@ func BenchmarkGenerateTextWith500Length(b *testing.B) {
 		})
 	}
 }
+
+// Results on a broken PC:
+//
+//	goos: linux
+//	goarch: amd64
+//	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
+//	cpu: AMD Ryzen 9 3900X 12-Core Processor
+//	BenchmarkGenerateFixedUUID-24    	 2163597	       555.5 ns/op	     184 B/op	       7 allocs/op
+//	PASS
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	1.207s
+func BenchmarkGenerateFixedUUID(b *testing.B) {
+	for b.Loop() {
+		if _, err := rand.GenerateFixedUUID(); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
