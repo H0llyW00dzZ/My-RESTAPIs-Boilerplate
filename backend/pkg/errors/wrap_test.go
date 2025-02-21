@@ -96,3 +96,27 @@ func TestMultipleWraps10Times(t *testing.T) {
 	// Verify that the wrapped error still contains the original error
 	assert.True(t, stdErrors.Is(wrappedErr, originalErr), "wrapped error does not contain the original error")
 }
+
+// TestWrapErrorNil tests the Wrap function with a nil error.
+func TestWrapErrorNil(t *testing.T) {
+	wrappedErr := errors.Wrap(nil, "additional context")
+	if wrappedErr != nil {
+		t.Fatal("expected nil error")
+	}
+}
+
+// TestWrapErrorFNil tests the WrapF function with a nil error.
+func TestWrapErrorFNil(t *testing.T) {
+	wrappedErrF := errors.WrapF(nil, "additional context with value: %d", 42)
+	if wrappedErrF != nil {
+		t.Fatal("expected nil error")
+	}
+}
+
+// TestWrapSFNil tests the WrapSF function with a nil error.
+func TestWrapSFNil(t *testing.T) {
+	wrappedErrSF := errors.WrapF(nil, "additional context with value: %s", "example")
+	if wrappedErrSF != nil {
+		t.Fatal("expected nil error")
+	}
+}
