@@ -113,8 +113,8 @@ func TestWrapErrorFNil(t *testing.T) {
 	}
 }
 
-// TestWrapSFNil tests the WrapSF function with a nil error.
-func TestWrapSFNil(t *testing.T) {
+// TestWrapFNil tests the WrapF function with a nil error.
+func TestWrapFNil(t *testing.T) {
 	wrappedErrSF := errors.WrapF(nil, "additional context with value: %s", "example")
 	if wrappedErrSF != nil {
 		t.Fatal("expected nil error")
