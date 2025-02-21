@@ -7,17 +7,17 @@
 // using the built-in errors and fmt packages.
 //
 // This package offers two main functions:
-// - Wrap: Wraps an error with a simple message.
-// - WrapF: Wraps an error with a formatted message.
+//   - Wrap: Wraps an error with a simple message.
+//   - WrapF: Wraps an error with a formatted message.
 //
 // These functions serve as a replacement for github.com/pkg/errors
 // by utilizing Go's native error wrapping capabilities introduced in Go 1.13.
 //
 // Reasons to use this package:
-// - Leverage Go's built-in error wrapping and inspection.
-// - Avoid external dependencies that are no longer maintained, keeping the codebase lightweight.
-// - Easily wrap multiple errors to provide additional context.
-// - Enhance reusability by standardizing error handling across projects.
+//   - Leverage Go's built-in error wrapping and inspection.
+//   - Avoid external dependencies that are no longer maintained, keeping the codebase lightweight.
+//   - Easily wrap multiple errors to provide additional context.
+//   - Enhance reusability by standardizing error handling across projects.
 //
 // Example usage:
 //
