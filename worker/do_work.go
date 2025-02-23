@@ -188,7 +188,7 @@ func (wp *Pool[T]) Start() {
 
 		// Use the WaitGroup to wait for workers to start
 		wp.wg.Add(wp.numWorkers)
-		for range wp.numWorkers {
+		for w := 0; w < wp.numWorkers; w++ {
 			go func() {
 				defer wp.wg.Done() // Signal when a worker is ready
 				for {
