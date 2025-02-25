@@ -28,7 +28,7 @@
 //	BenchmarkFixedSizeECDSA/P-384-16         	 5626008	       214.1 ns/op	       0 B/op	       0 allocs/op
 //	BenchmarkFixedSizeECDSA/P-521-16         	 5705864	       211.9 ns/op	       0 B/op	       0 allocs/op
 //
-// On an old PC with a broken motherboard due to Windows (physical memory corruption), switched to Linux for freedom and privacy:
+// On an old PC with a broken motherboard due to Windows (physical memory corruption), switched to Linux (Kernel 6.11) for freedom and privacy:
 //
 //	goos: linux
 //	goarch: amd64
@@ -43,7 +43,7 @@
 //	BenchmarkFixedSizeECC/P-384-24	         	 9008350	       132.9 ns/op	       0 B/op	       0 allocs/op
 //	BenchmarkFixedSizeECC/P-521-24	         	 6845301	       173.9 ns/op	       0 B/op	       0 allocs/op
 //
-// Note that the old PC runs on Ubuntu Pro with 16 GiB of RAM and performs smoothly without issues on Linux (it literally fixes what Windows can't), unlike Windows.
+// Note that the old PC runs on Ubuntu Pro with 16 GiB of RAM and performs smoothly without issues on Linux (Kernel 6.11) (it literally fixes what Windows can't), unlike Windows.
 // However, there is no chance of going back to Windows due to physical memory corruption issues that also damage the memory slots, which is why
 // the broken motherboard can't support more than 32 GiB++ of RAM (because Windows caused the damage).
 //
@@ -145,7 +145,7 @@ func BenchmarkFixedSizeECC(b *testing.B) {
 	}
 }
 
-// Results on an old PC with a broken motherboard. It still works fine & stable on Linux with only 16 GiB of RAM:
+// Results on an old PC with a broken motherboard. It still works fine & stable on Linux (Kernel 6.11) with only 16 GiB of RAM:
 //
 //	goos: linux
 //	goarch: amd64
@@ -191,7 +191,7 @@ func BenchmarkGenerateTextWith10Length(b *testing.B) {
 	}
 }
 
-// Results on an old PC with a broken motherboard. It still works fine & stable on Linux with only 16 GiB of RAM:
+// Results on an old PC with a broken motherboard. It still works fine & stable on Linux (Kernel 6.11) with only 16 GiB of RAM:
 //
 //	goos: linux
 //	goarch: amd64
@@ -237,7 +237,7 @@ func BenchmarkGenerateTextWith25Length(b *testing.B) {
 	}
 }
 
-// Results on an old PC with a broken motherboard. It still works fine & stable on Linux with only 16 GiB of RAM:
+// Results on an old PC with a broken motherboard. It still works fine & stable on Linux (Kernel 6.11) with only 16 GiB of RAM:
 //
 //	goos: linux
 //	goarch: amd64
@@ -283,7 +283,7 @@ func BenchmarkGenerateTextWith50Length(b *testing.B) {
 	}
 }
 
-// Results on an old PC with a broken motherboard. It still works fine & stable on Linux with only 16 GiB of RAM:
+// Results on an old PC with a broken motherboard. It still works fine & stable on Linux (Kernel 6.11) with only 16 GiB of RAM:
 //
 //	goos: linux
 //	goarch: amd64
@@ -329,7 +329,7 @@ func BenchmarkGenerateTextWith100Length(b *testing.B) {
 	}
 }
 
-// Results on an old PC with a broken motherboard. It still works fine & stable on Linux with only 16 GiB of RAM:
+// Results on an old PC with a broken motherboard. It still works fine & stable on Linux (Kernel 6.11) with only 16 GiB of RAM:
 //
 //	goos: linux
 //	goarch: amd64
