@@ -17,6 +17,8 @@ import (
 // HandleCallback handles the callback request from Google after the user has authenticated.
 // It retrieves the authorization code from the query parameters, exchanges it for an access token,
 // and then uses the access token to retrieve the user's information from the Google API.
+//
+// TODO: This still needs improvement and must be combined with Fiber's rate limiter to protect against bots bruteforce attacks.
 func (m *Manager) HandleCallback(c *fiber.Ctx) error {
 	ctx := c.Context()
 	code := c.Query("code")
