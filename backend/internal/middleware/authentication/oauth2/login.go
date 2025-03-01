@@ -14,6 +14,9 @@ import (
 
 // HandleLogin handles the login request.
 // It generates the authorization URL and redirects the user to the Google login page.
+//
+// Note: This can be used not only for login but also for sign-in and sign-up, as OAuth2 can leverage user information such as name and email.
+// The user information can be combined with multiple databases. For example, the session storage can use Redis, while the actual user data (e.g., name, email) can be stored and inserted into MySQL.
 func (m *Manager) HandleLogin(c *fiber.Ctx) error {
 	// Note: This safe against CSRF Attacks 🤪
 	state, err := rand.GenerateFixedUUID()
