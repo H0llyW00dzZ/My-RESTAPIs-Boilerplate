@@ -40,6 +40,8 @@ func (m *Manager) HandleCallback(c *fiber.Ctx) error {
 	// Explicitly converting it to a string using .(string) is a better approach because the "state" is a string,
 	// and it's effective in protecting against CSRF attacks 🤪.
 	if state != storedState.(string) {
+		// Useful protect against bots bruteforce attacks.
+		sess.Destroy()
 		return helper.SendErrorResponse(c, http.StatusBadRequest, "Invalid state parameter")
 	}
 
