@@ -35,7 +35,11 @@ func (m *Manager) HandleCallback(c *fiber.Ctx) error {
 	// Note: This already uses Fiber's session middleware mechanism, so the session is not using OAuth2's built-in mechanisms such as token, JWT, JWS, etc.
 	// This approach is better oauth2 custom and considered safer.
 	storedState := sess.Get("oauth2_state")
-	if state != storedState {
+
+	// Just in case it keeps getting an "Invalid state parameter" error, it's because storedState is of type interface{}/any.
+	// Explicitly converting it to a string using .(string) is a better approach because the "state" is a string,
+	// and it's effective in protecting against CSRF attacks 🤪.
+	if state != storedState.(string) {
 		return helper.SendErrorResponse(c, http.StatusBadRequest, "Invalid state parameter")
 	}
 
