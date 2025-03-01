@@ -28,7 +28,9 @@ metadata:
   namespace: database
 spec:
   accessModes:
-    # Note: This is suitable for VPA "ReadWriteOnce".
+    # Note: This is suitable for a VPA with "ReadWriteOnce" access mode and a minimum of 1 replica for VPA. 
+    # Unlike RWX, which makes it possible to achieve zero downtime, RWO does not allow for zero-downtime scaling.
+    # However, RWX is rarely supported by some cloud providers.
     - ReadWriteOnce
   storageClassName: gp2-encrypted
   resources:
