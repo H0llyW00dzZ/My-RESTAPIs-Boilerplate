@@ -3,6 +3,7 @@
 # Note: In AWS EKS, to achieve storage flexibility with the ability to attach/detach and enable automated encryption at rest/full encryption,
 # you need to create a storage class first. This is unlike GKE, where you don't have to manually create a storage class for automated encryption
 # at rest/full encryption because it is already automatically encrypted at rest/fully encrypted on GKE.
+# It's also worth noting that this only works without EKS Auto Mode because if EKS Auto Mode is on, it's too much overhead for the policy. For example, you have to manually allow policy things, and the policy becomes too complex.
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
