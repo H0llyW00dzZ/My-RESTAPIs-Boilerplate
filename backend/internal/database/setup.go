@@ -208,7 +208,7 @@ func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
 	//
 	// Note that SetConnMaxIdleTime, SetMaxOpenConns, and SetMaxIdleConns have been updated, and they are suitable for only 1 pod with an attached disk/storage.
 	// However, it's recommended to make a trade-off by not attaching disk/storage for HPA because MySQL can still handle it even when there are many pods + pools,
-	// as long as the disk/storage for MySQL is not HDD.
+	// as long as the disk/storage for MySQL is not HDD. Additionally, the load balancer must be standalone, meaning it should be dedicated only to MySQL Deployment Unlike Ingress (e.g., Nginx).
 	db.SetMaxOpenConns(100) // Maximum number of open connections
 	db.SetMaxIdleConns(50)  // Maximum number of idle connections
 
