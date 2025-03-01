@@ -199,14 +199,18 @@ func (config *MySQLConfig) InitializeMySQLDB() (*sql.DB, error) {
 	// Note: Implementing statistics similar to those in Redis isn't feasible due to connection limitations.
 	// Even attempting to set it to unlimited will inevitably lead to a bottleneck, regardless of server specs (e.g., even on a high-spec or baremetal server).
 	// So, it's best to maintain the current configuration since Redis will handle this aspect.
-	db.SetConnMaxIdleTime(time.Minute * 3) // Connections are not closed due to being idle too long.
+	db.SetConnMaxIdleTime(1 * time.Hour) // Connections are not closed due to being idle too long.
 	// Note: This is highly scalable when running on Kubernetes, especially with Fiber, which is the best choice with HPA (Horizontal Pod Autoscaling)
 	// due to its built-in zer0-allocation and can be dynamic resource usage (e.g., CPU, Memory).
 	// The values for "SetMaxIdleConns" and "SetMaxOpenConns" depend on the number of Pods.
 	// For example, if the maximum number of replicas in HPA is set to 99999, then "SetMaxIdleConns" and "SetMaxOpenConns" should also be set to 99999.
 	// Don't forget to set the maximum connections in the MySQL container to 99999 as well.
-	db.SetMaxIdleConns(50) // Maximum number of connections in the idle connection pool.
-	db.SetMaxOpenConns(50) // Maximum number of open connections to the database.
+	//
+	// Note that SetConnMaxIdleTime, SetMaxOpenConns, and SetMaxIdleConns have been updated, and they are suitable for only 1 pod with an attached disk/storage.
+	// However, it's recommended to make a trade-off by not attaching disk/storage for HPA because MySQL can still handle it even when there are many pods + pools,
+	// as long as the disk/storage for MySQL is not HDD.
+	db.SetMaxOpenConns(100) // Maximum number of open connections
+	db.SetMaxIdleConns(50)  // Maximum number of idle connections
 
 	// Set a timeout for the Ping operation.
 	//
