@@ -14,6 +14,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+const (
+	googleUserInfoURL = "https://www.googleapis.com/oauth2/v2/userinfo"
+)
+
 // HandleCallback handles the callback request from Google after the user has authenticated.
 // It retrieves the authorization code from the query parameters, exchanges it for an access token,
 // and then uses the access token to retrieve the user's information from the Google API.
@@ -53,7 +57,7 @@ func (m *Manager) HandleCallback(c *fiber.Ctx) error {
 
 	client := m.config.Client(ctx, token)
 	// TODO: This still needs improvement because Google has many types of OAuth2 (e.g., for desktop, which has been used to implement OAuth2-CLI before, and for web)
-	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
+	resp, err := client.Get(googleUserInfoURL)
 	if err != nil {
 		sess.Destroy()
 		return helper.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
