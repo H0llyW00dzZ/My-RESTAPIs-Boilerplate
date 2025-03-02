@@ -55,6 +55,7 @@ func (m *Manager) HandleCallback(c *fiber.Ctx) error {
 	// TODO: This still needs improvement because Google has many types of OAuth2 (e.g., for desktop, which has been used to implement OAuth2-CLI before, and for web)
 	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
 	if err != nil {
+		sess.Destroy()
 		return helper.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}
 	defer resp.Body.Close()
@@ -69,6 +70,7 @@ func (m *Manager) HandleCallback(c *fiber.Ctx) error {
 
 	// Read the response body into the buffer
 	if _, err := buf.ReadFrom(resp.Body); err != nil {
+		sess.Destroy()
 		return helper.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}
 
@@ -76,6 +78,7 @@ func (m *Manager) HandleCallback(c *fiber.Ctx) error {
 	var userInfo map[string]any
 	// Use the decoder from the Fiber app configuration
 	if err := c.App().Config().JSONDecoder(buf.Bytes(), &userInfo); err != nil {
+		sess.Destroy()
 		return helper.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}
 
