@@ -47,7 +47,8 @@ func (m *Manager) HandleCallback(c *fiber.Ctx) error {
 
 	token, err := m.config.Exchange(ctx, code)
 	if err != nil {
-		return helper.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		sess.Destroy()
+		return helper.SendErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	client := m.config.Client(ctx, token)
