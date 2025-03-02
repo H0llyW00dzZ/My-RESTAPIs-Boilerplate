@@ -17,6 +17,12 @@ const (
 	providerGoogle = "Google"
 )
 
+// googleScopes defines the scopes required for Google OAuth2 authentication.
+var googleScopes = []string{
+	"https://www.googleapis.com/auth/userinfo.email",
+	"https://www.googleapis.com/auth/userinfo.profile",
+}
+
 // Config represents the configuration for the OAuth2 Manager.
 type Config struct {
 	Provider      string
@@ -45,11 +51,8 @@ func New(cfg Config) *Manager {
 			ClientID:     cfg.ClientID,
 			ClientSecret: cfg.ClientSecret,
 			RedirectURL:  cfg.RedirectURL,
-			Scopes: []string{
-				"https://www.googleapis.com/auth/userinfo.email",
-				"https://www.googleapis.com/auth/userinfo.profile",
-			},
-			Endpoint: google.Endpoint,
+			Scopes:       googleScopes,
+			Endpoint:     google.Endpoint,
 		}
 	default:
 		panic(fmt.Sprintf("unsupported provider: %s", cfg.Provider))
