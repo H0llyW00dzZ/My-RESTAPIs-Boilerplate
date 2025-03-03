@@ -100,7 +100,7 @@ This command removes the Cluster Autoscaler from your Kubernetes cluster.
 If you encounter any issues during the deployment or operation of the Cluster Autoscaler, you can check the logs of the Cluster Autoscaler pod using the following command:
 
 ```bash
-kubectl logs -f deployment/cluster-autoscaler -n kube-system
+kubectl logs -f deployment/cluster-autoscaler-aws-cluster-autoscaler -n kube-system
 ```
 
 This command displays the logs of the Cluster Autoscaler pod, which can help in identifying and resolving any issues.
