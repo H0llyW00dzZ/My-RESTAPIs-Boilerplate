@@ -2,6 +2,9 @@ autoDiscovery:
   clusterName: <your_clustername>  # Replace with your actual cluster name
 
 awsRegion: <your_region>  # Replace with your AWS region
+# This requires awsAccessKeyID & awsSecretAccessKey. You can create a user and attach the ca-policy.json to that user related to these credentials.
+# It won't work without these credentials, and installing manually without Helm will also result in misconfiguration issues related to the region.
+# This is due to the lack of proper configuration.
 awsAccessKeyID: "*"
 awsSecretAccessKey: "*"
 
