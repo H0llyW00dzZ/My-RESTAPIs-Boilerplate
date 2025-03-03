@@ -34,7 +34,7 @@ data:
     ssl-cert=/etc/mysql/tls/certificate.cer
     ssl-key=/etc/mysql/tls/server-key.pem
     ssl-ca=/etc/mysql/tls/ECC.crt
-    ssl-capath=/etc/mysql/
+    ssl-capath=/etc/mysql/tls
     require_secure_transport=ON
     tls-version=TLSv1.3
     pid-file=/var/run/mysqld/mysqld.pid
