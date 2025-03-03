@@ -99,8 +99,8 @@ github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f h1:Y/CXytFA4m6
 github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f/go.mod h1:vw97MGsxSvLiUE2X8qFplwetxpGLQrlU1Q9AUEIzCaM=
 github.com/ethereum/c-kzg-4844 v1.0.3 h1:IEnbOHwjixW2cTvKRUlAAUOeleV7nNM/umJR+qy4WDs=
 github.com/ethereum/c-kzg-4844 v1.0.3/go.mod h1:VewdlzQmpT5QSrVhbBuGoCdFJkpaJlO1aQputP83wc0=
-github.com/ethereum/go-ethereum v1.15.3 h1:OeTWAq6r8iR89bfJDjmmOemE74ywArl9DUViFsVj3Y8=
-github.com/ethereum/go-ethereum v1.15.3/go.mod h1:jMXlpZXfSar1mGs/5sB0aEpEnPsiE1Jn6/3anlueqz8=
+github.com/ethereum/go-ethereum v1.15.4 h1:a0P+AalZaosp97rfKoYXHYWzyK3+jXWZrciM9S7XFrI=
+github.com/ethereum/go-ethereum v1.15.4/go.mod h1:1LG2LnMOx2yPRHR/S+xuipXH29vPr6BIH6GElD8N/fo=
 github.com/ethereum/go-verkle v0.2.2 h1:I2W0WjnrFUIzzVPwm8ykY+7pL2d4VhlsePn4j7cnFk8=
 github.com/ethereum/go-verkle v0.2.2/go.mod h1:M3b90YRnzqKyyzBEWJGqj8Qff4IDeXnzFw0P9bFw3uk=
 github.com/fatih/color v1.16.0 h1:zmkK9Ngbjj+K0yRhTVONQh1p/HknKYSlNT+vZCzyokM=
