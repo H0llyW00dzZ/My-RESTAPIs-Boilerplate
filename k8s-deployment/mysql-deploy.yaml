@@ -34,14 +34,14 @@ data:
     ssl-cert=/etc/mysql/tls/certificate.cer
     ssl-key=/etc/mysql/tls/server-key.pem
     ssl-ca=/etc/mysql/tls/ECC.crt
-    ssl-capath=/etc/mysql/tls
+    ssl-capath=/etc/mysql/
     require_secure_transport=ON
     tls-version=TLSv1.3
     pid-file=/var/run/mysqld/mysqld.pid
-    max_connections=1000
+    max_connections=2000
     wait_timeout=600
     interactive_timeout=600
-    max_connect_errors=1000
+    max_connect_errors=10000
     datadir=/gopher/mysql/data
     bind-address=*
     character-set-server=UTF8MB4
@@ -53,6 +53,11 @@ data:
     explicit_defaults_for_timestamp
     authentication_policy='* ,,'
     log_error=/gopher/mysql/error.log
+    back_log=500
+    open_files_limit=10000
+    thread_cache_size=100
+# Note: It's recommended to set up a load balancer for MySQL that only allows pods within the cluster to connect to it.
+# This is because if the load balancer (e.g., a standalone load balancer) for MySQL is too publicly accessible, it may cause connection errors due to excessive network traffic from outside sources, such as bots attempting to connect through brute-forcing.
 ---
 apiVersion: apps/v1
 kind: Deployment
