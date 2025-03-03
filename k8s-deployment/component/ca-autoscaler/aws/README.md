@@ -20,8 +20,8 @@ Before deploying the Cluster Autoscaler, ensure that you have the following prer
 
    Update the `helm-values.yaml` file with your specific cluster configuration, such as the cluster name, AWS region, and IAM role ARN.
 
-   > [!IMPORTANT]
-   > The Cluster Autoscaler requires `awsAccessKeyID` and `awsSecretAccessKey` to function properly. You can create a user and attach the `ca-policy.json` to that user related to these credentials. Without these credentials, the Cluster Autoscaler won't work, and installing it manually without Helm will also result in misconfiguration issues related to the region. This is due to the lack of proper configuration.
+> [!IMPORTANT]
+> The Cluster Autoscaler requires `awsAccessKeyID` and `awsSecretAccessKey` to function properly. You can create a user and attach the `ca-policy.json` to that user related to these credentials. Without these credentials, the Cluster Autoscaler won't work, and installing it manually without Helm will also result in misconfiguration issues related to the region. This is due to the lack of proper configuration.
 
    Make sure to set the `awsAccessKeyID` and `awsSecretAccessKey` values in the `helm-values.yaml` file:
 
@@ -32,8 +32,8 @@ Before deploying the Cluster Autoscaler, ensure that you have the following prer
 
    Replace `"*"` with your actual AWS access key ID and secret access key.
 
-   > [!NOTE]
-   > The credentials related to `awsAccessKeyID` and `awsSecretAccessKey` are also safe because they will be automatically created as Kubernetes secrets when installing via Helm.
+> [!NOTE]
+> The credentials related to `awsAccessKeyID` and `awsSecretAccessKey` are also safe because they will be automatically created as Kubernetes secrets when installing via Helm.
 
 ## Deployment
 
