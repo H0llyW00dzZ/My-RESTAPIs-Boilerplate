@@ -6,7 +6,7 @@
 package oauth2
 
 import (
-	"fmt"
+	"errors"
 	"h0llyw00dz-template/backend/pkg/gc"
 	"net/http"
 
@@ -16,6 +16,12 @@ import (
 
 const (
 	googleUserInfoURL = "https://www.googleapis.com/oauth2/v2/userinfo"
+)
+
+var (
+	// ErrorsUnsupportedProviderEndpoint is returned when the OAuth2 provider's endpoint is not supported by the Manager.
+	// It indicates that the Manager does not have the necessary configuration or implementation to handle the specified provider's endpoint.
+	ErrorsUnsupportedProviderEndpoint = errors.New("better oauth2: unsupported provider endpoint")
 )
 
 // getUserInfo retrieves the user information from the OAuth2 provider's API.
@@ -28,7 +34,7 @@ func (m *Manager) getUserInfo(c *fiber.Ctx, client *http.Client) (map[string]any
 	case google.Endpoint:
 		userInfoURL = googleUserInfoURL
 	default:
-		return nil, fmt.Errorf("unsupported provider endpoint")
+		return nil, ErrorsUnsupportedProviderEndpoint
 	}
 
 	resp, err := client.Get(userInfoURL)
