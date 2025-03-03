@@ -14,6 +14,10 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
+const (
+	googleUserInfoURL = "https://www.googleapis.com/oauth2/v2/userinfo"
+)
+
 // getUserInfo retrieves the user information from the OAuth2 provider's API.
 // It takes an OAuth2 client and a Fiber context as parameters and returns a map of user information.
 func (m *Manager) getUserInfo(c *fiber.Ctx, client *http.Client) (map[string]any, error) {

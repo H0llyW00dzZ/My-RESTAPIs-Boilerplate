@@ -13,10 +13,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-const (
-	googleUserInfoURL = "https://www.googleapis.com/oauth2/v2/userinfo"
-)
-
 // HandleCallback handles the callback request from Google after the user has authenticated.
 // It retrieves the authorization code from the query parameters, exchanges it for an access token,
 // and then uses the access token to retrieve the user's information from the Google API.
