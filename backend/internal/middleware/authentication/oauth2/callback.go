@@ -7,15 +7,10 @@ package oauth2
 
 import (
 	"fmt"
-	"h0llyw00dz-template/backend/pkg/gc"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
-)
-
-const (
-	googleUserInfoURL = "https://www.googleapis.com/oauth2/v2/userinfo"
 )
 
 // HandleCallback handles the callback request from Google after the user has authenticated.
@@ -57,31 +52,8 @@ func (m *Manager) HandleCallback(c *fiber.Ctx) error {
 
 	client := m.config.Client(ctx, token)
 	// TODO: This still needs improvement because Google has many types of OAuth2 (e.g., for desktop, which has been used to implement OAuth2-CLI before, and for web)
-	resp, err := client.Get(googleUserInfoURL)
+	userInfo, err := m.getUserInfo(c, client)
 	if err != nil {
-		sess.Destroy()
-		return helper.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
-	}
-	defer resp.Body.Close()
-
-	// Get a buffer from the pool
-	buf := gc.BufferPool.Get()
-
-	defer func() {
-		buf.Reset()            // Reset the buffer to prevent data leaks
-		gc.BufferPool.Put(buf) // Return the buffer to the pool for reuse
-	}()
-
-	// Read the response body into the buffer
-	if _, err := buf.ReadFrom(resp.Body); err != nil {
-		sess.Destroy()
-		return helper.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
-	}
-
-	// TODO: This still needs improvement.
-	var userInfo map[string]any
-	// Use the decoder from the Fiber app configuration
-	if err := c.App().Config().JSONDecoder(buf.Bytes(), &userInfo); err != nil {
 		sess.Destroy()
 		return helper.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}
