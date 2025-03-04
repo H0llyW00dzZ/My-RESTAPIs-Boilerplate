@@ -6,6 +6,7 @@
 package oauth2
 
 import (
+	"context"
 	"fmt"
 	"h0llyw00dz-template/backend/pkg/restapis/helper"
 	"net/http"
@@ -19,7 +20,10 @@ import (
 //
 // TODO: This still needs improvement and must be combined with Fiber's rate limiter to protect against bots bruteforce attacks.
 func (m *Manager) HandleCallback(c *fiber.Ctx) error {
-	ctx := c.Context()
+	// Get the context from the [*fiber.Ctx]
+	ctx, cancel := context.WithCancel(c.Context())
+	defer cancel()
+
 	code := c.Query("code")
 	state := c.Query("state")
 
