@@ -69,6 +69,20 @@ func (m *Manager) HandleCallback(c *fiber.Ctx) error {
 	email := userInfo["email"].(string)
 	name := userInfo["name"].(string)
 
+	// Store the user information in the session
+	//
+	// TODO: This should be Set after verifying the user in the database for later identification in the final router
+	sess.Set("oauth2_authorized", fiber.Map{
+		"id":    state, // Changed from "state" to "id" for later identification
+		"email": email,
+		"name":  name,
+	})
+
+	if err := sess.Save(); err != nil {
+		sess.Destroy()
+		return helper.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+
 	// Perform further actions with the user information
 	//
 	// TODO: Remove this later when it is fully improved.
