@@ -23,7 +23,7 @@ require (
 	github.com/heroku/x v0.4.3
 	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-colorable v0.1.14
-	github.com/prometheus/client_golang v1.21.0
+	github.com/prometheus/client_golang v1.21.1
 	github.com/redis/go-redis/v9 v9.7.1
 	github.com/stretchr/testify v1.10.0
 	github.com/valyala/bytebufferpool v1.0.0
