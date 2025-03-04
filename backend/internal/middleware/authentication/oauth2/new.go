@@ -14,7 +14,9 @@ import (
 )
 
 const (
-	providerGoogle = "Google"
+	// ProviderGoogle represents the identifier for the Google OAuth2 provider.
+	// It is used to specify the provider when configuring the OAuth2 Manager.
+	ProviderGoogle = "Google"
 )
 
 // googleScopes defines the scopes required for Google OAuth2 authentication.
@@ -46,7 +48,7 @@ func New(cfg Config) *Manager {
 
 	switch cfg.Provider {
 	// TODO: This still needs improvement because Google has many types of OAuth2 (e.g., for desktop, which has been used to implement OAuth2-CLI before, and for web)
-	case providerGoogle:
+	case ProviderGoogle:
 		config = &oauth2.Config{
 			ClientID:     cfg.ClientID,
 			ClientSecret: cfg.ClientSecret,
