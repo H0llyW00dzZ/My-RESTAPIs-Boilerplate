@@ -25,6 +25,8 @@ func (m *Manager) HandleCallback(c *fiber.Ctx) error {
 	defer cancel()
 
 	code := c.Query("code")
+	// Note: In the Google OAuth2 mechanism, it always returns the same value, which is useful for protecting against CSRF attacks.
+	// However, for other providers that I'm not familiar with, this code must be refactored later.
 	state := c.Query("state")
 
 	// Get the session from the store
