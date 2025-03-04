@@ -65,6 +65,7 @@ func (m *Manager) HandleCallback(c *fiber.Ctx) error {
 	// Access user information
 	//
 	// TODO: This still needs improvement.
+	// This should connect to the database and verify the user. If the user is found in the database, they are authorized for signin. However, the signup process is different.
 	email := userInfo["email"].(string)
 	name := userInfo["name"].(string)
 
@@ -74,5 +75,6 @@ func (m *Manager) HandleCallback(c *fiber.Ctx) error {
 	fmt.Printf("User logged in: Email: %s, Name: %s\n", email, name)
 
 	// TODO: This still needs improvement.
+	// This should redirect to the final router, which connects to everything, including a frontend website.
 	return c.SendString("User logged in successfully")
 }
