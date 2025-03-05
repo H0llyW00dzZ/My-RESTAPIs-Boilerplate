@@ -2,6 +2,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: gp2-encrypted-retain
+  description: "GP2 storage class with encryption enabled and retain reclaim policy. Provides a baseline performance of 3 IOPS per GiB, with the ability to burst to 3,000 IOPS for extended periods of time. Suitable for general-purpose workloads."
 provisioner: ebs.csi.aws.com
 parameters:
   type: gp2
@@ -14,6 +15,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: gp2-retain
+  description: "GP2 storage class with encryption disabled and retain reclaim policy. Provides a baseline performance of 3 IOPS per GiB, with the ability to burst to 3,000 IOPS for extended periods of time. Suitable for general-purpose workloads."
 provisioner: ebs.csi.aws.com
 parameters:
   type: gp2
@@ -26,6 +28,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: gp2-encrypted
+  description: "GP2 storage class with encryption enabled and delete reclaim policy. Provides a baseline performance of 3 IOPS per GiB, with the ability to burst to 3,000 IOPS for extended periods of time. Suitable for general-purpose workloads."
 provisioner: ebs.csi.aws.com
 parameters:
   type: gp2
@@ -38,6 +41,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: gp2
+  description: "GP2 storage class with encryption disabled and delete reclaim policy. Provides a baseline performance of 3 IOPS per GiB, with the ability to burst to 3,000 IOPS for extended periods of time. Suitable for general-purpose workloads."
 provisioner: ebs.csi.aws.com
 parameters:
   type: gp2
@@ -50,6 +54,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: gp3-encrypted-retain
+  description: "GP3 storage class with encryption enabled and retain reclaim policy. Provides a baseline performance of 3,000 IOPS and 125 MiB/s throughput per volume, with the ability to provision up to 16,000 IOPS and 1,000 MiB/s throughput. Suitable for high-performance workloads."
 provisioner: ebs.csi.aws.com
 parameters:
   type: gp3
@@ -62,6 +67,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: gp3-retain
+  description: "GP3 storage class with encryption disabled and retain reclaim policy. Provides a baseline performance of 3,000 IOPS and 125 MiB/s throughput per volume, with the ability to provision up to 16,000 IOPS and 1,000 MiB/s throughput. Suitable for high-performance workloads."
 provisioner: ebs.csi.aws.com
 parameters:
   type: gp3
@@ -74,6 +80,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: gp3-encrypted
+  description: "GP3 storage class with encryption enabled and delete reclaim policy. Provides a baseline performance of 3,000 IOPS and 125 MiB/s throughput per volume, with the ability to provision up to 16,000 IOPS and 1,000 MiB/s throughput. Suitable for high-performance workloads."
 provisioner: ebs.csi.aws.com
 parameters:
   type: gp3
@@ -86,6 +93,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: gp3
+  description: "GP3 storage class with encryption disabled and delete reclaim policy. Provides a baseline performance of 3,000 IOPS and 125 MiB/s throughput per volume, with the ability to provision up to 16,000 IOPS and 1,000 MiB/s throughput. Suitable for high-performance workloads."
 provisioner: ebs.csi.aws.com
 parameters:
   type: gp3
