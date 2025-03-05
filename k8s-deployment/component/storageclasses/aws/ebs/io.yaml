@@ -2,7 +2,6 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: io1-encrypted-retain
-  description: "IO1 storage class with encryption enabled and retain reclaim policy. Provides high-performance storage with consistent IOPS. Supports up to 50 IOPS per GiB, with a maximum of 64,000 IOPS per volume. Suitable for I/O-intensive workloads that require low latency and high throughput."
 provisioner: ebs.csi.aws.com
 parameters:
   type: io1
@@ -16,7 +15,6 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: io1-retain
-  description: "IO1 storage class with encryption disabled and retain reclaim policy. Provides high-performance storage with consistent IOPS. Supports up to 50 IOPS per GiB, with a maximum of 64,000 IOPS per volume. Suitable for I/O-intensive workloads that require low latency and high throughput."
 provisioner: ebs.csi.aws.com
 parameters:
   type: io1
@@ -30,7 +28,6 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: io1-encrypted
-  description: "IO1 storage class with encryption enabled and delete reclaim policy. Provides high-performance storage with consistent IOPS. Supports up to 50 IOPS per GiB, with a maximum of 64,000 IOPS per volume. Suitable for I/O-intensive workloads that require low latency and high throughput."
 provisioner: ebs.csi.aws.com
 parameters:
   type: io1
@@ -44,7 +41,6 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: io1
-  description: "IO1 storage class with encryption disabled and delete reclaim policy. Provides high-performance storage with consistent IOPS. Supports up to 50 IOPS per GiB, with a maximum of 64,000 IOPS per volume. Suitable for I/O-intensive workloads that require low latency and high throughput."
 provisioner: ebs.csi.aws.com
 parameters:
   type: io1
@@ -58,7 +54,6 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: io2-encrypted-retain
-  description: "IO2 storage class with encryption enabled and retain reclaim policy. Provides the highest performance storage with consistent IOPS and low latency. Supports up to 500 IOPS per GiB, with a maximum of 64,000 IOPS per volume. Suitable for mission-critical, I/O-intensive workloads that require superior performance and durability."
 provisioner: ebs.csi.aws.com
 parameters:
   type: io2
@@ -72,7 +67,6 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: io2-retain
-  description: "IO2 storage class with encryption disabled and retain reclaim policy. Provides the highest performance storage with consistent IOPS and low latency. Supports up to 500 IOPS per GiB, with a maximum of 64,000 IOPS per volume. Suitable for mission-critical, I/O-intensive workloads that require superior performance and durability."
 provisioner: ebs.csi.aws.com
 parameters:
   type: io2
@@ -86,7 +80,6 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: io2-encrypted
-  description: "IO2 storage class with encryption enabled and delete reclaim policy. Provides the highest performance storage with consistent IOPS and low latency. Supports up to 500 IOPS per GiB, with a maximum of 64,000 IOPS per volume. Suitable for mission-critical, I/O-intensive workloads that require superior performance and durability."
 provisioner: ebs.csi.aws.com
 parameters:
   type: io2
@@ -100,7 +93,6 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: io2
-  description: "IO2 storage class with encryption disabled and delete reclaim policy. Provides the highest performance storage with consistent IOPS and low latency. Supports up to 500 IOPS per GiB, with a maximum of 64,000 IOPS per volume. Suitable for mission-critical, I/O-intensive workloads that require superior performance and durability."
 provisioner: ebs.csi.aws.com
 parameters:
   type: io2
