@@ -1,0 +1,103 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: io1-encrypted-retain
+provisioner: ebs.csi.aws.com
+parameters:
+  type: io1
+  iopsPerGB: "50"
+  encrypted: "true"
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: io1-retain
+provisioner: ebs.csi.aws.com
+parameters:
+  type: io1
+  iopsPerGB: "50"
+  encrypted: "false"
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: io1-encrypted
+provisioner: ebs.csi.aws.com
+parameters:
+  type: io1
+  iopsPerGB: "50"
+  encrypted: "true"
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: io1
+provisioner: ebs.csi.aws.com
+parameters:
+  type: io1
+  iopsPerGB: "50"
+  encrypted: "false"
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: io2-encrypted-retain
+provisioner: ebs.csi.aws.com
+parameters:
+  type: io2
+  iopsPerGB: "500"
+  encrypted: "true"
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: io2-retain
+provisioner: ebs.csi.aws.com
+parameters:
+  type: io2
+  iopsPerGB: "500"
+  encrypted: "false"
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: io2-encrypted
+provisioner: ebs.csi.aws.com
+parameters:
+  type: io2
+  iopsPerGB: "500"
+  encrypted: "true"
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: io2
+provisioner: ebs.csi.aws.com
+parameters:
+  type: io2
+  iopsPerGB: "500"
+  encrypted: "false"
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
