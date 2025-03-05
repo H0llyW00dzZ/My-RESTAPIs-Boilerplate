@@ -12,6 +12,10 @@ Adding these StorageClass definitions to your cluster ensures that you have a se
 
 The provided StorageClass configurations cover different scenarios and requirements:
 
+### General Purpose SSD (gp2 and gp3) StorageClasses
+
+File location: `ebs/gp.yaml`
+
 1. `gp2-encrypted-retain`: Provisions encrypted gp2 volumes with the `Retain` reclaim policy.
 2. `gp2-retain`: Provisions non-encrypted gp2 volumes with the `Retain` reclaim policy.
 3. `gp2-encrypted`: Provisions encrypted gp2 volumes with the `Delete` reclaim policy.
@@ -22,6 +26,21 @@ The provided StorageClass configurations cover different scenarios and requireme
 8. `gp3`: Provisions non-encrypted gp3 volumes with the `Delete` reclaim policy.
 
 These StorageClasses cover both gp2 and gp3 volume types, with options for encryption and different reclaim policies (`Retain` and `Delete`).
+
+### Provisioned IOPS SSD (io1 and io2) StorageClasses
+
+File location: `ebs/io.yaml`
+
+1. `io1-encrypted-retain`: Provisions encrypted io1 volumes with the `Retain` reclaim policy and 50 IOPS per GiB.
+2. `io1-retain`: Provisions non-encrypted io1 volumes with the `Retain` reclaim policy and 50 IOPS per GiB.
+3. `io1-encrypted`: Provisions encrypted io1 volumes with the `Delete` reclaim policy and 50 IOPS per GiB.
+4. `io1`: Provisions non-encrypted io1 volumes with the `Delete` reclaim policy and 50 IOPS per GiB.
+5. `io2-encrypted-retain`: Provisions encrypted io2 volumes with the `Retain` reclaim policy and 500 IOPS per GiB.
+6. `io2-retain`: Provisions non-encrypted io2 volumes with the `Retain` reclaim policy and 500 IOPS per GiB.
+7. `io2-encrypted`: Provisions encrypted io2 volumes with the `Delete` reclaim policy and 500 IOPS per GiB.
+8. `io2`: Provisions non-encrypted io2 volumes with the `Delete` reclaim policy and 500 IOPS per GiB.
+
+These StorageClasses cover both io1 and io2 volume types, with options for encryption, different reclaim policies (`Retain` and `Delete`), and specified IOPS per GiB.
 
 > [!NOTE]
 > Make sure the CSI Driver for AWS EBS is installed via add-ons before applying these StorageClasses.
