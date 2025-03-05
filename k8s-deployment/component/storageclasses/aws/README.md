@@ -22,3 +22,6 @@ The provided StorageClass configurations cover different scenarios and requireme
 8. `gp3`: Provisions non-encrypted gp3 volumes with the `Delete` reclaim policy.
 
 These StorageClasses cover both gp2 and gp3 volume types, with options for encryption and different reclaim policies (`Retain` and `Delete`).
+
+> [!NOTE]
+> Make sure the CSI Driver for AWS EBS is installed via add-ons before applying these StorageClasses.
