@@ -7,7 +7,7 @@ require (
 	github.com/ProtonMail/gopenpgp/v2 v2.8.3
 	github.com/a-h/templ v0.3.833
 	github.com/ansrivas/fiberprometheus/v2 v2.9.0
-	github.com/bytedance/sonic v1.12.10
+	github.com/bytedance/sonic v1.13.1
 	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.3.4
 	github.com/ethereum/go-ethereum v1.15.5
@@ -47,7 +47,7 @@ require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bits-and-blooms/bitset v1.17.0 // indirect
-	github.com/bytedance/sonic/loader v0.2.2 // indirect
+	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/charmbracelet/lipgloss v1.0.0 // indirect
