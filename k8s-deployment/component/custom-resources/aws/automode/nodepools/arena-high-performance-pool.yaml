@@ -1,0 +1,54 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  # Note: Don't forget to modify this as it's just an example.
+  name: arena-high-performance-pool
+spec:
+  template:
+    metadata:
+      labels:
+        # Note: Don't forget to modify this as it's just an example.
+        billing-team: arena-high-performance-pool
+    spec:
+      nodeClassRef:
+        group: eks.amazonaws.com
+        kind: NodeClass
+        # Note: Don't forget to modify this as it's just an example.
+        name: arena-high-performance-pool
+      requirements:
+        - key: "karpenter.sh/capacity-type"
+          operator: In
+          values: ["spot", "on-demand"]
+        - key: "eks.amazonaws.com/instance-category"
+          operator: In
+          values: ["c", "m", "r", "t"]
+          minValues: 1
+        - key: "eks.amazonaws.com/instance-family"
+          operator: In
+          values: ["m5", "m5d", "c5", "c5d", "r5", "r5d", "t3a", "m6i", "c6i"]
+          minValues: 1
+        - key: "eks.amazonaws.com/instance-cpu"
+          operator: In
+          values: ["1", "2", "4", "8", "16", "32"]  # Added "1" for minimum CPU
+          # Note: This is suitable for io1 and io2.
+        - key: "eks.amazonaws.com/instance-hypervisor"
+          operator: In
+          values: ["nitro"]
+        - key: "topology.kubernetes.io/zone"
+          operator: In
+          # Note: Don't forget to modify this as it's just an example.
+          values: ["region-1a", "region-1b", "region-1c"]
+        - key: "kubernetes.io/arch"
+          operator: In
+          values: ["amd64"]
+      terminationGracePeriod: 30m
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 1h
+    budgets:
+      - nodes: 10%
+  limits:
+    # Note: Don't forget to modify this as it's just an example.
+    cpu: "100"
+    memory: 100Gi
+    weight: 10
