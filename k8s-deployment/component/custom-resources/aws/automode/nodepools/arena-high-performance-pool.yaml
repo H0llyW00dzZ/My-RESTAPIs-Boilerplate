@@ -19,6 +19,9 @@ spec:
         - key: "karpenter.sh/capacity-type"
           operator: In
           values: ["spot", "on-demand"]
+          # Note: The instance category and family will depend on the characteristics of the deployment.
+          # For example, if the characteristics of the deployment (these REST APIs) are only focusing on CPU due to its concurrency and networking requirements,
+          # it will automatically use the specifications of instances optimized for CPU and network performance, which can significantly save costs, unlike standard/static nodes.
         - key: "eks.amazonaws.com/instance-category"
           operator: In
           values: ["c", "m", "r", "t"]
