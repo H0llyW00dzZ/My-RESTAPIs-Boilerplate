@@ -44,3 +44,29 @@ These StorageClasses cover both io1 and io2 volume types, with options for encry
 
 > [!NOTE]
 > Make sure the CSI Driver for AWS EBS is installed via add-ons before applying these StorageClasses.
+
+## StorageClass Configurations for EKS Automode
+
+In addition to the standard StorageClass configurations, this repository also includes StorageClass configurations specifically tailored for Amazon EKS clusters with automode enabled.
+
+### General Purpose SSD (gp2 and gp3) StorageClasses for EKS Automode
+
+File location: `auto/ebs/gp.yaml`
+
+1. `gp2-auto-encrypted`: Automatically provisions encrypted gp2 volumes.
+2. `gp2-auto`: Automatically provisions non-encrypted gp2 volumes.
+3. `gp3-auto-encrypted`: Automatically provisions encrypted gp3 volumes.
+4. `gp3-auto`: Automatically provisions non-encrypted gp3 volumes.
+
+These StorageClasses are designed to work seamlessly with EKS automode, allowing automatic provisioning of EBS volumes with gp2 and gp3 volume types, with options for encryption.
+
+### Provisioned IOPS SSD (io1 and io2) StorageClasses for EKS Automode
+
+File location: `auto/ebs/io.yaml`
+
+1. `io1-auto-encrypted`: Automatically provisions encrypted io1 volumes with 50 IOPS per GiB.
+2. `io1-auto`: Automatically provisions non-encrypted io1 volumes with 50 IOPS per GiB.
+3. `io2-auto-encrypted`: Automatically provisions encrypted io2 volumes with 500 IOPS per GiB.
+4. `io2-auto`: Automatically provisions non-encrypted io2 volumes with 500 IOPS per GiB.
+
+These StorageClasses are designed to work seamlessly with EKS automode, allowing automatic provisioning of EBS volumes with io1 and io2 volume types, with options for encryption and specified IOPS per GiB.

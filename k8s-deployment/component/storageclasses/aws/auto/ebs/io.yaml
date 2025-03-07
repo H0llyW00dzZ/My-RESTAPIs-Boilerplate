@@ -1,0 +1,47 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: io1-auto-encrypted
+provisioner: ebs.csi.eks.amazonaws.com
+parameters:
+  type: io1
+  iopsPerGB: "50"
+  encrypted: "true"
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: io1-auto
+provisioner: ebs.csi.eks.amazonaws.com
+parameters:
+  type: io1
+  iopsPerGB: "50"
+  encrypted: "false"
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: io2-auto-encrypted
+provisioner: ebs.csi.eks.amazonaws.com
+parameters:
+  type: io2
+  iopsPerGB: "500"
+  encrypted: "true"
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: io2-auto
+provisioner: ebs.csi.eks.amazonaws.com
+parameters:
+  type: io2
+  iopsPerGB: "500"
+  encrypted: "false"
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
