@@ -53,20 +53,23 @@ In addition to the standard StorageClass configurations, this repository also in
 
 File location: `auto/ebs/gp.yaml`
 
-1. `gp2-auto-encrypted`: Automatically provisions encrypted gp2 volumes.
-2. `gp2-auto`: Automatically provisions non-encrypted gp2 volumes.
-3. `gp3-auto-encrypted`: Automatically provisions encrypted gp3 volumes.
-4. `gp3-auto`: Automatically provisions non-encrypted gp3 volumes.
+1. `gp2-auto-encrypted`: Automatically provisions and attaches/detaches encrypted gp2 volumes based on workload requirements.
+2. `gp2-auto`: Automatically provisions and attaches/detaches non-encrypted gp2 volumes based on workload requirements.
+3. `gp3-auto-encrypted`: Automatically provisions and attaches/detaches encrypted gp3 volumes based on workload requirements.
+4. `gp3-auto`: Automatically provisions and attaches/detaches non-encrypted gp3 volumes based on workload requirements.
 
-These StorageClasses are designed to work seamlessly with EKS automode, allowing automatic provisioning of EBS volumes with gp2 and gp3 volume types, with options for encryption.
+These StorageClasses are designed to work seamlessly with EKS automode, allowing automatic provisioning, attachment, and detachment of EBS volumes with gp2 and gp3 volume types, with options for encryption.
 
 ### Provisioned IOPS SSD (io1 and io2) StorageClasses for EKS Automode
 
 File location: `auto/ebs/io.yaml`
 
-1. `io1-auto-encrypted`: Automatically provisions encrypted io1 volumes with 50 IOPS per GiB.
-2. `io1-auto`: Automatically provisions non-encrypted io1 volumes with 50 IOPS per GiB.
-3. `io2-auto-encrypted`: Automatically provisions encrypted io2 volumes with 500 IOPS per GiB.
-4. `io2-auto`: Automatically provisions non-encrypted io2 volumes with 500 IOPS per GiB.
+1. `io1-auto-encrypted`: Automatically provisions and attaches/detaches encrypted io1 volumes with 50 IOPS per GiB based on workload requirements.
+2. `io1-auto`: Automatically provisions and attaches/detaches non-encrypted io1 volumes with 50 IOPS per GiB based on workload requirements.
+3. `io2-auto-encrypted`: Automatically provisions and attaches/detaches encrypted io2 volumes with 500 IOPS per GiB based on workload requirements.
+4. `io2-auto`: Automatically provisions and attaches/detaches non-encrypted io2 volumes with 500 IOPS per GiB based on workload requirements.
 
-These StorageClasses are designed to work seamlessly with EKS automode, allowing automatic provisioning of EBS volumes with io1 and io2 volume types, with options for encryption and specified IOPS per GiB.
+These StorageClasses are designed to work seamlessly with EKS automode, allowing automatic provisioning, attachment, and detachment of EBS volumes with io1 and io2 volume types, with options for encryption and specified IOPS per GiB.
+
+> [!NOTE]
+> The `StorageClasses` for `EKS Automode` do not include the `Retain` reclaim policy. In `EKS Automode`, when deployments are in specific node pools, nodes will automatically scale or change specifications to recommended cost-effective options such as Spot or On-Demand instances (depending on your node pool configuration).
