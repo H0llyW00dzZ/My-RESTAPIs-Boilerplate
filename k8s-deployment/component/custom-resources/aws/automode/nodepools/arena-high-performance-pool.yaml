@@ -18,6 +18,7 @@ spec:
       requirements:
         - key: "karpenter.sh/capacity-type"
           operator: In
+          # Note: If you get spot instances when EKS Auto Provisioning nodes, consider yourself lucky. Personally, all of my node pools use spot instances, which saves a lot of cost.
           values: ["spot", "on-demand"]
           # Note: The instance category and family will depend on the characteristics of the deployment.
           # For example, if the characteristics of the deployment (these REST APIs) are only focusing on CPU due to its concurrency and networking requirements,
@@ -47,7 +48,8 @@ spec:
       terminationGracePeriod: 30m
   disruption:
     consolidationPolicy: WhenEmptyOrUnderutilized
-    consolidateAfter: 1h
+    # Note: This can reduce downtime by changing the instance spec of the node to one suitable for the deployment/workloads
+    consolidateAfter: 24h
     budgets:
       - nodes: 10%
   limits:
