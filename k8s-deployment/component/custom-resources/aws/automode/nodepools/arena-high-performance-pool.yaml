@@ -20,7 +20,7 @@ spec:
           operator: In
           # Note: If you get spot instances when EKS Auto Provisioning nodes, consider yourself lucky. Personally, all of my node pools use spot instances, which saves a lot of cost.
           values: ["spot", "on-demand"]
-          # Note: The instance category and family will depend on the characteristics of the deployment.
+          # Note: The instance category and family will depend on the characteristics of the deployment/workloads.
           # For example, if the characteristics of the deployment (these REST APIs) are only focusing on CPU due to its concurrency and networking requirements,
           # it will automatically use the specifications of instances optimized for CPU and network performance, which can significantly save costs, unlike standard/static nodes.
         - key: "eks.amazonaws.com/instance-category"
