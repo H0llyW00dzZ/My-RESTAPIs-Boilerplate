@@ -37,6 +37,9 @@ spec:
           # Note: This is suitable for io1 and io2.
         - key: "eks.amazonaws.com/instance-hypervisor"
           operator: In
+          # Note: The "nitro" instance type is highly recommended in the new era of containerization. By default,
+          # it will use Bottlerocket Linux as the operating system. If you are familiar with hypervisor mechanisms and compare Nitro with other hypervisors like Windows Hyper-V,
+          # Nitro still comes out on top.
           values: ["nitro"]
         - key: "topology.kubernetes.io/zone"
           operator: In
