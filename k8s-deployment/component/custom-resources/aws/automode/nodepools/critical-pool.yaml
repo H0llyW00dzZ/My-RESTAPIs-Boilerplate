@@ -1,0 +1,64 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  # Note: Ensure that the name reflects the purpose of this critical node pool.
+  name: critical-pool
+spec:
+  template:
+    metadata:
+      labels:
+        # Note: Adjust the billing team label to match your organization's conventions.
+        billing-team: critical-pool
+    spec:
+      nodeClassRef:
+        group: eks.amazonaws.com
+        kind: NodeClass
+        # Note: Make sure the name matches the corresponding NodeClass resource.
+        name: critical-pool
+      requirements:
+        - key: "karpenter.sh/capacity-type"
+          operator: In
+          # Note: Consider using spot instances for cost savings, if applicable.
+          values: ["spot", "on-demand"]
+        - key: "eks.amazonaws.com/instance-category"
+          operator: In
+          # Note: Choose instance categories based on the requirements of your critical workloads.
+          values: ["r", "m", "c", "t"]
+          minValues: 1
+        - key: "eks.amazonaws.com/instance-family"
+          operator: In
+          # Note: Select instance families that align with your performance and cost requirements.
+          values: ["m5", "m5d", "m5n", "c5", "c5d", "c5n", "r5", "r5d", "r5n", "t3a", "m6i", "c6i"]
+          minValues: 1
+        - key: "eks.amazonaws.com/instance-cpu"
+          operator: In
+          # Note: Specify the CPU requirements for your critical workloads.
+          values: ["1", "2", "4", "8", "16", "32"]
+        - key: "eks.amazonaws.com/instance-hypervisor"
+          operator: In
+          # Note: Using the "nitro" hypervisor is recommended for better performance and security.
+          values: ["nitro"]
+        - key: "topology.kubernetes.io/zone"
+          operator: In
+          # Note: Don't forget to modify this as it's just an example.
+          values: ["region-1a", "region-1b", "region-1c"]
+        - key: "kubernetes.io/arch"
+          operator: In
+          values: ["amd64"]
+      taints:
+        # Note: The "CriticalAddonsOnly" taint ensures that only critical pods are scheduled on these nodes.
+        - key: "CriticalAddonsOnly"
+          value: "true"
+          effect: "NoSchedule"
+      # Note: Adjust the termination grace period based on your application's requirements.
+      terminationGracePeriod: 1h30m
+  disruption:
+    consolidationPolicy: WhenEmpty
+    # Note: Set the consolidation interval to a value that balances cost optimization and disruption minimization.
+    consolidateAfter: 3h
+  limits:
+    # Note: Adjust the CPU and memory limits based on the expected workload requirements.
+    cpu: "80"
+    memory: 128Gi
+    # Note: Set the weight to prioritize this node pool relative to others.
+    weight: 20
