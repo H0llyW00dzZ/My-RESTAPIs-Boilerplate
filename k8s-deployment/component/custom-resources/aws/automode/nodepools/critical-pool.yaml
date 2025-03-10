@@ -55,7 +55,7 @@ spec:
   disruption:
     consolidationPolicy: WhenEmpty
     # Note: Set the consolidation interval to a value that balances cost optimization and disruption minimization.
-    consolidateAfter: 3h
+    consolidateAfter: 24h
   limits:
     # Note: Adjust the CPU and memory limits based on the expected workload requirements.
     cpu: "80"
