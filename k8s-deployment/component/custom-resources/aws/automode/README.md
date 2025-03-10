@@ -44,3 +44,23 @@ The `critical-pool.yaml` file defines a NodePool for critical workloads. It incl
 
 > [!NOTE]
 > Make sure to review and modify the values in the configuration files to match your specific requirements and environment.
+
+## Best Practices for Controlling Node Pools via EKS Automode
+
+1. Ensure that the node pools match your specific requirements and environment. For example, the `critical-pool` is suitable for deploying Kubernetes components such as CoreDNS with HPA, Ingress Nginx, and other deployments that rely on the `kube-system` namespace.
+
+2. Use meaningful names for your node pools that reflect their purpose and workload characteristics. This helps in identifying and managing node pools effectively.
+
+3. Adjust the labels, node class references, and resource requirements according to your organization's conventions and the specific needs of your workloads.
+
+4. Consider using Spot instances for cost optimization, especially for non-critical workloads. However, ensure that you have appropriate fallback mechanisms in place.
+
+5. Utilize taints and tolerations to control pod scheduling on specific node pools. For example, the `critical-pool` uses the "CriticalAddonsOnly" taint to ensure that only critical pods are scheduled on those nodes.
+
+6. Set appropriate termination grace periods for your node pools based on the nature of your workloads and the time required for graceful shutdown.
+
+7. Define disruption budgets and consolidation policies to minimize the impact of node terminations and optimize resource utilization.
+
+8. Regularly review and adjust the resource limits (CPU, memory, weight) of your node pools based on actual usage patterns and the evolving needs of your workloads.
+
+By following these best practices and carefully configuring your node pools, you can ensure optimal performance, reliability, and cost-efficiency for your EKS cluster.
