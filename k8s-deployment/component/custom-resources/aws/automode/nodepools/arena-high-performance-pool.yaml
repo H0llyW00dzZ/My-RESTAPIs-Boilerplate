@@ -48,13 +48,14 @@ spec:
         - key: "kubernetes.io/arch"
           operator: In
           values: ["amd64"]
-      terminationGracePeriod: 30m
+      terminationGracePeriod: 1h
   disruption:
     consolidationPolicy: WhenEmptyOrUnderutilized
     # Note: This can reduce downtime by changing the instance spec of the node to one suitable for the deployment/workloads
     consolidateAfter: 24h
     budgets:
-      - nodes: 10%
+      # Setting a fixed minimum of 1 node is better than using a percentage-based value
+      - nodes: "1"
   limits:
     # Note: Don't forget to modify this as it's just an example.
     cpu: "100"
