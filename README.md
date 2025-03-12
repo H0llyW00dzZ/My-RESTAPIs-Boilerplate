@@ -585,9 +585,8 @@ Due to the use of [Sonic JSON](https://github.com/bytedance/sonic) for encoding/
 - `ARM64`
 
 > [!NOTE]
-> Although designed for `multi-architecture` workloads, this boilerplate always uses the latest version of Go.
-> Currently, Sonic JSON doesn't support the latest Go version (1.24.0). Therefore, when Sonic lacks support,
-> it defaults to using the standard library for JSON encoding/decoding, which might support any architecture.
+> Although this boilerplate is designed for `multi-architecture` workloads and aims to use the latest version of Go, it's important to note that Sonic JSON supports the latest version of Go but does not support Go version `1.24.0`. When using Go version `1.24.0`, the boilerplate falls back to using the standard library for JSON encoding and decoding, which may support a wider range of architectures.
+> To make Sonic JSON support Go version `1.24.0`, you can refer to the [documentation](https://github.com/bytedance/sonic?tab=readme-ov-file#requirement) for additional information and requirements.
 
 ## License
 
