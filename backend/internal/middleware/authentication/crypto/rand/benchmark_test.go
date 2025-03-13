@@ -381,13 +381,26 @@ func BenchmarkGenerateTextWith500Length(b *testing.B) {
 //	goarch: amd64
 //	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
 //	cpu: AMD Ryzen 9 3900X 12-Core Processor
-//	BenchmarkGenerateFixedUUID-24    	 2163597	       555.5 ns/op	     184 B/op	       7 allocs/op
+//	BenchmarkGenerateFixedUUID/WithHyphens-24         	 2186991	       546.6 ns/op	     184 B/op	       7 allocs/op
+//	BenchmarkGenerateFixedUUID/WithoutHyphens-24      	 1760920	       680.4 ns/op	     216 B/op	       8 allocs/op
 //	PASS
-//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	1.207s
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	2.400s
 func BenchmarkGenerateFixedUUID(b *testing.B) {
-	for b.Loop() {
-		if _, err := rand.GenerateFixedUUID(); err != nil {
-			b.Fatal(err)
-		}
+	tests := []struct {
+		name          string
+		removeHyphens bool
+	}{
+		{"WithHyphens", false},
+		{"WithoutHyphens", true},
+	}
+
+	for _, tt := range tests {
+		b.Run(tt.name, func(b *testing.B) {
+			for b.Loop() {
+				if _, err := rand.GenerateFixedUUID(rand.UUIDFormat{RemoveHyphens: tt.removeHyphens}); err != nil {
+					b.Fatalf("unexpected error: %v", err)
+				}
+			}
+		})
 	}
 }
