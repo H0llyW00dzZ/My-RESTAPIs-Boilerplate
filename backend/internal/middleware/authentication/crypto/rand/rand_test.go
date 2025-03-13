@@ -237,57 +237,41 @@ func TestGenerateFixedUUID(t *testing.T) {
 	uuidPatternWithoutHyphens := `^[a-f0-9]{32}$`
 	reWithoutHyphens := regexp.MustCompile(uuidPatternWithoutHyphens)
 
-	// Test case 1: Generate UUID with hyphens
-	t.Run("WithHyphens", func(t *testing.T) {
-		// Generate a UUID and check for errors.
-		uuid, err := rand.GenerateFixedUUID()
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		t.Logf("Generated UUID: %s", uuid)
+	tests := []struct {
+		name          string
+		removeHyphens bool
+		pattern       *regexp.Regexp
+	}{
+		{"WithHyphens", false, re},
+		{"WithoutHyphens", true, reWithoutHyphens},
+	}
 
-		// Verify the format of the UUID.
-		if !re.MatchString(uuid) {
-			t.Errorf("UUID %s does not match expected format", uuid)
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Generate a UUID and check for errors.
+			uuid, err := rand.GenerateFixedUUID(rand.UUIDFormat{RemoveHyphens: tt.removeHyphens})
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			t.Logf("Generated UUID: %s", uuid)
 
-		// Generate another UUID and ensure it is different from the first.
-		uuid2, err := rand.GenerateFixedUUID()
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		t.Logf("Generated UUID: %s", uuid2)
+			// Verify the format of the UUID.
+			if !tt.pattern.MatchString(uuid) {
+				t.Errorf("UUID %s does not match expected format", uuid)
+			}
 
-		if uuid == uuid2 {
-			t.Error("expected different UUIDs, but got the same")
-		}
-	})
+			// Generate another UUID and ensure it is different from the first.
+			uuid2, err := rand.GenerateFixedUUID(rand.UUIDFormat{RemoveHyphens: tt.removeHyphens})
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			t.Logf("Generated UUID: %s", uuid2)
 
-	// Test case 2: Generate UUID without hyphens
-	t.Run("WithoutHyphens", func(t *testing.T) {
-		// Generate a UUID without hyphens and check for errors.
-		uuid, err := rand.GenerateFixedUUID(rand.UUIDFormat{RemoveHyphens: true})
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		t.Logf("Generated UUID without hyphens: %s", uuid)
-
-		// Verify the format of the UUID without hyphens.
-		if !reWithoutHyphens.MatchString(uuid) {
-			t.Errorf("UUID %s does not match expected format without hyphens", uuid)
-		}
-
-		// Generate another UUID without hyphens and ensure it is different from the first.
-		uuid2, err := rand.GenerateFixedUUID(rand.UUIDFormat{RemoveHyphens: true})
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		t.Logf("Generated UUID without hyphens: %s", uuid2)
-
-		if uuid == uuid2 {
-			t.Error("expected different UUIDs without hyphens, but got the same")
-		}
-	})
+			if uuid == uuid2 {
+				t.Error("expected different UUIDs, but got the same")
+			}
+		})
+	}
 }
 
 func textCaseToString(tc rand.TextCase) string {
