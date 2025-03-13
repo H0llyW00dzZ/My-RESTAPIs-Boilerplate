@@ -382,9 +382,9 @@ func BenchmarkGenerateTextWith500Length(b *testing.B) {
 //	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
 //	cpu: AMD Ryzen 9 3900X 12-Core Processor
 //	BenchmarkGenerateFixedUUID/WithHyphens-24         	 2186991	       546.6 ns/op	     184 B/op	       7 allocs/op
-//	BenchmarkGenerateFixedUUID/WithoutHyphens-24      	 1760920	       680.4 ns/op	     216 B/op	       8 allocs/op
+//	BenchmarkGenerateFixedUUID/WithoutHyphens-24      	 2337110	       512.1 ns/op	     168 B/op	       7 allocs/op
 //	PASS
-//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	2.400s
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	2.401s
 func BenchmarkGenerateFixedUUID(b *testing.B) {
 	tests := []struct {
 		name          string
