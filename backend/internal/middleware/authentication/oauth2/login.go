@@ -20,7 +20,11 @@ import (
 // For example, the session storage can use Redis, while the actual user data (e.g., name, email) can be stored and inserted into MySQL.
 func (m *Manager) HandleLogin(c *fiber.Ctx) error {
 	// Note: This safe against CSRF Attacks 🤪
-	state, err := rand.GenerateFixedUUID()
+	state, err := rand.GenerateFixedUUID(
+		rand.UUIDFormat{
+			RemoveHyphens: true,
+		},
+	)
 	if err != nil {
 		return err
 	}
