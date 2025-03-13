@@ -7,7 +7,6 @@ package rand
 
 import (
 	"fmt"
-	"strings"
 )
 
 // UUIDFormat represents the format options for generating UUIDs.
@@ -48,12 +47,14 @@ func GenerateFixedUUID(format ...UUIDFormat) (string, error) {
 	uuid[6] = (uuid[6] & 0x0f) | 0x40 // Version 4
 	uuid[8] = (uuid[8] & 0x3f) | 0x80 // Variant is 10
 
-	uuidStr := fmt.Sprintf("%08x-%04x-%04x-%04x-%012x",
-		uuid[0:4], uuid[4:6], uuid[6:8], uuid[8:10], uuid[10:])
-
 	if opts.RemoveHyphens {
-		uuidStr = strings.ReplaceAll(uuidStr, "-", "")
+		// Construct the UUID string without hyphens directly
+		// Note: This much faster.
+		return fmt.Sprintf("%08x%04x%04x%04x%012x",
+			uuid[0:4], uuid[4:6], uuid[6:8], uuid[8:10], uuid[10:]), nil
 	}
 
-	return uuidStr, nil
+	// Construct the UUID string with hyphens
+	return fmt.Sprintf("%08x-%04x-%04x-%04x-%012x",
+		uuid[0:4], uuid[4:6], uuid[6:8], uuid[8:10], uuid[10:]), nil
 }
