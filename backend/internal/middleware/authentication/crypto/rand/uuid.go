@@ -7,13 +7,30 @@ package rand
 
 import (
 	"fmt"
+	"strings"
 )
+
+// UUIDFormat represents the format options for generating UUIDs.
+type UUIDFormat struct {
+	RemoveHyphens bool
+}
 
 // GenerateFixedUUID creates a new UUID using [crypto/rand] for high randomness.
 //
 // Note: Unlike most UUID implementations bound by RFC standards,
 // this is purely random and not bound to any specific format/resource (e.g., disk (serial), memory, clock, other hardware id).
-func GenerateFixedUUID() (string, error) {
+//
+// The format of the generated UUID can be customized using the UUIDFormat struct.
+// If no format options are provided, the default format with hyphens will be used.
+func GenerateFixedUUID(format ...UUIDFormat) (string, error) {
+	// Set default format options if none are provided
+	opts := UUIDFormat{
+		RemoveHyphens: false,
+	}
+	if len(format) > 0 {
+		opts = format[0]
+	}
+
 	// Use FixedSizeReader to ensure a consistent 16-byte read.
 	reader := FixedSizeReader(16)
 	uuid := make([]byte, 16)
@@ -31,6 +48,12 @@ func GenerateFixedUUID() (string, error) {
 	uuid[6] = (uuid[6] & 0x0f) | 0x40 // Version 4
 	uuid[8] = (uuid[8] & 0x3f) | 0x80 // Variant is 10
 
-	return fmt.Sprintf("%08x-%04x-%04x-%04x-%012x",
-		uuid[0:4], uuid[4:6], uuid[6:8], uuid[8:10], uuid[10:]), nil
+	uuidStr := fmt.Sprintf("%08x-%04x-%04x-%04x-%012x",
+		uuid[0:4], uuid[4:6], uuid[6:8], uuid[8:10], uuid[10:])
+
+	if opts.RemoveHyphens {
+		uuidStr = strings.ReplaceAll(uuidStr, "-", "")
+	}
+
+	return uuidStr, nil
 }
