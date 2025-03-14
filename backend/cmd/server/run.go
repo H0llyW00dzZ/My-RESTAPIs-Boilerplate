@@ -13,6 +13,8 @@ import (
 	setupTLS "h0llyw00dz-template/backend/internal/middleware/authentication/crypto/tls"
 	"h0llyw00dz-template/backend/pkg/convert"
 	"h0llyw00dz-template/backend/pkg/network/cidr"
+	"net"
+	"strconv"
 	"time"
 
 	"github.com/bytedance/sonic"
@@ -147,7 +149,8 @@ func setupFiber(config Config) *fiber.App {
 // If the certificate is valid and properly configured, the server will run; otherwise, it won't run.
 func startServer(app *fiber.App, config Config) {
 	// Define the server address using the specified port
-	addr := fmt.Sprintf(":%s", config.Port)
+	addr := findAvailablePort(config.Port)
+	newAddr := fmt.Sprintf(":%s", addr)
 
 	// Create a new instance of the server
 	server := handler.NewFiberServer(app, config.AppName, config.MonitorPath)
@@ -163,10 +166,10 @@ func startServer(app *fiber.App, config Config) {
 	// Start the server with graceful shutdown and monitor
 	if tlsConfig != nil {
 		// Start the server with TLS or mTLS ?
-		handler.StartServer(server, addr, config.MonitorPath, config.ShutdownTimeout, tlsConfig, nil)
+		handler.StartServer(server, newAddr, config.MonitorPath, config.ShutdownTimeout, tlsConfig, nil)
 	} else {
 		// Start the server without TLS
-		handler.StartServer(server, addr, config.MonitorPath, config.ShutdownTimeout, nil, nil)
+		handler.StartServer(server, newAddr, config.MonitorPath, config.ShutdownTimeout, nil, nil)
 	}
 }
 
@@ -178,4 +181,39 @@ func parseDuration(durationStr string) time.Duration {
 		return 5 * time.Second
 	}
 	return duration
+}
+
+// findAvailablePort tries to bind to a list of ports and returns the first available one.
+//
+// TODO: Make this function configurable through an environment variable.
+// For example, if the "DYNAMIC_PORT" environment variable is set to "true", then call this function.
+func findAvailablePort(startPort string) string {
+	// Convert the startPort string to an integer.
+	port, err := strconv.Atoi(startPort)
+	if err != nil {
+		// Log a fatal error if the port format is invalid.
+		log.LogFatalf("invalid port format: %s", startPort)
+	}
+
+	// Define the maximum range of ports to check.
+	const maxRange = 100000
+	// Calculate the maximum port number to check.
+	maxPort := port + maxRange
+
+	// Iterate over the range of ports starting from the given port.
+	for currentPort := port; currentPort < maxPort; currentPort++ {
+		// Format the current port as a network address.
+		address := fmt.Sprintf(":%d", currentPort)
+		// Try to listen on the current port.
+		ln, err := net.Listen("tcp", address)
+		if err == nil {
+			// Close the listener and return the first available port as a string.
+			ln.Close()
+			return strconv.Itoa(currentPort)
+		}
+	}
+
+	// Log a fatal error if no available ports are found in the specified range.
+	log.LogFatalf("no available ports found in the range %d to %d", port, maxPort-1)
+	return "" // Unreachable code, added for compilation purposes.
 }
