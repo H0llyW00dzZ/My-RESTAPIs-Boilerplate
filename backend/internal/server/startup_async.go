@@ -72,6 +72,9 @@ func NewFiberServer(app *fiber.App, appName, monitorPath string) *FiberServer {
 }
 
 // Start runs the Fiber server in a separate goroutine to listen for incoming requests.
+//
+// TODO: Improve by using dynamic ports for listening. For example, if port 8080 is unavailable, it will automatically bind to port 8081.
+// If port 8081 is still unavailable, it will bind to port 8082. If port 8082 is still unavailable, it will keep rotating and binding to the next available port (e.g., 8099999).
 func (s *FiberServer) Start(addr, monitorPath string, tlsConfig *tls.Config, streamListener net.Listener) {
 	// Important: Do not modify the current implementation of the HTTPS/TLS mechanism (e.g., by removing the tlsHandler struct).
 	// This implementation is similar to the default Fiber setup, with the key difference being that it can be customized to support
