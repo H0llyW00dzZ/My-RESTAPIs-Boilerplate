@@ -69,6 +69,7 @@ func New(cfg Config) *Manager {
 	return &Manager{
 		config: config,
 		store:  store,
-		db:     cfg.DB,
+		// TODO: The DB field will be used to verify the user in the database after the token is exchanged, as mentioned earlier in callback.go.
+		db: cfg.DB,
 	}
 }
