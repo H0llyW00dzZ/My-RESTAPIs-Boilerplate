@@ -34,7 +34,7 @@ type Config struct {
 	RedirectURL   string
 	SessionConfig session.Config
 	// Note: The DB field cannot be nil.
-	DB database.Service
+	DB database.ServiceAuth
 }
 
 // Manager represents an OAuth2 manager that handles the OAuth2 flow.
@@ -42,7 +42,7 @@ type Config struct {
 type Manager struct {
 	config *oauth2.Config
 	store  *session.Store
-	db     database.Service
+	db     database.ServiceAuth
 }
 
 // New creates a new instance of the OAuth2 Manager.
