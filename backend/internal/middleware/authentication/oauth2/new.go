@@ -55,7 +55,7 @@ type Manager struct {
 //
 //	// Create the OAuth2 configuration
 //	cfg := oauth2.Config{
-//		Provider:      "Google",
+//		Provider:      oauth2.ProviderGoogle,
 //		ClientID:      "your-client-id",
 //		ClientSecret:  "your-client-secret",
 //		RedirectURL:   "your-redirect-url",
