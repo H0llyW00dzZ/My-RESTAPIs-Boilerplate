@@ -7,6 +7,7 @@ package oauth2
 
 import (
 	"fmt"
+	"h0llyw00dz-template/backend/internal/database"
 
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"golang.org/x/oauth2"
@@ -32,6 +33,8 @@ type Config struct {
 	ClientSecret  string
 	RedirectURL   string
 	SessionConfig session.Config
+	// Note: The DB field cannot be nil.
+	DB database.Service
 }
 
 // Manager represents an OAuth2 manager that handles the OAuth2 flow.
@@ -39,6 +42,7 @@ type Config struct {
 type Manager struct {
 	config *oauth2.Config
 	store  *session.Store
+	db     database.Service
 }
 
 // New creates a new instance of the OAuth2 Manager.
@@ -65,5 +69,6 @@ func New(cfg Config) *Manager {
 	return &Manager{
 		config: config,
 		store:  store,
+		db:     cfg.DB,
 	}
 }
