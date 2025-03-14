@@ -152,6 +152,9 @@ type Service interface {
 	RestartMySQLConnection() error
 
 	// AuthUser returns the ServiceAuth interface for managing user authentication-related database operations.
+	//
+	// Note: This can be used to connect code to other functions once database.New() is called. The reason for implementing it like this
+	// is that it's a better approach for maintaining a large codebase, as it uses the singleton pattern for database management.
 	Auth() ServiceAuth
 
 	// SetKeysAtPipeline efficiently sets multiple key-value pairs in Redis/Valkey with a specified TTL (Time To Live) using pipelining.
