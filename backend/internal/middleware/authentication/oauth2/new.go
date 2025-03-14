@@ -47,6 +47,24 @@ type Manager struct {
 
 // New creates a new instance of the OAuth2 Manager.
 // It takes a Config struct as a parameter and returns a pointer to the Manager.
+//
+// Example Usage:
+//
+//	// Create an instance of the database service
+//	dbService := database.New()
+//
+//	// Create the OAuth2 configuration
+//	cfg := oauth2.Config{
+//		Provider:      "Google",
+//		ClientID:      "your-client-id",
+//		ClientSecret:  "your-client-secret",
+//		RedirectURL:   "your-redirect-url",
+//		SessionConfig: sessionConfig,
+//		DB:            dbService.AuthUser(),
+//	}
+//
+//	// Create an instance of the OAuth2 manager
+//	manager := oauth2.New(cfg)
 func New(cfg Config) *Manager {
 	var config *oauth2.Config
 
