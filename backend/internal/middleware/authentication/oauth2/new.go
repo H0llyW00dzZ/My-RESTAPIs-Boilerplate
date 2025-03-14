@@ -66,6 +66,11 @@ type Manager struct {
 //	// Create an instance of the OAuth2 manager
 //	manager := oauth2.New(cfg)
 func New(cfg Config) *Manager {
+	// Check if the DB field in the Config struct is nil
+	if cfg.DB == nil {
+		panic("better oauth2: DB field in the Config struct cannot be nil")
+	}
+
 	var config *oauth2.Config
 
 	switch cfg.Provider {
