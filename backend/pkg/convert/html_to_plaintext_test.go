@@ -89,6 +89,11 @@ func TestHTMLToPlainText(t *testing.T) {
 					<p>Hello HTML Frontend, from Go.</p>`,
 			expected: crlf + "\t\t\t\t\t" + crlf + crlf + "Hello HTML Frontend, from Go." + crlf + crlf,
 		},
+		{
+			name:     "Another Links",
+			input:    "Visit <a href=\"https://go.dev/dl/\">Go Dev</a> to download Go.",
+			expected: "Visit [Go Dev](https://go.dev/dl/) to download Go.",
+		},
 	}
 
 	for _, tt := range tests {
