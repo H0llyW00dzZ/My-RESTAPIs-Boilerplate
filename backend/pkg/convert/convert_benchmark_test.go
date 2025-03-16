@@ -23,7 +23,7 @@ const (
 </head>
 <body>
     <div class="content">
-        <h1>Why Go is Great for Systems Programming</h1>
+        <h1>Why Go is Great for Systems Programming ? 🤔</h1>
         <p>Go, also known as Golang, is designed for simplicity and efficiency.</p>
         <p>Here are some reasons why Go excels:</p>
         <ul>
