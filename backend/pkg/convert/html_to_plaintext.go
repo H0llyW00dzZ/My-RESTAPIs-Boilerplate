@@ -63,6 +63,8 @@ func handleElementNode(n *html.Node, textContent *strings.Builder, inList *bool)
 		// TODO: This case for "a" might be unnecessary; will remove it later.
 	case "a":
 		handleAnchorTag(n, textContent)
+	case "img":
+		handleImageTag(n, textContent)
 	}
 }
 
@@ -152,4 +154,21 @@ func HTMLToPlainTextStreams(i io.Reader, o io.Writer) error {
 
 	_, err = o.Write([]byte(textContent.String()))
 	return err
+}
+
+// handleImageTag processes <img> tags.
+func handleImageTag(n *html.Node, textContent *strings.Builder) {
+	src := ""
+	alt := ""
+
+	for _, attr := range n.Attr {
+		if attr.Key == "src" {
+			src = attr.Val
+		}
+		if attr.Key == "alt" {
+			alt = attr.Val
+		}
+	}
+
+	textContent.WriteString(fmt.Sprintf("![%s](%s)", alt, src))
 }
