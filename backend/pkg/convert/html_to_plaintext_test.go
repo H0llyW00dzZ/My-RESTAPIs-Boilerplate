@@ -13,7 +13,7 @@ import (
 )
 
 func TestHTMLToPlainText(t *testing.T) {
-	// Note: This depends on the OS. Linux/Unix uses "\n", while Windows uses "\r\n" due to MS-DOS conventions.
+	// Note: This test might depends on the OS. Linux/Unix uses "\n", while Windows uses "\r\n" due to MS-DOS conventions.
 	// When testing on Windows, "\r" might be required.
 	crlf := "\n"
 	if runtime.GOOS == "windows" {
