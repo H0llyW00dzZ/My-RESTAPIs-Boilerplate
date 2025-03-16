@@ -37,7 +37,7 @@ func TestHTMLToPlainText(t *testing.T) {
 		},
 		{
 			name:     "HTML with CRLF",
-			input:    "<p>Hello,\r" + crlf + "World!</p>",
+			input:    "<p>Hello,\r\nWorld!</p>",
 			expected: crlf + crlf + "Hello," + crlf + "World!" + crlf + crlf,
 		},
 		{
