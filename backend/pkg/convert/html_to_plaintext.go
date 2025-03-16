@@ -7,6 +7,7 @@ package convert
 
 import (
 	"fmt"
+	"io"
 	"runtime"
 	"strings"
 
@@ -132,4 +133,23 @@ func handleClosingTags(n *html.Node, textContent *strings.Builder, inList *bool)
 	case "h1", "h2", "h3", "h4", "h5", "h6":
 		textContent.WriteString(newline)
 	}
+}
+
+// HTMLToPlainTextStreams converts HTML content from an input stream to plain text
+// and writes it to an output stream.
+//
+// Note: This function does not fully handle elements like "<script>" or other non-text content.
+//
+// TODO: Improving this will require additional filtering, possibly using regex.
+func HTMLToPlainTextStreams(i io.Reader, o io.Writer) error {
+	doc, err := html.Parse(i)
+	if err != nil {
+		return err // Return error if parsing fails
+	}
+
+	var textContent strings.Builder
+	extractText(doc, &textContent, false)
+
+	_, err = o.Write([]byte(textContent.String()))
+	return err
 }

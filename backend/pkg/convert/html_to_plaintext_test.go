@@ -6,8 +6,10 @@
 package convert_test
 
 import (
+	"bytes"
 	"h0llyw00dz-template/backend/pkg/convert"
 	"runtime"
+	"strings"
 	"testing"
 )
 
@@ -35,7 +37,7 @@ func TestHTMLToPlainText(t *testing.T) {
 		},
 		{
 			name:     "HTML with CRLF",
-			input:    "<p>Hello,\r\nWorld!</p>",
+			input:    "<p>Hello,\r" + crlf + "World!</p>",
 			expected: crlf + crlf + "Hello," + crlf + "World!" + crlf + crlf,
 		},
 		{
@@ -94,6 +96,11 @@ func TestHTMLToPlainText(t *testing.T) {
 			input:    "Visit <a href=\"https://go.dev/dl/\">Go Dev</a> to download Go.",
 			expected: "Visit [Go Dev](https://go.dev/dl/) to download Go.",
 		},
+		{
+			name:     "Large Input",
+			input:    largeInput,
+			expected: crlf + "    Go Programming Language" + crlf + "    " + crlf + "" + crlf + "" + crlf + "    " + crlf + "" + crlf + "" + crlf + "        " + crlf + "Why Go is Great for Systems Programming" + crlf + "" + crlf + "        " + crlf + "" + crlf + "Go, also known as Golang, is designed for simplicity and efficiency." + crlf + "" + crlf + "" + crlf + "        " + crlf + "" + crlf + "Here are some reasons why Go excels:" + crlf + "" + crlf + "" + crlf + "        " + crlf + "" + crlf + "            - Concurrency support with goroutines" + crlf + "" + crlf + "            - Fast compilation times" + crlf + "" + crlf + "            - Robust standard library" + crlf + "" + crlf + "        " + crlf + "" + crlf + "        " + crlf + "" + crlf + "Discover more about Go at the [official site](https://go.dev)." + crlf + "" + crlf + "" + crlf + "    " + crlf + "" + crlf + "" + crlf + "" + crlf + "",
+		},
 	}
 
 	for _, tt := range tests {
@@ -105,5 +112,34 @@ func TestHTMLToPlainText(t *testing.T) {
 				t.Errorf("expected: %q, got %q", tt.expected, result)
 			}
 		})
+	}
+}
+
+func TestHTMLToPlainTextStreams_LargeInput(t *testing.T) {
+	// Determine the newline character based on the operating system.
+	crlf := "\n"
+	if runtime.GOOS == "windows" {
+		crlf = "\r\n"
+	}
+
+	// Expected plain text output.
+	expected := crlf + "    Go Programming Language" + crlf + "    " + crlf + "" + crlf + "" + crlf + "    " + crlf + "" + crlf + "" + crlf + "        " + crlf + "Why Go is Great for Systems Programming" + crlf + "" + crlf + "        " + crlf + "" + crlf + "Go, also known as Golang, is designed for simplicity and efficiency." + crlf + "" + crlf + "" + crlf + "        " + crlf + "" + crlf + "Here are some reasons why Go excels:" + crlf + "" + crlf + "" + crlf + "        " + crlf + "" + crlf + "            - Concurrency support with goroutines" + crlf + "" + crlf + "            - Fast compilation times" + crlf + "" + crlf + "            - Robust standard library" + crlf + "" + crlf + "        " + crlf + "" + crlf + "        " + crlf + "" + crlf + "Discover more about Go at the [official site](https://go.dev)." + crlf + "" + crlf + "" + crlf + "    " + crlf + "" + crlf + "" + crlf + "" + crlf + ""
+
+	// Create a reader and writer for the test.
+	input := strings.NewReader(largeInput)
+	var output bytes.Buffer
+
+	// Run the conversion.
+	err := convert.HTMLToPlainTextStreams(input, &output)
+	if err != nil {
+		t.Fatalf("Failed to convert HTML to plain text: %v", err)
+	}
+
+	// Get the result and compare it to the expected output.
+	result := output.String()
+	t.Log("Expected:", expected)
+	t.Log("Result:", result)
+	if result != expected {
+		t.Errorf("expected: %q, got %q", expected, result)
 	}
 }
