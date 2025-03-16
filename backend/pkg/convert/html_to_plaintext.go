@@ -142,7 +142,7 @@ func handleClosingTags(n *html.Node, textContent *strings.Builder, inList *bool)
 }
 
 // HTMLToPlainTextStreams converts HTML content from an input stream to plain text
-// and writes it to an output stream.
+// and writes it to an output stream (a.k.a Hybrid Streaming).
 //
 // Note: This function does not fully handle elements like "<script>" or other non-text content.
 //
