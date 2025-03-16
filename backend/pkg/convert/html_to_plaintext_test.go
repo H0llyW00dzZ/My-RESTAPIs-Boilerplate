@@ -13,7 +13,7 @@ import (
 )
 
 func TestHTMLToPlainText(t *testing.T) {
-	// Note: This test might depends on the OS. Linux/Unix uses "\n", while Windows uses "\r\n" due to MS-DOS conventions.
+	// Note: This test might depend on the OS. Linux/Unix uses "\n", while Windows uses "\r\n" due to MS-DOS conventions.
 	// When testing on Windows, "\r" might be required.
 	crlf := "\n"
 	if runtime.GOOS == "windows" {
@@ -44,6 +44,11 @@ func TestHTMLToPlainText(t *testing.T) {
 			name:     "HTML with Nested Elements",
 			input:    "<div>Hello,<br>World!</div>",
 			expected: "Hello,World!",
+		},
+		{
+			name:     "Complex HTML Structure",
+			input:    "<div><h1>Hello</h1> <span>HTML</span> <p>Frontend,</p> <strong>from Go</strong></div>",
+			expected: "Hello HTML Frontend, from Go",
 		},
 	}
 
