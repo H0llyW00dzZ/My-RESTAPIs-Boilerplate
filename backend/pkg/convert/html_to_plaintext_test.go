@@ -205,8 +205,12 @@ func TestHTMLToPlainTextStreamsConcurrent(t *testing.T) {
 
 	result := output.String()
 	for i, expected := range expectedOutputs {
+		t.Logf("Test %d - Expected Output: %q", i, expected)
+		t.Logf("Test %d - Actual Result: %q", i, result)
 		if !strings.Contains(result, expected) {
 			t.Errorf("Test %d failed: expected to find %q in result, but it was missing", i, expected)
+		} else {
+			t.Logf("Test %d passed: found expected output.", i)
 		}
 	}
 }
