@@ -8,6 +8,7 @@ package convert_test
 import (
 	"bytes"
 	"h0llyw00dz-template/backend/pkg/convert"
+	"io"
 	"runtime"
 	"strings"
 	"testing"
@@ -15,10 +16,7 @@ import (
 
 func TestHTMLToPlainText(t *testing.T) {
 	// Determine the newline character based on the operating system.
-	crlf := "\n"
-	if runtime.GOOS == "windows" {
-		crlf = "\r\n"
-	}
+	crlf := getNewline()
 
 	tests := []struct {
 		name     string
@@ -117,10 +115,7 @@ func TestHTMLToPlainText(t *testing.T) {
 
 func TestHTMLToPlainTextStreams_LargeInput(t *testing.T) {
 	// Determine the newline character based on the operating system.
-	crlf := "\n"
-	if runtime.GOOS == "windows" {
-		crlf = "\r\n"
-	}
+	crlf := getNewline()
 
 	// Expected plain text output.
 	expected := crlf + "    Go Programming Language" + crlf + "    " + crlf + "" + crlf + "" + crlf + "    " + crlf + "" + crlf + "" + crlf + "        " + crlf + "Why Go is Great for Systems Programming ? 🤔" + crlf + "" + crlf + "\t\t![Gopher Biplane Ready To Fly](https://go.dev/images/gophers/biplane.svg)" + crlf + "        " + crlf + "" + crlf + "Go, also known as Golang, is designed for simplicity and efficiency." + crlf + "" + crlf + "" + crlf + "        " + crlf + "" + crlf + "Here are some reasons why Go excels:" + crlf + "" + crlf + "" + crlf + "        " + crlf + "" + crlf + "            - Concurrency support with goroutines" + crlf + "" + crlf + "            - Fast compilation times" + crlf + "" + crlf + "            - Robust standard library" + crlf + "" + crlf + "        " + crlf + "" + crlf + "        " + crlf + "" + crlf + "Discover more about Go at the [official site](https://go.dev)." + crlf + "" + crlf + "" + crlf + "    " + crlf + "" + crlf + "" + crlf + "" + crlf + ""
@@ -141,5 +136,77 @@ func TestHTMLToPlainTextStreams_LargeInput(t *testing.T) {
 	t.Log("Result:", result)
 	if result != expected {
 		t.Errorf("expected: %q, got %q", expected, result)
+	}
+}
+
+// getNewline returns the appropriate newline characters based on the operating system.
+//
+// Note: Currently supports only Linux/Unix and Windows (MS-DOS). Other OS support is marked as TODO.
+func getNewline() string {
+	if runtime.GOOS == "windows" {
+		return "\r\n"
+	}
+	return "\n"
+}
+
+func TestHTMLToPlainTextConcurrent(t *testing.T) {
+	// Determine the newline character based on the operating system.
+	crlf := getNewline()
+
+	htmlContents := []string{
+		"<p>Hello, World!</p>",
+		"<h1>Title</h1><p>Paragraph</p>",
+		"<div><a href=\"https://example.com\">Link</a></div>",
+	}
+
+	expectedResults := []string{
+		crlf + crlf + "Hello, World!" + crlf + crlf,
+		crlf + "Title" + crlf + crlf + crlf + "Paragraph" + crlf + crlf,
+		crlf + crlf + "[Link](https://example.com)" + crlf + crlf,
+	}
+
+	results := convert.HTMLToPlainTextConcurrent(htmlContents)
+
+	for i, result := range results {
+		t.Log("Expected:", expectedResults[i])
+		t.Log("Result:", result)
+		if result != expectedResults[i] {
+			t.Errorf("Test %d failed: expected %q, got %q", i, expectedResults[i], result)
+		}
+	}
+}
+
+func TestHTMLToPlainTextStreamsConcurrent(t *testing.T) {
+	crlf := getNewline()
+
+	htmlInputs := []string{
+		"<p>Hello, World!</p>",
+		"<h1>Title</h1><p>Paragraph</p>",
+		"<div><a href=\"https://example.com\">Link</a></div>",
+	}
+
+	expectedOutputs := []string{
+		crlf + crlf + "Hello, World!" + crlf + crlf,
+		crlf + "Title" + crlf + crlf + crlf + "Paragraph" + crlf + crlf,
+		crlf + crlf + "[Link](https://example.com)" + crlf + crlf,
+	}
+
+	var readers []io.Reader
+	for _, input := range htmlInputs {
+		readers = append(readers, strings.NewReader(input))
+	}
+
+	var output bytes.Buffer
+	errs := convert.HTMLToPlainTextStreamsConcurrent(readers, &output)
+
+	if len(errs) > 0 {
+		t.Fatalf("Encountered errors: %v", errs)
+	}
+
+	result := output.String()
+	for i, expected := range expectedOutputs {
+		if !strings.Contains(result, expected) {
+			t.Errorf("Test %d failed: expected to find %q in result, but it was missing", i, expected)
+		}
 	}
 }
