@@ -8,7 +8,6 @@ package convert_test
 import (
 	"h0llyw00dz-template/backend/pkg/convert"
 	"runtime"
-	"strings"
 	"testing"
 )
 
@@ -32,13 +31,13 @@ func TestHTMLToPlainText(t *testing.T) {
 		},
 		{
 			name:     "HTML with Newlines",
-			input:    "<p>Hello,\nWorld!</p>",
-			expected: crlf + crlf + "Hello,\nWorld!" + crlf + crlf,
+			input:    "<p>Hello," + crlf + "World!</p>",
+			expected: crlf + crlf + "Hello," + crlf + "World!" + crlf + crlf,
 		},
 		{
 			name:     "HTML with CRLF",
 			input:    "<p>Hello,\r\nWorld!</p>",
-			expected: strings.ReplaceAll(crlf+crlf+"Hello,\nWorld!"+crlf+crlf, "\n", crlf),
+			expected: crlf + crlf + "Hello," + crlf + "World!" + crlf + crlf,
 		},
 		{
 			name:     "HTML with Nested Elements",
