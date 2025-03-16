@@ -17,7 +17,7 @@ import (
 // It parses the HTML and extracts text nodes, concatenating them into a single string.
 // If parsing fails, it returns the original HTML content as a fallback.
 //
-// Note: This function does not fully handle elements like "<style>" or other non-text content.
+// Note: This function does not fully handle elements like "<script>" or other non-text content.
 //
 // TODO: Improving this will require additional filtering, possibly using regex.
 func HTMLToPlainText(htmlContent string) string {
@@ -70,6 +70,9 @@ func extractText(n *html.Node, textContent *strings.Builder, inList bool) {
 	if n.Type == html.TextNode {
 		textContent.WriteString(n.Data)
 	} else if n.Type == html.ElementNode {
+		if n.Data == "style" {
+			return // Skip <style> tags entirely
+		}
 		if n.Data == "a" {
 			handleAnchorTag(n, textContent)
 			return // Skip further processing for child nodes of <a>

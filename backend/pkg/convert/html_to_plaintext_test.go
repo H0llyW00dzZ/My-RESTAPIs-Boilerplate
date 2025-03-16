@@ -12,8 +12,7 @@ import (
 )
 
 func TestHTMLToPlainText(t *testing.T) {
-	// Note: This test might depend on the OS. Linux/Unix uses "\n", while Windows uses "\r\n" due to MS-DOS conventions.
-	// When testing on Windows, "\r" might be required.
+	// Determine the newline character based on the operating system.
 	crlf := "\n"
 	if runtime.GOOS == "windows" {
 		crlf = "\r\n"
@@ -73,6 +72,22 @@ func TestHTMLToPlainText(t *testing.T) {
 			name:     "Multiple Paragraphs",
 			input:    "<p>Hello HTML Frontend, from Go.</p><p>Hello HTML Frontend, from Go.</p>",
 			expected: crlf + crlf + "Hello HTML Frontend, from Go." + crlf + crlf + crlf + crlf + "Hello HTML Frontend, from Go." + crlf + crlf,
+		},
+		{
+			name: "Complex with Style",
+			input: `<style>
+						body { font-family: Arial; }
+					</style>
+					<p>Hello HTML Frontend, from Go.</p>`,
+			expected: crlf + "\t\t\t\t\t" + crlf + crlf + "Hello HTML Frontend, from Go." + crlf + crlf,
+		},
+		{
+			name: "Style with Class",
+			input: `<style class="example">
+						.example { color: red; }
+					</style>
+					<p>Hello HTML Frontend, from Go.</p>`,
+			expected: crlf + "\t\t\t\t\t" + crlf + crlf + "Hello HTML Frontend, from Go." + crlf + crlf,
 		},
 	}
 
