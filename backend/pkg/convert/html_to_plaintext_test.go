@@ -28,52 +28,52 @@ func TestHTMLToPlainText(t *testing.T) {
 		{
 			name:     "Simple HTML",
 			input:    "<p>Hello, World!</p>",
-			expected: "\n\nHello, World!\n\n",
+			expected: crlf + crlf + "Hello, World!" + crlf + crlf,
 		},
 		{
 			name:     "HTML with Newlines",
 			input:    "<p>Hello,\nWorld!</p>",
-			expected: "\n\nHello,\nWorld!\n\n",
+			expected: crlf + crlf + "Hello,\nWorld!" + crlf + crlf,
 		},
 		{
 			name:     "HTML with CRLF",
 			input:    "<p>Hello,\r\nWorld!</p>",
-			expected: strings.ReplaceAll("\n\nHello,\nWorld!\n\n", "\n", crlf),
+			expected: strings.ReplaceAll(crlf+crlf+"Hello,\nWorld!"+crlf+crlf, "\n", crlf),
 		},
 		{
 			name:     "HTML with Nested Elements",
 			input:    "<div>Hello,<br>World!</div>",
-			expected: "\n\nHello,\nWorld!\n\n",
+			expected: crlf + crlf + "Hello," + crlf + "World!" + crlf + crlf,
 		},
 		{
 			name:     "Complex HTML Structure",
 			input:    "<div><h1>Hello</h1> <span>HTML</span> <p>Frontend,</p> <strong>from Go</strong></div>",
-			expected: "\n\n\nHello\n HTML \n\nFrontend,\n\n from Go\n\n",
+			expected: crlf + crlf + crlf + "Hello" + crlf + " HTML " + crlf + crlf + "Frontend," + crlf + crlf + " from Go" + crlf + crlf,
 		},
 		{
 			name:     "List Items",
 			input:    "<ul><li>Get Good</li><li>Get Go</li></ul>",
-			expected: "\n- Get Good\n- Get Go\n\n",
+			expected: crlf + "- Get Good" + crlf + "- Get Go" + crlf + crlf,
 		},
 		{
 			name:     "Ordered List",
 			input:    "<ol><li>First</li><li>Second</li></ol>",
-			expected: "\n- First\n- Second\n\n",
+			expected: crlf + "- First" + crlf + "- Second" + crlf + crlf,
 		},
 		{
 			name:     "Headings",
 			input:    "<h1>Hello HTML Frontend</h1><h2>from</h2><p>Go</p>",
-			expected: "\nHello HTML Frontend\n\nfrom\n\n\nGo\n\n",
+			expected: crlf + "Hello HTML Frontend" + crlf + crlf + "from" + crlf + crlf + crlf + "Go" + crlf + crlf,
 		},
 		{
 			name:     "Links",
 			input:    "<p>Visit <a href=\"https://go.dev/dl/\">Go Dev</a> to download Go.</p>",
-			expected: "\n\nVisit [Go Dev](https://go.dev/dl/) to download Go.\n\n",
+			expected: crlf + crlf + "Visit [Go Dev](https://go.dev/dl/) to download Go." + crlf + crlf,
 		},
 		{
 			name:     "Multiple Paragraphs",
 			input:    "<p>Hello HTML Frontend, from Go.</p><p>Hello HTML Frontend, from Go.</p>",
-			expected: "\n\nHello HTML Frontend, from Go.\n\n\n\nHello HTML Frontend, from Go.\n\n",
+			expected: crlf + crlf + "Hello HTML Frontend, from Go." + crlf + crlf + crlf + crlf + "Hello HTML Frontend, from Go." + crlf + crlf,
 		},
 	}
 

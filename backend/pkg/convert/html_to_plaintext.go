@@ -7,6 +7,7 @@ package convert
 
 import (
 	"fmt"
+	"runtime"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -30,19 +31,28 @@ func HTMLToPlainText(htmlContent string) string {
 	return textContent.String()
 }
 
+// getNewline returns the appropriate newline characters based on the operating system.
+func getNewline() string {
+	if runtime.GOOS == "windows" {
+		return "\r\n"
+	}
+	return "\n"
+}
+
 // handleElementNode processes HTML element nodes and appends corresponding
 // plain text representations to the textContent based on the tag type.
 func handleElementNode(n *html.Node, textContent *strings.Builder, inList *bool) {
+	newline := getNewline()
 	switch n.Data {
 	case "br":
-		textContent.WriteString("\n")
+		textContent.WriteString(newline)
 	case "p", "div":
-		textContent.WriteString("\n\n")
+		textContent.WriteString(newline + newline)
 	case "h1", "h2", "h3", "h4", "h5", "h6":
-		textContent.WriteString("\n")
+		textContent.WriteString(newline)
 	case "ul", "ol":
 		*inList = true
-		textContent.WriteString("\n")
+		textContent.WriteString(newline)
 	case "li":
 		if *inList {
 			textContent.WriteString("- ")
@@ -102,17 +112,18 @@ func handleAnchorTag(n *html.Node, textContent *strings.Builder) {
 // handleClosingTags appends appropriate plain text representations
 // for closing tags, managing list states and formatting.
 func handleClosingTags(n *html.Node, textContent *strings.Builder, inList *bool) {
+	newline := getNewline()
 	switch n.Data {
 	case "li":
 		if *inList {
-			textContent.WriteString("\n")
+			textContent.WriteString(newline)
 		}
 	case "ul", "ol":
 		*inList = false
-		textContent.WriteString("\n")
+		textContent.WriteString(newline)
 	case "p", "div":
-		textContent.WriteString("\n\n")
+		textContent.WriteString(newline + newline)
 	case "h1", "h2", "h3", "h4", "h5", "h6":
-		textContent.WriteString("\n")
+		textContent.WriteString(newline)
 	}
 }
