@@ -6,7 +6,6 @@
 package convert
 
 import (
-	"fmt"
 	"io"
 	"runtime"
 	"strings"
@@ -115,7 +114,11 @@ func handleAnchorTag(n *html.Node, textContent *strings.Builder) {
 		// Append markdown formatted link
 		//
 		// Note: This is what it will look like in markdown format "Visit [Example](https://example.com) website."
-		textContent.WriteString(fmt.Sprintf("[%s](%s)", linkText, href))
+		textContent.WriteString("[")
+		textContent.WriteString(linkText)
+		textContent.WriteString("](")
+		textContent.WriteString(href)
+		textContent.WriteString(")")
 	}
 }
 
