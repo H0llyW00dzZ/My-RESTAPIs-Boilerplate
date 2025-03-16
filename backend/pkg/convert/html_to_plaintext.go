@@ -32,6 +32,8 @@ func HTMLToPlainText(htmlContent string) string {
 }
 
 // getNewline returns the appropriate newline characters based on the operating system.
+//
+// Note: Currently supports only Linux/Unix and Windows (MS-DOS). Other OS support is marked as TODO.
 func getNewline() string {
 	if runtime.GOOS == "windows" {
 		return "\r\n"
