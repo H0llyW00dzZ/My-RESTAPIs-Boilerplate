@@ -32,4 +32,18 @@
 //
 //   - Support for larger units such as Petabytes (PB), Exabytes (EB), Zettabytes (ZB), and Yottabytes (YB) could be added in the future (might required quantum bits or 128-bit architectures).
 //   - Compatibility with quantum bits or 128-bit architectures could be considered as technology evolves.
+//
+// # HTML to Plain Text Conversion
+//
+// The package also includes functions for converting HTML content into plain text.
+//
+// # Functions HTML to Plain Text Conversion
+//
+// - [handleElementNode]: Processes HTML element nodes and appends corresponding plain text representations to the textContent based on the tag type.
+//
+// - [extractText]: Recursively traverses the HTML node tree, converting nodes to plain text and appending them to textContent.
+//
+// - [handleAnchorTag]: Processes <a> tags, extracting the href attribute and text content, then appending a markdown formatted link to textContent.
+//
+// - [handleClosingTags]: Appends appropriate plain text representations for closing tags, managing list states and formatting.
 package convert
