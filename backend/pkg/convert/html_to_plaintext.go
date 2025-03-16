@@ -59,6 +59,7 @@ func handleElementNode(n *html.Node, textContent *strings.Builder, inList *bool)
 		if *inList {
 			textContent.WriteString("- ")
 		}
+		// TODO: This case for "a" might be unnecessary; will remove it later.
 	case "a":
 		handleAnchorTag(n, textContent)
 	}
