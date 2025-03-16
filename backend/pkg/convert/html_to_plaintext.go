@@ -157,6 +157,8 @@ func HTMLToPlainTextStreams(i io.Reader, o io.Writer) error {
 }
 
 // handleImageTag processes <img> tags.
+//
+// TODO: Automatically handle the size of the image as well.
 func handleImageTag(n *html.Node, textContent *strings.Builder) {
 	src := ""
 	alt := ""
