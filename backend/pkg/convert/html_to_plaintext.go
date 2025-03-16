@@ -26,66 +26,58 @@ func HTMLToPlainText(htmlContent string) string {
 	}
 
 	var textContent strings.Builder
-	var extractText func(*html.Node, bool)
+	var extractText func(*html.Node)
 
-	extractText = func(n *html.Node, inList bool) {
+	extractText = func(n *html.Node) {
 		if n.Type == html.TextNode {
 			textContent.WriteString(n.Data)
 		} else if n.Type == html.ElementNode {
 			switch n.Data {
 			case "br":
 				textContent.WriteString("\n")
-			case "p":
+			case "p", "div":
 				textContent.WriteString("\n\n")
 			case "h1", "h2", "h3", "h4", "h5", "h6":
 				textContent.WriteString("\n")
 			case "ul", "ol":
-				inList = true
 				textContent.WriteString("\n")
 			case "li":
-				if inList {
-					textContent.WriteString("- ")
-				}
-			case "div":
-				textContent.WriteString("\n\n")
+				textContent.WriteString("- ")
 			case "a":
-				href := ""
-				for _, attr := range n.Attr {
-					if attr.Key == "href" {
-						href = attr.Val
-						break
-					}
-				}
+				href := getAttrValue(n, "href")
 
 				// Note: This is what it will look like in markdown format "Visit [Example](https://example.com) website."
-				textContent.WriteString(fmt.Sprintf("[%s](%s)", n.FirstChild.Data, href))
+				textContent.WriteString(fmt.Sprintf("[%s](%s)", getTextContent(n), href))
 				return // Skip processing child nodes of the <a> tag
 			}
 		}
 
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			extractText(c, inList)
-		}
-
-		if n.Type == html.ElementNode {
-			switch n.Data {
-			case "li":
-				if inList {
-					textContent.WriteString("\n")
-				}
-			case "ul", "ol":
-				inList = false
-				textContent.WriteString("\n")
-			case "p":
-				textContent.WriteString("\n\n")
-			case "div":
-				textContent.WriteString("\n\n")
-			case "h1", "h2", "h3", "h4", "h5", "h6":
-				textContent.WriteString("\n")
-			}
+			extractText(c)
 		}
 	}
 
-	extractText(doc, false)
+	extractText(doc)
 	return textContent.String()
+}
+
+// getAttrValue retrieves the value of the specified attribute from a node
+func getAttrValue(n *html.Node, attrName string) string {
+	for _, attr := range n.Attr {
+		if attr.Key == attrName {
+			return attr.Val
+		}
+	}
+	return ""
+}
+
+// getTextContent retrieves the text content of a node
+func getTextContent(n *html.Node) string {
+	if n.Type == html.TextNode {
+		return n.Data
+	}
+	if n.FirstChild != nil {
+		return getTextContent(n.FirstChild)
+	}
+	return ""
 }
