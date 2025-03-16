@@ -24,6 +24,7 @@ const (
 <body>
     <div class="content">
         <h1>Why Go is Great for Systems Programming ? 🤔</h1>
+		<img src="https://go.dev/images/gophers/biplane.svg" alt="Gopher Biplane Ready To Fly">
         <p>Go, also known as Golang, is designed for simplicity and efficiency.</p>
         <p>Here are some reasons why Go excels:</p>
         <ul>
