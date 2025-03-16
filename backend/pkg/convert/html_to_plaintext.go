@@ -6,6 +6,7 @@
 package convert
 
 import (
+	"fmt"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -25,17 +26,66 @@ func HTMLToPlainText(htmlContent string) string {
 	}
 
 	var textContent strings.Builder
-	var extractText func(*html.Node)
+	var extractText func(*html.Node, bool)
 
-	extractText = func(n *html.Node) {
+	extractText = func(n *html.Node, inList bool) {
 		if n.Type == html.TextNode {
 			textContent.WriteString(n.Data)
+		} else if n.Type == html.ElementNode {
+			switch n.Data {
+			case "br":
+				textContent.WriteString("\n")
+			case "p":
+				textContent.WriteString("\n\n")
+			case "h1", "h2", "h3", "h4", "h5", "h6":
+				textContent.WriteString("\n")
+			case "ul", "ol":
+				inList = true
+				textContent.WriteString("\n")
+			case "li":
+				if inList {
+					textContent.WriteString("- ")
+				}
+			case "div":
+				textContent.WriteString("\n\n")
+			case "a":
+				href := ""
+				for _, attr := range n.Attr {
+					if attr.Key == "href" {
+						href = attr.Val
+						break
+					}
+				}
+
+				// Note: This is what it will look like in markdown format "Visit [Example](https://example.com) website."
+				textContent.WriteString(fmt.Sprintf("[%s](%s)", n.FirstChild.Data, href))
+				return // Skip processing child nodes of the <a> tag
+			}
 		}
+
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			extractText(c)
+			extractText(c, inList)
+		}
+
+		if n.Type == html.ElementNode {
+			switch n.Data {
+			case "li":
+				if inList {
+					textContent.WriteString("\n")
+				}
+			case "ul", "ol":
+				inList = false
+				textContent.WriteString("\n")
+			case "p":
+				textContent.WriteString("\n\n")
+			case "div":
+				textContent.WriteString("\n\n")
+			case "h1", "h2", "h3", "h4", "h5", "h6":
+				textContent.WriteString("\n")
+			}
 		}
 	}
 
-	extractText(doc)
+	extractText(doc, false)
 	return textContent.String()
 }
