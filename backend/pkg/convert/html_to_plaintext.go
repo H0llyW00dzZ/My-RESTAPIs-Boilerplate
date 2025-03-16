@@ -9,6 +9,7 @@ import (
 	"io"
 	"runtime"
 	"strings"
+	"sync"
 
 	"golang.org/x/net/html"
 )
@@ -182,4 +183,71 @@ func handleImageTag(n *html.Node, textContent *strings.Builder) {
 		textContent.WriteString(src)
 		textContent.WriteString(")")
 	}
+}
+
+// HTMLToPlainTextConcurrent converts multiple HTML strings to plain text concurrently.
+// It returns a slice of plain text results corresponding to each HTML input.
+//
+// Note: This is designed for high-performance scenarios.
+func HTMLToPlainTextConcurrent(htmlContents []string) []string {
+	results := make([]string, len(htmlContents))
+	var wg sync.WaitGroup
+
+	// Iterate over each HTML content and process concurrently
+	for i, content := range htmlContents {
+		wg.Add(1)
+		go func(i int, content string) {
+			defer wg.Done()
+			// Convert HTML to plain text and store the result
+			results[i] = HTMLToPlainText(content)
+		}(i, content)
+	}
+
+	// Wait for all goroutines to complete
+	wg.Wait()
+	return results
+}
+
+// SafeWriter wraps an [io.Writer] with a mutex for thread-safe writing
+type SafeWriter struct {
+	writer io.Writer
+	mu     sync.Mutex
+}
+
+// Write safely writes data to the underlying writer using a mutex
+func (sw *SafeWriter) Write(p []byte) (n int, err error) {
+	sw.mu.Lock()
+	defer sw.mu.Unlock()
+	return sw.writer.Write(p)
+}
+
+// HTMLToPlainTextStreamsConcurrent processes multiple readers concurrently
+// and writes the plain text to a single writer, returning any errors encountered
+//
+// Note: This is designed for high-performance scenarios, like non-stop 24/7 streaming hahaha.
+// It's where your machine really earns its keep—no coffee breaks here!
+func HTMLToPlainTextStreamsConcurrent(i []io.Reader, o io.Writer) []error {
+	safeWriter := &SafeWriter{writer: o}
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	var errs []error
+
+	// Iterate over each reader and process concurrently
+	for _, reader := range i {
+		wg.Add(1)
+		go func(r io.Reader) {
+			defer wg.Done()
+			// Convert HTML to plain text and write to the safe writer
+			if e := HTMLToPlainTextStreams(r, safeWriter); e != nil {
+				// Capture any errors encountered
+				mu.Lock()
+				errs = append(errs, e)
+				mu.Unlock()
+			}
+		}(reader)
+	}
+
+	// Wait for all goroutines to complete
+	wg.Wait()
+	return errs
 }
