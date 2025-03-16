@@ -96,8 +96,7 @@ func extractText(n *html.Node, textContent *strings.Builder, inList bool) {
 // handleAnchorTag processes <a> tags, extracting the href attribute and
 // text content, then appending a markdown formatted link to textContent.
 func handleAnchorTag(n *html.Node, textContent *strings.Builder) {
-	href := ""
-	linkText := ""
+	var href, linkText string
 
 	// Extract href attribute
 	for _, attr := range n.Attr {
@@ -112,10 +111,12 @@ func handleAnchorTag(n *html.Node, textContent *strings.Builder) {
 		linkText = n.FirstChild.Data
 	}
 
-	// Append markdown formatted link
-	//
-	// Note: This is what it will look like in markdown format "Visit [Example](https://example.com) website."
-	textContent.WriteString(fmt.Sprintf("[%s](%s)", linkText, href))
+	if href != "" && linkText != "" {
+		// Append markdown formatted link
+		//
+		// Note: This is what it will look like in markdown format "Visit [Example](https://example.com) website."
+		textContent.WriteString(fmt.Sprintf("[%s](%s)", linkText, href))
+	}
 }
 
 // handleClosingTags appends appropriate plain text representations
@@ -160,17 +161,22 @@ func HTMLToPlainTextStreams(i io.Reader, o io.Writer) error {
 //
 // TODO: Automatically handle the size of the image as well.
 func handleImageTag(n *html.Node, textContent *strings.Builder) {
-	src := ""
-	alt := ""
+	var src, alt string
 
 	for _, attr := range n.Attr {
-		if attr.Key == "src" {
+		switch attr.Key {
+		case "src":
 			src = attr.Val
-		}
-		if attr.Key == "alt" {
+		case "alt":
 			alt = attr.Val
 		}
 	}
 
-	textContent.WriteString(fmt.Sprintf("![%s](%s)", alt, src))
+	if src != "" {
+		textContent.WriteString("![")
+		textContent.WriteString(alt)
+		textContent.WriteString("](")
+		textContent.WriteString(src)
+		textContent.WriteString(")")
+	}
 }
