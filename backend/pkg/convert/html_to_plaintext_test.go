@@ -14,6 +14,34 @@ import (
 	"testing"
 )
 
+const (
+	simpleInput = `<div><h1>Hello</h1> <span>HTML</span> <p>Frontend,</p> <strong>from Go</strong></div>`
+	largeInput  = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Go Programming Language</title>
+    <style>
+        .content { font-family: Arial; }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>Why Go is Great for Systems Programming ? 🤔</h1>
+		<img src="https://go.dev/images/gophers/biplane.svg" alt="Gopher Biplane Ready To Fly">
+        <p>Go, also known as Golang, is designed for simplicity and efficiency.</p>
+        <p>Here are some reasons why Go excels:</p>
+        <ul>
+            <li>Concurrency support with goroutines</li>
+            <li>Fast compilation times</li>
+            <li>Robust standard library</li>
+        </ul>
+        <p>Discover more about Go at the <a href="https://go.dev">official site</a>.</p>
+    </div>
+</body>
+</html>`
+)
+
 func TestHTMLToPlainText(t *testing.T) {
 	// Determine the newline character based on the operating system.
 	crlf := getNewline()
