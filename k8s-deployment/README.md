@@ -32,6 +32,12 @@ This section covers the deployment of the MySQL database service.
 
 - [Documentation for MySQL](MySQL.md)
 
+### Gitea DinD Runner
+
+This section covers the deployment of the Gitea Docker-in-Docker Runner.
+
+- [Documentation for Gitea DinD Runner](Gitea-Runner.md)
+
 ---
 
 > [!NOTE]
