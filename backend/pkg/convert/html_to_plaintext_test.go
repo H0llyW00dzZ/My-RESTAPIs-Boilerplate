@@ -40,6 +40,47 @@ const (
     </div>
 </body>
 </html>`
+
+	tableInput = `
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Introduction to Go Programming Language</h2>
+
+<table style="width:100%">
+    <tr>
+        <th>Feature</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>Concurrency</td>
+        <td>Go provides built-in support for concurrent programming with goroutines and channels.</td>
+    </tr>
+    <tr>
+        <td>Static Typing</td>
+        <td>Go is statically typed, which helps catch errors at compile time.</td>
+    </tr>
+    <tr>
+        <td>Efficiency</td>
+        <td>Go compiles quickly and produces fast executables, making it ideal for performance-critical applications.</td>
+    </tr>
+</table>
+
+<p>Go, also known as Golang, is a statically typed, compiled programming language designed for simplicity and efficiency.</p>
+
+</body>
+</html>`
 )
 
 func TestHTMLToPlainText(t *testing.T) {
@@ -128,13 +169,9 @@ func TestHTMLToPlainText(t *testing.T) {
 			expected: "Go Programming Language" + crlf + crlf + crlf + "Why Go is Great for Systems Programming ? 🤔" + crlf + "![Gopher Biplane Ready To Fly](https://go.dev/images/gophers/biplane.svg)" + crlf + crlf + "Go, also known as Golang, is designed for simplicity and efficiency." + crlf + crlf + crlf + crlf + "Here are some reasons why Go excels:" + crlf + crlf + crlf + "- Concurrency support with goroutines" + crlf + "- Fast compilation times" + crlf + "- Robust standard library" + crlf + crlf + crlf + crlf + "Discover more about Go at the [official site](https://go.dev) ." + crlf + crlf + crlf + crlf,
 		},
 		{
-			name: "Table Structure",
-			input: `<table>
-						<tr><th>Header 1</th><th>Header 2</th></tr>
-						<tr><td>Row 1 Col 1</td><td>Row 1 Col 2</td></tr>
-						<tr><td>Row 2 Col 1</td><td>Row 2 Col 2</td></tr>
-					</table>`,
-			expected: crlf + crlf + " | Header 1 | Header 2" + crlf + " | Row 1 Col 1 | Row 1 Col 2" + crlf + " | Row 2 Col 1 | Row 2 Col 2" + crlf + crlf,
+			name:     "Table Structure",
+			input:    tableInput,
+			expected: crlf + "Introduction to Go Programming Language" + crlf + crlf + "|  Feature | Description |" + crlf + "|---------|-------------|" + crlf + "|  Concurrency | Go provides built-in support for concurrent programming with goroutines and channels. |" + crlf + "|  Static Typing | Go is statically typed, which helps catch errors at compile time. |" + crlf + "|  Efficiency | Go compiles quickly and produces fast executables, making it ideal for performance-critical applications. |" + crlf + crlf + crlf + crlf + crlf + "Go, also known as Golang, is a statically typed, compiled programming language designed for simplicity and efficiency." + crlf + crlf,
 		},
 		{
 			name:     "Noscript Element",
