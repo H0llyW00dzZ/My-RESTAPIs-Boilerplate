@@ -30,11 +30,14 @@ func HTMLToPlainText(htmlContent string) string {
 	}
 
 	state := &textState{
-		builder:    builder,
-		needSpace:  false,
-		inList:     false,
-		listIndent: 0,
-		nl:         getNewline(),
+		builder:      builder,
+		needSpace:    false,
+		inList:       false,
+		listIndent:   0,
+		nl:           getNewline(),
+		inTable:      false,
+		headerParsed: false,
+		headerSizes:  []int{},
 	}
 
 	extractText(doc, state)
@@ -43,11 +46,14 @@ func HTMLToPlainText(htmlContent string) string {
 
 // textState maintains the state during text extraction
 type textState struct {
-	builder    *strings.Builder
-	needSpace  bool
-	inList     bool
-	listIndent int
-	nl         string
+	builder      *strings.Builder
+	needSpace    bool
+	inList       bool
+	listIndent   int
+	nl           string
+	inTable      bool
+	headerParsed bool
+	headerSizes  []int
 }
 
 // shouldSkipNode determines if a node should be skipped during processing
@@ -94,6 +100,10 @@ func processTextNode(n *html.Node, state *textState) {
 		state.builder.WriteString(text)
 		// Set needSpace after writing text
 		state.needSpace = true
+
+		if state.inTable && !state.headerParsed {
+			state.headerSizes = append(state.headerSizes, len(text))
+		}
 	} else {
 		// Reset needSpace if text is empty
 		state.needSpace = false
@@ -126,13 +136,15 @@ func handleElementStart(n *html.Node, state *textState) {
 	case "img":
 		processImage(n, state)
 	case "table":
+		state.inTable = true
+		state.headerParsed = false
 		state.builder.WriteString(state.nl)
 		state.needSpace = false
 	case "tr":
-		state.builder.WriteString(state.nl)
+		state.builder.WriteString("| ")
 		state.needSpace = false
 	case "td", "th":
-		state.builder.WriteString(" | ")
+		state.builder.WriteString(" ")
 		state.needSpace = false
 	}
 }
@@ -158,9 +170,32 @@ func handleElementEnd(n *html.Node, state *textState) {
 	case "a":
 		processAnchorEnd(n, state)
 	case "table":
+		state.inTable = false
 		state.builder.WriteString(state.nl + state.nl)
 		state.needSpace = false
+	case "tr":
+		state.builder.WriteString(state.nl)
+		if state.inTable && !state.headerParsed {
+			state.headerParsed = true
+			addHeaderSeparator(state)
+		}
+		state.needSpace = false
+	case "td", "th":
+		state.builder.WriteString(" |")
+		state.needSpace = true
 	}
+}
+
+// addHeaderSeparator adds a markdown separator line for table headers.
+// It uses the lengths of the header text to ensure the separator aligns properly.
+func addHeaderSeparator(state *textState) {
+	state.builder.WriteString("|")
+	// this should be fine, even with 1 billion tables; it won't overflow like Unix time.
+	for _, size := range state.headerSizes {
+		state.builder.WriteString(strings.Repeat("-", size+2) + "|")
+	}
+	state.builder.WriteString(state.nl)
+	state.headerSizes = nil
 }
 
 // processAnchorStart handles the start of anchor tags
