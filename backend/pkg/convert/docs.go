@@ -3,7 +3,8 @@
 // By accessing or using this software, you agree to be bound by the terms
 // of the License Agreement, which you can find at LICENSE files.
 
-// Package convert provides utility functions for converting between different units of measurement.
+// Package convert provides utility functions for converting between different units of measurement
+// and converting HTML content into plain text.
 //
 // # Compatibility
 //
@@ -30,20 +31,22 @@
 //
 // # Future Enhancements
 //
-//   - Support for larger units such as Petabytes (PB), Exabytes (EB), Zettabytes (ZB), and Yottabytes (YB) could be added in the future (might required quantum bits or 128-bit architectures).
+//   - Support for larger units such as Petabytes (PB), Exabytes (EB), Zettabytes (ZB), and Yottabytes (YB) could be added in the future (might require quantum bits or 128-bit architectures).
 //   - Compatibility with quantum bits or 128-bit architectures could be considered as technology evolves.
 //
 // # HTML to Plain Text Conversion
 //
-// The package also includes functions for converting HTML content into plain text.
+// The package includes functions for converting HTML content into plain text, which is useful for extracting readable text from HTML documents.
 //
-// # Functions HTML to Plain Text Conversion
+// # Functions for HTML to Plain Text Conversion
 //
-// - [handleElementNode]: Processes HTML element nodes and appends corresponding plain text representations to the textContent based on the tag type.
+// - [HTMLToPlainText]: Converts a single HTML string to plain text by parsing the HTML and extracting text nodes.
 //
-// - [extractText]: Recursively traverses the HTML node tree, converting nodes to plain text and appending them to textContent.
+// - [HTMLToPlainTextStreams]: Converts HTML content from an input stream to plain text and writes it to an output stream, designed for hybrid streaming scenarios.
 //
-// - [handleAnchorTag]: Processes <a> tags, extracting the href attribute and text content, then appending a markdown formatted link to textContent.
+// - [HTMLToPlainTextConcurrent]: Converts multiple HTML strings to plain text concurrently, leveraging multiple CPU cores for high-performance scenarios.
 //
-// - [handleClosingTags]: Appends appropriate plain text representations for closing tags, managing list states and formatting.
+// - [HTMLToPlainTextStreamsConcurrent]: Processes multiple readers concurrently, writing the plain text to a single writer, ideal for high-performance streaming applications.
+//
+// These functions efficiently handle HTML elements, preserving text content while discarding non-text elements, and support concurrent processing for enhanced performance.
 package convert
