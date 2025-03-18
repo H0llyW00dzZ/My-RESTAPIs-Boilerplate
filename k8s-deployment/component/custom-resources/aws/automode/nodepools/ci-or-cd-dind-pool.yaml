@@ -1,0 +1,57 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  # Note: Ensure that the name reflects the purpose of this CI/CD node pool.
+  name: ci-or-cd-dind-pool
+spec:
+  template:
+    metadata:
+      labels:
+        # Note: Adjust the billing team label to match your organization's conventions.
+        billing-team: ci-cd-pool
+    spec:
+      nodeClassRef:
+        group: eks.amazonaws.com
+        kind: NodeClass
+        # Note: Make sure the name matches the corresponding NodeClass resource.
+        name: ci-or-cd-dind-pool
+      requirements:
+        - key: "karpenter.sh/capacity-type"
+          operator: In
+          # Note: Consider using spot instances for cost savings, if applicable.
+          values: ["spot", "on-demand"]
+        - key: "eks.amazonaws.com/instance-category"
+          operator: In
+          # Note: Choose instance categories based on the requirements of your CI/CD workloads.
+          values: ["c", "m"]
+        - key: "eks.amazonaws.com/instance-family"
+          operator: In
+          # Note: Select instance families that align with your performance and cost requirements.
+          values: ["c5", "m5"]
+        - key: "eks.amazonaws.com/instance-cpu"
+          operator: In
+          # Note: Specify the CPU requirements for your CI/CD workloads.
+          values: ["4", "8", "16"]
+        - key: "eks.amazonaws.com/instance-hypervisor"
+          operator: In
+          # Note: Using the "nitro" hypervisor is recommended for better performance and security.
+          values: ["nitro"]
+        - key: "topology.kubernetes.io/zone"
+          operator: In
+          # Note: Don't forget to modify this as it's just an example.
+          values: ["region-1a", "region-1b", "region-1c"]
+        - key: "kubernetes.io/arch"
+          operator: In
+          values: ["amd64"]
+      # Note: Adjust the termination grace period based on your application's requirements.
+      terminationGracePeriod: 30m
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    # Note: Set the consolidation interval to a value that balances cost optimization and disruption minimization.
+    consolidateAfter: 12h
+  limits:
+    # Note: Adjust the CPU and memory limits based on the expected workload requirements.
+    cpu: "50"
+    memory: 64Gi
+    # Note: Set the weight to prioritize this node pool relative to others.
+    weight: 15

@@ -10,10 +10,11 @@ Using NodePools allows you to have fine-grained control over the nodes that are 
 
 ## NodePool Configurations
 
-This repository contains two NodePool configuration files:
+This repository contains three NodePool configuration files:
 
 1. `nodepools/arena-high-performance-pool.yaml`: Defines a NodePool for high-performance workloads.
 2. `nodepools/critical-pool.yaml`: Defines a NodePool for critical workloads.
+3. `nodepools/ci-or-cd-dind-pool.yaml`: Defines a NodePool specifically for CI/CD workloads with Docker-in-Docker (DinD) support (e.g., Gitea Runner).
 
 Let's go through the key components of each configuration:
 
@@ -66,4 +67,4 @@ The `critical-pool.yaml` file defines a NodePool for critical workloads. It incl
 By following these best practices and carefully configuring your node pools, you can ensure optimal performance, reliability, and cost-efficiency for your EKS cluster.
 
 > [!NOTE]
-> The current custom resource configurations for the EKS Automode NodePools include both `spot` and `on-demand` capacity types. It's important to note that using `spot` instances may not guarantee zero downtime due to the nature of spot instances, which can be interrupted or terminated by AWS based on market conditions. To achieve zero downtime, it is recommended to remove the `spot` capacity type from the `arena-high-performance-pool.yaml` and `critical-pool.yaml` configuration files and rely solely on `on-demand` instances.
+> The current custom resource configurations for the EKS Automode NodePools include both `spot` and `on-demand` capacity types. It's important to note that using `spot` instances may not guarantee zero downtime due to the nature of spot instances, which can be interrupted or terminated by AWS based on market conditions. To achieve zero downtime, it is recommended to remove the `spot` capacity type from the `arena-high-performance-pool.yaml`, `critical-pool.yaml` and `ci-or-cd-dind-pool.yaml` configuration files and rely solely on `on-demand` instances.
