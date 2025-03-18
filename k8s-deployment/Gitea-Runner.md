@@ -90,6 +90,7 @@ The configuration is managed using a `ConfigMap` and a `Deployment` in Kubernete
 
 - For storage solutions like EFS, you can increase the number of replicas for scalability.
 - Ensure all placeholder values are replaced with actual configurations before deployment.
+- If your Kubernetes cluster uses custom resources, such as EKS Auto Mode, it will become easier & effectively manage node pools for the runner in your infrastructure.
 
 ## Security Considerations
 
