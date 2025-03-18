@@ -222,14 +222,14 @@ func processImage(n *html.Node, state *textState) {
 // and writes it to an output stream (a.k.a Hybrid Streaming).
 //
 // TODO: Improving this will require additional filtering, possibly using regex.
-func HTMLToPlainTextStreams(r io.Reader, w io.Writer) error {
+func HTMLToPlainTextStreams(i io.Reader, o io.Writer) error {
 	buf := bufferPool.Get().([]byte)
 	defer bufferPool.Put(buf)
 
 	builder := getBuilder()
 	defer putBuilder(builder)
 
-	doc, err := html.Parse(bufio.NewReader(r))
+	doc, err := html.Parse(bufio.NewReader(i))
 	if err != nil {
 		return err // Return error if parsing fails
 	}
@@ -243,7 +243,7 @@ func HTMLToPlainTextStreams(r io.Reader, w io.Writer) error {
 	}
 
 	extractText(doc, state)
-	_, err = w.Write([]byte(state.builder.String()))
+	_, err = o.Write([]byte(state.builder.String()))
 	return err
 }
 
