@@ -1,0 +1,180 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: act-runner-config
+  namespace: gitea
+data:
+  # Note: The container options are correct, and they work with the latest version of Kubernetes (v1.32.0).
+  runner-config.yml: |
+    log:
+      # The level of logging; options are trace, debug, info, warn, error, fatal.
+      level: info
+
+    runner:
+      # File to store the registration result.
+      file: .runner
+      # Number of tasks to execute concurrently.
+      capacity: 1
+      # Additional environment variables for running jobs.
+      envs:
+        A_TEST_ENV_NAME_1: a_test_env_value_1
+        A_TEST_ENV_NAME_2: a_test_env_value_2
+      # Environment variables from a file. Ignored if empty or the file doesn't exist.
+      env_file: .env
+      # Job completion timeout. Note: Gitea also has a default 3-hour timeout.
+      timeout: 30m
+      # Timeout for the runner to wait for jobs to finish during shutdown. Unfinished jobs will be canceled.
+      shutdown_timeout: 0s
+      # Skip TLS certificate verification for the Gitea instance.
+      insecure: false
+      # Timeout for fetching jobs from the Gitea instance.
+      fetch_timeout: 5s
+      # Interval for fetching jobs from the Gitea instance.
+      fetch_interval: 2s
+      # Runner labels determine which jobs it can run and how. 
+      # Examples: "macos-arm64:host" or "ubuntu-latest:docker://docker.gitea.com/runner-images:ubuntu-latest"
+      # More images at https://gitea.com/docker.gitea.com/runner-images.
+      # If empty during registration, it will prompt for labels. If empty during `daemon`, it uses labels in `.runner`.
+      labels:
+        - "ubuntu-latest:docker://docker.gitea.com/runner-images:ubuntu-latest"
+        - "ubuntu-22.04:docker://docker.gitea.com/runner-images:ubuntu-22.04"
+        - "ubuntu-20.04:docker://docker.gitea.com/runner-images:ubuntu-20.04"
+
+    cache:
+      # Enable cache server for actions/cache.
+      enabled: true
+      # Directory for cache data. Defaults to $HOME/.cache/actcache if empty.
+      dir: ""
+      # Cache server host. Leave empty for automatic detection. Avoid using 0.0.0.0.
+      host: ""
+      # Cache server port. 0 means a random available port.
+      port: 0
+      # External cache server URL. Valid only if enabled. Use this URL for ACTIONS_CACHE_URL instead of starting a server.
+      # The URL should generally end with "/".
+      external_server: ""
+
+    container:
+      # Network for container connection. Options: host, bridge, or a custom network name.
+      # Automatically created if empty.
+      network: ""
+      # Use privileged mode for task containers (required for Docker-in-Docker).
+      privileged: true
+      # Additional options for starting the container (e.g., --add-host=my.gitea.url:host-gateway).
+      options: |
+        --add-host=docker:host-gateway -v /certs:/certs
+        -e "DOCKER_HOST=tcp://docker:2376/"
+        -e "DOCKER_TLS_CERTDIR=/certs"
+        -e "DOCKER_TLS_VERIFY=1"
+        -e "DOCKER_CERT_PATH=/certs/server"
+      # Parent directory for a job's working directory.
+      # NOTE: No need to add a leading '/' as act_runner adds it automatically.
+      # If the path starts with '/', it will be trimmed.
+      # Example: for /path/to/my/dir, use path/to/my/dir.
+      # Defaults to /workspace if empty.
+      workdir_parent:
+      # Volumes (including bind mounts) can be mounted to containers. Supports Glob syntax, see https://github.com/gobwas/glob.
+      # Specify multiple volumes. If empty, no volumes can be mounted.
+      # Example: To allow only `data` volume and all .json files in `/src`, use:
+      # valid_volumes:
+      #   - data
+      #   - /src/*.json
+      # To allow any volume, use:
+      valid_volumes:
+        - /certs
+      # valid_volumes: []
+      # Overrides the Docker client host.
+      # If empty, act_runner finds an available Docker host automatically.
+      # If "-", act_runner finds an available Docker host, but it won't be mounted to job and service containers.
+      # If specified, the given Docker host is used. An error is returned if it fails.
+      # docker_host: "tcp://localhost:2376"
+      # Pull Docker images even if already present.
+      # force_pull: true
+      # Rebuild Docker images even if already present.
+      # force_rebuild: false
+
+    host:
+      # Parent directory for a job's working directory.
+      # Defaults to $HOME/.cache/act/ if empty.
+      # workdir_parent:
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: act-runner
+  name: act-runner
+  namespace: gitea
+spec:
+  # Tip: If using storage like EFS or RWX, you can set replicas to 2 or 10 to have multiple runners.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: act-runner
+  strategy:
+    rollingUpdate:
+      maxSurge: 5%
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: act-runner
+    spec:
+      restartPolicy: Always
+      # Note: Ensure to request storage and modify this as needed.
+      volumes:
+      - name: docker-certs
+        emptyDir: {}
+      - name: runner-data
+        persistentVolumeClaim:
+          claimName: act-runner-vol
+      - name: runner-config
+        configMap:
+          name: act-runner-config
+      containers:
+      - name: runner
+        image: gitea/act_runner:nightly
+        resources:
+          limits:
+            cpu: 2
+            memory: 4Gi
+          requests:
+            cpu: 2
+            memory: 4Gi
+        command: ["sh", "-c", "while ! nc -z 127.0.0.1 2376 </dev/null; do echo 'waiting for docker daemon...'; sleep 5; done; /sbin/tini -- run.sh"]
+        env:
+        - name: DOCKER_HOST
+          value: tcp://127.0.0.1:2376
+        - name: DOCKER_CERT_PATH
+          value: /certs/client
+        - name: DOCKER_TLS_VERIFY
+          value: "1"
+          # Note: Don't forget to replace this.
+        - name: GITEA_INSTANCE_URL
+          value: <REPLACE_THIS>
+        - name: GITEA_RUNNER_REGISTRATION_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: runner-secret
+              key: token
+        - name: CONFIG_FILE
+          value: /data/runner-config.yml
+        volumeMounts:
+        - name: docker-certs
+          mountPath: /certs
+        - name: runner-data
+          mountPath: /data
+        - name: runner-config
+          mountPath: /data/runner-config.yml
+          subPath: runner-config.yml
+      - name: daemon
+        image: docker:28.0.1-dind
+        env:
+        - name: DOCKER_TLS_CERTDIR
+          value: /certs
+        # Note: Docker-in-Docker requires this.
+        # If focusing only on CI/CD and your cluster has built-in custom resources like node pools (e.g., EKS Automode), this setting is safe.
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: docker-certs
+          mountPath: /certs
