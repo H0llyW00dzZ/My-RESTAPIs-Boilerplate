@@ -273,11 +273,14 @@ func HTMLToPlainTextStreams(i io.Reader, o io.Writer) error {
 	}
 
 	state := &textState{
-		builder:    builder,
-		needSpace:  false,
-		inList:     false,
-		listIndent: 0,
-		nl:         getNewline(),
+		builder:      builder,
+		needSpace:    false,
+		inList:       false,
+		listIndent:   0,
+		nl:           getNewline(),
+		inTable:      false,
+		headerParsed: false,
+		headerSizes:  []int{},
 	}
 
 	extractText(doc, state)
