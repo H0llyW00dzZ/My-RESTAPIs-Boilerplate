@@ -18,6 +18,8 @@ The Gitea DinD Runner allows you to execute CI/CD jobs within a Kubernetes clust
 > ![Screenshot from 2025-03-18 23-53-13](https://github.com/user-attachments/assets/7e00ddfc-3716-4b24-9081-cbe308122c2d)
 >
 > ![Screenshot from 2025-03-18 23-53-57](https://github.com/user-attachments/assets/19783ce0-983d-4e04-9be2-f67407ac2eb8)
+>
+> Note that Gitea itself (self-hosted) is also running in a Kubernetes container.
 
 ## Prerequisites
 
