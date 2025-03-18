@@ -74,7 +74,7 @@ func TestHTMLToPlainText(t *testing.T) {
 		{
 			name:     "Complex HTML Structure",
 			input:    "<div><h1>Hello</h1> <span>HTML</span> <p>Frontend,</p> <strong>from Go</strong></div>",
-			expected: crlf + crlf + crlf + "Hello" + crlf + " HTML " + crlf + crlf + "Frontend," + crlf + crlf + " from Go" + crlf + crlf,
+			expected: crlf + crlf + crlf + "Hello" + crlf + "HTML" + crlf + crlf + "Frontend," + crlf + crlf + "from Go" + crlf + crlf,
 		},
 		{
 			name:     "List Items",
@@ -107,7 +107,7 @@ func TestHTMLToPlainText(t *testing.T) {
 						body { font-family: Arial; }
 					</style>
 					<p>Hello HTML Frontend, from Go.</p>`,
-			expected: crlf + "\t\t\t\t\t" + crlf + crlf + "Hello HTML Frontend, from Go." + crlf + crlf,
+			expected: crlf + crlf + "Hello HTML Frontend, from Go." + crlf + crlf,
 		},
 		{
 			name: "Style with Class",
@@ -115,7 +115,7 @@ func TestHTMLToPlainText(t *testing.T) {
 						.example { color: red; }
 					</style>
 					<p>Hello HTML Frontend, from Go.</p>`,
-			expected: crlf + "\t\t\t\t\t" + crlf + crlf + "Hello HTML Frontend, from Go." + crlf + crlf,
+			expected: crlf + crlf + "Hello HTML Frontend, from Go." + crlf + crlf,
 		},
 		{
 			name:     "Another Links",
@@ -125,7 +125,29 @@ func TestHTMLToPlainText(t *testing.T) {
 		{
 			name:     "Large Input",
 			input:    largeInput,
-			expected: crlf + "    Go Programming Language" + crlf + "    " + crlf + "" + crlf + "" + crlf + "    " + crlf + "" + crlf + "" + crlf + "        " + crlf + "Why Go is Great for Systems Programming ? 🤔" + crlf + "" + crlf + "\t\t![Gopher Biplane Ready To Fly](https://go.dev/images/gophers/biplane.svg)" + crlf + "        " + crlf + "" + crlf + "Go, also known as Golang, is designed for simplicity and efficiency." + crlf + "" + crlf + "" + crlf + "        " + crlf + "" + crlf + "Here are some reasons why Go excels:" + crlf + "" + crlf + "" + crlf + "        " + crlf + "" + crlf + "            - Concurrency support with goroutines" + crlf + "" + crlf + "            - Fast compilation times" + crlf + "" + crlf + "            - Robust standard library" + crlf + "" + crlf + "        " + crlf + "" + crlf + "        " + crlf + "" + crlf + "Discover more about Go at the [official site](https://go.dev)." + crlf + "" + crlf + "" + crlf + "    " + crlf + "" + crlf + "" + crlf + "" + crlf + "",
+			expected: "Go Programming Language" + crlf + crlf + crlf + "Why Go is Great for Systems Programming ? 🤔" + crlf + "![Gopher Biplane Ready To Fly](https://go.dev/images/gophers/biplane.svg)" + crlf + crlf + "Go, also known as Golang, is designed for simplicity and efficiency." + crlf + crlf + crlf + crlf + "Here are some reasons why Go excels:" + crlf + crlf + crlf + "- Concurrency support with goroutines" + crlf + "- Fast compilation times" + crlf + "- Robust standard library" + crlf + crlf + crlf + crlf + "Discover more about Go at the [official site](https://go.dev) ." + crlf + crlf + crlf + crlf,
+		},
+		{
+			name: "Table Structure",
+			input: `<table>
+						<tr><th>Header 1</th><th>Header 2</th></tr>
+						<tr><td>Row 1 Col 1</td><td>Row 1 Col 2</td></tr>
+						<tr><td>Row 2 Col 1</td><td>Row 2 Col 2</td></tr>
+					</table>`,
+			expected: crlf + crlf + " | Header 1 | Header 2" + crlf + " | Row 1 Col 1 | Row 1 Col 2" + crlf + " | Row 2 Col 1 | Row 2 Col 2" + crlf + crlf,
+		},
+		{
+			name:     "Noscript Element",
+			input:    `<noscript>This is a noscript content.</noscript><p>Visible content.</p>`,
+			expected: crlf + crlf + "Visible content." + crlf + crlf,
+		},
+		{
+			name: "Script Element",
+			input: `<script>
+						console.log('This is a script.');
+					</script>
+					<p>Visible content.</p>`,
+			expected: crlf + crlf + "Visible content." + crlf + crlf,
 		},
 	}
 
@@ -146,7 +168,7 @@ func TestHTMLToPlainTextStreams_LargeInput(t *testing.T) {
 	crlf := getNewline()
 
 	// Expected plain text output.
-	expected := crlf + "    Go Programming Language" + crlf + "    " + crlf + "" + crlf + "" + crlf + "    " + crlf + "" + crlf + "" + crlf + "        " + crlf + "Why Go is Great for Systems Programming ? 🤔" + crlf + "" + crlf + "\t\t![Gopher Biplane Ready To Fly](https://go.dev/images/gophers/biplane.svg)" + crlf + "        " + crlf + "" + crlf + "Go, also known as Golang, is designed for simplicity and efficiency." + crlf + "" + crlf + "" + crlf + "        " + crlf + "" + crlf + "Here are some reasons why Go excels:" + crlf + "" + crlf + "" + crlf + "        " + crlf + "" + crlf + "            - Concurrency support with goroutines" + crlf + "" + crlf + "            - Fast compilation times" + crlf + "" + crlf + "            - Robust standard library" + crlf + "" + crlf + "        " + crlf + "" + crlf + "        " + crlf + "" + crlf + "Discover more about Go at the [official site](https://go.dev)." + crlf + "" + crlf + "" + crlf + "    " + crlf + "" + crlf + "" + crlf + "" + crlf + ""
+	expected := "Go Programming Language" + crlf + crlf + crlf + "Why Go is Great for Systems Programming ? 🤔" + crlf + "![Gopher Biplane Ready To Fly](https://go.dev/images/gophers/biplane.svg)" + crlf + crlf + "Go, also known as Golang, is designed for simplicity and efficiency." + crlf + crlf + crlf + crlf + "Here are some reasons why Go excels:" + crlf + crlf + crlf + "- Concurrency support with goroutines" + crlf + "- Fast compilation times" + crlf + "- Robust standard library" + crlf + crlf + crlf + crlf + "Discover more about Go at the [official site](https://go.dev) ." + crlf + crlf + crlf + crlf
 
 	// Create a reader and writer for the test.
 	input := strings.NewReader(largeInput)
