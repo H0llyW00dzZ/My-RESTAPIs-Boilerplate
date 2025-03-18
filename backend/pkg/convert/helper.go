@@ -7,8 +7,10 @@ package convert
 
 import (
 	"fmt"
+	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 // extractParts extracts the numeric part and the unit part from the input string.
@@ -86,4 +88,51 @@ func convertToBytes(num float64, unitPart string) (int, error) {
 	bytes := int(num * float64(factor))
 
 	return bytes, nil
+}
+
+// Resource pools for better memory management.
+// These pools help in reusing objects to reduce garbage collection overhead
+// and improve performance by minimizing allocations.
+//
+// Note: This smiliar manual memory management in C or C++ hahaha.
+var (
+	// builderPool provides reusable [*strings.Builder] objects.
+	// Useful for constructing strings efficiently without frequent allocations.
+	builderPool = sync.Pool{
+		New: func() any {
+			return new(strings.Builder)
+		},
+	}
+
+	// bufferPool provides reusable byte slices.
+	// Each buffer is 32KB, suitable for handling moderate-sized data chunks.
+	bufferPool = sync.Pool{
+		New: func() any {
+			// Not good if the buffer size is too large.
+			return make([]byte, 32*1024) // 32KB buffer
+		},
+	}
+)
+
+// getBuilder retrieves a [*strings.Builder] from the pool.
+// If none are available, it creates a new one.
+func getBuilder() *strings.Builder {
+	return builderPool.Get().(*strings.Builder)
+}
+
+// putBuilder resets and returns a [*strings.Builder] to the pool.
+// This prepares the builder for reuse, reducing memory allocations.
+func putBuilder(b *strings.Builder) {
+	b.Reset()
+	builderPool.Put(b)
+}
+
+// getNewline returns the appropriate newline characters based on the operating system.
+//
+// Note: Currently supports only Linux/Unix and Windows (MS-DOS). Other OS support is marked as TODO.
+func getNewline() string {
+	if runtime.GOOS == "windows" {
+		return "\r\n"
+	}
+	return "\n"
 }

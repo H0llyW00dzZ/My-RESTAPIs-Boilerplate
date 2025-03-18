@@ -6,6 +6,7 @@
 package convert
 
 import (
+	"bufio"
 	"io"
 	"runtime"
 	"strings"
@@ -18,189 +19,256 @@ import (
 // It parses the HTML and extracts text nodes, concatenating them into a single string.
 // If parsing fails, it returns the original HTML content as a fallback.
 //
-// Note: This function does not fully handle elements like "<script>" or other non-text content.
-//
 // TODO: Improving this will require additional filtering, possibly using regex.
 func HTMLToPlainText(htmlContent string) string {
+	builder := getBuilder()
+	defer putBuilder(builder)
+
 	doc, err := html.Parse(strings.NewReader(htmlContent))
 	if err != nil {
-		return htmlContent // Fallback to original HTML if parsing fails
+		return htmlContent
 	}
 
-	var textContent strings.Builder
-	extractText(doc, &textContent, false)
-	return textContent.String()
-}
-
-// getNewline returns the appropriate newline characters based on the operating system.
-//
-// Note: Currently supports only Linux/Unix and Windows (MS-DOS). Other OS support is marked as TODO.
-func getNewline() string {
-	if runtime.GOOS == "windows" {
-		return "\r\n"
+	state := &textState{
+		builder:    builder,
+		needSpace:  false,
+		inList:     false,
+		listIndent: 0,
+		nl:         getNewline(),
 	}
-	return "\n"
+
+	extractText(doc, state)
+	return state.builder.String()
 }
 
-// handleElementNode processes HTML element nodes and appends corresponding
-// plain text representations to the textContent based on the tag type.
-func handleElementNode(n *html.Node, textContent *strings.Builder, inList *bool) {
-	newline := getNewline()
+// textState maintains the state during text extraction
+type textState struct {
+	builder    *strings.Builder
+	needSpace  bool
+	inList     bool
+	listIndent int
+	nl         string
+}
+
+// shouldSkipNode determines if a node should be skipped during processing
+func shouldSkipNode(n *html.Node) bool {
+	if n.Type != html.ElementNode {
+		return false
+	}
+	switch n.Data {
+	case "script", "style", "noscript":
+		return true
+	}
+	return false
+}
+
+// extractText processes HTML nodes and extracts text content
+func extractText(n *html.Node, state *textState) {
+	if shouldSkipNode(n) {
+		return
+	}
+
+	switch n.Type {
+	case html.TextNode:
+		processTextNode(n, state)
+	case html.ElementNode:
+		handleElementStart(n, state)
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			extractText(c, state)
+		}
+		handleElementEnd(n, state)
+	default:
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			extractText(c, state)
+		}
+	}
+}
+
+// processTextNode handles text node content
+func processTextNode(n *html.Node, state *textState) {
+	text := strings.TrimSpace(n.Data)
+	if text != "" {
+		if state.needSpace {
+			state.builder.WriteString(" ")
+		}
+		state.builder.WriteString(text)
+		// Set needSpace after writing text
+		state.needSpace = true
+	} else {
+		// Reset needSpace if text is empty
+		state.needSpace = false
+	}
+}
+
+// handleElementStart processes the opening of HTML elements
+func handleElementStart(n *html.Node, state *textState) {
 	switch n.Data {
 	case "br":
-		textContent.WriteString(newline)
+		state.builder.WriteString(state.nl)
+		state.needSpace = false
 	case "p", "div":
-		textContent.WriteString(newline + newline)
+		state.builder.WriteString(state.nl + state.nl)
+		state.needSpace = false
 	case "h1", "h2", "h3", "h4", "h5", "h6":
-		textContent.WriteString(newline)
+		state.builder.WriteString(state.nl)
+		state.needSpace = false
 	case "ul", "ol":
-		*inList = true
-		textContent.WriteString(newline)
+		state.inList = true
+		state.builder.WriteString(state.nl)
+		state.needSpace = false
 	case "li":
-		if *inList {
-			textContent.WriteString("- ")
+		if state.inList {
+			state.builder.WriteString("- ")
 		}
-		// TODO: This case for "a" might be unnecessary; will remove it later.
+		state.needSpace = false
 	case "a":
-		handleAnchorTag(n, textContent)
+		processAnchorStart(n, state)
 	case "img":
-		handleImageTag(n, textContent)
+		processImage(n, state)
+	case "table":
+		state.builder.WriteString(state.nl)
+		state.needSpace = false
+	case "tr":
+		state.builder.WriteString(state.nl)
+		state.needSpace = false
+	case "td", "th":
+		state.builder.WriteString(" | ")
+		state.needSpace = false
 	}
 }
 
-// extractText recursively traverses the HTML node tree, converting nodes
-// to plain text and appending them to textContent.
-func extractText(n *html.Node, textContent *strings.Builder, inList bool) {
-	if n.Type == html.TextNode {
-		textContent.WriteString(n.Data)
-	} else if n.Type == html.ElementNode {
-		if n.Data == "style" {
-			return // Skip <style> tags entirely
+// handleElementEnd processes the closing of HTML elements
+func handleElementEnd(n *html.Node, state *textState) {
+	switch n.Data {
+	case "p", "div":
+		state.builder.WriteString(state.nl + state.nl)
+		state.needSpace = false
+	case "h1", "h2", "h3", "h4", "h5", "h6":
+		state.builder.WriteString(state.nl)
+		state.needSpace = false
+	case "li":
+		if state.inList {
+			state.builder.WriteString(state.nl)
 		}
-		if n.Data == "a" {
-			handleAnchorTag(n, textContent)
-			return // Skip further processing for child nodes of <a>
-		}
-		handleElementNode(n, textContent, &inList)
-	}
-
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		extractText(c, textContent, inList)
-	}
-
-	if n.Type == html.ElementNode {
-		handleClosingTags(n, textContent, &inList)
+		state.needSpace = false
+	case "ul", "ol":
+		state.inList = false
+		state.builder.WriteString(state.nl)
+		state.needSpace = false
+	case "a":
+		processAnchorEnd(n, state)
+	case "table":
+		state.builder.WriteString(state.nl + state.nl)
+		state.needSpace = false
 	}
 }
 
-// handleAnchorTag processes <a> tags, extracting the href attribute and
-// text content, then appending a markdown formatted link to textContent.
-func handleAnchorTag(n *html.Node, textContent *strings.Builder) {
-	var href, linkText string
-
-	// Extract href attribute
+// processAnchorStart handles the start of anchor tags
+func processAnchorStart(n *html.Node, state *textState) {
+	var href string
 	for _, attr := range n.Attr {
 		if attr.Key == "href" {
 			href = attr.Val
 			break
 		}
 	}
-
-	// Extract the text content of the link
-	if n.FirstChild != nil {
-		linkText = n.FirstChild.Data
-	}
-
-	if href != "" && linkText != "" {
-		// Append markdown formatted link
-		//
-		// Note: This is what it will look like in markdown format "Visit [Example](https://example.com) website."
-		textContent.WriteString("[")
-		textContent.WriteString(linkText)
-		textContent.WriteString("](")
-		textContent.WriteString(href)
-		textContent.WriteString(")")
+	if href != "" {
+		if state.needSpace {
+			// Add space before the link if needed
+			state.builder.WriteString(" ")
+			state.needSpace = false
+		}
+		state.builder.WriteString("[")
+		// Store href for later use
+		n.Attr = append(n.Attr, html.Attribute{Key: "_stored_href", Val: href})
 	}
 }
 
-// handleClosingTags appends appropriate plain text representations
-// for closing tags, managing list states and formatting.
-func handleClosingTags(n *html.Node, textContent *strings.Builder, inList *bool) {
-	newline := getNewline()
-	switch n.Data {
-	case "li":
-		if *inList {
-			textContent.WriteString(newline)
+// processAnchorEnd handles the end of anchor tags
+func processAnchorEnd(n *html.Node, state *textState) {
+	for _, attr := range n.Attr {
+		if attr.Key == "_stored_href" {
+			state.builder.WriteString("](")
+			state.builder.WriteString(attr.Val)
+			state.builder.WriteString(")")
+			// Set needSpace after the link
+			state.needSpace = true
+			break
 		}
-	case "ul", "ol":
-		*inList = false
-		textContent.WriteString(newline)
-	case "p", "div":
-		textContent.WriteString(newline + newline)
-	case "h1", "h2", "h3", "h4", "h5", "h6":
-		textContent.WriteString(newline)
+	}
+}
+
+// processImage handles image tags
+func processImage(n *html.Node, state *textState) {
+	var alt, src string
+	for _, attr := range n.Attr {
+		switch attr.Key {
+		case "alt":
+			alt = attr.Val
+		case "src":
+			src = attr.Val
+		}
+	}
+	if src != "" {
+		state.builder.WriteString("![")
+		state.builder.WriteString(alt)
+		state.builder.WriteString("](")
+		state.builder.WriteString(src)
+		state.builder.WriteString(")")
 	}
 }
 
 // HTMLToPlainTextStreams converts HTML content from an input stream to plain text
 // and writes it to an output stream (a.k.a Hybrid Streaming).
 //
-// Note: This function does not fully handle elements like "<script>" or other non-text content.
-//
 // TODO: Improving this will require additional filtering, possibly using regex.
-func HTMLToPlainTextStreams(i io.Reader, o io.Writer) error {
-	doc, err := html.Parse(i)
+func HTMLToPlainTextStreams(r io.Reader, w io.Writer) error {
+	buf := bufferPool.Get().([]byte)
+	defer bufferPool.Put(buf)
+
+	builder := getBuilder()
+	defer putBuilder(builder)
+
+	doc, err := html.Parse(bufio.NewReader(r))
 	if err != nil {
 		return err // Return error if parsing fails
 	}
 
-	var textContent strings.Builder
-	extractText(doc, &textContent, false)
+	state := &textState{
+		builder:    builder,
+		needSpace:  false,
+		inList:     false,
+		listIndent: 0,
+		nl:         getNewline(),
+	}
 
-	_, err = o.Write([]byte(textContent.String()))
+	extractText(doc, state)
+	_, err = w.Write([]byte(state.builder.String()))
 	return err
-}
-
-// handleImageTag processes <img> tags.
-//
-// TODO: Automatically handle the size of the image as well.
-func handleImageTag(n *html.Node, textContent *strings.Builder) {
-	var src, alt string
-
-	for _, attr := range n.Attr {
-		switch attr.Key {
-		case "src":
-			src = attr.Val
-		case "alt":
-			alt = attr.Val
-		}
-	}
-
-	if src != "" {
-		textContent.WriteString("![")
-		textContent.WriteString(alt)
-		textContent.WriteString("](")
-		textContent.WriteString(src)
-		textContent.WriteString(")")
-	}
 }
 
 // HTMLToPlainTextConcurrent converts multiple HTML strings to plain text concurrently.
 // It returns a slice of plain text results corresponding to each HTML input.
 //
-// Note: This is designed for high-performance scenarios.
+// Note: This is designed for high-performance scenarios. It also depends on the number of available CPU cores,
+// unlike [HTMLToPlainTextStreamsConcurrent], which depends on the input reader.
 func HTMLToPlainTextConcurrent(htmlContents []string) []string {
 	results := make([]string, len(htmlContents))
+	numWorkers := runtime.GOMAXPROCS(0)
 	var wg sync.WaitGroup
 
-	// Iterate over each HTML content and process concurrently
-	for i, content := range htmlContents {
+	chunkSize := (len(htmlContents) + numWorkers - 1) / numWorkers
+	// Launch a goroutine for each worker to process a chunk of the input concurrently.
+	for i := 0; i < numWorkers; i++ {
 		wg.Add(1)
-		go func(i int, content string) {
+		go func(start int) {
 			defer wg.Done()
-			// Convert HTML to plain text and store the result
-			results[i] = HTMLToPlainText(content)
-		}(i, content)
+			end := min(start+chunkSize, len(htmlContents))
+
+			for j := start; j < end; j++ {
+				results[j] = HTMLToPlainText(htmlContents[j])
+			}
+		}(i * chunkSize)
 	}
 
 	// Wait for all goroutines to complete
