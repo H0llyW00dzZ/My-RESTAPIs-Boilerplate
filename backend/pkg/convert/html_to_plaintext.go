@@ -258,9 +258,6 @@ func processImage(n *html.Node, state *textState) {
 //
 // TODO: Improving this will require additional filtering, possibly using regex.
 func HTMLToPlainTextStreams(i io.Reader, o io.Writer) error {
-	buf := getBuffer()
-	defer putBuffer(buf)
-
 	builder := getBuilder()
 	defer putBuilder(builder)
 
