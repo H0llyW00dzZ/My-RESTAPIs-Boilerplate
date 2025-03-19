@@ -106,9 +106,15 @@ var (
 	// Each buffer is 32KB, suitable for handling moderate-sized data chunks.
 	bufferPool = sync.Pool{
 		// Not good if the buffer size is too large.
-		New: func() any { return make([]byte, 32*1024) }, // 32KB buffer
+		New: func() any { return &buffer{buf: make([]byte, 32*1024)} }, // 32KB buffer
 	}
 )
+
+// buffer wraps a byte slice and provides a reset method.
+type buffer struct{ buf []byte }
+
+// reset clears the buffer for reuse.
+func (b *buffer) reset() { b.buf = b.buf[:0] }
 
 // getBuilder retrieves a [*strings.Builder] from the pool.
 // If none are available, it creates a new one.
@@ -119,6 +125,15 @@ func getBuilder() *strings.Builder { return builderPool.Get().(*strings.Builder)
 func putBuilder(b *strings.Builder) {
 	b.Reset()
 	builderPool.Put(b)
+}
+
+// getBuffer retrieves a buffer from the pool.
+func getBuffer() *buffer { return bufferPool.Get().(*buffer) }
+
+// putBuffer returns a buffer to the pool.
+func putBuffer(b *buffer) {
+	b.reset()
+	bufferPool.Put(b)
 }
 
 // getNewline returns the appropriate newline characters based on the operating system.
