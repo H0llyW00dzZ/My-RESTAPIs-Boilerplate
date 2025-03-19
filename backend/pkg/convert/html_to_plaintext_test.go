@@ -202,7 +202,7 @@ func TestHTMLToPlainText(t *testing.T) {
 }
 
 // Note: This test is a better way
-func TestHTMLToPlainTextStreams_LargeInput(t *testing.T) {
+func TestHTMLToPlainTextStreams_Hybrid(t *testing.T) {
 	// Determine the newline character based on the operating system.
 	crlf := getNewline()
 
