@@ -99,18 +99,14 @@ var (
 	// builderPool provides reusable [*strings.Builder] objects.
 	// Useful for constructing strings efficiently without frequent allocations.
 	builderPool = sync.Pool{
-		New: func() any {
-			return new(strings.Builder)
-		},
+		New: func() any { return new(strings.Builder) },
 	}
 
 	// bufferPool provides reusable byte slices.
 	// Each buffer is 32KB, suitable for handling moderate-sized data chunks.
 	bufferPool = sync.Pool{
-		New: func() any {
-			// Not good if the buffer size is too large.
-			return make([]byte, 32*1024) // 32KB buffer
-		},
+		// Not good if the buffer size is too large.
+		New: func() any { return make([]byte, 32*1024) }, // 32KB buffer
 	}
 )
 
