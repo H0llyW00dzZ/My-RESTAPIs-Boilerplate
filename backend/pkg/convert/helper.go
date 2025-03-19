@@ -110,7 +110,7 @@ var (
 	}
 )
 
-// buffer wraps a byte slice and provides a Reset method.
+// buffer wraps a byte slice and provides a reset method.
 type buffer struct{ buf []byte }
 
 // reset clears the buffer for reuse.
