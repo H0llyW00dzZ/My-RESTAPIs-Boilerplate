@@ -245,8 +245,7 @@ func TestHTMLToPlainTextStreams_LargeInput(t *testing.T) {
 					t.Fatalf("Failed to create temporary input file: %v", err)
 				}
 				t.Cleanup(func() { os.Remove(file.Name()) })
-				_, err = file.WriteString(largeInput)
-				if err != nil {
+				if _, err = file.WriteString(largeInput); err != nil {
 					t.Fatalf("Failed to write to temporary input file: %v", err)
 				}
 				file.Seek(0, io.SeekStart)
@@ -254,6 +253,12 @@ func TestHTMLToPlainTextStreams_LargeInput(t *testing.T) {
 			},
 			output:   func() io.Writer { return &bytes.Buffer{} },
 			expected: "Go Programming Language" + crlf + crlf + crlf + "Why Go is Great for Systems Programming ? 🤔" + crlf + "![Gopher Biplane Ready To Fly](https://go.dev/images/gophers/biplane.svg)" + crlf + crlf + "Go, also known as Golang, is designed for simplicity and efficiency." + crlf + crlf + crlf + crlf + "Here are some reasons why Go excels:" + crlf + crlf + crlf + "- Concurrency support with goroutines" + crlf + "- Fast compilation times" + crlf + "- Robust standard library" + crlf + crlf + crlf + crlf + "Discover more about Go at the [official site](https://go.dev) ." + crlf + crlf + crlf + crlf,
+		},
+		{
+			name:     "Byte Buffer to String Builder",
+			input:    func() io.Reader { return bytes.NewBufferString("<h1>Title</h1><p>Content</p>") },
+			output:   func() io.Writer { return &strings.Builder{} },
+			expected: crlf + "Title" + crlf + crlf + crlf + "Content" + crlf + crlf,
 		},
 	}
 
@@ -263,8 +268,7 @@ func TestHTMLToPlainTextStreams_LargeInput(t *testing.T) {
 			output := tt.output()
 
 			// Run the conversion.
-			err := convert.HTMLToPlainTextStreams(input, output)
-			if err != nil {
+			if err := convert.HTMLToPlainTextStreams(input, output); err != nil {
 				t.Fatalf("Failed to convert HTML to plain text: %v", err)
 			}
 
@@ -272,6 +276,8 @@ func TestHTMLToPlainTextStreams_LargeInput(t *testing.T) {
 			var result string
 			switch out := output.(type) {
 			case *bytes.Buffer:
+				result = out.String()
+			case *strings.Builder:
 				result = out.String()
 			case *os.File:
 				out.Seek(0, io.SeekStart)
