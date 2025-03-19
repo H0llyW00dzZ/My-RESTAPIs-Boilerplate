@@ -116,9 +116,7 @@ var (
 
 // getBuilder retrieves a [*strings.Builder] from the pool.
 // If none are available, it creates a new one.
-func getBuilder() *strings.Builder {
-	return builderPool.Get().(*strings.Builder)
-}
+func getBuilder() *strings.Builder { return builderPool.Get().(*strings.Builder) }
 
 // putBuilder resets and returns a [*strings.Builder] to the pool.
 // This prepares the builder for reuse, reducing memory allocations.
