@@ -20,6 +20,9 @@ The Gitea DinD Runner allows you to execute CI/CD jobs within a Kubernetes clust
 > ![Screenshot from 2025-03-18 23-53-57](https://github.com/user-attachments/assets/19783ce0-983d-4e04-9be2-f67407ac2eb8)
 >
 > Note that Gitea itself (self-hosted) is also running in a Kubernetes container.
+>
+> The performance is also different when building images with QEMU (e.g., it won't get stuck forever when building multi-arch images, unlike building outside of the cluster, which can cause the process to get stuck forever or become very slow).
+> This is especially true when your cluster has built-in custom resources such as node pools like EKS Auto Mode. It basically becomes a layer on top of Kubernetes, because you can specify node specs through node pools, and your infrastructure always runs smoothly while sailing 🛳️ the Kubernetes seas ☸.
 
 ## Prerequisites
 
