@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"h0llyw00dz-template/backend/pkg/convert"
 	"io"
+	"os"
 	"runtime"
 	"strings"
 	"testing"
@@ -200,29 +201,94 @@ func TestHTMLToPlainText(t *testing.T) {
 	}
 }
 
+// Note: This test is a better way
 func TestHTMLToPlainTextStreams_LargeInput(t *testing.T) {
 	// Determine the newline character based on the operating system.
 	crlf := getNewline()
 
-	// Expected plain text output.
-	expected := "Go Programming Language" + crlf + crlf + crlf + "Why Go is Great for Systems Programming ? 🤔" + crlf + "![Gopher Biplane Ready To Fly](https://go.dev/images/gophers/biplane.svg)" + crlf + crlf + "Go, also known as Golang, is designed for simplicity and efficiency." + crlf + crlf + crlf + crlf + "Here are some reasons why Go excels:" + crlf + crlf + crlf + "- Concurrency support with goroutines" + crlf + "- Fast compilation times" + crlf + "- Robust standard library" + crlf + crlf + crlf + crlf + "Discover more about Go at the [official site](https://go.dev) ." + crlf + crlf + crlf + crlf
-
-	// Create a reader and writer for the test.
-	input := strings.NewReader(largeInput)
-	var output bytes.Buffer
-
-	// Run the conversion.
-	err := convert.HTMLToPlainTextStreams(input, &output)
-	if err != nil {
-		t.Fatalf("Failed to convert HTML to plain text: %v", err)
+	tests := []struct {
+		name     string
+		input    func() io.Reader
+		output   func() io.Writer
+		expected string
+	}{
+		{
+			name:     "Simple HTML",
+			input:    func() io.Reader { return strings.NewReader("<p>Hello, World!</p>") },
+			output:   func() io.Writer { return &bytes.Buffer{} },
+			expected: crlf + crlf + "Hello, World!" + crlf + crlf,
+		},
+		{
+			name:     "Large HTML to Buffer",
+			input:    func() io.Reader { return strings.NewReader(largeInput) },
+			output:   func() io.Writer { return &bytes.Buffer{} },
+			expected: "Go Programming Language" + crlf + crlf + crlf + "Why Go is Great for Systems Programming ? 🤔" + crlf + "![Gopher Biplane Ready To Fly](https://go.dev/images/gophers/biplane.svg)" + crlf + crlf + "Go, also known as Golang, is designed for simplicity and efficiency." + crlf + crlf + crlf + crlf + "Here are some reasons why Go excels:" + crlf + crlf + crlf + "- Concurrency support with goroutines" + crlf + "- Fast compilation times" + crlf + "- Robust standard library" + crlf + crlf + crlf + crlf + "Discover more about Go at the [official site](https://go.dev) ." + crlf + crlf + crlf + crlf,
+		},
+		{
+			name:  "Large HTML to File",
+			input: func() io.Reader { return strings.NewReader(largeInput) },
+			output: func() io.Writer {
+				file, err := os.CreateTemp("", "output.txt")
+				if err != nil {
+					t.Fatalf("Failed to create temporary file: %v", err)
+				}
+				t.Cleanup(func() { os.Remove(file.Name()) })
+				return file
+			},
+			expected: "Go Programming Language" + crlf + crlf + crlf + "Why Go is Great for Systems Programming ? 🤔" + crlf + "![Gopher Biplane Ready To Fly](https://go.dev/images/gophers/biplane.svg)" + crlf + crlf + "Go, also known as Golang, is designed for simplicity and efficiency." + crlf + crlf + crlf + crlf + "Here are some reasons why Go excels:" + crlf + crlf + crlf + "- Concurrency support with goroutines" + crlf + "- Fast compilation times" + crlf + "- Robust standard library" + crlf + crlf + crlf + crlf + "Discover more about Go at the [official site](https://go.dev) ." + crlf + crlf + crlf + crlf,
+		},
+		{
+			name: "File Input to Buffer",
+			input: func() io.Reader {
+				file, err := os.CreateTemp("", "input.html")
+				if err != nil {
+					t.Fatalf("Failed to create temporary input file: %v", err)
+				}
+				t.Cleanup(func() { os.Remove(file.Name()) })
+				_, err = file.WriteString(largeInput)
+				if err != nil {
+					t.Fatalf("Failed to write to temporary input file: %v", err)
+				}
+				file.Seek(0, io.SeekStart)
+				return file
+			},
+			output:   func() io.Writer { return &bytes.Buffer{} },
+			expected: "Go Programming Language" + crlf + crlf + crlf + "Why Go is Great for Systems Programming ? 🤔" + crlf + "![Gopher Biplane Ready To Fly](https://go.dev/images/gophers/biplane.svg)" + crlf + crlf + "Go, also known as Golang, is designed for simplicity and efficiency." + crlf + crlf + crlf + crlf + "Here are some reasons why Go excels:" + crlf + crlf + crlf + "- Concurrency support with goroutines" + crlf + "- Fast compilation times" + crlf + "- Robust standard library" + crlf + crlf + crlf + crlf + "Discover more about Go at the [official site](https://go.dev) ." + crlf + crlf + crlf + crlf,
+		},
 	}
 
-	// Get the result and compare it to the expected output.
-	result := output.String()
-	t.Log("Expected:", expected)
-	t.Log("Result:", result)
-	if result != expected {
-		t.Errorf("expected: %q, got %q", expected, result)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			input := tt.input()
+			output := tt.output()
+
+			// Run the conversion.
+			err := convert.HTMLToPlainTextStreams(input, output)
+			if err != nil {
+				t.Fatalf("Failed to convert HTML to plain text: %v", err)
+			}
+
+			// Read the result from the output.
+			var result string
+			switch out := output.(type) {
+			case *bytes.Buffer:
+				result = out.String()
+			case *os.File:
+				out.Seek(0, io.SeekStart)
+				content, err := io.ReadAll(out)
+				if err != nil {
+					t.Fatalf("Failed to read from file: %v", err)
+				}
+				result = string(content)
+			}
+
+			// Compare the result to the expected output.
+			t.Log("Expected:", tt.expected)
+			t.Log("Result:", result)
+			if result != tt.expected {
+				t.Errorf("expected: %q, got %q", tt.expected, result)
+			}
+		})
 	}
 }
 
