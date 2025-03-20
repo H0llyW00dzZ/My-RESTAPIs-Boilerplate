@@ -116,35 +116,39 @@ func (s *textState) processTextNode(n *html.Node) {
 	}
 }
 
+// addNewline adds the specified number of newline characters to the builder.
+// It also resets the needSpace flag to ensure proper spacing in the output.
+func (s *textState) addNewline(count int) {
+	for i := 0; i < count; i++ {
+		s.builder.WriteString(s.nl)
+	}
+	s.needSpace = false
+}
+
 // elementStartHandlers processes the opening of HTML elements
 //
 // Note: This reduces cyclomatic complexity by avoiding numerous "if-else" statements, switch cases, and for loops.
 var elementStartHandlers = map[string]func(*textState, *html.Node){
-	"br":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
-	"p":   func(s *textState, n *html.Node) { s.builder.WriteString(s.nl + s.nl); s.needSpace = false },
-	"div": func(s *textState, n *html.Node) { s.builder.WriteString(s.nl + s.nl); s.needSpace = false },
-	"h1":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
-	"h2":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
-	"h3":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
-	"h4":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
-	"h5":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
-	"h6":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
-	"ul":  func(s *textState, n *html.Node) { s.inList = true; s.builder.WriteString(s.nl); s.needSpace = false },
-	"ol":  func(s *textState, n *html.Node) { s.inList = true; s.builder.WriteString(s.nl); s.needSpace = false },
+	"br":  func(s *textState, n *html.Node) { s.addNewline(1) },
+	"p":   func(s *textState, n *html.Node) { s.addNewline(2) },
+	"div": func(s *textState, n *html.Node) { s.addNewline(2) },
+	"h1":  func(s *textState, n *html.Node) { s.addNewline(1) },
+	"h2":  func(s *textState, n *html.Node) { s.addNewline(1) },
+	"h3":  func(s *textState, n *html.Node) { s.addNewline(1) },
+	"h4":  func(s *textState, n *html.Node) { s.addNewline(1) },
+	"h5":  func(s *textState, n *html.Node) { s.addNewline(1) },
+	"h6":  func(s *textState, n *html.Node) { s.addNewline(1) },
+	"ul":  func(s *textState, n *html.Node) { s.inList = true; s.addNewline(1) },
+	"ol":  func(s *textState, n *html.Node) { s.inList = true; s.addNewline(1) },
 	"li": func(s *textState, n *html.Node) {
 		if s.inList {
 			s.builder.WriteString("- ")
 		}
 		s.needSpace = false
 	},
-	"a":   func(s *textState, n *html.Node) { s.processAnchorStart(n) },
-	"img": func(s *textState, n *html.Node) { s.processImage(n) },
-	"table": func(s *textState, n *html.Node) {
-		s.inTable = true
-		s.headerParsed = false
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
+	"a":     func(s *textState, n *html.Node) { s.processAnchorStart(n) },
+	"img":   func(s *textState, n *html.Node) { s.processImage(n) },
+	"table": func(s *textState, n *html.Node) { s.inTable = true; s.headerParsed = false; s.addNewline(1) },
 	// Note: The tr, td, and th elements should now be correct and will only display formatting if they are inside a table.
 	"tr": func(s *textState, n *html.Node) {
 		if s.inTable {
@@ -170,38 +174,32 @@ var elementStartHandlers = map[string]func(*textState, *html.Node){
 //
 // Note: This reduces cyclomatic complexity by avoiding numerous "if-else" statements, switch cases, and for loops.
 var elementEndHandlers = map[string]func(*textState, *html.Node){
-	"p":   func(s *textState, n *html.Node) { s.builder.WriteString(s.nl + s.nl); s.needSpace = false },
-	"div": func(s *textState, n *html.Node) { s.builder.WriteString(s.nl + s.nl); s.needSpace = false },
-	"h1":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
-	"h2":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
-	"h3":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
-	"h4":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
-	"h5":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
-	"h6":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
+	"p":   func(s *textState, n *html.Node) { s.addNewline(2) },
+	"div": func(s *textState, n *html.Node) { s.addNewline(2) },
+	"h1":  func(s *textState, n *html.Node) { s.addNewline(1) },
+	"h2":  func(s *textState, n *html.Node) { s.addNewline(1) },
+	"h3":  func(s *textState, n *html.Node) { s.addNewline(1) },
+	"h4":  func(s *textState, n *html.Node) { s.addNewline(1) },
+	"h5":  func(s *textState, n *html.Node) { s.addNewline(1) },
+	"h6":  func(s *textState, n *html.Node) { s.addNewline(1) },
 	"li": func(s *textState, n *html.Node) {
 		if s.inList {
-			s.builder.WriteString(s.nl)
+			s.addNewline(1)
 		}
-		s.needSpace = false
 	},
-	"ul": func(s *textState, n *html.Node) { s.inList = false; s.builder.WriteString(s.nl); s.needSpace = false },
-	"ol": func(s *textState, n *html.Node) { s.inList = false; s.builder.WriteString(s.nl); s.needSpace = false },
-	"a":  func(s *textState, n *html.Node) { s.processAnchorEnd(n) },
-	"table": func(s *textState, n *html.Node) {
-		s.inTable = false
-		s.builder.WriteString(s.nl + s.nl)
-		s.needSpace = false
-	},
+	"ul":    func(s *textState, n *html.Node) { s.inList = false; s.addNewline(1) },
+	"ol":    func(s *textState, n *html.Node) { s.inList = false; s.addNewline(1) },
+	"a":     func(s *textState, n *html.Node) { s.processAnchorEnd(n) },
+	"table": func(s *textState, n *html.Node) { s.inTable = false; s.addNewline(2) },
 	// Note: The tr, td, and th elements should now be correct and will only display formatting if they are inside a table.
 	"tr": func(s *textState, n *html.Node) {
 		if s.inTable {
-			s.builder.WriteString(s.nl)
+			s.addNewline(1)
 			if !s.headerParsed {
 				s.headerParsed = true
 				s.addHeaderSeparator()
 			}
 		}
-		s.needSpace = false
 	},
 	"td": func(s *textState, n *html.Node) {
 		if s.inTable {
