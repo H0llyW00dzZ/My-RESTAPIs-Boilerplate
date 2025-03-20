@@ -69,6 +69,8 @@ func shouldSkipNode(n *html.Node) bool {
 }
 
 // extractText processes HTML nodes and extracts text content
+//
+// TODO: This is still unfinished because HTML is complex. The table extraction also needs improvement.
 func extractText(n *html.Node, state *textState) {
 	if shouldSkipNode(n) {
 		return
