@@ -187,6 +187,21 @@ func TestHTMLToPlainText(t *testing.T) {
 					<p>Visible content.</p>`,
 			expected: crlf + crlf + "Visible content." + crlf + crlf,
 		},
+		{
+			name:     "TR without Table",
+			input:    "<tr><td>Data</td></tr>",
+			expected: "Data",
+		},
+		{
+			name:     "TD without Table",
+			input:    "<td>Data</td>",
+			expected: "Data",
+		},
+		{
+			name:     "TH without Table",
+			input:    "<th>Header</th>",
+			expected: "Header",
+		},
 	}
 
 	for _, tt := range tests {
