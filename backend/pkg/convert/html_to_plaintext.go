@@ -70,9 +70,15 @@ func shouldSkipNode(n *html.Node) bool {
 	return false
 }
 
-// extractText processes HTML nodes and extracts text content
+// extractText processes HTML nodes and extracts text content.
 //
-// TODO: This is still unfinished because HTML is complex. The table extraction also needs improvement.
+// Note: If you are familiar with [AST] interpreters and you are bored with other programming languages,
+// it is possible to create a new language where you write HTML and convert it into Go code or any other language.
+// In this case, Go can act as a compiler for your new language.
+//
+// TODO: This implementation is still unfinished because HTML is complex. The table extraction functionality also needs improvement.
+//
+// [AST]: https://en.wikipedia.org/wiki/Abstract_syntax_tree
 func (s *textState) extractText(n *html.Node) {
 	if shouldSkipNode(n) {
 		return
