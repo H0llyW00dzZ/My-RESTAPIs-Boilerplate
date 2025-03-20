@@ -117,6 +117,8 @@ func (s *textState) processTextNode(n *html.Node) {
 }
 
 // elementStartHandlers processes the opening of HTML elements
+//
+// Note: This reduces cyclomatic complexity by avoiding numerous "if-else" statements, switch cases, and for loops.
 var elementStartHandlers = map[string]func(*textState, *html.Node){
 	"br": func(s *textState, n *html.Node) {
 		s.builder.WriteString(s.nl)
@@ -204,6 +206,8 @@ var elementStartHandlers = map[string]func(*textState, *html.Node){
 }
 
 // elementEndHandlers processes the closing of HTML elements
+//
+// Note: This reduces cyclomatic complexity by avoiding numerous "if-else" statements, switch cases, and for loops.
 var elementEndHandlers = map[string]func(*textState, *html.Node){
 	"p": func(s *textState, n *html.Node) {
 		s.builder.WriteString(s.nl + s.nl)
