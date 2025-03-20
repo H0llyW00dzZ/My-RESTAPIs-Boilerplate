@@ -136,6 +136,8 @@ func (s *textState) addNewline(count int) {
 // elementStartHandlers processes the opening of HTML elements
 //
 // Note: This reduces cyclomatic complexity by avoiding numerous "if-else" statements, switch cases, and for loops.
+// The performance might differ from the previous implementation that used switch cases due to the trade-off.
+// However, using switch cases can become harder to maintain when there are many cases (not good 👎).
 var elementStartHandlers = map[string]func(*textState, *html.Node){
 	"br":  func(s *textState, n *html.Node) { s.addNewline(1) },
 	"p":   func(s *textState, n *html.Node) { s.addNewline(2) },
@@ -181,6 +183,8 @@ var elementStartHandlers = map[string]func(*textState, *html.Node){
 // elementEndHandlers processes the closing of HTML elements
 //
 // Note: This reduces cyclomatic complexity by avoiding numerous "if-else" statements, switch cases, and for loops.
+// The performance might differ from the previous implementation that used switch cases due to the trade-off.
+// However, using switch cases can become harder to maintain when there are many cases (not good 👎).
 var elementEndHandlers = map[string]func(*textState, *html.Node){
 	"p":   func(s *textState, n *html.Node) { s.addNewline(2) },
 	"div": func(s *textState, n *html.Node) { s.addNewline(2) },
