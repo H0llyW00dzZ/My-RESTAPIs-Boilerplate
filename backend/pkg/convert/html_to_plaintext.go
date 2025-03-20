@@ -142,11 +142,16 @@ func handleElementStart(n *html.Node, state *textState) {
 		state.headerParsed = false
 		state.builder.WriteString(state.nl)
 		state.needSpace = false
+		// Note: The tr, td, and th elements should now be correct and will only display formatting if they are inside a table.
 	case "tr":
-		state.builder.WriteString("| ")
+		if state.inTable {
+			state.builder.WriteString("| ")
+		}
 		state.needSpace = false
 	case "td", "th":
-		state.builder.WriteString(" ")
+		if state.inTable {
+			state.builder.WriteString(" ")
+		}
 		state.needSpace = false
 	}
 }
@@ -175,16 +180,21 @@ func handleElementEnd(n *html.Node, state *textState) {
 		state.inTable = false
 		state.builder.WriteString(state.nl + state.nl)
 		state.needSpace = false
+		// Note: The tr, td, and th elements should now be correct and will only display formatting if they are inside a table.
 	case "tr":
-		state.builder.WriteString(state.nl)
-		if state.inTable && !state.headerParsed {
-			state.headerParsed = true
-			addHeaderSeparator(state)
+		if state.inTable {
+			state.builder.WriteString(state.nl)
+			if !state.headerParsed {
+				state.headerParsed = true
+				addHeaderSeparator(state)
+			}
 		}
 		state.needSpace = false
 	case "td", "th":
-		state.builder.WriteString(" |")
-		state.needSpace = true
+		if state.inTable {
+			state.builder.WriteString(" |")
+			state.needSpace = true
+		}
 	}
 }
 
