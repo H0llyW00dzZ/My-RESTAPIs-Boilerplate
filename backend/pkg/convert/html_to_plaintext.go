@@ -148,7 +148,7 @@ var elementStartHandlers = map[string]func(*textState, *html.Node){
 	},
 	"a":     func(s *textState, n *html.Node) { s.processAnchorStart(n) },
 	"img":   func(s *textState, n *html.Node) { s.processImage(n) },
-	"table": func(s *textState, n *html.Node) { ; s.inTable = true; s.headerParsed = false; s.addNewline(1) },
+	"table": func(s *textState, n *html.Node) { s.inTable = true; s.headerParsed = false; s.addNewline(1) },
 	// Note: The tr, td, and th elements should now be correct and will only display formatting if they are inside a table.
 	"tr": func(s *textState, n *html.Node) {
 		if s.inTable {
