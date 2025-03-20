@@ -120,64 +120,25 @@ func (s *textState) processTextNode(n *html.Node) {
 //
 // Note: This reduces cyclomatic complexity by avoiding numerous "if-else" statements, switch cases, and for loops.
 var elementStartHandlers = map[string]func(*textState, *html.Node){
-	"br": func(s *textState, n *html.Node) {
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
-	"p": func(s *textState, n *html.Node) {
-		s.builder.WriteString(s.nl + s.nl)
-		s.needSpace = false
-	},
-	"div": func(s *textState, n *html.Node) {
-		s.builder.WriteString(s.nl + s.nl)
-		s.needSpace = false
-	},
-	"h1": func(s *textState, n *html.Node) {
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
-	"h2": func(s *textState, n *html.Node) {
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
-	"h3": func(s *textState, n *html.Node) {
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
-	"h4": func(s *textState, n *html.Node) {
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
-	"h5": func(s *textState, n *html.Node) {
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
-	"h6": func(s *textState, n *html.Node) {
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
-	"ul": func(s *textState, n *html.Node) {
-		s.inList = true
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
-	"ol": func(s *textState, n *html.Node) {
-		s.inList = true
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
+	"br":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
+	"p":   func(s *textState, n *html.Node) { s.builder.WriteString(s.nl + s.nl); s.needSpace = false },
+	"div": func(s *textState, n *html.Node) { s.builder.WriteString(s.nl + s.nl); s.needSpace = false },
+	"h1":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
+	"h2":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
+	"h3":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
+	"h4":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
+	"h5":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
+	"h6":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
+	"ul":  func(s *textState, n *html.Node) { s.inList = true; s.builder.WriteString(s.nl); s.needSpace = false },
+	"ol":  func(s *textState, n *html.Node) { s.inList = true; s.builder.WriteString(s.nl); s.needSpace = false },
 	"li": func(s *textState, n *html.Node) {
 		if s.inList {
 			s.builder.WriteString("- ")
 		}
 		s.needSpace = false
 	},
-	"a": func(s *textState, n *html.Node) {
-		s.processAnchorStart(n)
-	},
-	"img": func(s *textState, n *html.Node) {
-		s.processImage(n)
-	},
+	"a":   func(s *textState, n *html.Node) { s.processAnchorStart(n) },
+	"img": func(s *textState, n *html.Node) { s.processImage(n) },
 	"table": func(s *textState, n *html.Node) {
 		s.inTable = true
 		s.headerParsed = false
@@ -209,57 +170,23 @@ var elementStartHandlers = map[string]func(*textState, *html.Node){
 //
 // Note: This reduces cyclomatic complexity by avoiding numerous "if-else" statements, switch cases, and for loops.
 var elementEndHandlers = map[string]func(*textState, *html.Node){
-	"p": func(s *textState, n *html.Node) {
-		s.builder.WriteString(s.nl + s.nl)
-		s.needSpace = false
-	},
-	"div": func(s *textState, n *html.Node) {
-		s.builder.WriteString(s.nl + s.nl)
-		s.needSpace = false
-	},
-	"h1": func(s *textState, n *html.Node) {
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
-	"h2": func(s *textState, n *html.Node) {
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
-	"h3": func(s *textState, n *html.Node) {
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
-	"h4": func(s *textState, n *html.Node) {
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
-	"h5": func(s *textState, n *html.Node) {
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
-	"h6": func(s *textState, n *html.Node) {
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
+	"p":   func(s *textState, n *html.Node) { s.builder.WriteString(s.nl + s.nl); s.needSpace = false },
+	"div": func(s *textState, n *html.Node) { s.builder.WriteString(s.nl + s.nl); s.needSpace = false },
+	"h1":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
+	"h2":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
+	"h3":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
+	"h4":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
+	"h5":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
+	"h6":  func(s *textState, n *html.Node) { s.builder.WriteString(s.nl); s.needSpace = false },
 	"li": func(s *textState, n *html.Node) {
 		if s.inList {
 			s.builder.WriteString(s.nl)
 		}
 		s.needSpace = false
 	},
-	"ul": func(s *textState, n *html.Node) {
-		s.inList = false
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
-	"ol": func(s *textState, n *html.Node) {
-		s.inList = false
-		s.builder.WriteString(s.nl)
-		s.needSpace = false
-	},
-	"a": func(s *textState, n *html.Node) {
-		s.processAnchorEnd(n)
-	},
+	"ul": func(s *textState, n *html.Node) { s.inList = false; s.builder.WriteString(s.nl); s.needSpace = false },
+	"ol": func(s *textState, n *html.Node) { s.inList = false; s.builder.WriteString(s.nl); s.needSpace = false },
+	"a":  func(s *textState, n *html.Node) { s.processAnchorEnd(n) },
 	"table": func(s *textState, n *html.Node) {
 		s.inTable = false
 		s.builder.WriteString(s.nl + s.nl)
