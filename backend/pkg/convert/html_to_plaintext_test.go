@@ -202,6 +202,26 @@ func TestHTMLToPlainText(t *testing.T) {
 			input:    "<th>Header</th>",
 			expected: "Header",
 		},
+		{
+			name:     "Simple H3 Heading",
+			input:    "<h3>Heading 3</h3>",
+			expected: crlf + "Heading 3" + crlf,
+		},
+		{
+			name:     "Simple H4 Heading",
+			input:    "<h4>Heading 4</h4>",
+			expected: crlf + "Heading 4" + crlf,
+		},
+		{
+			name:     "Simple H5 Heading",
+			input:    "<h5>Heading 5</h5>",
+			expected: crlf + "Heading 5" + crlf,
+		},
+		{
+			name:     "Simple H6 Heading",
+			input:    "<h6>Heading 6</h6>",
+			expected: crlf + "Heading 6" + crlf,
+		},
 	}
 
 	for _, tt := range tests {

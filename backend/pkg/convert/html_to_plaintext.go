@@ -80,11 +80,15 @@ func (s *textState) extractText(n *html.Node) {
 	case html.TextNode:
 		s.processTextNode(n)
 	case html.ElementNode:
-		s.handleElementStart(n)
+		if startFunc, exists := elementStartHandlers[n.Data]; exists {
+			startFunc(s, n)
+		}
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			s.extractText(c)
 		}
-		s.handleElementEnd(n)
+		if endFunc, exists := elementEndHandlers[n.Data]; exists {
+			endFunc(s, n)
+		}
 	default:
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			s.extractText(c)
@@ -112,76 +116,153 @@ func (s *textState) processTextNode(n *html.Node) {
 	}
 }
 
-// handleElementStart processes the opening of HTML elements
-func (s *textState) handleElementStart(n *html.Node) {
-	switch n.Data {
-	case "br":
+// elementStartHandlers processes the opening of HTML elements
+var elementStartHandlers = map[string]func(*textState, *html.Node){
+	"br": func(s *textState, n *html.Node) {
 		s.builder.WriteString(s.nl)
 		s.needSpace = false
-	case "p", "div":
+	},
+	"p": func(s *textState, n *html.Node) {
 		s.builder.WriteString(s.nl + s.nl)
 		s.needSpace = false
-	case "h1", "h2", "h3", "h4", "h5", "h6":
+	},
+	"div": func(s *textState, n *html.Node) {
+		s.builder.WriteString(s.nl + s.nl)
+		s.needSpace = false
+	},
+	"h1": func(s *textState, n *html.Node) {
 		s.builder.WriteString(s.nl)
 		s.needSpace = false
-	case "ul", "ol":
+	},
+	"h2": func(s *textState, n *html.Node) {
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
+	},
+	"h3": func(s *textState, n *html.Node) {
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
+	},
+	"h4": func(s *textState, n *html.Node) {
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
+	},
+	"h5": func(s *textState, n *html.Node) {
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
+	},
+	"h6": func(s *textState, n *html.Node) {
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
+	},
+	"ul": func(s *textState, n *html.Node) {
 		s.inList = true
 		s.builder.WriteString(s.nl)
 		s.needSpace = false
-	case "li":
+	},
+	"ol": func(s *textState, n *html.Node) {
+		s.inList = true
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
+	},
+	"li": func(s *textState, n *html.Node) {
 		if s.inList {
 			s.builder.WriteString("- ")
 		}
 		s.needSpace = false
-	case "a":
+	},
+	"a": func(s *textState, n *html.Node) {
 		s.processAnchorStart(n)
-	case "img":
+	},
+	"img": func(s *textState, n *html.Node) {
 		s.processImage(n)
-	case "table":
+	},
+	"table": func(s *textState, n *html.Node) {
 		s.inTable = true
 		s.headerParsed = false
 		s.builder.WriteString(s.nl)
 		s.needSpace = false
-		// Note: The tr, td, and th elements should now be correct and will only display formatting if they are inside a table.
-	case "tr":
+	},
+	// Note: The tr, td, and th elements should now be correct and will only display formatting if they are inside a table.
+	"tr": func(s *textState, n *html.Node) {
 		if s.inTable {
 			s.builder.WriteString("| ")
 		}
 		s.needSpace = false
-	case "td", "th":
+	},
+	"td": func(s *textState, n *html.Node) {
 		if s.inTable {
 			s.builder.WriteString(" ")
 		}
 		s.needSpace = false
-	}
+	},
+	"th": func(s *textState, n *html.Node) {
+		if s.inTable {
+			s.builder.WriteString(" ")
+		}
+		s.needSpace = false
+	},
 }
 
-// handleElementEnd processes the closing of HTML elements
-func (s *textState) handleElementEnd(n *html.Node) {
-	switch n.Data {
-	case "p", "div":
+// elementEndHandlers processes the closing of HTML elements
+var elementEndHandlers = map[string]func(*textState, *html.Node){
+	"p": func(s *textState, n *html.Node) {
 		s.builder.WriteString(s.nl + s.nl)
 		s.needSpace = false
-	case "h1", "h2", "h3", "h4", "h5", "h6":
+	},
+	"div": func(s *textState, n *html.Node) {
+		s.builder.WriteString(s.nl + s.nl)
+		s.needSpace = false
+	},
+	"h1": func(s *textState, n *html.Node) {
 		s.builder.WriteString(s.nl)
 		s.needSpace = false
-	case "li":
+	},
+	"h2": func(s *textState, n *html.Node) {
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
+	},
+	"h3": func(s *textState, n *html.Node) {
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
+	},
+	"h4": func(s *textState, n *html.Node) {
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
+	},
+	"h5": func(s *textState, n *html.Node) {
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
+	},
+	"h6": func(s *textState, n *html.Node) {
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
+	},
+	"li": func(s *textState, n *html.Node) {
 		if s.inList {
 			s.builder.WriteString(s.nl)
 		}
 		s.needSpace = false
-	case "ul", "ol":
+	},
+	"ul": func(s *textState, n *html.Node) {
 		s.inList = false
 		s.builder.WriteString(s.nl)
 		s.needSpace = false
-	case "a":
+	},
+	"ol": func(s *textState, n *html.Node) {
+		s.inList = false
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
+	},
+	"a": func(s *textState, n *html.Node) {
 		s.processAnchorEnd(n)
-	case "table":
+	},
+	"table": func(s *textState, n *html.Node) {
 		s.inTable = false
 		s.builder.WriteString(s.nl + s.nl)
 		s.needSpace = false
-		// Note: The tr, td, and th elements should now be correct and will only display formatting if they are inside a table.
-	case "tr":
+	},
+	// Note: The tr, td, and th elements should now be correct and will only display formatting if they are inside a table.
+	"tr": func(s *textState, n *html.Node) {
 		if s.inTable {
 			s.builder.WriteString(s.nl)
 			if !s.headerParsed {
@@ -190,12 +271,19 @@ func (s *textState) handleElementEnd(n *html.Node) {
 			}
 		}
 		s.needSpace = false
-	case "td", "th":
+	},
+	"td": func(s *textState, n *html.Node) {
 		if s.inTable {
 			s.builder.WriteString(" |")
 			s.needSpace = true
 		}
-	}
+	},
+	"th": func(s *textState, n *html.Node) {
+		if s.inTable {
+			s.builder.WriteString(" |")
+			s.needSpace = true
+		}
+	},
 }
 
 // addHeaderSeparator adds a markdown separator line for table headers.
