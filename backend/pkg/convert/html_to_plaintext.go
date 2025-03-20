@@ -15,13 +15,13 @@ import (
 	"golang.org/x/net/html"
 )
 
-// HTMLToPlainText is an [AST-based interpreter] that converts HTML content to plain text.
+// HTMLToPlainText is an [AST]-based interpreter that converts HTML content to plain text.
 // It parses the HTML and extracts text nodes, concatenating them into a single string.
 // If parsing fails, it returns the original HTML content as a fallback.
 //
 // TODO: Improving this will require additional filtering, possibly using regex.
 //
-// [AST-based interpreter]: https://en.wikipedia.org/wiki/Abstract_syntax_tree
+// [AST]: https://en.wikipedia.org/wiki/Abstract_syntax_tree
 func HTMLToPlainText(htmlContent string) string {
 	builder := getBuilder()
 	defer putBuilder(builder)
@@ -284,12 +284,12 @@ func (s *textState) processImage(n *html.Node) {
 	}
 }
 
-// HTMLToPlainTextStreams is an [AST-based interpreter] that converts HTML content from an input stream to plain text
+// HTMLToPlainTextStreams is an [AST]-based interpreter that converts HTML content from an input stream to plain text
 // and writes it to an output stream (a.k.a Hybrid Streaming).
 //
 // TODO: Improving this will require additional filtering, possibly using regex.
 //
-// [AST-based interpreter]: https://en.wikipedia.org/wiki/Abstract_syntax_tree
+// [AST]: https://en.wikipedia.org/wiki/Abstract_syntax_tree
 func HTMLToPlainTextStreams(i io.Reader, o io.Writer) error {
 	builder := getBuilder()
 	defer putBuilder(builder)
@@ -315,13 +315,13 @@ func HTMLToPlainTextStreams(i io.Reader, o io.Writer) error {
 	return err
 }
 
-// HTMLToPlainTextConcurrent is an [AST-based interpreter] that converts multiple HTML strings to plain text concurrently.
+// HTMLToPlainTextConcurrent is an [AST]-based interpreter that converts multiple HTML strings to plain text concurrently.
 // It returns a slice of plain text results corresponding to each HTML input.
 //
 // Note: This is designed for high-performance scenarios. It also depends on the number of available CPU cores,
 // unlike [HTMLToPlainTextStreamsConcurrent], which depends on the input reader.
 //
-// [AST-based interpreter]: https://en.wikipedia.org/wiki/Abstract_syntax_tree
+// [AST]: https://en.wikipedia.org/wiki/Abstract_syntax_tree
 func HTMLToPlainTextConcurrent(htmlContents []string) []string {
 	results := make([]string, len(htmlContents))
 	numWorkers := runtime.GOMAXPROCS(0)
@@ -359,13 +359,13 @@ func (sw *SafeWriter) Write(p []byte) (n int, err error) {
 	return sw.writer.Write(p)
 }
 
-// HTMLToPlainTextStreamsConcurrent is an [AST-based interpreter] that processes multiple readers concurrently
+// HTMLToPlainTextStreamsConcurrent is an [AST]-based interpreter that processes multiple readers concurrently
 // and writes the plain text to a single writer, returning any errors encountered
 //
 // Note: This is designed for high-performance scenarios, like non-stop 24/7 streaming hahaha.
 // It's where your machine really earns its keep—no coffee breaks here!
 //
-// [AST-based interpreter]: https://en.wikipedia.org/wiki/Abstract_syntax_tree
+// [AST]: https://en.wikipedia.org/wiki/Abstract_syntax_tree
 func HTMLToPlainTextStreamsConcurrent(i []io.Reader, o io.Writer) []error {
 	safeWriter := &SafeWriter{writer: o}
 	var wg sync.WaitGroup
