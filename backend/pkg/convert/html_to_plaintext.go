@@ -40,7 +40,7 @@ func HTMLToPlainText(htmlContent string) string {
 		headerSizes:  []int{},
 	}
 
-	extractText(doc, state)
+	state.extractText(doc)
 	return state.builder.String()
 }
 
@@ -71,147 +71,147 @@ func shouldSkipNode(n *html.Node) bool {
 // extractText processes HTML nodes and extracts text content
 //
 // TODO: This is still unfinished because HTML is complex. The table extraction also needs improvement.
-func extractText(n *html.Node, state *textState) {
+func (s *textState) extractText(n *html.Node) {
 	if shouldSkipNode(n) {
 		return
 	}
 
 	switch n.Type {
 	case html.TextNode:
-		processTextNode(n, state)
+		s.processTextNode(n)
 	case html.ElementNode:
-		handleElementStart(n, state)
+		s.handleElementStart(n)
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			extractText(c, state)
+			s.extractText(c)
 		}
-		handleElementEnd(n, state)
+		s.handleElementEnd(n)
 	default:
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			extractText(c, state)
+			s.extractText(c)
 		}
 	}
 }
 
 // processTextNode handles text node content
-func processTextNode(n *html.Node, state *textState) {
+func (s *textState) processTextNode(n *html.Node) {
 	text := strings.TrimSpace(n.Data)
 	if text != "" {
-		if state.needSpace {
-			state.builder.WriteString(" ")
+		if s.needSpace {
+			s.builder.WriteString(" ")
 		}
-		state.builder.WriteString(text)
+		s.builder.WriteString(text)
 		// Set needSpace after writing text
-		state.needSpace = true
+		s.needSpace = true
 
-		if state.inTable && !state.headerParsed {
-			state.headerSizes = append(state.headerSizes, len(text))
+		if s.inTable && !s.headerParsed {
+			s.headerSizes = append(s.headerSizes, len(text))
 		}
 	} else {
 		// Reset needSpace if text is empty
-		state.needSpace = false
+		s.needSpace = false
 	}
 }
 
 // handleElementStart processes the opening of HTML elements
-func handleElementStart(n *html.Node, state *textState) {
+func (s *textState) handleElementStart(n *html.Node) {
 	switch n.Data {
 	case "br":
-		state.builder.WriteString(state.nl)
-		state.needSpace = false
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
 	case "p", "div":
-		state.builder.WriteString(state.nl + state.nl)
-		state.needSpace = false
+		s.builder.WriteString(s.nl + s.nl)
+		s.needSpace = false
 	case "h1", "h2", "h3", "h4", "h5", "h6":
-		state.builder.WriteString(state.nl)
-		state.needSpace = false
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
 	case "ul", "ol":
-		state.inList = true
-		state.builder.WriteString(state.nl)
-		state.needSpace = false
+		s.inList = true
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
 	case "li":
-		if state.inList {
-			state.builder.WriteString("- ")
+		if s.inList {
+			s.builder.WriteString("- ")
 		}
-		state.needSpace = false
+		s.needSpace = false
 	case "a":
-		processAnchorStart(n, state)
+		s.processAnchorStart(n)
 	case "img":
-		processImage(n, state)
+		s.processImage(n)
 	case "table":
-		state.inTable = true
-		state.headerParsed = false
-		state.builder.WriteString(state.nl)
-		state.needSpace = false
+		s.inTable = true
+		s.headerParsed = false
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
 		// Note: The tr, td, and th elements should now be correct and will only display formatting if they are inside a table.
 	case "tr":
-		if state.inTable {
-			state.builder.WriteString("| ")
+		if s.inTable {
+			s.builder.WriteString("| ")
 		}
-		state.needSpace = false
+		s.needSpace = false
 	case "td", "th":
-		if state.inTable {
-			state.builder.WriteString(" ")
+		if s.inTable {
+			s.builder.WriteString(" ")
 		}
-		state.needSpace = false
+		s.needSpace = false
 	}
 }
 
 // handleElementEnd processes the closing of HTML elements
-func handleElementEnd(n *html.Node, state *textState) {
+func (s *textState) handleElementEnd(n *html.Node) {
 	switch n.Data {
 	case "p", "div":
-		state.builder.WriteString(state.nl + state.nl)
-		state.needSpace = false
+		s.builder.WriteString(s.nl + s.nl)
+		s.needSpace = false
 	case "h1", "h2", "h3", "h4", "h5", "h6":
-		state.builder.WriteString(state.nl)
-		state.needSpace = false
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
 	case "li":
-		if state.inList {
-			state.builder.WriteString(state.nl)
+		if s.inList {
+			s.builder.WriteString(s.nl)
 		}
-		state.needSpace = false
+		s.needSpace = false
 	case "ul", "ol":
-		state.inList = false
-		state.builder.WriteString(state.nl)
-		state.needSpace = false
+		s.inList = false
+		s.builder.WriteString(s.nl)
+		s.needSpace = false
 	case "a":
-		processAnchorEnd(n, state)
+		s.processAnchorEnd(n)
 	case "table":
-		state.inTable = false
-		state.builder.WriteString(state.nl + state.nl)
-		state.needSpace = false
+		s.inTable = false
+		s.builder.WriteString(s.nl + s.nl)
+		s.needSpace = false
 		// Note: The tr, td, and th elements should now be correct and will only display formatting if they are inside a table.
 	case "tr":
-		if state.inTable {
-			state.builder.WriteString(state.nl)
-			if !state.headerParsed {
-				state.headerParsed = true
-				addHeaderSeparator(state)
+		if s.inTable {
+			s.builder.WriteString(s.nl)
+			if !s.headerParsed {
+				s.headerParsed = true
+				s.addHeaderSeparator()
 			}
 		}
-		state.needSpace = false
+		s.needSpace = false
 	case "td", "th":
-		if state.inTable {
-			state.builder.WriteString(" |")
-			state.needSpace = true
+		if s.inTable {
+			s.builder.WriteString(" |")
+			s.needSpace = true
 		}
 	}
 }
 
 // addHeaderSeparator adds a markdown separator line for table headers.
 // It uses the lengths of the header text to ensure the separator aligns properly.
-func addHeaderSeparator(state *textState) {
-	state.builder.WriteString("|")
-	// this should be fine, even with 1 billion tables; it won't overflow like Unix time.
-	for _, size := range state.headerSizes {
-		state.builder.WriteString(strings.Repeat("-", size+2) + "|")
+func (s *textState) addHeaderSeparator() {
+	s.builder.WriteString("|")
+	for _, size := range s.headerSizes {
+		// this should be fine, even with 1 billion tables; it won't overflow like Unix time.
+		s.builder.WriteString(strings.Repeat("-", size+2) + "|")
 	}
-	state.builder.WriteString(state.nl)
-	state.headerSizes = nil
+	s.builder.WriteString(s.nl)
+	s.headerSizes = nil
 }
 
 // processAnchorStart handles the start of anchor tags
-func processAnchorStart(n *html.Node, state *textState) {
+func (s *textState) processAnchorStart(n *html.Node) {
 	var href string
 	for _, attr := range n.Attr {
 		if attr.Key == "href" {
@@ -220,33 +220,33 @@ func processAnchorStart(n *html.Node, state *textState) {
 		}
 	}
 	if href != "" {
-		if state.needSpace {
+		if s.needSpace {
 			// Add space before the link if needed
-			state.builder.WriteString(" ")
-			state.needSpace = false
+			s.builder.WriteString(" ")
+			s.needSpace = false
 		}
-		state.builder.WriteString("[")
+		s.builder.WriteString("[")
 		// Store href for later use
 		n.Attr = append(n.Attr, html.Attribute{Key: "_stored_href", Val: href})
 	}
 }
 
 // processAnchorEnd handles the end of anchor tags
-func processAnchorEnd(n *html.Node, state *textState) {
+func (s *textState) processAnchorEnd(n *html.Node) {
 	for _, attr := range n.Attr {
 		if attr.Key == "_stored_href" {
-			state.builder.WriteString("](")
-			state.builder.WriteString(attr.Val)
-			state.builder.WriteString(")")
+			s.builder.WriteString("](")
+			s.builder.WriteString(attr.Val)
+			s.builder.WriteString(")")
 			// Set needSpace after the link
-			state.needSpace = true
+			s.needSpace = true
 			break
 		}
 	}
 }
 
 // processImage handles image tags
-func processImage(n *html.Node, state *textState) {
+func (s *textState) processImage(n *html.Node) {
 	var alt, src string
 	for _, attr := range n.Attr {
 		switch attr.Key {
@@ -257,11 +257,11 @@ func processImage(n *html.Node, state *textState) {
 		}
 	}
 	if src != "" {
-		state.builder.WriteString("![")
-		state.builder.WriteString(alt)
-		state.builder.WriteString("](")
-		state.builder.WriteString(src)
-		state.builder.WriteString(")")
+		s.builder.WriteString("![")
+		s.builder.WriteString(alt)
+		s.builder.WriteString("](")
+		s.builder.WriteString(src)
+		s.builder.WriteString(")")
 	}
 }
 
@@ -289,7 +289,7 @@ func HTMLToPlainTextStreams(i io.Reader, o io.Writer) error {
 		headerSizes:  []int{},
 	}
 
-	extractText(doc, state)
+	state.extractText(doc)
 	_, err = o.Write([]byte(state.builder.String()))
 	return err
 }
