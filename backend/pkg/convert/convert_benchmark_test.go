@@ -47,10 +47,10 @@ func BenchmarkHTMLToPlainText(b *testing.B) {
 //	goarch: amd64
 //	pkg: h0llyw00dz-template/backend/pkg/convert
 //	cpu: AMD Ryzen 9 3900X 12-Core Processor
-//	BenchmarkHTMLToPlainTextStreams_Hybrid/Simple_HTML-24         	  512937	      2148 ns/op	    9264 B/op	      12 allocs/op
-//	BenchmarkHTMLToPlainTextStreams_Hybrid/Large_HTML-24          	  534913	      2175 ns/op	    9264 B/op	      12 allocs/op
+//	BenchmarkHTMLToPlainTextStreams_Hybrid/Simple_HTML-24         	  843254	      1413 ns/op	    5068 B/op	      10 allocs/op
+//	BenchmarkHTMLToPlainTextStreams_Hybrid/Large_HTML-24          	  853084	      1374 ns/op	    5068 B/op	      10 allocs/op
 //	PASS
-//	ok  	h0llyw00dz-template/backend/pkg/convert	2.227s
+//	ok  	h0llyw00dz-template/backend/pkg/convert	2.369s
 //
 // Note: This is much better because it uses streaming.
 func BenchmarkHTMLToPlainTextStreams_Hybrid(b *testing.B) {
@@ -112,12 +112,12 @@ func BenchmarkHTMLToPlainTextConcurrent(b *testing.B) {
 //	goarch: amd64
 //	pkg: h0llyw00dz-template/backend/pkg/convert
 //	cpu: AMD Ryzen 9 3900X 12-Core Processor
-//	BenchmarkHTMLToPlainTextStreamsConcurrent/Simple_HTML-24         	  194490	      5964 ns/op	    9417 B/op	      18 allocs/op
-//	BenchmarkHTMLToPlainTextStreamsConcurrent/Large_HTML-24          	  202483	      5947 ns/op	    9417 B/op	      18 allocs/op
-//	BenchmarkHTMLToPlainTextStreamsConcurrent/Mixed_HTML-24          	   94112	     12861 ns/op	   18765 B/op	      32 allocs/op
+//	BenchmarkHTMLToPlainTextStreamsConcurrent/Simple_HTML-24         	  376934	      2942 ns/op	    5221 B/op	      16 allocs/op
+//	BenchmarkHTMLToPlainTextStreamsConcurrent/Large_HTML-24          	  424011	      2943 ns/op	    5221 B/op	      16 allocs/op
+//	BenchmarkHTMLToPlainTextStreamsConcurrent/Mixed_HTML-24          	  196773	      6220 ns/op	   10372 B/op	      28 allocs/op
 //
 //	PASS
-//	ok  	h0llyw00dz-template/backend/pkg/convert	3.590s
+//	ok  	h0llyw00dz-template/backend/pkg/convert	3.586s
 func BenchmarkHTMLToPlainTextStreamsConcurrent(b *testing.B) {
 	benchmarks := []struct {
 		name   string
