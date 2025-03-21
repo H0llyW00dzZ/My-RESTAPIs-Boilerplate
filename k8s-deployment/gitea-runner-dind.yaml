@@ -4,7 +4,9 @@ metadata:
   name: act-runner-config
   namespace: gitea
 data:
-  # Note: The container options are correct, and they work with the latest version of Kubernetes (v1.32.0).
+  # Note: The container options are also correct and work with the latest version of Kubernetes (v1.32.0).
+  # The current runner configuration for the Gitea Docker-in-Docker (DinD) Runner is also bound to the PVC "act-runner-vol".
+  # Make sure to also request a PVC named "act-runner-vol" in the Gitea namespace.
   runner-config.yml: |
     log:
       # The level of logging; options are trace, debug, info, warn, error, fatal.
@@ -44,7 +46,7 @@ data:
       # Enable cache server for actions/cache.
       enabled: true
       # Directory for cache data. Defaults to $HOME/.cache/actcache if empty.
-      dir: ""
+      dir: "/data/.cache/actcache"
       # Cache server host. Leave empty for automatic detection. Avoid using 0.0.0.0.
       host: ""
       # Cache server port. 0 means a random available port.
@@ -71,7 +73,7 @@ data:
       # If the path starts with '/', it will be trimmed.
       # Example: for /path/to/my/dir, use path/to/my/dir.
       # Defaults to /workspace if empty.
-      workdir_parent:
+      workdir_parent: "data/workspace"
       # Volumes (including bind mounts) can be mounted to containers. Supports Glob syntax, see https://github.com/gobwas/glob.
       # Specify multiple volumes. If empty, no volumes can be mounted.
       # Example: To allow only `data` volume and all .json files in `/src`, use:
@@ -81,6 +83,8 @@ data:
       # To allow any volume, use:
       valid_volumes:
         - /certs
+        - data
+        - /src/*.json
       # valid_volumes: []
       # Overrides the Docker client host.
       # If empty, act_runner finds an available Docker host automatically.
@@ -95,7 +99,7 @@ data:
     host:
       # Parent directory for a job's working directory.
       # Defaults to $HOME/.cache/act/ if empty.
-      # workdir_parent:
+      workdir_parent: ".cache/act"
 ---
 apiVersion: apps/v1
 kind: Deployment
