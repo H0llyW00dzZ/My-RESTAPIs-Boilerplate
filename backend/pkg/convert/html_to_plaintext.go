@@ -34,7 +34,6 @@ func HTMLToPlainText(htmlContent string) string {
 		builder:      builder,
 		needSpace:    false,
 		inList:       false,
-		listIndent:   0,
 		nl:           getNewline(),
 		inTable:      false,
 		headerParsed: false,
@@ -50,7 +49,6 @@ type textState struct {
 	builder      *strings.Builder
 	needSpace    bool
 	inList       bool
-	listIndent   int
 	nl           string
 	inTable      bool
 	headerParsed bool
@@ -317,7 +315,6 @@ func HTMLToPlainTextStreams(i io.Reader, o io.Writer) error {
 		builder:      builder,
 		needSpace:    false,
 		inList:       false,
-		listIndent:   0,
 		nl:           getNewline(),
 		inTable:      false,
 		headerParsed: false,
