@@ -50,7 +50,7 @@ func BenchmarkHTMLToPlainText(b *testing.B) {
 //	BenchmarkHTMLToPlainTextStreams_Hybrid/Simple_HTML-24         	  512937	      2148 ns/op	    9264 B/op	      12 allocs/op
 //	BenchmarkHTMLToPlainTextStreams_Hybrid/Large_HTML-24          	  534913	      2175 ns/op	    9264 B/op	      12 allocs/op
 //	PASS
-//	ok  	h0llyw00dz-template/backend/pkg/convert	2.290s
+//	ok  	h0llyw00dz-template/backend/pkg/convert	2.227s
 //
 // Note: This is much better because it uses streaming.
 func BenchmarkHTMLToPlainTextStreams_Hybrid(b *testing.B) {
@@ -86,7 +86,7 @@ func BenchmarkHTMLToPlainTextStreams_Hybrid(b *testing.B) {
 //	BenchmarkHTMLToPlainTextConcurrent/Mixed_HTML-24          	   33387	     35895 ns/op	   21653 B/op	     184 allocs/op
 //
 //	PASS
-//	ok  	h0llyw00dz-template/backend/pkg/convert	2.290s
+//	ok  	h0llyw00dz-template/backend/pkg/convert	3.559s
 func BenchmarkHTMLToPlainTextConcurrent(b *testing.B) {
 	benchmarks := []struct {
 		name   string
@@ -117,7 +117,7 @@ func BenchmarkHTMLToPlainTextConcurrent(b *testing.B) {
 //	BenchmarkHTMLToPlainTextStreamsConcurrent/Mixed_HTML-24          	   94112	     12861 ns/op	   18765 B/op	      32 allocs/op
 //
 //	PASS
-//	ok  	h0llyw00dz-template/backend/pkg/convert	2.290s
+//	ok  	h0llyw00dz-template/backend/pkg/convert	3.590s
 func BenchmarkHTMLToPlainTextStreamsConcurrent(b *testing.B) {
 	benchmarks := []struct {
 		name   string
