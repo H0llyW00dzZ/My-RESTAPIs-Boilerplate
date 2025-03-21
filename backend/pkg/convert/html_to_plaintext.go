@@ -6,7 +6,6 @@
 package convert
 
 import (
-	"bufio"
 	"io"
 	"runtime"
 	"strings"
@@ -308,7 +307,8 @@ func HTMLToPlainTextStreams(i io.Reader, o io.Writer) error {
 	builder := getBuilder()
 	defer putBuilder(builder)
 
-	doc, err := html.Parse(bufio.NewReader(i))
+	// It's better to handle this directly without bufio, allowing the caller to manage buffering.
+	doc, err := html.Parse(i)
 	if err != nil {
 		return err // Return error if parsing fails
 	}
