@@ -124,7 +124,7 @@ func (s *textState) processTextNode(n *html.Node) {
 // addNewline adds the specified number of newline characters to the builder.
 // It also resets the needSpace flag to ensure proper spacing in the output.
 func (s *textState) addNewline(count int) {
-	for i := 0; i < count; i++ {
+	for range count {
 		s.builder.WriteString(s.nl)
 	}
 	s.needSpace = false
@@ -340,7 +340,7 @@ func HTMLToPlainTextConcurrent(htmlContents []string) []string {
 
 	chunkSize := (len(htmlContents) + numWorkers - 1) / numWorkers
 	// Launch a goroutine for each worker to process a chunk of the input concurrently.
-	for i := 0; i < numWorkers; i++ {
+	for i := range numWorkers {
 		wg.Add(1)
 		go func(start int) {
 			defer wg.Done()
