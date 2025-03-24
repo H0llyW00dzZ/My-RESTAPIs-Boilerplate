@@ -17,7 +17,7 @@ The Gitea DinD Runner allows you to execute CI/CD jobs within a Kubernetes clust
 > For Example:
 > ![Screenshot from 2025-03-18 23-53-13](https://github.com/user-attachments/assets/7e00ddfc-3716-4b24-9081-cbe308122c2d)
 >
-> ![Screenshot from 2025-03-20 05-12-57.png](https://github.com/user-attachments/assets/b317a458-c398-47fd-b79c-e12d08d22c96)
+> ![Screenshot from 2025-03-20 05-12-57](https://github.com/user-attachments/assets/b317a458-c398-47fd-b79c-e12d08d22c96)
 > 
 > ![Screenshot from 2025-03-18 23-53-57](https://github.com/user-attachments/assets/19783ce0-983d-4e04-9be2-f67407ac2eb8)
 >
@@ -54,18 +54,10 @@ The configuration is managed using a `ConfigMap` and a `Deployment` in Kubernete
 
 2. **Apply ConfigMap & Deployment**
 
-   Ensure the configuration in `gitea-runner-dind.yaml` is correct, then apply:
+   Update the deployment file (`gitea-runner-dind.yaml`) with your specific settings, particularly the `GITEA_INSTANCE_URL` and `GITEA_RUNNER_REGISTRATION_TOKEN`. Once you have verified that the configuration is correct, apply the changes using the following command:
 
    ```bash
    kubectl apply -f gitea-runner-dind.yaml
-   ```
-
-3. **Deploy the Runner**
-
-   Update the deployment file with your specific settings, particularly the `GITEA_INSTANCE_URL` and `GITEA_RUNNER_REGISTRATION_TOKEN`, then apply:
-
-   ```bash
-   kubectl apply -f deployment.yml
    ```
 
 ## Configuration Details
@@ -95,7 +87,7 @@ The configuration is managed using a `ConfigMap` and a `Deployment` in Kubernete
 
 ## Tips
 
-- For storage solutions like EFS, you can increase the number of replicas for scalability.
+- For storage solutions like EFS or RWX (Storage Classes that support RWX), you can increase the number of replicas for scalability.
 - Ensure all placeholder values are replaced with actual configurations before deployment.
 - If your Kubernetes cluster uses custom resources, such as EKS Auto Mode, it will become easier & effectively manage node pools for the runner in your infrastructure.
 
