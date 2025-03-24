@@ -54,7 +54,7 @@ The configuration is managed using a `ConfigMap` and a `Deployment` in Kubernete
 
 2. **Apply ConfigMap & Deployment**
 
-   Ensure the configuration in `gitea-runner-dind.yaml` is correct, then apply:
+   Update the deployment file (`gitea-runner-dind.yaml`) with your specific settings, particularly the `GITEA_INSTANCE_URL` and `GITEA_RUNNER_REGISTRATION_TOKEN`. Once you have verified that the configuration is correct, apply the changes using the following command:
 
    ```bash
    kubectl apply -f gitea-runner-dind.yaml
