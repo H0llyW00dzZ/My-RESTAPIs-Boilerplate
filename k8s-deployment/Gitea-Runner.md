@@ -11,6 +11,38 @@ This repository contains the configuration for deploying a Gitea runner using Do
 
 The Gitea DinD Runner allows you to execute CI/CD jobs within a Kubernetes cluster using Docker containers. It leverages the act-runner to manage job execution and supports caching and custom network configurations.
 
+## Architecture
+
+```mermaid
+graph TD;
+    A[☸ Kubernetes] -->|Deployment| B[Gitea Runner Pod]
+    
+    subgraph Gitea Runner Pod
+        B --> C[DinD Container]
+        C --> D[Docker Daemon]
+        D --> E[Inner Containers]
+    end
+    
+    F[Gitea Instance] -->|Triggers Jobs| B
+    G[Docker Registry] -->|Provides Images| C
+    
+    style A fill:#1e90ff,stroke:#333,stroke-width:2px;
+    style B fill:#32cd32,stroke:#333,stroke-width:2px;
+    style C fill:#bfb,stroke:#333,stroke-width:2px;
+    style D fill:#ffb,stroke:#333,stroke-width:2px;
+    style E fill:#fbb,stroke:#333,stroke-width:2px;
+    style F fill:#32cd32,stroke:#333,stroke-width:2px;
+    style G fill:#bff,stroke:#333,stroke-width:2px;
+```
+
+### How It Works
+
+1. **Kubernetes**: Manages the deployment of the pod.
+2. **Gitea Runner Pod**: Contains the DinD container.
+3. **DinD Container**: Runs its own Docker Daemon.
+4. **Docker Daemon**: Manages inner containers for CI/CD tasks.
+5. **Inner Containers**: Execute the CI/CD jobs.
+
 > [!NOTE]
 > The current deployment for the Gitea DinD Runner is compatible with the existing workflow implementation in [`private-registry-kvm-only.yaml`](https://github.com/H0llyW00dzZ/My-RESTAPIs-Boilerplate/blob/master/.github/workflows/private-registry-kvm-only.yaml).
 >
