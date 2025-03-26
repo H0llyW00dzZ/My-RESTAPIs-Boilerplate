@@ -38,7 +38,7 @@ graph TD;
 ### How It Works
 
 1. **Kubernetes**: Manages the deployment of the pod.
-2. **Pod**: Contains the DinD container.
+2. **Gitea Runner Pod**: Contains the DinD container.
 3. **DinD Container**: Runs its own Docker Daemon.
 4. **Docker Daemon**: Manages inner containers for CI/CD tasks.
 5. **Inner Containers**: Execute the CI/CD jobs.
