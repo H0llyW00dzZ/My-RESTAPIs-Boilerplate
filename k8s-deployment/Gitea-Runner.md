@@ -15,16 +15,16 @@ The Gitea DinD Runner allows you to execute CI/CD jobs within a Kubernetes clust
 
 ```mermaid
 graph TD;
-    A[☸ Kubernetes] -->|Deployment| B[Gitea Runner Pod]
+    A[☸ Kubernetes] -->|Deployment| B[🛠️ Gitea Runner Pod]
     
     subgraph Gitea Runner Pod
-        B --> C[DinD Container]
-        C --> D[Docker Daemon]
-        D --> E[Inner Containers]
+        B --> C[🏗️ DinD Container]
+        C --> D[🐋 Docker Daemon]
+        D --> E[📦 Inner Containers]
     end
     
-    F[Gitea Instance] -->|Triggers Jobs| B
-    G[Docker Registry] -->|Provides Images| C
+    F[🍵 Gitea Instance] -->|Triggers Jobs| B
+    G[🐋 Docker Registry] -->|Provides Images| C
     
     style A fill:#1e90ff,stroke:#333,stroke-width:2px;
     style B fill:#32cd32,stroke:#333,stroke-width:2px;
