@@ -171,6 +171,9 @@ spec:
           mountPath: /data/runner-config.yml
           subPath: runner-config.yml
       - name: daemon
+        # Note: Modify this as needed. It should work with the latest DinD version, because the "runner-config.yml" container configuration is correct.
+        # The most important aspect of setting up the Gitea DinD runner is the container configuration in "runner-config.yml".
+        # If it's incorrect, it won't work.
         image: docker:28.0.1-dind
         env:
         - name: DOCKER_TLS_CERTDIR
