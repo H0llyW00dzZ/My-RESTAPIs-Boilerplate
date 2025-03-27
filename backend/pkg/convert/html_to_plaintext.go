@@ -135,6 +135,10 @@ func (s *textState) addNewline(count int) {
 // Note: This reduces cyclomatic complexity by avoiding numerous "if-else" statements, switch cases, and for loops.
 // The performance might differ from the previous implementation that used switch cases due to the [trade-off].
 // However, using switch cases can become harder to maintain when there are many cases (not good 👎).
+// Additionally, this pattern (using a function map) is designed to handle different behaviors based on the type of HTML element encountered,
+// providing a clean and flexible way to manage element-specific logic.
+//
+// TODO: Add support for additional elements here later. This helper function is unfinished, and it is designed for easy extension to handle new elements.
 //
 // [trade-off]: https://en.wikipedia.org/wiki/Trade-off
 var elementStartHandlers = map[string]func(*textState, *html.Node){
@@ -184,6 +188,10 @@ var elementStartHandlers = map[string]func(*textState, *html.Node){
 // Note: This reduces cyclomatic complexity by avoiding numerous "if-else" statements, switch cases, and for loops.
 // The performance might differ from the previous implementation that used switch cases due to the [trade-off].
 // However, using switch cases can become harder to maintain when there are many cases (not good 👎).
+// Additionally, this pattern (using a function map) is designed to handle different behaviors based on the type of HTML element encountered,
+// providing a clean and flexible way to manage element-specific logic.
+//
+// TODO: Add support for additional elements here later. This helper function is unfinished, and it is designed for easy extension to handle new elements.
 //
 // [trade-off]: https://en.wikipedia.org/wiki/Trade-off
 var elementEndHandlers = map[string]func(*textState, *html.Node){
