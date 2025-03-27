@@ -142,45 +142,25 @@ func (s *textState) addNewline(count int) {
 //
 // [trade-off]: https://en.wikipedia.org/wiki/Trade-off
 var elementStartHandlers = map[string]func(*textState, *html.Node){
-	"br":  func(s *textState, n *html.Node) { s.addNewline(1) },
-	"p":   func(s *textState, n *html.Node) { s.addNewline(2) },
-	"div": func(s *textState, n *html.Node) { s.addNewline(2) },
-	"h1":  func(s *textState, n *html.Node) { s.addNewline(1) },
-	"h2":  func(s *textState, n *html.Node) { s.addNewline(1) },
-	"h3":  func(s *textState, n *html.Node) { s.addNewline(1) },
-	"h4":  func(s *textState, n *html.Node) { s.addNewline(1) },
-	"h5":  func(s *textState, n *html.Node) { s.addNewline(1) },
-	"h6":  func(s *textState, n *html.Node) { s.addNewline(1) },
-	"ul":  func(s *textState, n *html.Node) { s.inList = true; s.addNewline(1) },
-	"ol":  func(s *textState, n *html.Node) { s.inList = true; s.addNewline(1) },
-	"li": func(s *textState, n *html.Node) {
-		if s.inList {
-			s.builder.WriteString("- ")
-		}
-		s.needSpace = false
-	},
+	"br":    oneNewLine,
+	"p":     twoNewLines,
+	"div":   twoNewLines,
+	"h1":    oneNewLine,
+	"h2":    oneNewLine,
+	"h3":    oneNewLine,
+	"h4":    oneNewLine,
+	"h5":    oneNewLine,
+	"h6":    oneNewLine,
+	"ul":    inList,
+	"ol":    inList,
+	"li":    listItem,
 	"a":     func(s *textState, n *html.Node) { s.processAnchorStart(n) },
 	"img":   func(s *textState, n *html.Node) { s.processImage(n) },
 	"table": func(s *textState, n *html.Node) { s.inTable = true; s.headerParsed = false; s.addNewline(1) },
 	// Note: The tr, td, and th elements should now be correct and will only display formatting if they are inside a table.
-	"tr": func(s *textState, n *html.Node) {
-		if s.inTable {
-			s.builder.WriteString("| ")
-		}
-		s.needSpace = false
-	},
-	"td": func(s *textState, n *html.Node) {
-		if s.inTable {
-			s.builder.WriteString(" ")
-		}
-		s.needSpace = false
-	},
-	"th": func(s *textState, n *html.Node) {
-		if s.inTable {
-			s.builder.WriteString(" ")
-		}
-		s.needSpace = false
-	},
+	"tr": tableRowStart,
+	"td": tableCellStart,
+	"th": tableCellStart,
 }
 
 // elementEndHandlers processes the closing of HTML elements
@@ -195,45 +175,23 @@ var elementStartHandlers = map[string]func(*textState, *html.Node){
 //
 // [trade-off]: https://en.wikipedia.org/wiki/Trade-off
 var elementEndHandlers = map[string]func(*textState, *html.Node){
-	"p":   func(s *textState, n *html.Node) { s.addNewline(2) },
-	"div": func(s *textState, n *html.Node) { s.addNewline(2) },
-	"h1":  func(s *textState, n *html.Node) { s.addNewline(1) },
-	"h2":  func(s *textState, n *html.Node) { s.addNewline(1) },
-	"h3":  func(s *textState, n *html.Node) { s.addNewline(1) },
-	"h4":  func(s *textState, n *html.Node) { s.addNewline(1) },
-	"h5":  func(s *textState, n *html.Node) { s.addNewline(1) },
-	"h6":  func(s *textState, n *html.Node) { s.addNewline(1) },
-	"li": func(s *textState, n *html.Node) {
-		if s.inList {
-			s.addNewline(1)
-		}
-	},
-	"ul":    func(s *textState, n *html.Node) { s.inList = false; s.addNewline(1) },
-	"ol":    func(s *textState, n *html.Node) { s.inList = false; s.addNewline(1) },
+	"p":     twoNewLines,
+	"div":   twoNewLines,
+	"h1":    oneNewLine,
+	"h2":    oneNewLine,
+	"h3":    oneNewLine,
+	"h4":    oneNewLine,
+	"h5":    oneNewLine,
+	"h6":    oneNewLine,
+	"li":    listItemEnd,
+	"ul":    listEnd,
+	"ol":    listEnd,
 	"a":     func(s *textState, n *html.Node) { s.processAnchorEnd(n) },
-	"table": func(s *textState, n *html.Node) { s.inTable = false; s.addNewline(2) },
+	"table": tableEnd,
 	// Note: The tr, td, and th elements should now be correct and will only display formatting if they are inside a table.
-	"tr": func(s *textState, n *html.Node) {
-		if s.inTable {
-			s.addNewline(1)
-			if !s.headerParsed {
-				s.headerParsed = true
-				s.addHeaderSeparator()
-			}
-		}
-	},
-	"td": func(s *textState, n *html.Node) {
-		if s.inTable {
-			s.builder.WriteString(" |")
-			s.needSpace = true
-		}
-	},
-	"th": func(s *textState, n *html.Node) {
-		if s.inTable {
-			s.builder.WriteString(" |")
-			s.needSpace = true
-		}
-	},
+	"tr": tableRowEnd,
+	"td": tableCellEnd,
+	"th": tableCellEnd,
 }
 
 // addHeaderSeparator adds a markdown separator line for table headers.
