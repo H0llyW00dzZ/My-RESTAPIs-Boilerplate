@@ -1,7 +1,6 @@
 module h0llyw00dz-template
 
 go 1.24.1
-
 require (
 	github.com/H0llyW00dzZ/FiberValidator v0.5.2
 	github.com/ProtonMail/gopenpgp/v2 v2.8.3
@@ -131,7 +130,7 @@ require (
 	go.mongodb.org/mongo-driver v1.16.1 // indirect
 	golang.org/x/arch v0.9.0 // indirect
 	golang.org/x/exp v0.0.0-20240808152545-0cdaa3abc0fa // indirect
-	golang.org/x/net v0.37.0
+	golang.org/x/net v0.38.0
 	golang.org/x/oauth2 v0.28.0
 	golang.org/x/sync v0.12.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
