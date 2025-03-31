@@ -9,7 +9,7 @@ require (
 	github.com/bytedance/sonic v1.13.2
 	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.3.4
-	github.com/ethereum/go-ethereum v1.15.6
+	github.com/ethereum/go-ethereum v1.15.7
 	github.com/go-sql-driver/mysql v1.9.1
 	github.com/go-webauthn/webauthn v0.12.2
 	github.com/gofiber/contrib/swagger v1.2.0
