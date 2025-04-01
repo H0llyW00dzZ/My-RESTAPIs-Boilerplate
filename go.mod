@@ -11,7 +11,7 @@ require (
 	github.com/charmbracelet/bubbletea v1.3.4
 	github.com/ethereum/go-ethereum v1.15.7
 	github.com/go-sql-driver/mysql v1.9.1
-	github.com/go-webauthn/webauthn v0.12.2
+	github.com/go-webauthn/webauthn v0.12.3
 	github.com/gofiber/contrib/swagger v1.2.0
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/gofiber/storage/cloudflarekv v0.1.2
@@ -66,7 +66,7 @@ require (
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
 	github.com/ethereum/c-kzg-4844 v1.0.3 // indirect
 	github.com/ethereum/go-verkle v0.2.2 // indirect
-	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
+	github.com/fxamacker/cbor/v2 v2.8.0 // indirect
 	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-openapi/analysis v0.23.0 // indirect
@@ -79,7 +79,7 @@ require (
 	github.com/go-openapi/strfmt v0.23.0 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/go-openapi/validate v0.24.0 // indirect
-	github.com/go-webauthn/x v0.1.19 // indirect
+	github.com/go-webauthn/x v0.1.20 // indirect
 	github.com/goccy/go-json v0.10.4 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
