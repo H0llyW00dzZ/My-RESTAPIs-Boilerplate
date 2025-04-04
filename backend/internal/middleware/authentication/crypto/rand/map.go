@@ -33,3 +33,21 @@ func Map[K comparable, V any](m map[K]V) (V, error) {
 	}
 	return m[key], nil
 }
+
+// MapValue selects a random value from the provided map.
+// It does this by first collecting all values into a slice and then using the [Choice] function
+// to randomly select one of these values.
+// If the map is empty, it returns the zero value of the map's value type and an error.
+func MapValue[K comparable, V any](m map[K]V) (V, error) {
+	if len(m) == 0 {
+		var zero V
+		return zero, ErrMapIsEmpty
+	}
+
+	values := make([]V, 0, len(m))
+	for _, v := range m {
+		values = append(values, v)
+	}
+
+	return Choice(values)
+}

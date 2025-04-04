@@ -502,3 +502,78 @@ func TestMap(t *testing.T) {
 		})
 	}
 }
+
+func TestMapValue(t *testing.T) {
+	tests := []struct {
+		name     string
+		m        any
+		expected error
+	}{
+		{
+			name: "NonEmptyStringToInt",
+			m: map[string]int{
+				"a": 1,
+				"b": 2,
+				"c": 3,
+			},
+			expected: nil,
+		},
+		{
+			name:     "EmptyStringToInt",
+			m:        map[string]int{},
+			expected: rand.ErrMapIsEmpty,
+		},
+		{
+			name: "NonEmptyIntToString",
+			m: map[int]string{
+				1: "one",
+				2: "two",
+				3: "three",
+			},
+			expected: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			switch m := tt.m.(type) {
+			case map[string]int:
+				results := make(map[int]int)
+				for range 1000 {
+					value, err := rand.MapValue(m)
+					if err != nil {
+						if !errors.Is(err, tt.expected) {
+							t.Fatalf("unexpected error: %v", err)
+						}
+						return
+					}
+					results[value]++
+				}
+				for _, v := range m {
+					if results[v] == 0 {
+						t.Errorf("value %d was never selected", v)
+					}
+				}
+			case map[int]string:
+				results := make(map[string]int)
+				for range 1000 {
+					value, err := rand.MapValue(m)
+					if err != nil {
+						if !errors.Is(err, tt.expected) {
+							t.Fatalf("unexpected error: %v", err)
+						}
+						return
+					}
+					results[value]++
+				}
+				for _, v := range m {
+					if results[v] == 0 {
+						t.Errorf("value %s was never selected", v)
+					}
+				}
+			default:
+				t.Fatalf("unsupported type: %T", tt.m)
+			}
+		})
+	}
+}
