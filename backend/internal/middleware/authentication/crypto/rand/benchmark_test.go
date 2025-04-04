@@ -452,3 +452,52 @@ func BenchmarkChoice(b *testing.B) {
 		})
 	}
 }
+
+// Results on a broken PC:
+//
+//	goos: linux
+//	goarch: amd64
+//	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
+//	cpu: AMD Ryzen 9 3900X 12-Core Processor
+//	BenchmarkMap/StringToInt-24         	 3968944	       298.3 ns/op	      96 B/op	       4 allocs/op
+//	BenchmarkMap/IntToString-24         	 4372929	       274.8 ns/op	      72 B/op	       4 allocs/op
+//	BenchmarkMap/BoolToFloat-24         	 4813395	       249.2 ns/op	      48 B/op	       4 allocs/op
+//	PASS
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	3.592s
+func BenchmarkMap(b *testing.B) {
+	benchmarks := []struct {
+		name string
+		m    any
+	}{
+		{"StringToInt", map[string]int{"a": 1, "b": 2, "c": 3}},
+		{"IntToString", map[int]string{1: "one", 2: "two", 3: "three"}},
+		{"BoolToFloat", map[bool]float64{true: 1.1, false: 2.2}},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			switch m := bm.m.(type) {
+			case map[string]int:
+				for b.Loop() {
+					if _, err := rand.Map(m); err != nil {
+						b.Fatalf("unexpected error: %v", err)
+					}
+				}
+			case map[int]string:
+				for b.Loop() {
+					if _, err := rand.Map(m); err != nil {
+						b.Fatalf("unexpected error: %v", err)
+					}
+				}
+			case map[bool]float64:
+				for b.Loop() {
+					if _, err := rand.Map(m); err != nil {
+						b.Fatalf("unexpected error: %v", err)
+					}
+				}
+			default:
+				b.Fatalf("unsupported type: %T", bm.m)
+			}
+		})
+	}
+}
