@@ -1,6 +1,7 @@
 module h0llyw00dz-template
 
 go 1.24.1
+
 require (
 	github.com/H0llyW00dzZ/FiberValidator v0.5.2
 	github.com/ProtonMail/gopenpgp/v2 v2.8.3
@@ -12,7 +13,7 @@ require (
 	github.com/ethereum/go-ethereum v1.15.7
 	github.com/go-sql-driver/mysql v1.9.1
 	github.com/go-webauthn/webauthn v0.12.3
-	github.com/gofiber/contrib/swagger v1.2.0
+	github.com/gofiber/contrib/swagger v1.2.1
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/gofiber/storage/cloudflarekv v0.1.2
 	github.com/gofiber/storage/redis/v3 v3.1.3
