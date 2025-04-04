@@ -403,3 +403,29 @@ func TestGenerateRandomTextInvalidInputs(t *testing.T) {
 		})
 	}
 }
+
+func TestChoice(t *testing.T) {
+	choices := []string{"apple", "banana", "cherry"}
+	results := make(map[string]bool)
+
+	// Run the test multiple times to ensure randomness
+	for range 100 {
+		choice, err := rand.Choice(choices)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		// Check if the choice is within the expected set
+		if choice != "apple" && choice != "banana" && choice != "cherry" {
+			t.Errorf("unexpected choice: %v", choice)
+		}
+
+		// Record the result
+		results[choice] = true
+	}
+
+	// Ensure all choices have been selected at least once
+	if len(results) != len(choices) {
+		t.Errorf("not all choices were selected: %v", results)
+	}
+}

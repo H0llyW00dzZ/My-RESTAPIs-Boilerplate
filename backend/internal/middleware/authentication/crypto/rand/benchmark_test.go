@@ -404,3 +404,51 @@ func BenchmarkGenerateFixedUUID(b *testing.B) {
 		})
 	}
 }
+
+// Results on a broken PC:
+//
+//	goos: linux
+//	goarch: amd64
+//	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
+//	BenchmarkChoice/Strings-24         	 6847174	       172.5 ns/op	      48 B/op	       3 allocs/op
+//	BenchmarkChoice/Integers-24        	 6318064	       189.4 ns/op	      48 B/op	       3 allocs/op
+//	BenchmarkChoice/Booleans-24        	 7773070	       153.9 ns/op	      48 B/op	       3 allocs/op
+//	PASS
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	3.580s
+func BenchmarkChoice(b *testing.B) {
+	benchmarks := []struct {
+		name    string
+		choices any
+	}{
+		{"Strings", []string{"apple", "banana", "cherry"}},
+		{"Integers", []int{1, 2, 3, 4, 5}},
+		{"Booleans", []bool{true, false}},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			switch choices := bm.choices.(type) {
+			case []string:
+				for b.Loop() {
+					if _, err := rand.Choice(choices); err != nil {
+						b.Fatalf("unexpected error: %v", err)
+					}
+				}
+			case []int:
+				for b.Loop() {
+					if _, err := rand.Choice(choices); err != nil {
+						b.Fatalf("unexpected error: %v", err)
+					}
+				}
+			case []bool:
+				for b.Loop() {
+					if _, err := rand.Choice(choices); err != nil {
+						b.Fatalf("unexpected error: %v", err)
+					}
+				}
+			default:
+				b.Fatalf("unsupported type: %T", bm.choices)
+			}
+		})
+	}
+}
