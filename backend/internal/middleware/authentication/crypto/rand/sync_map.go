@@ -31,7 +31,7 @@ var (
 //	m := &sync.Map{}
 //	m.Store("a", 1)
 //	m.Store("b", 2)
-//	value, err := SyncMap[string, int](m)
+//	value, err := rand.SyncMap[string, int](m)
 //	if err != nil {
 //	    // handle error, you poggers.
 //	}
@@ -74,7 +74,7 @@ func SyncMap[K comparable, V any](m *sync.Map) (V, error) {
 //	m := &sync.Map{}
 //	m.Store(1, "one")
 //	m.Store(2, "two")
-//	value, err := SyncMapValue[int, string](m)
+//	value, err := rand.SyncMapValue[int, string](m)
 //	if err != nil {
 //	    // handle error, you poggers.
 //	}
