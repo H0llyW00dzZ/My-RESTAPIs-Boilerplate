@@ -54,6 +54,7 @@ package rand_test
 import (
 	"crypto/elliptic"
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand"
+	"sync"
 	"testing"
 )
 
@@ -546,6 +547,124 @@ func BenchmarkMapValue(b *testing.B) {
 				}
 			default:
 				b.Fatalf("unsupported type: %T", bm.m)
+			}
+		})
+	}
+}
+
+// Results on a broken PC:
+//
+//	goos: linux
+//	goarch: amd64
+//	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
+//	cpu: AMD Ryzen 9 3900X 12-Core Processor
+//	BenchmarkSyncMap/StringToInt-24         	 3221506	       371.3 ns/op	     160 B/op	       6 allocs/op
+//	BenchmarkSyncMap/IntToString-24         	 3334437	       360.5 ns/op	     160 B/op	       6 allocs/op
+//	BenchmarkSyncMap/BoolToFloat-24         	 4088044	       294.1 ns/op	      96 B/op	       5 allocs/op
+//	PASS
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	3.607s
+func BenchmarkSyncMap(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		setup func() *sync.Map
+	}{
+		{
+			"StringToInt",
+			func() *sync.Map {
+				m := &sync.Map{}
+				m.Store("a", 1)
+				m.Store("b", 2)
+				m.Store("c", 3)
+				return m
+			},
+		},
+		{
+			"IntToString",
+			func() *sync.Map {
+				m := &sync.Map{}
+				m.Store(1, "one")
+				m.Store(2, "two")
+				m.Store(3, "three")
+				return m
+			},
+		},
+		{
+			"BoolToFloat",
+			func() *sync.Map {
+				m := &sync.Map{}
+				m.Store(true, 1.1)
+				m.Store(false, 2.2)
+				return m
+			},
+		},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			m := bm.setup()
+			for b.Loop() {
+				if _, err := rand.SyncMap[any, any](m); err != nil {
+					b.Fatalf("unexpected error: %v", err)
+				}
+			}
+		})
+	}
+}
+
+// Results on a broken PC:
+//
+//	goos: linux
+//	goarch: amd64
+//	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
+//	cpu: AMD Ryzen 9 3900X 12-Core Processor
+//	BenchmarkSyncMapValue/StringToInt-24         	 3535789	       335.8 ns/op	     160 B/op	       6 allocs/op
+//	BenchmarkSyncMapValue/IntToString-24         	 3392522	       352.0 ns/op	     160 B/op	       6 allocs/op
+//	BenchmarkSyncMapValue/BoolToFloat-24         	 4572424	       262.2 ns/op	      96 B/op	       5 allocs/op
+//	PASS
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	3.587s
+func BenchmarkSyncMapValue(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		setup func() *sync.Map
+	}{
+		{
+			"StringToInt",
+			func() *sync.Map {
+				m := &sync.Map{}
+				m.Store("a", 1)
+				m.Store("b", 2)
+				m.Store("c", 3)
+				return m
+			},
+		},
+		{
+			"IntToString",
+			func() *sync.Map {
+				m := &sync.Map{}
+				m.Store(1, "one")
+				m.Store(2, "two")
+				m.Store(3, "three")
+				return m
+			},
+		},
+		{
+			"BoolToFloat",
+			func() *sync.Map {
+				m := &sync.Map{}
+				m.Store(true, 1.1)
+				m.Store(false, 2.2)
+				return m
+			},
+		},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			m := bm.setup()
+			for b.Loop() {
+				if _, err := rand.SyncMapValue[any, any](m); err != nil {
+					b.Fatalf("unexpected error: %v", err)
+				}
 			}
 		})
 	}

@@ -11,6 +11,7 @@ import (
 	"h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand"
 	"reflect"
 	"regexp"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -574,6 +575,124 @@ func TestMapValue(t *testing.T) {
 			default:
 				t.Fatalf("unsupported type: %T", tt.m)
 			}
+		})
+	}
+}
+
+func TestSyncMap(t *testing.T) {
+	tests := []struct {
+		name     string
+		m        *sync.Map
+		expected error
+	}{
+		{
+			name: "NonEmptyStringToInt",
+			m: func() *sync.Map {
+				m := &sync.Map{}
+				m.Store("a", 1)
+				m.Store("b", 2)
+				m.Store("c", 3)
+				return m
+			}(),
+			expected: nil,
+		},
+		{
+			name:     "EmptyStringToInt",
+			m:        &sync.Map{},
+			expected: rand.ErrSyncMapIsEmpty,
+		},
+		{
+			name: "NonEmptyIntToString",
+			m: func() *sync.Map {
+				m := &sync.Map{}
+				m.Store(1, "one")
+				m.Store(2, "two")
+				m.Store(3, "three")
+				return m
+			}(),
+			expected: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			results := make(map[any]int)
+			for range 1000 {
+				value, err := rand.SyncMap[any, any](tt.m)
+				if err != nil {
+					if !errors.Is(err, tt.expected) {
+						t.Fatalf("unexpected error: %v", err)
+					}
+					return
+				}
+				results[value]++
+			}
+
+			tt.m.Range(func(_, value any) bool {
+				if results[value] == 0 {
+					t.Errorf("value %v was never selected", value)
+				}
+				return true
+			})
+		})
+	}
+}
+
+func TestSyncMapValue(t *testing.T) {
+	tests := []struct {
+		name     string
+		m        *sync.Map
+		expected error
+	}{
+		{
+			name: "NonEmptyStringToInt",
+			m: func() *sync.Map {
+				m := &sync.Map{}
+				m.Store("a", 1)
+				m.Store("b", 2)
+				m.Store("c", 3)
+				return m
+			}(),
+			expected: nil,
+		},
+		{
+			name:     "EmptyStringToInt",
+			m:        &sync.Map{},
+			expected: rand.ErrSyncMapIsEmpty,
+		},
+		{
+			name: "NonEmptyIntToString",
+			m: func() *sync.Map {
+				m := &sync.Map{}
+				m.Store(1, "one")
+				m.Store(2, "two")
+				m.Store(3, "three")
+				return m
+			}(),
+			expected: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			results := make(map[any]int)
+			for range 1000 {
+				value, err := rand.SyncMapValue[any, any](tt.m)
+				if err != nil {
+					if !errors.Is(err, tt.expected) {
+						t.Fatalf("unexpected error: %v", err)
+					}
+					return
+				}
+				results[value]++
+			}
+
+			tt.m.Range(func(_, value any) bool {
+				if results[value] == 0 {
+					t.Errorf("value %v was never selected", value)
+				}
+				return true
+			})
 		})
 	}
 }
