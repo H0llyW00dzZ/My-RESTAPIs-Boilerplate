@@ -11,7 +11,7 @@ import (
 	"math/big"
 )
 
-// ErrEmptyChoices is returned by the Choice function when the provided slice is empty.
+// ErrEmptyChoices is returned by the [Choice] function when the provided slice is empty.
 // This error indicates that there are no elements to select from, ensuring that the
 // function handles empty input gracefully and predictably.
 var ErrEmptyChoices = errors.New("crypto/rand: choices slice is empty")
