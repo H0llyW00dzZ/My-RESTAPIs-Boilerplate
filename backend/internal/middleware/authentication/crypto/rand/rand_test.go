@@ -408,28 +408,41 @@ func TestGenerateRandomTextInvalidInputs(t *testing.T) {
 }
 
 func TestChoice(t *testing.T) {
-	choices := []string{"apple", "banana", "cherry"}
-	results := make(map[string]bool)
-
-	// Run the test multiple times to ensure randomness
-	for range 100 {
-		choice, err := rand.Choice(choices)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-
-		// Check if the choice is within the expected set
-		if choice != "apple" && choice != "banana" && choice != "cherry" {
-			t.Errorf("unexpected choice: %v", choice)
-		}
-
-		// Record the result
-		results[choice] = true
+	tests := []struct {
+		name     string
+		choices  []string
+		expected error
+	}{
+		{
+			name:     "StringChoices",
+			choices:  []string{"apple", "banana", "cherry"},
+			expected: nil,
+		},
+		{
+			name:     "EmptyChoices",
+			choices:  []string{},
+			expected: rand.ErrEmptyChoices,
+		},
 	}
 
-	// Ensure all choices have been selected at least once
-	if len(results) != len(choices) {
-		t.Errorf("not all choices were selected: %v", results)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			results := make(map[string]bool)
+			for range 100 {
+				choice, err := rand.Choice(tt.choices)
+				if err != nil {
+					if !errors.Is(err, tt.expected) {
+						t.Fatalf("unexpected error: %v", err)
+					}
+					return
+				}
+				results[choice] = true
+			}
+
+			if tt.expected == nil && len(results) != len(tt.choices) {
+				t.Errorf("not all choices were selected: %v", results)
+			}
+		})
 	}
 }
 

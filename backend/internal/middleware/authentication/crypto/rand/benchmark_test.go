@@ -411,11 +411,11 @@ func BenchmarkGenerateFixedUUID(b *testing.B) {
 //	goos: linux
 //	goarch: amd64
 //	pkg: h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand
-//	BenchmarkChoice/Strings-24         	 6847174	       172.5 ns/op	      48 B/op	       3 allocs/op
-//	BenchmarkChoice/Integers-24        	 6318064	       189.4 ns/op	      48 B/op	       3 allocs/op
-//	BenchmarkChoice/Booleans-24        	 7773070	       153.9 ns/op	      48 B/op	       3 allocs/op
+//	BenchmarkChoice/Strings-24         	 6960171	       170.0 ns/op	      48 B/op	       3 allocs/op
+//	BenchmarkChoice/Integers-24        	 6462870	       186.0 ns/op	      48 B/op	       3 allocs/op
+//	BenchmarkChoice/Booleans-24        	 7876498	       151.4 ns/op	      48 B/op	       3 allocs/op
 //	PASS
-//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	3.580s
+//	ok  	h0llyw00dz-template/backend/internal/middleware/authentication/crypto/rand	3.584s
 func BenchmarkChoice(b *testing.B) {
 	benchmarks := []struct {
 		name    string
