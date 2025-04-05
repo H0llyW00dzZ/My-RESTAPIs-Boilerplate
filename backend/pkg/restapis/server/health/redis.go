@@ -34,15 +34,15 @@ type ConnectionFigures struct {
 
 // PoolingStats now contains a ConnectionFigures struct, representing a part of the pooling stats.
 type PoolingStats struct {
-	Figures       ConnectionFigures `json:"figures,omitempty"`
+	Figures       ConnectionFigures `json:"figures"`
 	ObservedTotal string            `json:"observed_total,omitempty"`
 }
 
 // MemoryStats represents the memory usage statistics.
 type MemoryStats struct {
-	Used       MemoryUsage `json:"used,omitempty"`
-	Peak       MemoryUsage `json:"peak,omitempty"`
-	Free       MemoryUsage `json:"free,omitempty"`
+	Used       MemoryUsage `json:"used"`
+	Peak       MemoryUsage `json:"peak"`
+	Free       MemoryUsage `json:"free"`
 	Percentage string      `json:"percentage,omitempty"`
 }
 
@@ -51,9 +51,9 @@ type RedisStats struct {
 	Version          string       `json:"version,omitempty"`
 	Mode             string       `json:"mode,omitempty"`
 	ConnectedClients string       `json:"connected_clients,omitempty"`
-	Memory           MemoryStats  `json:"memory,omitempty"`
+	Memory           MemoryStats  `json:"memory"`
 	Uptime           []any        `json:"uptime,omitempty"`
-	Pooling          PoolingStats `json:"pooling,omitempty"`
+	Pooling          PoolingStats `json:"pooling"`
 }
 
 // UptimeFields represents the uptime fields in a structured format.

@@ -36,8 +36,8 @@ func parseDateAdded(dateAddedBytes []uint8) (time.Time, error) {
 // parseRedisInfo parses the Redis info response and returns a map of key-value pairs.
 func parseRedisInfo(info string) map[string]string {
 	result := make(map[string]string)
-	lines := strings.Split(info, "\r\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(info, "\r\n")
+	for line := range lines {
 		if strings.Contains(line, ":") {
 			parts := strings.Split(line, ":")
 			key := strings.TrimSpace(parts[0])

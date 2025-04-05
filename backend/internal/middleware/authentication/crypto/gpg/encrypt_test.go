@@ -565,7 +565,7 @@ func TestEncryptStreamFromBytesToFileAsync(t *testing.T) {
 	done := make(chan error, 5)
 
 	// Start 5 goroutines
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		go func(i int) {
 			// Create a new input buffer for each goroutine
 			inputBuffer := bytes.NewReader(inputData)
@@ -612,7 +612,7 @@ func TestEncryptStreamFromBytesToFileAsync(t *testing.T) {
 	}
 
 	// Wait for all goroutines to complete
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		if err := <-done; err != nil {
 			t.Fatalf("Goroutine %d failed: %v", i, err)
 		}
@@ -634,7 +634,7 @@ func TestEncryptStreamFromBytesToFileAsyncWithArmoredAndCustomSuffix(t *testing.
 	done := make(chan error, 5)
 
 	// Start 5 goroutines
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		go func(i int) {
 			// Create a new input buffer for each goroutine
 			inputBuffer := bytes.NewReader(inputData)
@@ -685,7 +685,7 @@ func TestEncryptStreamFromBytesToFileAsyncWithArmoredAndCustomSuffix(t *testing.
 	}
 
 	// Wait for all goroutines to complete
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		if err := <-done; err != nil {
 			t.Fatalf("Goroutine %d failed: %v", i, err)
 		}

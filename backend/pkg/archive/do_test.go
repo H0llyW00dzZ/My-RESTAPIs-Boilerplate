@@ -170,7 +170,7 @@ func TestStreamingAndMultipleArchiving(t *testing.T) {
 		// Write data to the log file in chunks
 		chunkSize := int64(512)
 		data := make([]byte, chunkSize)
-		for i := 0; i < 5; i++ {
+		for range 5 {
 			if _, err := file.Write(data); err != nil {
 				t.Errorf("error writing to log file: %v", err)
 				return

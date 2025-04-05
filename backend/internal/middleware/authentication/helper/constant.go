@@ -46,10 +46,10 @@ const (
 
 // APIKeyData represents the structure of the API key data stored in the cache.
 // It includes the following fields:
-// 	- Identifier: The unique identifier associated with the API key.
-// 	- APIKey: The actual API key value.
-// 	- Status: The status of the API key (e.g., "active", "expired").
-// 	- Authorization: The authorization data of the API key.
+//   - Identifier: The unique identifier associated with the API key.
+//   - APIKey: The actual API key value.
+//   - Status: The status of the API key (e.g., "active", "expired").
+//   - Authorization: The authorization data of the API key.
 //
 // Note: This structure is only for Redis/Valkey, as it is used solely for caching + better performance.
 // for relational database (MySQL) marked as TODO.
@@ -57,7 +57,7 @@ type APIKeyData struct {
 	Identifier    string            `json:"identifier,omitempty"`
 	APIKey        string            `json:"apikey"`
 	Status        string            `json:"status"`
-	Authorization AuthorizationData `json:"authorization,omitempty"`
+	Authorization AuthorizationData `json:"authorization"`
 }
 
 // KeyAuthSessData is a type alias for map[string]any.
@@ -71,23 +71,24 @@ type KeyAuthSessData map[string]any
 
 // AuthorizationData represents the authorization data of an API key.
 // It includes the following fields:
-// 	- AuthTime: The time of the last authorization.
-// 	- ExpiredTime: The expiration time of the API key.
-// 	- Signature: The signature data associated with the API key, which can be of any type (e.g., ECDSA signature that can be used for enhance security purpose or other purpose).
+//   - AuthTime: The time of the last authorization.
+//   - ExpiredTime: The expiration time of the API key.
+//   - Signature: The signature data associated with the API key, which can be of any type (e.g., ECDSA signature that can be used for enhance security purpose or other purpose).
 //
 // Note: Current format, and may subject to changed:
-// {
-// 	"authorization": {
-// 	  "time": "2024-08-01T21:24:28.4352685Z",
-// 	  "apikey_expired_time": "2024-10-26T21:18:17Z",
-// 	  "signature": "..."
-// 	}
-// }
+//
+//	{
+//		"authorization": {
+//		  "time": "2024-08-01T21:24:28.4352685Z",
+//		  "apikey_expired_time": "2024-10-26T21:18:17Z",
+//		  "signature": "..."
+//		}
+//	}
 type AuthorizationData struct {
-	AuthTime time.Time `json:"time,omitempty"`
+	AuthTime time.Time `json:"time"`
 	// Note: This expiration time is retrieved from the relational database (MySQL).
 	// The performance speed might be somewhat slow (taking an average of 1s response time in the frontend) during the first query due to the relational database (always slow).
 	// However, when it hits Redis/Valkey and is released into cookies with encryption, the speed can be faster (possibly 0ms ~ 1ms response time).
-	ExpiredTime time.Time `json:"apikey_expired_time,omitempty"`
+	ExpiredTime time.Time `json:"apikey_expired_time"`
 	Signature   any       `json:"signature,omitempty"`
 }

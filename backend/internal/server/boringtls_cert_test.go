@@ -910,7 +910,7 @@ func TestSubmitToCTLog(t *testing.T) {
 
 				// Prepare the mock response with a valid SCT response
 				timestamp := uint64(time.Now().Unix())
-				data := append(hash[:], []byte(fmt.Sprintf("%d", timestamp))...)
+				data := append(hash[:], fmt.Appendf(nil, "%d", timestamp)...)
 
 				signature, err := ecdsa.SignASN1(rand.Reader, privateKeyx, data)
 				if err != nil {

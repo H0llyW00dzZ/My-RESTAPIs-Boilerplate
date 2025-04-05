@@ -18,7 +18,7 @@ func (v *VClient) buildTransitPath(operation, keyName string) string {
 
 // Encrypt encrypts data using Vault's Transit Secrets Engine.
 func (v *VClient) Encrypt(ctx context.Context, keyName string, plaintext []byte) ([]byte, error) {
-	encryptData := map[string]interface{}{
+	encryptData := map[string]any{
 		"plaintext": plaintext,
 	}
 
@@ -37,7 +37,7 @@ func (v *VClient) Encrypt(ctx context.Context, keyName string, plaintext []byte)
 
 // Decrypt decrypts data using Vault's Transit Secrets Engine.
 func (v *VClient) Decrypt(ctx context.Context, keyName string, ciphertext []byte) ([]byte, error) {
-	decryptData := map[string]interface{}{
+	decryptData := map[string]any{
 		"ciphertext": ciphertext,
 	}
 
