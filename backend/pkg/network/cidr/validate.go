@@ -25,9 +25,9 @@ func ValidateAndParseIPs(envVar string, defaultIPS string) ([]string, error) {
 	}
 
 	// Split the IPs by comma
-	ipList := strings.Split(ips, ",")
+	ipList := strings.SplitSeq(ips, ",")
 
-	for _, ip := range ipList {
+	for ip := range ipList {
 		ip = strings.TrimSpace(ip)
 		// Check if it's a valid IP or CIDR
 		if net.ParseIP(ip) != nil || isValidCIDR(ip) {

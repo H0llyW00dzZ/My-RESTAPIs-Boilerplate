@@ -42,9 +42,7 @@ func BenchmarkHybridEncryptDecryptStream(b *testing.B) {
 		b.Fatalf("Failed to generate plaintext: %v", err)
 	}
 
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		// Encrypt the data.
 		inputBuffer := bytes.NewBuffer(plaintext)
 		encryptedBuffer := new(bytes.Buffer)
@@ -103,9 +101,7 @@ func BenchmarkHybridEncryptDecryptStreamWithHMAC(b *testing.B) {
 		b.Fatalf("Failed to generate plaintext: %v", err)
 	}
 
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		// Encrypt the data.
 		inputBuffer := bytes.NewBuffer(plaintext)
 		encryptedBuffer := new(bytes.Buffer)

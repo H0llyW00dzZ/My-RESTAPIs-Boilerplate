@@ -15,6 +15,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/google/uuid"
+	"slices"
 )
 
 // CustomNextContentType is a helper function that creates a custom Next function for the fiber middleware.
@@ -141,12 +142,7 @@ func CustomNextStack(nextFuncs map[string]func(*fiber.Ctx) bool) func(*fiber.Ctx
 func CustomNextStatusCode(statusCodes ...int) func(*fiber.Ctx) bool {
 	return func(c *fiber.Ctx) bool {
 		status := c.Response().StatusCode()
-		for _, code := range statusCodes {
-			if status == code {
-				return true
-			}
-		}
-		return false
+		return slices.Contains(statusCodes, status)
 	}
 }
 
@@ -212,12 +208,7 @@ func CustomNextHostName(hostnames ...string) func(*fiber.Ctx) bool {
 		currentHostname := c.Hostname()
 		currentHandle := unique.Make(currentHostname)
 
-		for _, uniqueHostname := range uniqueHostnames {
-			if currentHandle == uniqueHostname {
-				return true
-			}
-		}
-		return false
+		return slices.Contains(uniqueHostnames, currentHandle)
 	}
 }
 

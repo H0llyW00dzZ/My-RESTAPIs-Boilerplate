@@ -80,7 +80,7 @@ func TestConnectionLoggerMiddleware(t *testing.T) {
 		buf.Reset()
 
 		// Launch multiple requests concurrently
-		for i := 0; i < concurrentRequests; i++ {
+		for range concurrentRequests {
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
@@ -162,7 +162,7 @@ func TestConnectionLoggerMiddlewareImmutable(t *testing.T) {
 		buf.Reset()
 
 		// Launch multiple requests concurrently
-		for i := 0; i < concurrentRequests; i++ {
+		for range concurrentRequests {
 			wg.Add(1)
 			go func() {
 				defer wg.Done()

@@ -36,7 +36,7 @@ func LoadTranslations(filePath string) error {
 }
 
 // Translate returns the translated string for the given key and language.
-func Translate(lang, key string, args ...interface{}) string {
+func Translate(lang, key string, args ...any) string {
 	translation, exists := Translations[lang][key]
 	if !exists {
 		return key // Fallback to the key itself if translation does not exist

@@ -26,6 +26,7 @@ import (
 
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
+	"slices"
 )
 
 // Note: This is just a test that demonstrates a working example of using TLS 1.3 along with an additional encryption layer.
@@ -177,12 +178,7 @@ func TestStreamServer(t *testing.T) {
 }
 
 func contains(lines []string, target string) bool {
-	for _, line := range lines {
-		if line == target {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(lines, target)
 }
 
 // Note: Explicit HTTPS "Content-Length" it's nil
@@ -1268,7 +1264,7 @@ func TestStreamServerWithCustomTransport(t *testing.T) {
 		log.LogInfo(fmt.Sprintf("Client %d: Sending request", i+1))
 
 		// Create a request with a body
-		requestBody := []byte(fmt.Sprintf("Request body from client %d", i+1)) // Encrypting transparently...
+		requestBody := fmt.Appendf(nil, "Request body from client %d", i+1) // Encrypting transparently...
 		req, err := http.NewRequest("GET", "https://"+ln.Addr().String()+"/test", bytes.NewBuffer(requestBody))
 		if err != nil {
 			t.Fatal(err)
@@ -1609,7 +1605,7 @@ func TestStandardTLS13ProtocolWithCustomTransport(t *testing.T) {
 		log.LogInfof("Client %d: Sending request", i+1)
 
 		// Create a request with a body
-		requestBody := []byte(fmt.Sprintf("Request body from client %d", i+1)) // Encrypting transparently...
+		requestBody := fmt.Appendf(nil, "Request body from client %d", i+1) // Encrypting transparently...
 		req, err := http.NewRequest("GET", "https://"+testHostName+":443/test", bytes.NewBuffer(requestBody))
 		if err != nil {
 			t.Fatal(err)

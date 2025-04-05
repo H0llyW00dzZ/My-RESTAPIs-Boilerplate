@@ -96,10 +96,10 @@ func getClientIP(c *fiber.Ctx, headerValue string) []string {
 	var validIPs []string
 
 	// Split the header value by comma to get multiple IP addresses
-	ipList := strings.Split(clientIP, ",")
+	ipList := strings.SplitSeq(clientIP, ",")
 
 	// Iterate over the IP addresses and store the valid ones
-	for _, ip := range ipList {
+	for ip := range ipList {
 		ip = strings.TrimSpace(ip) // Trim leading/trailing whitespace
 
 		// Check if the IP address is a valid IPv4 address

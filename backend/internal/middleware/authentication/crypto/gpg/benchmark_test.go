@@ -57,8 +57,8 @@ func BenchmarkEncryptLargeFile(b *testing.B) {
 	}
 
 	// Run the benchmark
-	b.ResetTimer() // Reset the timer to exclude setup time
-	for i := 0; i < b.N; i++ {
+	// Reset the timer to exclude setup time
+	for b.Loop() {
 		if err = gpg.EncryptFile(inputFile.Name(), outputFile); err != nil {
 			b.Fatalf("EncryptFile failed: %v", err)
 		}
@@ -107,8 +107,8 @@ func BenchmarkEncryptLargeStream(b *testing.B) {
 	}
 
 	// Run the benchmark
-	b.ResetTimer() // Reset the timer to exclude setup time
-	for i := 0; i < b.N; i++ {
+	// Reset the timer to exclude setup time
+	for b.Loop() {
 		// Reopen the input file for reading
 		inFile, err := os.Open(inputFile.Name())
 		if err != nil {
@@ -174,8 +174,8 @@ func BenchmarkEncryptLargeStreamWithArmorAndCustomSuffix(b *testing.B) {
 	}
 
 	// Run the benchmark
-	b.ResetTimer() // Reset the timer to exclude setup time
-	for i := 0; i < b.N; i++ {
+	// Reset the timer to exclude setup time
+	for b.Loop() {
 		// Reopen the input file for reading
 		inFile, err := os.Open(inputFile.Name())
 		if err != nil {
