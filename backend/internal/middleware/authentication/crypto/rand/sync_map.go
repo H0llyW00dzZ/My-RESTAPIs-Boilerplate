@@ -12,7 +12,7 @@ import (
 
 var (
 	// ErrSyncMapIsEmpty is returned by the SyncMap and SyncMapValue functions
-	// when the provided sync.Map is empty. This error indicates that there are
+	// when the provided [sync.Map] is empty. This error indicates that there are
 	// no elements to choose from.
 	ErrSyncMapIsEmpty = errors.New("crypto/rand: sync.Map is empty")
 )
