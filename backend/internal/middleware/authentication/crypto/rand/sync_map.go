@@ -23,7 +23,7 @@ var (
 //
 // The function uses a type parameter [K] for keys and [V] for values,
 // ensuring type safety when retrieving values from the map.
-// It leverages the [Range] method to iterate over the map and collect keys,
+// It leverages the [sync.Map.Range] method to iterate over the map and collect keys,
 // which are then passed to the [Choice] function to select one at random.
 //
 // Example usage:
