@@ -16,7 +16,9 @@ data:
       # File to store the registration result.
       file: .runner
       # Number of tasks to execute concurrently.
-      capacity: 1
+      # Note: This "capacity" is for one runner that can handle multiple CI/CD tasks. If you are using custom resources,
+      # such as nodepools in EKS Auto mode, it's suitable to increase this.
+      capacity: 10
       # Additional environment variables for running jobs.
       envs:
         A_TEST_ENV_NAME_1: a_test_env_value_1
