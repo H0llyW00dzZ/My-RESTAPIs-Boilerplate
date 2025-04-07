@@ -171,6 +171,7 @@ import (
 //		if err != nil {
 //			return nil, fmt.Errorf("error creating request: %w", err)
 //		}
+//		req.Header.Set("Accept-Encoding", "gzip")
 //		req.Header.Set("Content-Encoding", "gzip")
 //
 //		// Perform the request
