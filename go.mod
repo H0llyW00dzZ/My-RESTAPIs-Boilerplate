@@ -1,6 +1,6 @@
 module h0llyw00dz-template
 
-go 1.24.1
+go 1.24.2
 
 require (
 	github.com/H0llyW00dzZ/FiberValidator v0.5.2

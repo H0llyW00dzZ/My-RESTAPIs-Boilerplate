@@ -18,7 +18,7 @@
 # failed commit on ref "index-sha256:524acd083758062a04371a283008aa7d6a82d678fbf479c29a45f5ba86a04c57": unexpected status from PUT request
 #
 # Additionally, this has been modified (to previously) to support multiple build architectures.
-FROM golang:1.24.1 AS builder
+FROM golang:1.24.2 AS builder
 
 # Set the working directory outside $GOPATH to enable the support for modules.
 WORKDIR /app
