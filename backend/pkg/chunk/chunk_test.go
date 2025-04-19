@@ -7,6 +7,7 @@ package chunk_test
 
 import (
 	"h0llyw00dz-template/backend/pkg/chunk"
+	"slices"
 	"testing"
 )
 
@@ -65,20 +66,7 @@ func equal(a, b [][]int) bool {
 		return false
 	}
 	for i := range a {
-		if len(a[i]) != len(b[i]) || !equalSlice(a[i], b[i]) {
-			return false
-		}
-	}
-	return true
-}
-
-// Helper function to compare slices
-func equalSlice(a, b []int) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] {
+		if len(a[i]) != len(b[i]) || !slices.Equal(a[i], b[i]) {
 			return false
 		}
 	}
