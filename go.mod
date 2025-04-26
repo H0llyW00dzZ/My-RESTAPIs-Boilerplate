@@ -15,7 +15,7 @@ require (
 	github.com/go-webauthn/webauthn v0.12.3
 	github.com/gofiber/contrib/swagger v1.2.1
 	github.com/gofiber/fiber/v2 v2.52.6
-	github.com/gofiber/storage/cloudflarekv v0.1.2
+	github.com/gofiber/storage/cloudflarekv v0.1.3
 	github.com/gofiber/storage/redis/v3 v3.1.3
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/vault/api v1.16.0
@@ -57,7 +57,7 @@ require (
 	github.com/charmbracelet/x/ansi v0.8.0 // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/cloudflare/circl v1.3.7 // indirect
-	github.com/cloudflare/cloudflare-go v0.114.0 // indirect
+	github.com/cloudflare/cloudflare-go v0.115.0 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect
 	github.com/consensys/bavard v0.1.22 // indirect
 	github.com/consensys/gnark-crypto v0.14.0 // indirect
@@ -84,7 +84,7 @@ require (
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/go-openapi/validate v0.24.0 // indirect
 	github.com/go-webauthn/x v0.1.20 // indirect
-	github.com/goccy/go-json v0.10.4 // indirect
+	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/go-tpm v0.9.3 // indirect
