@@ -9,7 +9,7 @@ require (
 	github.com/ansrivas/fiberprometheus/v2 v2.9.1
 	github.com/bytedance/sonic v1.13.2
 	github.com/charmbracelet/bubbles v0.21.0
-	github.com/charmbracelet/bubbletea v1.3.4
+	github.com/charmbracelet/bubbletea v1.3.5
 	github.com/ethereum/go-ethereum v1.15.10
 	github.com/go-sql-driver/mysql v1.9.2
 	github.com/go-webauthn/webauthn v0.12.3
