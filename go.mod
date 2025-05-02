@@ -5,7 +5,7 @@ go 1.24.2
 require (
 	github.com/H0llyW00dzZ/FiberValidator v0.5.2
 	github.com/ProtonMail/gopenpgp/v2 v2.8.3
-	github.com/a-h/templ v0.3.857
+	github.com/a-h/templ v0.3.865
 	github.com/ansrivas/fiberprometheus/v2 v2.9.1
 	github.com/bytedance/sonic v1.13.2
 	github.com/charmbracelet/bubbles v0.21.0
