@@ -16,7 +16,7 @@ require (
 	github.com/gofiber/contrib/swagger v1.2.1
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/gofiber/storage/cloudflarekv v0.1.3
-	github.com/gofiber/storage/redis/v3 v3.1.4
+	github.com/gofiber/storage/redis/v3 v3.2.0
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/vault/api v1.16.0
 	github.com/hashicorp/vault/api/auth/approle v0.9.0
@@ -140,7 +140,7 @@ require (
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.25.0 // indirect
 	golang.org/x/time v0.9.0 // indirect
-	google.golang.org/protobuf v1.36.5 // indirect
+	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
