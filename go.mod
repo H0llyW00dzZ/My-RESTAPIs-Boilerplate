@@ -14,7 +14,7 @@ require (
 	github.com/go-sql-driver/mysql v1.9.2
 	github.com/go-webauthn/webauthn v0.13.0
 	github.com/gofiber/contrib/swagger v1.2.1
-	github.com/gofiber/fiber/v2 v2.52.6
+	github.com/gofiber/fiber/v2 v2.52.7
 	github.com/gofiber/storage/cloudflarekv v0.1.3
 	github.com/gofiber/storage/redis/v3 v3.2.0
 	github.com/google/uuid v1.6.0
