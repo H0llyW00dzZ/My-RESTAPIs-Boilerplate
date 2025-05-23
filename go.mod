@@ -6,7 +6,7 @@ require (
 	github.com/H0llyW00dzZ/FiberValidator v0.5.2
 	github.com/ProtonMail/gopenpgp/v2 v2.8.3
 	github.com/a-h/templ v0.3.865
-	github.com/ansrivas/fiberprometheus/v2 v2.9.1
+	github.com/ansrivas/fiberprometheus/v2 v2.10.0
 	github.com/bytedance/sonic v1.13.2
 	github.com/charmbracelet/bubbles v0.21.0
 	github.com/charmbracelet/bubbletea v1.3.5
@@ -14,7 +14,7 @@ require (
 	github.com/go-sql-driver/mysql v1.9.2
 	github.com/go-webauthn/webauthn v0.13.0
 	github.com/gofiber/contrib/swagger v1.2.1
-	github.com/gofiber/fiber/v2 v2.52.6
+	github.com/gofiber/fiber/v2 v2.52.8
 	github.com/gofiber/storage/cloudflarekv v0.1.3
 	github.com/gofiber/storage/redis/v3 v3.2.0
 	github.com/google/uuid v1.6.0
@@ -38,8 +38,8 @@ require (
 	github.com/crate-crypto/go-eth-kzg v1.3.0 // indirect
 	github.com/ethereum/c-kzg-4844/v2 v2.1.0 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
-	go.opentelemetry.io/otel v1.35.0 // indirect
-	go.opentelemetry.io/otel/trace v1.35.0 // indirect
+	go.opentelemetry.io/otel v1.36.0 // indirect
+	go.opentelemetry.io/otel/trace v1.36.0 // indirect
 )
 
 require (
